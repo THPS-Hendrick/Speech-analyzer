@@ -3,7 +3,7 @@
     "challenge": "Sell us",
     "sponsor": "Fast Food",
     "script": "Light Dark",
-    "micCheck": "Not use your hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-01-02": {
     "challenge": "Philosophize us",
@@ -411,13 +411,13 @@
     "challenge": "Sell us",
     "sponsor": "Food Containers",
     "script": "Genuine Fake",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-03-11": {
     "challenge": "Educate us",
     "sponsor": "Coffee",
     "script": "Before After",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-03-12": {
     "challenge": "Expose us",
@@ -453,7 +453,7 @@
     "challenge": "Bore us",
     "sponsor": "Cruise Ships",
     "script": "Quiet Loud",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-03-18": {
     "challenge": "Charm us",
@@ -483,7 +483,7 @@
     "challenge": "Educate us",
     "sponsor": "Leftovers",
     "script": "Virtual Physical",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-03-23": {
     "challenge": "Confuse us",
@@ -501,13 +501,13 @@
     "challenge": "Rally us",
     "sponsor": "Umbrellas",
     "script": "Top Bottom",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-03-26": {
     "challenge": "Debunk us",
     "sponsor": "Supermarkets",
     "script": "Public Private",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-03-27": {
     "challenge": "Roast us",
@@ -531,7 +531,7 @@
     "challenge": "Comfort us",
     "sponsor": "Breakfast",
     "script": "Fast Slow",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-03-31": {
     "challenge": "Traumatize us",
@@ -543,13 +543,13 @@
     "challenge": "Charm us",
     "sponsor": "Clouds",
     "script": "Small Medium Large",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-04-02": {
     "challenge": "Educate us",
     "sponsor": "Conferences",
     "script": "Short Long",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-04-03": {
     "challenge": "Debunk us",
@@ -561,7 +561,7 @@
     "challenge": "Bore us",
     "sponsor": "Salad",
     "script": "Save Spend",
-    "micCheck": "You're a boring speaker"
+    "micCheck": "Sound like A.I"
   },
   "2026-04-05": {
     "challenge": "Convince us",
@@ -579,7 +579,7 @@
     "challenge": "Traumatize us",
     "sponsor": "Influencers",
     "script": "Public Private",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-04-08": {
     "challenge": "Comfort us",
@@ -609,7 +609,7 @@
     "challenge": "Debunk us",
     "sponsor": "Sushi",
     "script": "Morning Night",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-04-13": {
     "challenge": "Confuse us",
@@ -627,7 +627,7 @@
     "challenge": "Entertain us",
     "sponsor": "Work Trips",
     "script": "Save Spend",
-    "micCheck": "You're a bit sarcastic sometimes"
+    "micCheck": "Use sarcasm at least once"
   },
   "2026-04-16": {
     "challenge": "Bore us",
@@ -645,7 +645,7 @@
     "challenge": "Philosophize us",
     "sponsor": "Trains",
     "script": "Hot Cold",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-04-19": {
     "challenge": "Comfort us",
@@ -693,7 +693,7 @@
     "challenge": "Entertain us",
     "sponsor": "Video Games",
     "script": "Chaos Order",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-04-27": {
     "challenge": "Comfort us",
@@ -711,7 +711,7 @@
     "challenge": "Debunk us",
     "sponsor": "Airline Travel",
     "script": "Before After",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-04-30": {
     "challenge": "Confuse us",
@@ -723,7 +723,7 @@
     "challenge": "Charm us",
     "sponsor": "Astronauts",
     "script": "True False",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-05-02": {
     "challenge": "Rally us",
@@ -735,13 +735,13 @@
     "challenge": "Educate us",
     "sponsor": "Bubble-wrap",
     "script": "Clean Dirty",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-05-04": {
     "challenge": "Expose us",
     "sponsor": "Influencers",
     "script": "Inside Outside",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-05-05": {
     "challenge": "Philosophize us",
@@ -789,19 +789,19 @@
     "challenge": "Rally us",
     "sponsor": "Leftovers",
     "script": "Winning Losing",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-05-13": {
     "challenge": "Educate us",
     "sponsor": "Scammers",
     "script": "Left Right Centre",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-05-14": {
     "challenge": "Traumatize us",
     "sponsor": "HR",
     "script": "Land Sea Sky",
-    "micCheck": "Whisper your next sentence"
+    "micCheck": "Whisper at least 3 times"
   },
   "2026-05-15": {
     "challenge": "Scare us",
@@ -819,7 +819,7 @@
     "challenge": "Expose us",
     "sponsor": "Breakfast",
     "script": "Extreme Extreme Sensible",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-05-18": {
     "challenge": "Philosophize us",
@@ -861,7 +861,7 @@
     "challenge": "Scare us",
     "sponsor": "Traffic Jams",
     "script": "Small Medium Large",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-05-25": {
     "challenge": "Convince us",
@@ -873,7 +873,7 @@
     "challenge": "Bore us",
     "sponsor": "Coffee",
     "script": "High Low",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-05-27": {
     "challenge": "Traumatize us",
@@ -885,7 +885,7 @@
     "challenge": "Educate us",
     "sponsor": "Cruise Ships",
     "script": "First Second Third",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-05-29": {
     "challenge": "Charm us",
@@ -921,7 +921,7 @@
     "challenge": "Rally us",
     "sponsor": "Sushi",
     "script": "Fast Slow",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-06-04": {
     "challenge": "Scare us",
@@ -933,7 +933,7 @@
     "challenge": "Charm us",
     "sponsor": "Working from Home",
     "script": "Fast Good Cheap",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-06-06": {
     "challenge": "Entertain us",
@@ -945,7 +945,7 @@
     "challenge": "Expose us",
     "sponsor": "Pencils",
     "script": "Hot Cold",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-06-08": {
     "challenge": "Bore us",
@@ -957,7 +957,7 @@
     "challenge": "Entertain us",
     "sponsor": "Umbrellas",
     "script": "Home Away",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-06-10": {
     "challenge": "Traumatize us",
@@ -969,7 +969,7 @@
     "challenge": "Sell us",
     "sponsor": "Cats",
     "script": "Easy Hard",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-06-12": {
     "challenge": "Rally us",
@@ -981,7 +981,7 @@
     "challenge": "Bore us",
     "sponsor": "Theme Parks",
     "script": "Bad Better Best",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-06-14": {
     "challenge": "Roast us",
@@ -993,7 +993,7 @@
     "challenge": "Educate us",
     "sponsor": "Cruise Ships",
     "script": "Win Lose",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-06-16": {
     "challenge": "Charm us",
@@ -1023,7 +1023,7 @@
     "challenge": "Entertain us",
     "sponsor": "Sushi",
     "script": "Simple Complex",
-    "micCheck": "Whisper your next sentence"
+    "micCheck": "Whisper at least 3 times"
   },
   "2026-06-21": {
     "challenge": "Roast us",
@@ -1035,7 +1035,7 @@
     "challenge": "Bore us",
     "sponsor": "Hot Air Balloons",
     "script": "Save Spend",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-06-23": {
     "challenge": "Traumatize us",
@@ -1065,7 +1065,7 @@
     "challenge": "Comfort us",
     "sponsor": "AI",
     "script": "Easy Hard",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-06-28": {
     "challenge": "Educate us",
@@ -1083,13 +1083,13 @@
     "challenge": "Debunk us",
     "sponsor": "Chocolate Factories",
     "script": "Small Medium Large",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-07-01": {
     "challenge": "Rally us",
     "sponsor": "Camping",
     "script": "Static Dynamic",
-    "micCheck": "Whisper your next sentence"
+    "micCheck": "Whisper at least 3 times"
   },
   "2026-07-02": {
     "challenge": "Philosophize us",
@@ -1113,7 +1113,7 @@
     "challenge": "Scare us",
     "sponsor": "Traffic Jams",
     "script": "Wrong Right",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-07-06": {
     "challenge": "Bore us",
@@ -1137,7 +1137,7 @@
     "challenge": "Comfort us",
     "sponsor": "Hot Air Balloons",
     "script": "Old New",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-07-10": {
     "challenge": "Roast us",
@@ -1179,13 +1179,13 @@
     "challenge": "Comfort us",
     "sponsor": "Airline Travel",
     "script": "True False",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-07-17": {
     "challenge": "Roast us",
     "sponsor": "Astronauts",
     "script": "Clean Dirty",
-    "micCheck": "You're a boring speaker"
+    "micCheck": "Sound like A.I"
   },
   "2026-07-18": {
     "challenge": "Rally us",
@@ -1197,7 +1197,7 @@
     "challenge": "Confuse us",
     "sponsor": "HR",
     "script": "Hot Cold",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-07-20": {
     "challenge": "Traumatize us",
@@ -1221,7 +1221,7 @@
     "challenge": "Educate us",
     "sponsor": "Cats",
     "script": "Short Long",
-    "micCheck": "Whisper your next sentence"
+    "micCheck": "Whisper at least 3 times"
   },
   "2026-07-24": {
     "challenge": "Expose us",
@@ -1233,7 +1233,7 @@
     "challenge": "Entertain us",
     "sponsor": "Flowers",
     "script": "True False",
-    "micCheck": "You're a bit sarcastic sometimes"
+    "micCheck": "Use sarcasm at least once"
   },
   "2026-07-26": {
     "challenge": "Scare us",
@@ -1245,7 +1245,7 @@
     "challenge": "Traumatize us",
     "sponsor": "Naps",
     "script": "Together Apart",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-07-28": {
     "challenge": "Rally us",
@@ -1257,13 +1257,13 @@
     "challenge": "Convince us",
     "sponsor": "Umbrellas",
     "script": "Left Right Centre",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-07-30": {
     "challenge": "Roast us",
     "sponsor": "Food Containers",
     "script": "Cheap Expensive",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-07-31": {
     "challenge": "Bore us",
@@ -1299,7 +1299,7 @@
     "challenge": "Rally us",
     "sponsor": "Hot Air Balloons",
     "script": "Strong Weak",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-08-06": {
     "challenge": "Entertain us",
@@ -1311,7 +1311,7 @@
     "challenge": "Bore us",
     "sponsor": "Breakfast",
     "script": "Land Sea Sky",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-08-08": {
     "challenge": "Convince us",
@@ -1389,13 +1389,13 @@
     "challenge": "Scare us",
     "sponsor": "Hot Air Balloons",
     "script": "Morning Night",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-08-21": {
     "challenge": "Traumatize us",
     "sponsor": "Conferences",
     "script": "Land Sea Sky",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-08-22": {
     "challenge": "Educate us",
@@ -1431,7 +1431,7 @@
     "challenge": "Debunk us",
     "sponsor": "Trains",
     "script": "Left Right Centre",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-08-28": {
     "challenge": "Scare us",
@@ -1461,7 +1461,7 @@
     "challenge": "Entertain us",
     "sponsor": "Scammers",
     "script": "Fast Slow",
-    "micCheck": "You're a bit sarcastic sometimes"
+    "micCheck": "Use sarcasm at least once"
   },
   "2026-09-02": {
     "challenge": "Convince us",
@@ -1479,7 +1479,7 @@
     "challenge": "Scare us",
     "sponsor": "Sugary Beverages",
     "script": "Light Dark",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-09-05": {
     "challenge": "Confuse us",
@@ -1491,7 +1491,7 @@
     "challenge": "Philosophize us",
     "sponsor": "Theme Parks",
     "script": "High Low",
-    "micCheck": "You're a boring speaker"
+    "micCheck": "Sound like A.I"
   },
   "2026-09-07": {
     "challenge": "Expose us",
@@ -1551,7 +1551,7 @@
     "challenge": "Scare us",
     "sponsor": "Pencils",
     "script": "Static Dynamic",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-09-17": {
     "challenge": "Comfort us",
@@ -1575,13 +1575,13 @@
     "challenge": "Entertain us",
     "sponsor": "HR",
     "script": "Hot Cold",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-09-21": {
     "challenge": "Philosophize us",
     "sponsor": "Escalators",
     "script": "Top Bottom",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-09-22": {
     "challenge": "Charm us",
@@ -1593,7 +1593,7 @@
     "challenge": "Traumatize us",
     "sponsor": "Camping",
     "script": "Wrong Right",
-    "micCheck": "You're a boring speaker"
+    "micCheck": "Sound like A.I"
   },
   "2026-09-24": {
     "challenge": "Rally us",
@@ -1611,7 +1611,7 @@
     "challenge": "Scare us",
     "sponsor": "Supermarkets",
     "script": "Clean Dirty",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-09-27": {
     "challenge": "Sell us",
@@ -1635,7 +1635,7 @@
     "challenge": "Expose us",
     "sponsor": "Chocolate Factories",
     "script": "Serious Sarcastic",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-10-01": {
     "challenge": "Bore us",
@@ -1647,7 +1647,7 @@
     "challenge": "Educate us",
     "sponsor": "Pencils",
     "script": "Too much Not Enough",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-10-03": {
     "challenge": "Entertain us",
@@ -1659,13 +1659,13 @@
     "challenge": "Sell us",
     "sponsor": "Sugary Beverages",
     "script": "Winning Losing",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-10-05": {
     "challenge": "Rally us",
     "sponsor": "Breakfast",
     "script": "Inside Outside",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-10-06": {
     "challenge": "Convince us",
@@ -1695,7 +1695,7 @@
     "challenge": "Comfort us",
     "sponsor": "Entrepreneurship",
     "script": "Left Right Centre",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-10-11": {
     "challenge": "Entertain us",
@@ -1707,7 +1707,7 @@
     "challenge": "Bore us",
     "sponsor": "Food Containers",
     "script": "Problem Options Solution",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-10-13": {
     "challenge": "Rally us",
@@ -1725,7 +1725,7 @@
     "challenge": "Hype us",
     "sponsor": "Naps",
     "script": "Chaos Order",
-    "micCheck": "Interrupt yourself by yelling out a random object"
+    "micCheck": "Interrupt yourself by yelling at something once"
   },
   "2026-10-16": {
     "challenge": "Convince us",
@@ -1743,19 +1743,19 @@
     "challenge": "Scare us",
     "sponsor": "Bakeries",
     "script": "Start Finish",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-10-19": {
     "challenge": "Bore us",
     "sponsor": "ID",
     "script": "Near Far",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-10-20": {
     "challenge": "Entertain us",
     "sponsor": "Umbrellas",
     "script": "Small Medium Large",
-    "micCheck": "You're a bit sarcastic sometimes"
+    "micCheck": "Use sarcasm at least once"
   },
   "2026-10-21": {
     "challenge": "Traumatize us",
@@ -1821,7 +1821,7 @@
     "challenge": "Charm us",
     "sponsor": "Umbrellas",
     "script": "Win Lose",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-11-01": {
     "challenge": "Traumatize us",
@@ -1887,7 +1887,7 @@
     "challenge": "Educate us",
     "sponsor": "Pigeons",
     "script": "Inside Outside",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-11-12": {
     "challenge": "Debunk us",
@@ -1899,7 +1899,7 @@
     "challenge": "Confuse us",
     "sponsor": "Airline Travel",
     "script": "Cheap Expensive",
-    "micCheck": "Whisper your next sentence"
+    "micCheck": "Whisper at least 3 times"
   },
   "2026-11-14": {
     "challenge": "Comfort us",
@@ -1923,7 +1923,7 @@
     "challenge": "Entertain us",
     "sponsor": "Working from Home",
     "script": "Extreme Extreme Sensible",
-    "micCheck": "Hands must only illustrate what you're saying"
+    "micCheck": "Use your hands to illustrate your words"
   },
   "2026-11-18": {
     "challenge": "Charm us",
@@ -1947,7 +1947,7 @@
     "challenge": "Debunk us",
     "sponsor": "HR",
     "script": "Small Big",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-11-22": {
     "challenge": "Scare us",
@@ -1965,7 +1965,7 @@
     "challenge": "Confuse us",
     "sponsor": "Trains",
     "script": "Input Output",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-11-25": {
     "challenge": "Roast us",
@@ -1989,7 +1989,7 @@
     "challenge": "Educate us",
     "sponsor": "Food Containers",
     "script": "Clean Dirty",
-    "micCheck": "Talk to an imaginary person"
+    "micCheck": "Voice-over a commercial"
   },
   "2026-11-29": {
     "challenge": "Entertain us",
@@ -2007,13 +2007,13 @@
     "challenge": "Hype us",
     "sponsor": "The Moon",
     "script": "Serious Sarcastic",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-12-02": {
     "challenge": "Philosophize us",
     "sponsor": "Socks",
     "script": "Win Lose",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-12-03": {
     "challenge": "Convince us",
@@ -2085,7 +2085,7 @@
     "challenge": "Traumatize us",
     "sponsor": "Decaf Coffee",
     "script": "Short Long",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speak quieter and quieter"
   },
   "2026-12-15": {
     "challenge": "Debunk us",
@@ -2109,19 +2109,19 @@
     "challenge": "Bore us",
     "sponsor": "Dream Jobs",
     "script": "Direct Indirect",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-12-19": {
     "challenge": "Convince us",
     "sponsor": "Work Trips",
     "script": "One Many",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-12-20": {
     "challenge": "Comfort us",
     "sponsor": "Sugary Beverages",
     "script": "Past Present Future",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-12-21": {
     "challenge": "Rally us",
@@ -2145,7 +2145,7 @@
     "challenge": "Entertain us",
     "sponsor": "Breakfast",
     "script": "Small Big",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-12-25": {
     "challenge": "Roast us",
@@ -2163,7 +2163,7 @@
     "challenge": "Hype us",
     "sponsor": "Online Shopping",
     "script": "First Second Third",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-12-28": {
     "challenge": "Convince us",
@@ -2175,12 +2175,12 @@
     "challenge": "Bore us",
     "sponsor": "Sugary Beverages",
     "script": "Land Sea Sky",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-12-30": {
     "challenge": "Educate us",
     "sponsor": "Airline Travel",
     "script": "Past Present Future",
-    "micCheck": "Wave goodbye then hello"
+    "micCheck": "Move your eyebrows a lot"
   }
 }
