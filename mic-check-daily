@@ -1,4 +1,952 @@
 {
+  "2026-01-01": {
+    "challenge": "Sell us",
+    "sponsor": "Fast Food",
+    "script": "Light Dark",
+    "micCheck": "No hands at all"
+  },
+  "2026-01-02": {
+    "challenge": "Philosophize us",
+    "sponsor": "Hot Air Balloons",
+    "script": "Hungry Full",
+    "micCheck": "Laugh for no reason"
+  },
+  "2026-01-03": {
+    "challenge": "Scare us",
+    "sponsor": "Leftovers",
+    "script": "Simple Complex",
+    "micCheck": "Say \"does that make sense\" 3 times"
+  },
+  "2026-01-04": {
+    "challenge": "Expose us",
+    "sponsor": "Traffic Jams",
+    "script": "Wrong Right",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-01-05": {
+    "challenge": "Roast us",
+    "sponsor": "Theme Parks",
+    "script": "Morning Night",
+    "micCheck": "Speak faster and faster"
+  },
+  "2026-01-06": {
+    "challenge": "Entertain us",
+    "sponsor": "Conferences",
+    "script": "Near Far",
+    "micCheck": "Wander off at some point"
+  },
+  "2026-01-07": {
+    "challenge": "Confuse us",
+    "sponsor": "Lawn Mowers",
+    "script": "Easy Hard",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-01-08": {
+    "challenge": "Rally us",
+    "sponsor": "Influencers",
+    "script": "Win Lose",
+    "micCheck": "Act like you're trying to escape handcuffs"
+  },
+  "2026-01-09": {
+    "challenge": "Educate us",
+    "sponsor": "Bubble-wrap",
+    "script": "Cheap Expensive",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-01-10": {
+    "challenge": "Scare us",
+    "sponsor": "Clouds",
+    "script": "Before After",
+    "micCheck": "Sing one line of a song"
+  },
+  "2026-01-11": {
+    "challenge": "Sell us",
+    "sponsor": "Supermarkets",
+    "script": "High Low",
+    "micCheck": "Include a whisper, a pause, and a loud voice"
+  },
+  "2026-01-12": {
+    "challenge": "Charm us",
+    "sponsor": "Salad",
+    "script": "Fast Slow",
+    "micCheck": "Stand on one leg"
+  },
+  "2026-01-13": {
+    "challenge": "Traumatize us",
+    "sponsor": "Graphic Designers",
+    "script": "Start Finish",
+    "micCheck": "Cough loudly"
+  },
+  "2026-01-14": {
+    "challenge": "Roast us",
+    "sponsor": "Conferences",
+    "script": "Clean Dirty",
+    "micCheck": "Pretend to step in something wet"
+  },
+  "2026-01-15": {
+    "challenge": "Entertain us",
+    "sponsor": "Astronauts",
+    "script": "Top Bottom",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-01-16": {
+    "challenge": "Philosophize us",
+    "sponsor": "Breakfast",
+    "script": "Virtual Physical",
+    "micCheck": "You're very sleepy"
+  },
+  "2026-01-17": {
+    "challenge": "Scare us",
+    "sponsor": "Fast Food",
+    "script": "Chaos Order",
+    "micCheck": "Wander off at some point"
+  },
+  "2026-01-18": {
+    "challenge": "Educate us",
+    "sponsor": "Cardboard Boxes",
+    "script": "Head Heart",
+    "micCheck": "You're a motivational speaker"
+  },
+  "2026-01-19": {
+    "challenge": "Debunk us",
+    "sponsor": "Bubble-wrap",
+    "script": "Simple Complex",
+    "micCheck": "Collect 3 objects and use them"
+  },
+  "2026-01-20": {
+    "challenge": "Rally us",
+    "sponsor": "Chocolate Factories",
+    "script": "Extreme Extreme Sensible",
+    "micCheck": "Your hands must move in small circles"
+  },
+  "2026-01-21": {
+    "challenge": "Expose us",
+    "sponsor": "Salad",
+    "script": "Left Right Centre",
+    "micCheck": "Sing one line of a song"
+  },
+  "2026-01-22": {
+    "challenge": "Entertain us",
+    "sponsor": "HR",
+    "script": "Morning Night",
+    "micCheck": "Clap at some point"
+  },
+  "2026-01-23": {
+    "challenge": "Sell us",
+    "sponsor": "Gravity",
+    "script": "Fast Good Cheap",
+    "micCheck": "Laugh for no reason"
+  },
+  "2026-01-24": {
+    "challenge": "Convince us",
+    "sponsor": "Astronauts",
+    "script": "Inside Outside",
+    "micCheck": "Close your eyes for 5 seconds"
+  },
+  "2026-01-25": {
+    "challenge": "Comfort us",
+    "sponsor": "Influencers",
+    "script": "Top Bottom",
+    "micCheck": "Act in a serious way at least 3 times"
+  },
+  "2026-01-26": {
+    "challenge": "Educate us",
+    "sponsor": "Books",
+    "script": "Light Dark",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-01-27": {
+    "challenge": "Hype us",
+    "sponsor": "Bureaucracy",
+    "script": "Wrong Right",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-01-28": {
+    "challenge": "Confuse us",
+    "sponsor": "Flowers",
+    "script": "Start Finish",
+    "micCheck": "Look shocked"
+  },
+  "2026-01-29": {
+    "challenge": "Entertain us",
+    "sponsor": "The Moon",
+    "script": "Problem Options Solution",
+    "micCheck": "Act like you've been shrunk down"
+  },
+  "2026-01-30": {
+    "challenge": "Rally us",
+    "sponsor": "Supermarkets",
+    "script": "Short Long",
+    "micCheck": "Pretend to step in something wet"
+  },
+  "2026-01-31": {
+    "challenge": "Traumatize us",
+    "sponsor": "Decaf Coffee",
+    "script": "Cheap Expensive",
+    "micCheck": "Move around faster and faster"
+  },
+  "2026-02-01": {
+    "challenge": "Charm us",
+    "sponsor": "AI",
+    "script": "Old New",
+    "micCheck": "You're a knowledgeable professor"
+  },
+  "2026-02-02": {
+    "challenge": "Sell us",
+    "sponsor": "Entrepreneurship",
+    "script": "Hungry Full",
+    "micCheck": "Cough loudly"
+  },
+  "2026-02-03": {
+    "challenge": "Hype us",
+    "sponsor": "Sushi",
+    "script": "Before After",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-02-04": {
+    "challenge": "Convince us",
+    "sponsor": "Online Shopping",
+    "script": "True False",
+    "micCheck": "Make a confusing gesture"
+  },
+  "2026-02-05": {
+    "challenge": "Expose us",
+    "sponsor": "Airline Travel",
+    "script": "Past Present Future",
+    "micCheck": "Pat an imaginary cat"
+  },
+  "2026-02-06": {
+    "challenge": "Entertain us",
+    "sponsor": "Fast Food",
+    "script": "Near Far",
+    "micCheck": "Include a whisper, a pause, and a loud voice"
+  },
+  "2026-02-07": {
+    "challenge": "Philosophize us",
+    "sponsor": "Graphic Designers",
+    "script": "Small Big",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-02-08": {
+    "challenge": "Rally us",
+    "sponsor": "Food Containers",
+    "script": "Small Medium Large",
+    "micCheck": "Draw a diagram while talking"
+  },
+  "2026-02-09": {
+    "challenge": "Bore us",
+    "sponsor": "Cruise Ships",
+    "script": "Strong Weak",
+    "micCheck": "You're a documentary voice over"
+  },
+  "2026-02-10": {
+    "challenge": "Hype us",
+    "sponsor": "Theme Parks",
+    "script": "Emotion Logic",
+    "micCheck": "You're very sleepy"
+  },
+  "2026-02-11": {
+    "challenge": "Traumatize us",
+    "sponsor": "AI",
+    "script": "One Many",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-02-12": {
+    "challenge": "Convince us",
+    "sponsor": "Salad",
+    "script": "Static Dynamic",
+    "micCheck": "Wander off at some point"
+  },
+  "2026-02-13": {
+    "challenge": "Roast us",
+    "sponsor": "Sugary Beverages",
+    "script": "Serious Sarcastic",
+    "micCheck": "Clap at some point"
+  },
+  "2026-02-14": {
+    "challenge": "Charm us",
+    "sponsor": "Trains",
+    "script": "Clean Dirty",
+    "micCheck": "Make yourself wide and long 3 times"
+  },
+  "2026-02-15": {
+    "challenge": "Expose us",
+    "sponsor": "Entrepreneurship",
+    "script": "Light Dark",
+    "micCheck": "Pretend to step in something wet"
+  },
+  "2026-02-16": {
+    "challenge": "Rally us",
+    "sponsor": "Lawn Mowers",
+    "script": "Hungry Full",
+    "micCheck": "Yell at some point"
+  },
+  "2026-02-17": {
+    "challenge": "Educate us",
+    "sponsor": "Cats",
+    "script": "Emotion Logic",
+    "micCheck": "Speak faster and faster"
+  },
+  "2026-02-18": {
+    "challenge": "Confuse us",
+    "sponsor": "Hot Air Balloons",
+    "script": "Direct Indirect",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-02-19": {
+    "challenge": "Comfort us",
+    "sponsor": "Pencils",
+    "script": "Head Heart",
+    "micCheck": "No hands at all"
+  },
+  "2026-02-20": {
+    "challenge": "Roast us",
+    "sponsor": "AI",
+    "script": "Wrong Right",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-02-21": {
+    "challenge": "Entertain us",
+    "sponsor": "Influencers",
+    "script": "Near Far",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-02-22": {
+    "challenge": "Traumatize us",
+    "sponsor": "HR",
+    "script": "Top Bottom",
+    "micCheck": "Say \"does that make sense\" 3 times"
+  },
+  "2026-02-23": {
+    "challenge": "Philosophize us",
+    "sponsor": "Camping",
+    "script": "Serious Sarcastic",
+    "micCheck": "Act like you're trying to escape handcuffs"
+  },
+  "2026-02-24": {
+    "challenge": "Debunk us",
+    "sponsor": "Books",
+    "script": "True False",
+    "micCheck": "You're a motivational speaker"
+  },
+  "2026-02-25": {
+    "challenge": "Convince us",
+    "sponsor": "Dream Jobs",
+    "script": "High Low",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-02-26": {
+    "challenge": "Educate us",
+    "sponsor": "Working from Home",
+    "script": "Before After",
+    "micCheck": "You're very sleepy"
+  },
+  "2026-02-27": {
+    "challenge": "Scare us",
+    "sponsor": "Conferences",
+    "script": "Light Dark",
+    "micCheck": "Sit on the floor"
+  },
+  "2026-02-28": {
+    "challenge": "Sell us",
+    "sponsor": "Umbrellas",
+    "script": "Public Private",
+    "micCheck": "Yell at some point"
+  },
+  "2026-03-01": {
+    "challenge": "Confuse us",
+    "sponsor": "AI",
+    "script": "Extreme Extreme Sensible",
+    "micCheck": "Collect 3 objects and use them"
+  },
+  "2026-03-02": {
+    "challenge": "Roast us",
+    "sponsor": "Food Containers",
+    "script": "Short Long",
+    "micCheck": "Stand on one leg"
+  },
+  "2026-03-03": {
+    "challenge": "Hype us",
+    "sponsor": "Breakfast",
+    "script": "Static Dynamic",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-03-04": {
+    "challenge": "Rally us",
+    "sponsor": "Cats",
+    "script": "Past Present Future",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-03-05": {
+    "challenge": "Philosophize us",
+    "sponsor": "Escalators",
+    "script": "Home Away",
+    "micCheck": "People have to come closer to hear you"
+  },
+  "2026-03-06": {
+    "challenge": "Traumatize us",
+    "sponsor": "Pigeons",
+    "script": "Land Sea Sky",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-03-07": {
+    "challenge": "Entertain us",
+    "sponsor": "Cardboard Boxes",
+    "script": "Old New",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-03-08": {
+    "challenge": "Debunk us",
+    "sponsor": "The Gym",
+    "script": "Light Dark",
+    "micCheck": "Hiccup at least 3 times"
+  },
+  "2026-03-09": {
+    "challenge": "Convince us",
+    "sponsor": "Salad",
+    "script": "Small Medium Large",
+    "micCheck": "No hands at all"
+  },
+  "2026-03-10": {
+    "challenge": "Sell us",
+    "sponsor": "Food Containers",
+    "script": "Genuine Fake",
+    "micCheck": "Talk to an imaginary person"
+  },
+  "2026-03-11": {
+    "challenge": "Educate us",
+    "sponsor": "Coffee",
+    "script": "Before After",
+    "micCheck": "You're a motivational speaker"
+  },
+  "2026-03-12": {
+    "challenge": "Expose us",
+    "sponsor": "Breakfast",
+    "script": "Hot Cold",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-03-13": {
+    "challenge": "Confuse us",
+    "sponsor": "Escalators",
+    "script": "Left Right Centre",
+    "micCheck": "Act in a serious way at least 3 times"
+  },
+  "2026-03-14": {
+    "challenge": "Comfort us",
+    "sponsor": "Books",
+    "script": "Internal External",
+    "micCheck": "Sing one line of a song"
+  },
+  "2026-03-15": {
+    "challenge": "Scare us",
+    "sponsor": "ID",
+    "script": "Extreme Extreme Sensible",
+    "micCheck": "Make yourself wide and long 3 times"
+  },
+  "2026-03-16": {
+    "challenge": "Rally us",
+    "sponsor": "Cats",
+    "script": "Winning Losing",
+    "micCheck": "Include a whisper, a pause, and a loud voice"
+  },
+  "2026-03-17": {
+    "challenge": "Bore us",
+    "sponsor": "Cruise Ships",
+    "script": "Quiet Loud",
+    "micCheck": "People have to come closer to hear you"
+  },
+  "2026-03-18": {
+    "challenge": "Charm us",
+    "sponsor": "Astronauts",
+    "script": "Small Big",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-03-19": {
+    "challenge": "Philosophize us",
+    "sponsor": "Bakeries",
+    "script": "Small Medium Large",
+    "micCheck": "Act like you've been shrunk down"
+  },
+  "2026-03-20": {
+    "challenge": "Sell us",
+    "sponsor": "Graphic Designers",
+    "script": "Clean Dirty",
+    "micCheck": "Act in a serious way at least 3 times"
+  },
+  "2026-03-21": {
+    "challenge": "Convince us",
+    "sponsor": "Clouds",
+    "script": "Bad Better Best",
+    "micCheck": "Sing one line of a song"
+  },
+  "2026-03-22": {
+    "challenge": "Educate us",
+    "sponsor": "Leftovers",
+    "script": "Virtual Physical",
+    "micCheck": "No hands at all"
+  },
+  "2026-03-23": {
+    "challenge": "Confuse us",
+    "sponsor": "Decaf Coffee",
+    "script": "Morning Night",
+    "micCheck": "Hiccup at least 3 times"
+  },
+  "2026-03-24": {
+    "challenge": "Bore us",
+    "sponsor": "Camping",
+    "script": "Past Present Future",
+    "micCheck": "Speak faster and faster"
+  },
+  "2026-03-25": {
+    "challenge": "Rally us",
+    "sponsor": "Umbrellas",
+    "script": "Top Bottom",
+    "micCheck": "Talk to an imaginary person"
+  },
+  "2026-03-26": {
+    "challenge": "Debunk us",
+    "sponsor": "Supermarkets",
+    "script": "Public Private",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-03-27": {
+    "challenge": "Roast us",
+    "sponsor": "Work Trips",
+    "script": "Near Far",
+    "micCheck": "Cough loudly"
+  },
+  "2026-03-28": {
+    "challenge": "Sell us",
+    "sponsor": "Bubble-wrap",
+    "script": "Chaos Order",
+    "micCheck": "Jump for joy at some point"
+  },
+  "2026-03-29": {
+    "challenge": "Hype us",
+    "sponsor": "Video Games",
+    "script": "Problem Options Solution",
+    "micCheck": "Yell at some point"
+  },
+  "2026-03-30": {
+    "challenge": "Comfort us",
+    "sponsor": "Breakfast",
+    "script": "Fast Slow",
+    "micCheck": "Hands must only illustrate what you're saying"
+  },
+  "2026-03-31": {
+    "challenge": "Traumatize us",
+    "sponsor": "Theme Parks",
+    "script": "Strong Weak",
+    "micCheck": "Play with your hair"
+  },
+  "2026-04-01": {
+    "challenge": "Charm us",
+    "sponsor": "Clouds",
+    "script": "Small Medium Large",
+    "micCheck": "You're a knowledgeable professor"
+  },
+  "2026-04-02": {
+    "challenge": "Educate us",
+    "sponsor": "Conferences",
+    "script": "Short Long",
+    "micCheck": "You're a motivational speaker"
+  },
+  "2026-04-03": {
+    "challenge": "Debunk us",
+    "sponsor": "Food Containers",
+    "script": "Internal External",
+    "micCheck": "Clap at some point"
+  },
+  "2026-04-04": {
+    "challenge": "Bore us",
+    "sponsor": "Salad",
+    "script": "Save Spend",
+    "micCheck": "You're a boring speaker"
+  },
+  "2026-04-05": {
+    "challenge": "Convince us",
+    "sponsor": "Dream Jobs",
+    "script": "Hungry Full",
+    "micCheck": "Make yourself wide and long 3 times"
+  },
+  "2026-04-06": {
+    "challenge": "Expose us",
+    "sponsor": "Lawn Mowers",
+    "script": "Virtual Physical",
+    "micCheck": "Check your non-existent watch"
+  },
+  "2026-04-07": {
+    "challenge": "Traumatize us",
+    "sponsor": "Influencers",
+    "script": "Public Private",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-04-08": {
+    "challenge": "Comfort us",
+    "sponsor": "Pencils",
+    "script": "Start Finish",
+    "micCheck": "Hiccup at least 3 times"
+  },
+  "2026-04-09": {
+    "challenge": "Roast us",
+    "sponsor": "Fast Food",
+    "script": "Extreme Extreme Sensible",
+    "micCheck": "Cough loudly"
+  },
+  "2026-04-10": {
+    "challenge": "Educate us",
+    "sponsor": "Pigeons",
+    "script": "Strong Weak",
+    "micCheck": "Make a confusing gesture"
+  },
+  "2026-04-11": {
+    "challenge": "Hype us",
+    "sponsor": "Chocolate Factories",
+    "script": "Serious Sarcastic",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-04-12": {
+    "challenge": "Debunk us",
+    "sponsor": "Sushi",
+    "script": "Morning Night",
+    "micCheck": "Talk to an imaginary person"
+  },
+  "2026-04-13": {
+    "challenge": "Confuse us",
+    "sponsor": "AI",
+    "script": "Too much Not Enough",
+    "micCheck": "Move around faster and faster"
+  },
+  "2026-04-14": {
+    "challenge": "Sell us",
+    "sponsor": "Dream Jobs",
+    "script": "Quiet Loud",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-04-15": {
+    "challenge": "Entertain us",
+    "sponsor": "Work Trips",
+    "script": "Save Spend",
+    "micCheck": "You're a bit sarcastic sometimes"
+  },
+  "2026-04-16": {
+    "challenge": "Bore us",
+    "sponsor": "Fast Food",
+    "script": "Genuine Fake",
+    "micCheck": "Spin around once"
+  },
+  "2026-04-17": {
+    "challenge": "Rally us",
+    "sponsor": "Coffee",
+    "script": "Before After",
+    "micCheck": "Stand on one leg"
+  },
+  "2026-04-18": {
+    "challenge": "Philosophize us",
+    "sponsor": "Trains",
+    "script": "Hot Cold",
+    "micCheck": "Interrupt yourself by yelling out a random object"
+  },
+  "2026-04-19": {
+    "challenge": "Comfort us",
+    "sponsor": "The Gym",
+    "script": "Clean Dirty",
+    "micCheck": "Include a whisper, a pause, and a loud voice"
+  },
+  "2026-04-20": {
+    "challenge": "Charm us",
+    "sponsor": "HR",
+    "script": "Serious Sarcastic",
+    "micCheck": "Cough loudly"
+  },
+  "2026-04-21": {
+    "challenge": "Roast us",
+    "sponsor": "Naps",
+    "script": "Small Medium Large",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-04-22": {
+    "challenge": "Traumatize us",
+    "sponsor": "Influencers",
+    "script": "Past Present Future",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-04-23": {
+    "challenge": "Sell us",
+    "sponsor": "Entrepreneurship",
+    "script": "Head Heart",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-04-24": {
+    "challenge": "Rally us",
+    "sponsor": "Camping",
+    "script": "Direct Indirect",
+    "micCheck": "Say \"does that make sense\" 3 times"
+  },
+  "2026-04-25": {
+    "challenge": "Bore us",
+    "sponsor": "Pencils",
+    "script": "Old New",
+    "micCheck": "Check your non-existent watch"
+  },
+  "2026-04-26": {
+    "challenge": "Entertain us",
+    "sponsor": "Video Games",
+    "script": "Chaos Order",
+    "micCheck": "Interrupt yourself by yelling out a random object"
+  },
+  "2026-04-27": {
+    "challenge": "Comfort us",
+    "sponsor": "Supermarkets",
+    "script": "Short Long",
+    "micCheck": "Pretend to step in something wet"
+  },
+  "2026-04-28": {
+    "challenge": "Hype us",
+    "sponsor": "Fast Food",
+    "script": "Easy Hard",
+    "micCheck": "Play with your hair"
+  },
+  "2026-04-29": {
+    "challenge": "Debunk us",
+    "sponsor": "Airline Travel",
+    "script": "Before After",
+    "micCheck": "Wave goodbye then hello"
+  },
+  "2026-04-30": {
+    "challenge": "Confuse us",
+    "sponsor": "Conferences",
+    "script": "Static Dynamic",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-05-01": {
+    "challenge": "Charm us",
+    "sponsor": "Astronauts",
+    "script": "True False",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-05-02": {
+    "challenge": "Rally us",
+    "sponsor": "Cats",
+    "script": "Old New",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-05-03": {
+    "challenge": "Educate us",
+    "sponsor": "Bubble-wrap",
+    "script": "Clean Dirty",
+    "micCheck": "People have to come closer to hear you"
+  },
+  "2026-05-04": {
+    "challenge": "Expose us",
+    "sponsor": "Influencers",
+    "script": "Inside Outside",
+    "micCheck": "No hands at all"
+  },
+  "2026-05-05": {
+    "challenge": "Philosophize us",
+    "sponsor": "Pigeons",
+    "script": "Left Right Centre",
+    "micCheck": "Look shocked"
+  },
+  "2026-05-06": {
+    "challenge": "Traumatize us",
+    "sponsor": "Sugary Beverages",
+    "script": "Past Present Future",
+    "micCheck": "Make yourself wide and long 3 times"
+  },
+  "2026-05-07": {
+    "challenge": "Scare us",
+    "sponsor": "Pencils",
+    "script": "Bad Better Best",
+    "micCheck": "Act in a serious way at least 3 times"
+  },
+  "2026-05-08": {
+    "challenge": "Sell us",
+    "sponsor": "Naps",
+    "script": "One Many",
+    "micCheck": "Make a confusing gesture"
+  },
+  "2026-05-09": {
+    "challenge": "Charm us",
+    "sponsor": "Food Containers",
+    "script": "Public Private",
+    "micCheck": "Check your non-existent watch"
+  },
+  "2026-05-10": {
+    "challenge": "Hype us",
+    "sponsor": "Chocolate Factories",
+    "script": "Problem Options Solution",
+    "micCheck": "Laugh for no reason"
+  },
+  "2026-05-11": {
+    "challenge": "Roast us",
+    "sponsor": "Online Shopping",
+    "script": "Home Away",
+    "micCheck": "Pat an imaginary cat"
+  },
+  "2026-05-12": {
+    "challenge": "Rally us",
+    "sponsor": "Leftovers",
+    "script": "Winning Losing",
+    "micCheck": "Wave goodbye then hello"
+  },
+  "2026-05-13": {
+    "challenge": "Educate us",
+    "sponsor": "Scammers",
+    "script": "Left Right Centre",
+    "micCheck": "You're a documentary voice over"
+  },
+  "2026-05-14": {
+    "challenge": "Traumatize us",
+    "sponsor": "HR",
+    "script": "Land Sea Sky",
+    "micCheck": "Whisper your next sentence"
+  },
+  "2026-05-15": {
+    "challenge": "Scare us",
+    "sponsor": "Naps",
+    "script": "Head Heart",
+    "micCheck": "Say \"does that make sense\" 3 times"
+  },
+  "2026-05-16": {
+    "challenge": "Entertain us",
+    "sponsor": "Fast Food",
+    "script": "Together Apart",
+    "micCheck": "Wander off at some point"
+  },
+  "2026-05-17": {
+    "challenge": "Expose us",
+    "sponsor": "Breakfast",
+    "script": "Extreme Extreme Sensible",
+    "micCheck": "You're the best teacher in high school"
+  },
+  "2026-05-18": {
+    "challenge": "Philosophize us",
+    "sponsor": "Sugary Beverages",
+    "script": "Morning Night",
+    "micCheck": "Cough loudly"
+  },
+  "2026-05-19": {
+    "challenge": "Debunk us",
+    "sponsor": "Airline Travel",
+    "script": "Theory Practice",
+    "micCheck": "Say \"oh no\" at some point"
+  },
+  "2026-05-20": {
+    "challenge": "Charm us",
+    "sponsor": "Trains",
+    "script": "Internal External",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-05-21": {
+    "challenge": "Rally us",
+    "sponsor": "Leftovers",
+    "script": "Input Output",
+    "micCheck": "Clap at some point"
+  },
+  "2026-05-22": {
+    "challenge": "Comfort us",
+    "sponsor": "Cardboard Boxes",
+    "script": "Too much Not Enough",
+    "micCheck": "Pause for great effect"
+  },
+  "2026-05-23": {
+    "challenge": "Roast us",
+    "sponsor": "AI",
+    "script": "Wrong Right",
+    "micCheck": "Move around faster and faster"
+  },
+  "2026-05-24": {
+    "challenge": "Scare us",
+    "sponsor": "Traffic Jams",
+    "script": "Small Medium Large",
+    "micCheck": "Your hands must move in small circles"
+  },
+  "2026-05-25": {
+    "challenge": "Convince us",
+    "sponsor": "Supermarkets",
+    "script": "Chaos Order",
+    "micCheck": "Hiccup at least 3 times"
+  },
+  "2026-05-26": {
+    "challenge": "Bore us",
+    "sponsor": "Coffee",
+    "script": "High Low",
+    "micCheck": "Interrupt yourself by yelling out a random object"
+  },
+  "2026-05-27": {
+    "challenge": "Traumatize us",
+    "sponsor": "Video Games",
+    "script": "Old New",
+    "micCheck": "Adjust an object slightly 3 times"
+  },
+  "2026-05-28": {
+    "challenge": "Educate us",
+    "sponsor": "Cruise Ships",
+    "script": "First Second Third",
+    "micCheck": "People have to come closer to hear you"
+  },
+  "2026-05-29": {
+    "challenge": "Charm us",
+    "sponsor": "HR",
+    "script": "Theory Practice",
+    "micCheck": "Project your voice to the far side of the room"
+  },
+  "2026-05-30": {
+    "challenge": "Philosophize us",
+    "sponsor": "Socks",
+    "script": "Win Lose",
+    "micCheck": "Sit on the floor"
+  },
+  "2026-05-31": {
+    "challenge": "Confuse us",
+    "sponsor": "Entrepreneurship",
+    "script": "True False",
+    "micCheck": "Act like you've been shrunk down"
+  },
+  "2026-06-01": {
+    "challenge": "Debunk us",
+    "sponsor": "Flowers",
+    "script": "Left Right Centre",
+    "micCheck": "Draw a diagram while talking"
+  },
+  "2026-06-02": {
+    "challenge": "Sell us",
+    "sponsor": "Influencers",
+    "script": "Bad Better Best",
+    "micCheck": "Act like you're at a protest"
+  },
+  "2026-06-03": {
+    "challenge": "Rally us",
+    "sponsor": "Sushi",
+    "script": "Fast Slow",
+    "micCheck": "You're very sleepy"
+  },
+  "2026-06-04": {
+    "challenge": "Scare us",
+    "sponsor": "Cats",
+    "script": "Problem Options Solution",
+    "micCheck": "Act in a serious way at least 3 times"
+  },
+  "2026-06-05": {
+    "challenge": "Charm us",
+    "sponsor": "Working from Home",
+    "script": "Fast Good Cheap",
+    "micCheck": "You're a documentary voice over"
+  },
+  "2026-06-06": {
+    "challenge": "Entertain us",
+    "sponsor": "Graphic Designers",
+    "script": "Simple Complex",
+    "micCheck": "Say \"does that make sense\" 3 times"
+  },
+  "2026-06-07": {
+    "challenge": "Expose us",
+    "sponsor": "Pencils",
+    "script": "Hot Cold",
+    "micCheck": "Hands must only illustrate what you're saying"
+  },
   "2026-06-07": {
     "challenge": "Charm us",
     "sponsor": "Theme Parks",
