@@ -3,13 +3,13 @@
     "challenge": "Sell us",
     "sponsor": "Fast Food",
     "script": "Light Dark",
-    "micCheck": "No hands at all"
+    "micCheck": "Not use your hands at all"
   },
   "2026-01-02": {
     "challenge": "Philosophize us",
     "sponsor": "Hot Air Balloons",
     "script": "Hungry Full",
-    "micCheck": "Laugh for no reason"
+    "micCheck": "Laugh for no reason at some point"
   },
   "2026-01-03": {
     "challenge": "Scare us",
@@ -75,7 +75,7 @@
     "challenge": "Traumatize us",
     "sponsor": "Graphic Designers",
     "script": "Start Finish",
-    "micCheck": "Cough loudly"
+    "micCheck": "Cough loudly at some point"
   },
   "2026-01-14": {
     "challenge": "Roast us",
@@ -93,7 +93,7 @@
     "challenge": "Philosophize us",
     "sponsor": "Breakfast",
     "script": "Virtual Physical",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-01-17": {
     "challenge": "Scare us",
@@ -105,7 +105,7 @@
     "challenge": "Educate us",
     "sponsor": "Cardboard Boxes",
     "script": "Head Heart",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-01-19": {
     "challenge": "Debunk us",
@@ -117,7 +117,7 @@
     "challenge": "Rally us",
     "sponsor": "Chocolate Factories",
     "script": "Extreme Extreme Sensible",
-    "micCheck": "Your hands must move in small circles"
+    "micCheck": "Move your hands in small circles"
   },
   "2026-01-21": {
     "challenge": "Expose us",
@@ -141,7 +141,7 @@
     "challenge": "Convince us",
     "sponsor": "Astronauts",
     "script": "Inside Outside",
-    "micCheck": "Close your eyes for 5 seconds"
+    "micCheck": "Move your eyebrows a lot"
   },
   "2026-01-25": {
     "challenge": "Comfort us",
@@ -153,7 +153,7 @@
     "challenge": "Educate us",
     "sponsor": "Books",
     "script": "Light Dark",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-01-27": {
     "challenge": "Hype us",
@@ -189,7 +189,7 @@
     "challenge": "Charm us",
     "sponsor": "AI",
     "script": "Old New",
-    "micCheck": "You're a knowledgeable professor"
+    "micCheck": "Act like a knowledgeable professor"
   },
   "2026-02-02": {
     "challenge": "Sell us",
@@ -237,13 +237,13 @@
     "challenge": "Bore us",
     "sponsor": "Cruise Ships",
     "script": "Strong Weak",
-    "micCheck": "You're a documentary voice over"
+    "micCheck": "Voice-over a nature documentary"
   },
   "2026-02-10": {
     "challenge": "Hype us",
     "sponsor": "Theme Parks",
     "script": "Emotion Logic",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-02-11": {
     "challenge": "Traumatize us",
@@ -297,7 +297,7 @@
     "challenge": "Comfort us",
     "sponsor": "Pencils",
     "script": "Head Heart",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-02-20": {
     "challenge": "Roast us",
@@ -327,7 +327,7 @@
     "challenge": "Debunk us",
     "sponsor": "Books",
     "script": "True False",
-    "micCheck": "You're a motivational speaker"
+    "micCheck": "Act like a motivational speaker"
   },
   "2026-02-25": {
     "challenge": "Convince us",
@@ -339,7 +339,7 @@
     "challenge": "Educate us",
     "sponsor": "Working from Home",
     "script": "Before After",
-    "micCheck": "You're very sleepy"
+    "micCheck": "Act very sleepy"
   },
   "2026-02-27": {
     "challenge": "Scare us",
@@ -369,7 +369,7 @@
     "challenge": "Hype us",
     "sponsor": "Breakfast",
     "script": "Static Dynamic",
-    "micCheck": "You're the best teacher in high school"
+    "micCheck": "Act like the best teacher"
   },
   "2026-03-04": {
     "challenge": "Rally us",
@@ -381,7 +381,7 @@
     "challenge": "Philosophize us",
     "sponsor": "Escalators",
     "script": "Home Away",
-    "micCheck": "People have to come closer to hear you"
+    "micCheck": "Speaker quieter and quieter"
   },
   "2026-03-06": {
     "challenge": "Traumatize us",
@@ -405,7 +405,7 @@
     "challenge": "Convince us",
     "sponsor": "Salad",
     "script": "Small Medium Large",
-    "micCheck": "No hands at all"
+    "micCheck": "Never use your hands"
   },
   "2026-03-10": {
     "challenge": "Sell us",
