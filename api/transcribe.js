@@ -1,6 +1,6 @@
-// A 100% stable CommonJS serverless function for Vercel.
-// We import the main speech package here and resolve the version dynamically
-// inside the handler to prevent Vercel's bundler from resolving lazy-loaded getters too early.
+// A stable, error-resilient CommonJS serverless function for Vercel.
+// Connects safely to Google Cloud Speech-to-Text with robust dependency loading.
+
 const speech = require('@google-cloud/speech');
 
 module.exports = async function handler(req, res) {
@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
     try {
         // 2. Validate Google credentials loaded from your Vercel digital vault
         if (!process.env.GOOGLE_CREDENTIALS) {
-            return res.status(500).json({ error: 'Server configuration error: Missing GOOGLE_CREDENTIALS in environment variables.' });
+            return res.status(500).json({ error: 'Server configuration error: GOOGLE_CREDENTIALS is empty.' });
         }
 
         let credentials;
@@ -48,15 +48,18 @@ module.exports = async function handler(req, res) {
             credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
         }
 
-        // 3. Initialize Google STT Client safely using runtime verification
-        // This prevents early lazy-load execution errors during Vercel's loading phase
+        // 3. Initialize Google STT Client with robust, dynamic sub-module verification
         let client;
-        if (speech.v1p1beta1 && speech.v1p1beta1.SpeechClient) {
-            client = new speech.v1p1beta1.SpeechClient({ credentials });
-        } else if (speech.SpeechClient) {
+        try {
+            // Attempt to resolve SpeechClient from the preferred v1p1beta1 namespace
+            if (speech.v1p1beta1 && speech.v1p1beta1.SpeechClient) {
+                client = new speech.v1p1beta1.SpeechClient({ credentials });
+            } else {
+                client = new speech.SpeechClient({ credentials });
+            }
+        } catch (initError) {
+            // Absolute baseline fallback to the standard SpeechClient
             client = new speech.SpeechClient({ credentials });
-        } else {
-            throw new Error("Could not resolve SpeechClient from the @google-cloud/speech library.");
         }
 
         const { audioContent, mimeType } = req.body;
@@ -70,7 +73,6 @@ module.exports = async function handler(req, res) {
         
         const clientMime = (mimeType || '').toLowerCase();
         if (clientMime.includes('mp4') || clientMime.includes('m4a') || clientMime.includes('aac')) {
-            // Set encoding to UNSPECIFIED and let Google natively negotiate the Apple AAC container
             encoding = 'ENCODING_UNSPECIFIED';
             sampleRateHertz = 16000;
         } else if (clientMime.includes('ogg') || clientMime.includes('opus')) {
@@ -84,7 +86,7 @@ module.exports = async function handler(req, res) {
                 sampleRateHertz: sampleRateHertz,
                 languageCode: 'en-AU',
                 alternativeLanguageCodes: ['en-US', 'en-GB'],
-                enableAutomaticPunctuation: true, // Auto-punctuation works perfectly on modern engines
+                enableAutomaticPunctuation: true,
             },
             audio: {
                 content: audioContent,
@@ -101,6 +103,10 @@ module.exports = async function handler(req, res) {
 
     } catch (error) {
         console.error('Error transcribing audio:', error);
-        return res.status(500).json({ error: 'Google Cloud STT Failed', details: error.message });
+        return res.status(500).json({ 
+            error: 'Google Cloud STT Failed', 
+            details: error.message,
+            stack: error.stack 
+        });
     }
 };
