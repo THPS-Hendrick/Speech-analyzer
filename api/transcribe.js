@@ -1,7 +1,7 @@
-// A 100% stable CommonJS serverless function for Vercel.
-// Connects safely to Google Cloud Speech-to-Text V1 for instant out-of-the-box transcribing.
+// A stable v1p1beta1 CommonJS serverless function for Vercel.
+// Connects safely to Google Cloud Speech-to-Text v1p1beta1 for modern audio formats.
 
-const speech = require('@google-cloud/speech');
+const speech = require('@google-cloud/speech').v1p1beta1;
 
 module.exports = async function handler(req, res) {
     // 1. Set CORS headers immediately to prevent browser handshake blocks
@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
             credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
         }
 
-        // 3. Initialize Google STT V1 Client (extremely stable, no Recognizer profiles required!)
+        // 3. Initialize Google STT Client using v1p1beta1
         const client = new speech.SpeechClient({ credentials });
 
         const { audioContent, mimeType } = req.body;
@@ -57,13 +57,15 @@ module.exports = async function handler(req, res) {
         }
 
         // 4. Intelligent format negotiator
-        // We scan the recording format sent from the browser to support Chrome (WebM) and Apple Safari (MP4) natively
+        // v1p1beta1 natively supports WEBM_OPUS as an audio encoding!
         let encoding = 'WEBM_OPUS';
         let sampleRateHertz = 48000;
         
         const clientMime = (mimeType || '').toLowerCase();
         if (clientMime.includes('mp4') || clientMime.includes('m4a') || clientMime.includes('aac')) {
-            encoding = 'MP4_ASA'; // Google Cloud's high-efficiency AAC container codec
+            // Safari formats are not directly supported as AAC in V1, so we set encoding to UNSPECIFIED
+            // and let Google's underlying decoder attempt to parse it natively
+            encoding = 'ENCODING_UNSPECIFIED';
             sampleRateHertz = 16000;
         } else if (clientMime.includes('ogg') || clientMime.includes('opus')) {
             encoding = 'OGG_OPUS';
@@ -76,7 +78,7 @@ module.exports = async function handler(req, res) {
                 sampleRateHertz: sampleRateHertz,
                 languageCode: 'en-AU',
                 alternativeLanguageCodes: ['en-US', 'en-GB'],
-                enableAutomaticPunctuation: true, // Auto-punctuation works perfectly on V1
+                enableAutomaticPunctuation: true, // Auto-punctuation works perfectly on v1p1beta1
             },
             audio: {
                 content: audioContent,
