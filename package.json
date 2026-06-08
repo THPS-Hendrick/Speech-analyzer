@@ -7,7 +7,7 @@
     "start": "node api/transcribe.js"
   },
   "dependencies": {
-    "@google-cloud/speech": "^4.2.0"
+    "@google-cloud/speech": "^5.3.0"
   },
   "engines": {
     "node": "24.x"
