@@ -1,0 +1,75 @@
+export default async function handler(req, res) {
+    // 1. ALWAYS send Secure Headers FIRST so the server never crashes silently
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Respond immediately to browser pre-flight checks
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    try {
+        // Import Google Cloud dynamically
+        const speech = require('@google-cloud/speech');
+
+        // 2. Safely check the Google Credentials
+        if (!process.env.GOOGLE_CREDENTIALS) {
+            return res.status(500).json({ error: 'Missing GOOGLE_CREDENTIALS in Vercel settings.' });
+        }
+
+        let credentials;
+        try {
+            credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+        } catch (parseError) {
+            console.error("JSON Parse Error:", parseError);
+            return res.status(500).json({ error: 'JSON Parse Error: Your Vercel Key is formatted incorrectly. Please re-copy and paste it.' });
+        }
+
+        // Initialize Google Cloud Client using the safe credentials
+        const client = new speech.SpeechClient({ credentials });
+
+        // Get the audio data sent from your Squarespace site
+        const { audioContent } = req.body;
+        if (!audioContent) {
+            return res.status(400).json({ error: 'No audio content provided' });
+        }
+
+        // Configure the Transcription Settings
+        const audio = { content: audioContent };
+        const config = {
+            encoding: 'WEBM_OPUS', // Chrome/Android standard
+            languageCode: 'en-AU', 
+            alternativeLanguageCodes: ['en-US', 'en-GB'], 
+            enableAutomaticPunctuation: true, 
+        };
+
+        const request = { audio: audio, config: config };
+
+        // Send to Google and wait for the transcription
+        const [response] = await client.recognize(request);
+        
+        // Combine the transcribed chunks
+        const transcript = response.results
+            .map(result => result.alternatives[0].transcript)
+            .join(' ');
+
+        // Send the beautiful text back to Squarespace!
+        return res.status(200).json({ transcript });
+
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        
+        // Handle specific Safari/Apple audio format errors gracefully
+        if (error.message && error.message.includes('bad encoding')) {
+            return res.status(500).json({ error: 'Audio Format Error: Apple device detected. We are updating the audio codecs!' });
+        }
+        
+        return res.status(500).json({ error: 'Google Cloud Failed', details: error.message });
+    }
+}
