@@ -1,16 +1,13 @@
-// A 100% stable CommonJS serverless function for Vercel.
-// Connects safely to Google Cloud Speech-to-Text V2 with auto-decoding configurations.
-
 const speech = require('@google-cloud/speech').v2;
 
 module.exports = async function handler(req, res) {
-    // 1. Set CORS headers immediately to prevent browser handshake blocks
+    // 1. Send CORS headers immediately so the browser handshake never fails
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*'); 
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Respond instantly to pre-flight OPTIONS requests
+    // Respond immediately to browser pre-flight checks
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -20,24 +17,48 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        // 2. Validate Google credentials loaded from your Vercel digital vault
+        // 2. Validate Google credentials loaded from Vercel's environment variables
         if (!process.env.GOOGLE_CREDENTIALS) {
-            return res.status(500).json({ error: 'Server configuration error: Missing GOOGLE_CREDENTIALS in environment variables.' });
+            return res.status(500).json({ error: 'Missing GOOGLE_CREDENTIALS environment variable on Vercel.' });
         }
 
+        // 3. Robust, error-resilient JSON parser
         let credentials;
+        let rawCreds = process.env.GOOGLE_CREDENTIALS.trim();
+        
+        // Remove accidental surrounding wrapper quotes if pasted with them
+        if (rawCreds.startsWith('"') && rawCreds.endsWith('"')) {
+            rawCreds = rawCreds.substring(1, rawCreds.length - 1);
+        }
+
         try {
-            credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-        } catch (parseError) {
-            return res.status(500).json({ error: 'Server configuration error: GOOGLE_CREDENTIALS environment variable is not valid JSON.' });
+            credentials = JSON.parse(rawCreds);
+        } catch (firstParseError) {
+            // Fallback: strip line breaks and try parsing again
+            try {
+                const sanitized = rawCreds.replace(/\r?\n/g, '').trim();
+                credentials = JSON.parse(sanitized);
+            } catch (secondParseError) {
+                console.error("JSON Parse Error:", firstParseError.message);
+                return res.status(500).json({ 
+                    error: 'JSON Parse Error: Your Vercel GOOGLE_CREDENTIALS env var has broken JSON formatting.',
+                    details: firstParseError.message,
+                    preview: rawCreds.substring(0, 60) + '...'
+                });
+            }
         }
 
         const projectId = credentials.project_id;
         if (!projectId) {
-            return res.status(500).json({ error: 'Server configuration error: Missing project_id inside credentials JSON.' });
+            return res.status(500).json({ error: 'Missing project_id in credentials JSON.' });
         }
 
-        // 3. Initialize Google STT client
+        // Google Cloud client library expects literal newlines in private_key strings
+        if (credentials.private_key) {
+            credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+        }
+
+        // 4. Initialize Google Cloud Client using credentials
         const client = new speech.SpeechClient({ credentials });
 
         const { audioContent } = req.body;
@@ -45,22 +66,20 @@ module.exports = async function handler(req, res) {
             return res.status(400).json({ error: 'Audio input payload is empty.' });
         }
 
-        // 4. Construct Speech V2 Configuration
-        // autoDecodingConfig is set to empty {} to instruct Google to automatically
-        // detect and decode formats (including Chrome WebM and Apple iOS MP4 containers)!
+        // 5. Construct Speech V2 Configuration
         const request = {
             recognizer: `projects/${projectId}/locations/global/recognizers/_`,
             config: {
                 autoDecodingConfig: {}, 
                 languageCodes: ['en-AU', 'en-US', 'en-GB'],
                 features: {
-                    enableAutomaticPunctuation: true, // Google automatically applies commas & periods
+                    enableAutomaticPunctuation: true,
                 }
             },
             content: audioContent,
         };
 
-        // 5. Query Google and extract perfectly punctuated transcriptions
+        // 6. Query Google and extract perfectly punctuated transcriptions
         const [response] = await client.recognize(request);
         const transcript = response.results
             ?.map(result => result.alternatives?.[0]?.transcript || '')
