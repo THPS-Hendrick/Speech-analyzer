@@ -3,19 +3,23 @@
 // Pure logic. No UI manipulation.
 // ==========================================
 
-const DICT_URLS = {
+// Establish the Global Trackman Namespace
+window.THPS = window.THPS || {};
+window.THPS.NLP = window.THPS.NLP || {};
+
+window.THPS.NLP.DICT_URLS = {
     simple: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/simple.json",
     visual: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json"
 };
 
-let personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's"]);
-let visualDictPronouns = new Set();
-let visualDictWords = new Set();
-let simpleMap = new Map();
-let google10kSet = new Set();
-let dictsLoaded = false;
+window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's"]);
+window.THPS.NLP.visualDictPronouns = new Set();
+window.THPS.NLP.visualDictWords = new Set();
+window.THPS.NLP.simpleMap = new Map();
+window.THPS.NLP.google10kSet = new Set();
+window.THPS.NLP.dictsLoaded = false;
 
-async function loadDictionaries() {
+window.THPS.NLP.loadDictionaries = async function() {
     try {
         const fetchDict = async (url) => {
             const res = await fetch(url + "?v=" + Date.now(), { cache: "no-store" });
@@ -23,7 +27,8 @@ async function loadDictionaries() {
         };
 
         const [simpleData, visualData] = await Promise.all([
-            fetchDict(DICT_URLS.simple), fetchDict(DICT_URLS.visual)
+            fetchDict(window.THPS.NLP.DICT_URLS.simple), 
+            fetchDict(window.THPS.NLP.DICT_URLS.visual)
         ]).catch(() => [{}, {}]);
 
         for (const [tier, words] of Object.entries(simpleData)) {
@@ -32,7 +37,7 @@ async function loadDictionaries() {
             if (t.includes('5yr') || t.includes('5 yr')) finalTier = '5yr Old 1000';
             else if (t.includes('esl')) finalTier = 'ESL 2000';
             else if (t.includes('kitchen') || t.includes('kit')) finalTier = 'Kitchen 1000';
-            if (finalTier !== 'outside') words.forEach(w => simpleMap.set(w.toLowerCase(), finalTier));
+            if (finalTier !== 'outside') words.forEach(w => window.THPS.NLP.simpleMap.set(w.toLowerCase(), finalTier));
         }
 
         const getFuzzyKey = (obj, keyword) => {
@@ -42,44 +47,42 @@ async function loadDictionaries() {
         
         let vPronouns = getFuzzyKey(visualData, "pronoun");
         let vWords = getFuzzyKey(visualData, "visual");
-        if (vPronouns) visualDictPronouns = new Set(vPronouns.map(w => w.toLowerCase()));
-        if (vWords) visualDictWords = new Set(vWords.map(w => w.toLowerCase()));
+        if (vPronouns) window.THPS.NLP.visualDictPronouns = new Set(vPronouns.map(w => w.toLowerCase()));
+        if (vWords) window.THPS.NLP.visualDictWords = new Set(vWords.map(w => w.toLowerCase()));
         
         try {
             const gRes = await fetch('https://cdn.jsdelivr.net/gh/first20hours/google-10000-english@master/google-10000-english-no-swears.txt');
             if(gRes.ok) {
                 const gWords = (await gRes.text()).split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-                google10kSet = new Set(gWords);
+                window.THPS.NLP.google10kSet = new Set(gWords);
             }
         } catch(e) { }
 
-        dictsLoaded = true;
-        
+        window.THPS.NLP.dictsLoaded = true;
         // Broadcast a custom message to the browser that the brain is ready!
         window.dispatchEvent(new Event('thps-dicts-loaded'));
 
     } catch (e) { 
         console.error("Dict Load Error", e); 
     }
-}
+};
 
 // -----------------------------------------------------
 // SYLLABLE COUNTER
 // -----------------------------------------------------
-function countSyllables(word) {
+window.THPS.NLP.countSyllables = function(word) {
     word = word.toLowerCase().replace(/[^a-z]/g, '');
     if (word.length <= 3) return 1;
     word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
     word = word.replace(/^y/, '');
     const syllables = word.match(/[aeiouy]{1,2}/g);
     return syllables ? syllables.length : 1;
-}
+};
 
 // -----------------------------------------------------
 // ACADEMIC READABILITY CALCULATORS
 // -----------------------------------------------------
-function calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount) {
-    // Safety check to prevent division by zero
+window.THPS.NLP.calculateReadabilityMetrics = function(numWords, numSentences, totalSyllables, letterCount, complexWordCount) {
     numWords = Math.max(1, numWords);
     numSentences = Math.max(1, numSentences);
 
@@ -97,4 +100,4 @@ function calculateReadabilityMetrics(numWords, numSentences, totalSyllables, let
         coleman: Math.max(0, coleman),
         avgGrade: avgGrade
     };
-}
+};
