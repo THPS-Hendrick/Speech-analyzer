@@ -3,11 +3,13 @@
 // Handles Microphone, WAV Chunking, and Vercel STT Integration
 // ==========================================
 
-// Global state variables attached to the window so the UI can read them
-window.isRecording = false;
-window.recordedAudio = false;
-window.recordStartTime = 0;
-window.lastRecordedDuration = 0;
+window.THPS = window.THPS || {};
+window.THPS.Audio = window.THPS.Audio || {};
+
+window.THPS.Audio.isRecording = false;
+window.THPS.Audio.recordedAudio = false;
+window.THPS.Audio.recordStartTime = 0;
+window.THPS.Audio.lastRecordedDuration = 0;
 
 let audioCtx = null;
 let sourceNode = null;
@@ -46,24 +48,24 @@ function encodeWAV(samples, sampleRate) {
     return new Blob([view], { type: 'audio/wav' });
 }
 
-window.stopRecordingProcess = async function() {
-    if (!window.isRecording) return;
-    window.isRecording = false;
+window.THPS.Audio.stopRecordingProcess = async function() {
+    if (!window.THPS.Audio.isRecording) return;
+    window.THPS.Audio.isRecording = false;
     
-    // Dynamically grab UI elements without needing them hardcoded
+    // Dynamically grab UI elements safely
     const inputEl = document.getElementById('cba-inputText');
     if (inputEl) inputEl.placeholder = "Processing Parallel Audio Streams...";
     
     const procPanel = document.getElementById('cba-processing-panel');
     if (procPanel) procPanel.classList.remove('hidden');
     
-    const elapsedSecs = (Date.now() - window.recordStartTime) / 1000;
-    window.lastRecordedDuration = elapsedSecs;
-    window.recordedAudio = true;
+    const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+    window.THPS.Audio.lastRecordedDuration = elapsedSecs;
+    window.THPS.Audio.recordedAudio = true;
     
     if (processorNode) { processorNode.disconnect(); processorNode = null; }
     if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-    if (window.audioStream) { window.audioStream.getTracks().forEach(t => t.stop()); }
+    if (window.THPS.Audio.audioStream) { window.THPS.Audio.audioStream.getTracks().forEach(t => t.stop()); }
     if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
 
     const analyzeBtn = document.getElementById('cba-analyzeBtn');
@@ -155,30 +157,30 @@ window.stopRecordingProcess = async function() {
     audioBuffers = []; masterFloatArray = null;
 };
 
-window.startRecordingProcess = async function() {
-    window.isRecording = true;
-    window.recordedAudio = true; 
+window.THPS.Audio.startRecordingProcess = async function() {
+    window.THPS.Audio.isRecording = true;
+    window.THPS.Audio.recordedAudio = true; 
     audioBuffers = [];
     totalSamplesRecorded = 0;
-    window.recordStartTime = Date.now();
+    window.THPS.Audio.recordStartTime = Date.now();
     
     const inputEl = document.getElementById('cba-inputText');
     if (inputEl) inputEl.placeholder = "Listening... speak clearly into your microphone.";
 
     try {
-        window.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
         
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContextClass({ sampleRate: 16000 });
         
-        sourceNode = audioCtx.createMediaStreamSource(window.audioStream);
+        sourceNode = audioCtx.createMediaStreamSource(window.THPS.Audio.audioStream);
         processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
         
         processorNode.onaudioprocess = function(e) {
-            if (!window.isRecording) return;
+            if (!window.THPS.Audio.isRecording) return;
             
             const channelData = e.inputBuffer.getChannelData(0);
-            const elapsed = (Date.now() - window.recordStartTime) / 1000;
+            const elapsed = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
             if (elapsed <= 240) { // Limit chunks safely to 4 minutes
                 audioBuffers.push(new Float32Array(channelData));
                 totalSamplesRecorded += channelData.length;
@@ -195,7 +197,7 @@ window.startRecordingProcess = async function() {
             errorMsgBox.innerHTML = `<strong>Microphone Access Error:</strong> Please allow microphone access. <br><span class="text-xs font-normal">${e.message}</span>`;
             errorMsgBox.classList.remove('hidden');
         }
-        window.stopRecordingProcess();
+        window.THPS.Audio.stopRecordingProcess();
         return;
     }
 };
