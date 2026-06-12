@@ -93,7 +93,7 @@ window.THPS.NLP.calculateReadabilityMetrics = function(numWords, numSentences, t
         avgGrade: avgGrade
     };
 };
-// Add the new wordTimestamps parameter to the function
+
 window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const words = text.split(/\s+/).filter(w => w.trim().length > 0);
@@ -237,6 +237,6 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         google10kCount,
         highlightedHTML,
         reportMarkdownText,
-        wordTimestamps // <--- NEW: Pass the timestamps directly through to the UI!
+        wordTimestamps // Safely returned out of the engine
     };
 };
