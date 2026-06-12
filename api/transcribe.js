@@ -20,7 +20,6 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        // 2. Validate Google credentials loaded from your Vercel digital vault
         if (!process.env.GOOGLE_CREDENTIALS) {
             return res.status(500).json({ error: 'Server configuration error: GOOGLE_CREDENTIALS is empty.' });
         }
@@ -28,7 +27,6 @@ module.exports = async function handler(req, res) {
         let credentials;
         let rawCreds = process.env.GOOGLE_CREDENTIALS.trim();
         
-        // Strip out accidental surrounding quotes
         if (rawCreds.startsWith('"') && rawCreds.endsWith('"')) {
             rawCreds = rawCreds.substring(1, rawCreds.length - 1);
         }
@@ -48,7 +46,6 @@ module.exports = async function handler(req, res) {
             credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
         }
 
-        // 3. Initialize Google STT Client
         const client = new speech.SpeechClient({ credentials });
 
         const { audioContent } = req.body;
@@ -56,28 +53,47 @@ module.exports = async function handler(req, res) {
             return res.status(400).json({ error: 'Audio input payload is empty.' });
         }
 
-        // 4. Use ENCODING_UNSPECIFIED with auto-detection!
-        // This instructs Google Cloud to inspect the binary headers of the container file (WebM, Ogg, MP4/AAC, WAV)
-        // and decode it dynamically. This eliminates browser, container, and sample rate mismatches!
         const request = {
             config: {
                 encoding: 'ENCODING_UNSPECIFIED',
                 languageCode: 'en-AU',
                 alternativeLanguageCodes: ['en-US', 'en-GB'],
                 enableAutomaticPunctuation: true,
+                enableWordTimeOffsets: true, // <-- NEW: Turns on exact timestamps!
             },
             audio: {
                 content: audioContent,
             },
         };
 
-        // 5. Query Google and extract perfectly punctuated transcriptions
         const [response] = await client.recognize(request);
+        
         const transcript = response.results
             ?.map(result => result.alternatives?.[0]?.transcript || '')
             .join(' ') || '';
 
-        return res.status(200).json({ transcript });
+        // Extract the exact timestamps for every single word!
+        let words = [];
+        response.results?.forEach(result => {
+            const alt = result.alternatives?.[0];
+            if (alt && alt.words) {
+                alt.words.forEach(w => {
+                    const startSecs = parseInt(w.startTime.seconds || 0, 10);
+                    const startNanos = parseInt(w.startTime.nanos || 0, 10);
+                    const endSecs = parseInt(w.endTime.seconds || 0, 10);
+                    const endNanos = parseInt(w.endTime.nanos || 0, 10);
+                    
+                    words.push({
+                        word: w.word,
+                        start: startSecs + (startNanos / 1e9),
+                        end: endSecs + (endNanos / 1e9)
+                    });
+                });
+            }
+        });
+
+        // Send BOTH the full string and the timestamp array back to the app
+        return res.status(200).json({ transcript, words });
 
     } catch (error) {
         console.error('Error transcribing audio:', error);
