@@ -3,7 +3,6 @@
 // Pure logic. No UI manipulation.
 // ==========================================
 
-// Establish the Global Trackman Namespace
 window.THPS = window.THPS || {};
 window.THPS.NLP = window.THPS.NLP || {};
 
@@ -59,7 +58,6 @@ window.THPS.NLP.loadDictionaries = async function() {
         } catch(e) { }
 
         window.THPS.NLP.dictsLoaded = true;
-        // Broadcast a custom message to the browser that the brain is ready!
         window.dispatchEvent(new Event('thps-dicts-loaded'));
 
     } catch (e) { 
@@ -67,9 +65,6 @@ window.THPS.NLP.loadDictionaries = async function() {
     }
 };
 
-// -----------------------------------------------------
-// SYLLABLE COUNTER
-// -----------------------------------------------------
 window.THPS.NLP.countSyllables = function(word) {
     word = word.toLowerCase().replace(/[^a-z]/g, '');
     if (word.length <= 3) return 1;
@@ -79,9 +74,6 @@ window.THPS.NLP.countSyllables = function(word) {
     return syllables ? syllables.length : 1;
 };
 
-// -----------------------------------------------------
-// ACADEMIC READABILITY CALCULATORS
-// -----------------------------------------------------
 window.THPS.NLP.calculateReadabilityMetrics = function(numWords, numSentences, totalSyllables, letterCount, complexWordCount) {
     numWords = Math.max(1, numWords);
     numSentences = Math.max(1, numSentences);
@@ -101,9 +93,7 @@ window.THPS.NLP.calculateReadabilityMetrics = function(numWords, numSentences, t
         avgGrade: avgGrade
     };
 };
-// -----------------------------------------------------
-// MASTER TRANSCRIPT ANALYZER (The Brain)
-// -----------------------------------------------------
+
 window.THPS.NLP.analyzeTranscript = function(text) {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const words = text.split(/\s+/).filter(w => w.trim().length > 0);
@@ -141,7 +131,6 @@ window.THPS.NLP.analyzeTranscript = function(text) {
                     if (window.THPS.NLP.personalPronouns.has(normal)) personalCountdown = 6;
                     if (!window.THPS.NLP.personalPronouns.has(normal)) {
                         if (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root)) {
-                            // THIS IS THE RULE: Change the 4 here to adjust visual word spread!
                             visualCountdown = Math.max(visualCountdown, 4);
                         }
                     }
@@ -195,7 +184,6 @@ window.THPS.NLP.analyzeTranscript = function(text) {
                 let root = normal.replace(/(?:s|es|ed|ing)$/, ''); 
                 if (window.THPS.NLP.personalPronouns.has(normal)) personalCountdown = 6;
                 if (!window.THPS.NLP.personalPronouns.has(normal) && (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root))) {
-                    // FALLBACK RULE: Change the 4 here to adjust visual word spread!
                     visualCountdown = Math.max(visualCountdown, 4);
                 }
                 let isPersonal = (inQuotes || personalCountdown > 0);
@@ -251,15 +239,14 @@ window.THPS.NLP.analyzeTranscript = function(text) {
         reportMarkdownText
     };
 };
-```eof
+```
 
-### Step 2: Delete the old logic from Squarespace
-Now that GitHub knows how to parse a transcript, we can delete the massive loop out of your `analyzer-app.html` file. We replace it with a single call to `window.THPS.NLP.analyzeTranscript(text)` and feed the resulting data directly to the safe UI setters.
+### Step 2: Ensure Squarespace has the complete function
+Because the previous code block was cut off in your prompt window, I want to ensure you have the **entire, complete `window.analyze` function** for Squarespace so nothing gets dropped. 
 
-Here is the exact replacement for the `window.analyze` function in your **Speech Analyzer App**:
+In your `analyzer-app.html` file, replace your entire `window.analyze = function() { ... }` block (all the way down to where the Copy Button logic starts) with this:
 
-```html:Speech Analyzer App:analyzer-app.html
-<!-- ... existing code ... -->
+```javascript
         window.analyze = function() {
             try {
                 if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') {
@@ -279,17 +266,15 @@ Here is the exact replacement for the `window.analyze` function in your **Speech
             }
 
             // --- DELEGATE TO THE GITHUB BRAIN ---
-            // We pass the raw text to GitHub, and it hands us back a clean dictionary of data.
             const nlpData = window.THPS.NLP.analyzeTranscript(text);
 
-            // Destructure the data dictionary for easy use in the UI
             const { 
                 numWords, numSentences, totalSyllables, letterCount, complexWordCount, 
                 personalCount, visualCount, simpleCounts, google10kCount, 
                 highlightedHTML, reportMarkdownText: newReportMarkdown 
             } = nlpData;
 
-            reportMarkdownText = newReportMarkdown; // Save globally for the Copy button
+            reportMarkdownText = newReportMarkdown; 
 
             // --- THE TRACKMAN FIX: SAFE UI UPDATERS ---
             const safeSetText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
@@ -298,7 +283,6 @@ Here is the exact replacement for the `window.analyze` function in your **Speech
             const safeSetBg = (id, color) => { const el = document.getElementById(id); if (el) el.style.backgroundColor = color; };
             const safeSetBorder = (id, color) => { const el = document.getElementById(id); if (el) el.style.borderLeftColor = color; };
 
-            // Populate the "More Metrics" data directly into the DOM
             safeSetText('cba-statWords', numWords);
             safeSetText('cba-statSentences', numSentences);
             safeSetText('cba-statSyllables', totalSyllables);
@@ -310,7 +294,6 @@ Here is the exact replacement for the `window.analyze` function in your **Speech
             const highlightTextEl = document.getElementById('cba-highlightedText');
             if (highlightTextEl) highlightTextEl.innerHTML = highlightedHTML.replace(/\n/g, '<br>');
 
-            // Component Visual Updates
             let gPct = Math.round((google10kCount / numWords) * 100);
             if (window.THPS.NLP.google10kSet.size > 0 && numWords > 0) {
                 safeSetText('cba-googleScore', `${gPct}%`);
@@ -430,14 +413,12 @@ Here is the exact replacement for the `window.analyze` function in your **Speech
                 if (wpmScoreEl) wpmScoreEl.className = 'text-3xl sm:text-4xl font-bold text-slate-400';
             }
 
-            // Calculate and print the various Readability Models to the DOM
             let avgGrade = 0;
             let readability = null;
             if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
                  readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
                  avgGrade = readability.avgGrade;
             } else {
-                // Fallback math just in case GitHub file didn't load properly
                 let flesch = (0.39 * (numWords / numSentences)) + (11.8 * (totalSyllables / numWords)) - 15.59;
                 let fog = 0.4 * ((numWords / numSentences) + 100 * (complexWordCount / numWords));
                 let smog = 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291;
@@ -489,10 +470,108 @@ Here is the exact replacement for the `window.analyze` function in your **Speech
             safeSetBg('cba-snProgress', snColor);
             safeSetWidth('cba-snProgress', `${Math.min(100, Math.max(0, (avgWps / 40) * 100))}%`);
 
-            // ==========================================
-            // SCORE SUMMARY DASHBOARD LOGIC
-            // ==========================================
             try {
                 let totalPoints = 0;
-// ... (rest of code remains exactly the same)
-```eof
+                let overrideGrade = false;
+
+                const setEval = (id, text, colorClass) => {
+                    const el = document.getElementById(id);
+                    if(el) { 
+                        el.textContent = text; 
+                        el.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide ${colorClass} ml-1 pointer-events-none`; 
+                    }
+                };
+
+                if (window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
+                    let m = Math.floor(elapsedSecs / 60);
+                    let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
+                    document.getElementById('sum-time').textContent = `${m}:${s}`;
+                    totalPoints += 1.0;
+                } else {
+                    document.getElementById('sum-time').textContent = "Text Only";
+                    overrideGrade = true;
+                }
+
+                document.getElementById('sum-personal').textContent = `${personalPercent}%`;
+                let pStatus = 'just right'; let pColorClass = 'bg-green-100 text-green-700';
+                if (personalPercent < 30) { pStatus = 'not enough'; pColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else if (personalPercent > 60) { pStatus = 'too much'; pColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else { totalPoints += 1; }
+                setEval('sum-personal-eval', pStatus, pColorClass);
+
+                document.getElementById('sum-visual').textContent = `${visualPercent}%`;
+                let vStatus = 'just right'; let vColorClass = 'bg-green-100 text-green-700';
+                if (visualPercent < 20) { vStatus = 'not enough'; vColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else if (visualPercent > 50) { vStatus = 'too much'; vColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else { totalPoints += 1; }
+                setEval('sum-visual-eval', vStatus, vColorClass);
+
+                let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+                document.getElementById('sum-intangible').textContent = `${intangiblePercent}%`;
+                let iStatus = 'just right'; let iColorClass = 'bg-green-100 text-green-700';
+                if (intangiblePercent > 45) { iStatus = 'too much'; iColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else if (intangiblePercent >= 30) { iStatus = 'bit much'; iColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else { totalPoints += 1; }
+                setEval('sum-intangible-eval', iStatus, iColorClass);
+
+                if (window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
+                    document.getElementById('sum-wpm').textContent = avgWpm;
+                    let wpmStatus = 'just right'; let wpmColorClass = 'bg-green-100 text-green-700';
+                    if (avgWpm < 100) { wpmStatus = 'speed up'; wpmColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                    else if (avgWpm > 150) { wpmStatus = 'strain'; wpmColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                    else { totalPoints += 1; }
+                    setEval('sum-wpm-eval', wpmStatus, wpmColorClass);
+
+                    document.getElementById('sum-sps').textContent = mumbleScore.toFixed(1);
+                    let spsStatus = 'just right'; let spsColorClass = 'bg-green-100 text-green-700';
+                    if (mumbleScore < 3) { spsStatus = 'speed up'; spsColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                    else if (mumbleScore > 5) { spsStatus = 'strain'; spsColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                    else { totalPoints += 1; }
+                    setEval('sum-sps-eval', spsStatus, spsColorClass);
+
+                    document.getElementById('sum-pause').textContent = `${pausePercent.toFixed(0)}%`;
+                    let pzStatus = 'just right'; let pzColorClass = 'bg-green-100 text-green-700';
+                    if (pausePercent < 10) { pzStatus = 'too little'; pzColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                    else if (pausePercent > 30) { pzStatus = 'too much'; pzColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                    else { totalPoints += 1; }
+                    setEval('sum-pause-eval', pzStatus, pzColorClass);
+                } else {
+                    document.getElementById('sum-wpm').textContent = "-";
+                    document.getElementById('sum-sps').textContent = "-";
+                    document.getElementById('sum-pause').textContent = "-";
+                    const fallbackEl = (id) => { const el = document.getElementById(id); if(el) { el.textContent = 'Text Only'; el.className = 'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none'; }};
+                    fallbackEl('sum-wpm-eval'); fallbackEl('sum-sps-eval'); fallbackEl('sum-pause-eval');
+                }
+
+                document.getElementById('sum-wps').textContent = avgWpsFloat.toFixed(1);
+                let wpsStatus = 'just right'; let wpsColorClass = 'bg-green-100 text-green-700';
+                if (avgWpsFloat < 5) { wpsStatus = 'simple'; wpsColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else if (avgWpsFloat > 15) { wpsStatus = 'complex'; wpsColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else { totalPoints += 1; }
+                setEval('sum-wps-eval', wpsStatus, wpsColorClass);
+
+                document.getElementById('sum-grade').textContent = avgGrade.toFixed(1);
+                let gradeStatus = 'just right'; let gradeColorClass = 'bg-green-100 text-green-700';
+                if (avgGrade < 5) { gradeStatus = 'simple'; gradeColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else if (avgGrade > 10) { gradeStatus = 'complex'; gradeColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else { totalPoints += 1; }
+                setEval('sum-grade-eval', gradeStatus, gradeColorClass);
+
+                document.getElementById('sum-simple').textContent = `${coreSimpleScore}%`;
+                let simpleStatus = 'just right'; let simpleColorClass = 'bg-green-100 text-green-700';
+                if (coreSimpleScore < 85) { simpleStatus = 'complex'; simpleColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
+                else if (coreSimpleScore > 95) { simpleStatus = 'simple'; simpleColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
+                else { totalPoints += 1; }
+                setEval('sum-simple-eval', simpleStatus, simpleColorClass);
+                
+                if (overrideGrade) {
+                    document.getElementById('cba-overallGrade').textContent = "- / 10";
+                } else {
+                    let formattedScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
+                    document.getElementById('cba-overallGrade').textContent = `${formattedScore} / 10`;
+                }
+
+                updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio.recordedAudio, text.length);
+
+            } catch(e) { console.error("Summary Dashboard Error:", e); }
+        };
