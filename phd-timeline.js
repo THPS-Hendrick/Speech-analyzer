@@ -54,13 +54,27 @@ window.addEventListener('thps-inject-snip', async (e) => {
     }
 
     try {
-        // 1. Decode the incoming audio blob
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // 1. Decode the incoming audio blob and force 16kHz downsampling
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
         const arrayBuffer = await blob.arrayBuffer();
-        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        let audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        // Safari/Older browser fallback: manually resample if decodeAudioData ignores the context sampleRate
+        if (audioBuffer.sampleRate !== 16000) {
+            const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
+                1, // Force Mono
+                Math.ceil(audioBuffer.duration * 16000), 
+                16000
+            );
+            const source = offlineCtx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(offlineCtx.destination);
+            source.start(0);
+            audioBuffer = await offlineCtx.startRendering();
+        }
 
         // 2. Slice the audio into safe 30-second chunks for Google Cloud
-        const sampleRate = audioBuffer.sampleRate;
+        const sampleRate = audioBuffer.sampleRate; // Will now strictly be 16000
         const channelData = audioBuffer.getChannelData(0); // Mono track
         const chunkSize = sampleRate * 30; // 30 seconds
 
