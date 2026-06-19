@@ -1,43 +1,38 @@
 // ==========================================
 // THPS WIDGET: SMALL PACE PILL
-// A self-contained, 1x1 summary metric.
 // ==========================================
 
 class ThpsPillPace extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-            <div class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm w-full max-w-[240px] transition-transform hover:-translate-y-1 hover:shadow-md">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pace</span>
-                </div>
-                <div class="flex items-baseline gap-1 text-right">
-                    <span class="thps-pace-val text-2xl font-black text-slate-800">--</span>
-                    <span class="text-[10px] text-slate-400 font-bold uppercase">WPM</span>
+            <div class="glass-panel p-4 rounded-2xl border-t-4 border-amber-500 shadow-sm flex flex-col items-center justify-center bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
+                
+                <!-- SELF DESTRUCT BUTTON (Appears on Hover) -->
+                <button class="thps-close-btn absolute top-2 right-2 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Speaking Pace</h3>
+                <div class="flex items-baseline gap-1">
+                    <span class="thps-wpm-val text-3xl sm:text-4xl font-black text-amber-500">-</span>
+                    <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">WPM</span>
                 </div>
             </div>
         `;
+
+        // The Self-Destruct Logic
+        this.querySelector('.thps-close-btn').addEventListener('click', () => {
+            const wrapper = this.closest('.cursor-move');
+            if (wrapper) wrapper.remove(); // Delete the grid slot so it collapses cleanly
+            else this.remove(); // Fallback
+        });
 
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
     }
 
     update(data) {
         if (data.wpm === undefined) return;
-        const wpm = data.wpm;
-        
-        const valEl = this.querySelector('.thps-pace-val');
-        valEl.innerText = wpm;
-        
-        // Color code based on Trackman zones
-        if (wpm < 100) {
-            valEl.className = 'thps-pace-val text-2xl font-black text-amber-500';
-        } else if (wpm > 150) {
-            valEl.className = 'thps-pace-val text-2xl font-black text-rose-500';
-        } else {
-            valEl.className = 'thps-pace-val text-2xl font-black text-emerald-500';
-        }
+        this.querySelector('.thps-wpm-val').innerText = data.wpm;
     }
 }
 
