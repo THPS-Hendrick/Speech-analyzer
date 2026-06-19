@@ -576,9 +576,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             const tsvString = rowData.join('\t');
+            
+            navigator.clipboard.writeText(tsvString).then(() => {
+                const originalText = btnExportCsv.innerHTML;
                 btnExportCsv.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied to Clipboard!`;
                 btnExportCsv.classList.replace('bg-emerald-600', 'bg-blue-600');
                 if(window.lucide) window.lucide.createIcons();
+                
                 setTimeout(() => {
                     btnExportCsv.innerHTML = originalText;
                     btnExportCsv.classList.replace('bg-blue-600', 'bg-emerald-600');
