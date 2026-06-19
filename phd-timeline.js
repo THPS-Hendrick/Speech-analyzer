@@ -1,14 +1,18 @@
 // ==========================================
 // THPS PhD TIMELINE & GRID ENGINE
-// Handles STT chunking, NLE interactive words, and metrics
+// Handles STT chunking, Pause/Repair coding, and NLE timeline
 // ==========================================
 
 let analyzerSurfer = null;
 let currentWordsData = [];
+let pauseBarsData = []; // NEW: Manually placed Pauses
 let clipStartTimeSec = 0; 
-let selectedIndex = -1;
 
-const PX_PER_SEC = 100; // 100px equals 1 second. Ensures smooth spacing.
+// Selection States
+let selectedIndex = -1; // For Words
+let selectedPauseId = null; // For Pauses
+
+const PX_PER_SEC = 100;
 
 // --- WAV ENCODER HELPERS ---
 function floatTo16BitPCM(output, offset, input) {
@@ -45,6 +49,12 @@ window.addEventListener('thps-inject-snip', async (e) => {
     const { blob, fileName, startTime } = e.detail;
     clipStartTimeSec = startTime; 
     
+    // Clear out old NLE Data
+    currentWordsData = [];
+    pauseBarsData = [];
+    selectedIndex = -1;
+    selectedPauseId = null;
+    
     const statusEl = document.getElementById('stt-status');
     if(statusEl) {
         statusEl.classList.remove('hidden');
@@ -54,17 +64,13 @@ window.addEventListener('thps-inject-snip', async (e) => {
     }
 
     try {
-        // 1. Decode the incoming audio blob and force 16kHz downsampling
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
         const arrayBuffer = await blob.arrayBuffer();
         let audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-        // Safari/Older browser fallback: manually resample if decodeAudioData ignores the context sampleRate
         if (audioBuffer.sampleRate !== 16000) {
             const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
-                1, // Force Mono
-                Math.ceil(audioBuffer.duration * 16000), 
-                16000
+                1, Math.ceil(audioBuffer.duration * 16000), 16000
             );
             const source = offlineCtx.createBufferSource();
             source.buffer = audioBuffer;
@@ -73,10 +79,9 @@ window.addEventListener('thps-inject-snip', async (e) => {
             audioBuffer = await offlineCtx.startRendering();
         }
 
-        // 2. Slice the audio into safe 30-second chunks for Google Cloud
-        const sampleRate = audioBuffer.sampleRate; // Will now strictly be 16000
-        const channelData = audioBuffer.getChannelData(0); // Mono track
-        const chunkSize = sampleRate * 30; // 30 seconds
+        const sampleRate = audioBuffer.sampleRate; 
+        const channelData = audioBuffer.getChannelData(0); 
+        const chunkSize = sampleRate * 30;
 
         let wavChunks = [];
         for(let i = 0; i < channelData.length; i += chunkSize) {
@@ -84,7 +89,6 @@ window.addEventListener('thps-inject-snip', async (e) => {
             wavChunks.push(encodeWAV(segment, sampleRate));
         }
 
-        // 3. Send chunks to Vercel in parallel
         const uploadPromises = wavChunks.map(async (chunkBlob, index) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -111,11 +115,9 @@ window.addEventListener('thps-inject-snip', async (e) => {
             });
         });
 
-        // 4. Await all processing and sort them back into chronological order
         const resolvedChunks = await Promise.all(uploadPromises);
         resolvedChunks.sort((a, b) => a.index - b.index);
 
-        // 5. Stitch the timestamps back together across the 30-second gaps
         let finalStitchedWords = [];
         resolvedChunks.forEach(chunk => {
             if (chunk.words && chunk.words.length > 0) {
@@ -123,7 +125,8 @@ window.addEventListener('thps-inject-snip', async (e) => {
                     finalStitchedWords.push({
                         word: w.word,
                         start: w.start + (chunk.index * 30),
-                        end: w.end + (chunk.index * 30)
+                        end: w.end + (chunk.index * 30),
+                        isRepair: false // Pre-tag for custom PhD logic
                     });
                 });
             }
@@ -131,7 +134,6 @@ window.addEventListener('thps-inject-snip', async (e) => {
 
         if(statusEl) statusEl.classList.add('hidden');
         
-        // 6. Push to UI
         setupAnalyzerTimeline(blob, finalStitchedWords);
         populateGridInitialData(fileName, startTime);
 
@@ -145,7 +147,6 @@ window.addEventListener('thps-inject-snip', async (e) => {
     }
 });
 
-// Helper: Format accurate HH:MM:SS
 function formatTrueTime(relativeSeconds) {
     const totalSecs = clipStartTimeSec + relativeSeconds;
     const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
@@ -171,7 +172,6 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
     analyzerSurfer.load(fileURL);
     
     currentWordsData = wordsArray.sort((a, b) => a.start - b.start);
-    selectedIndex = -1;
     
     analyzerSurfer.on('ready', () => {
         const duration = analyzerSurfer.getDuration();
@@ -180,7 +180,7 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
             const pxWidth = Math.max(duration * PX_PER_SEC, scrollArea.clientWidth);
             document.getElementById('timeline-inner').style.width = pxWidth + 'px';
         }
-        renderWordBlocks();
+        renderTimelineItems();
     });
 
     analyzerSurfer.on('timeupdate', (currentTime) => {
@@ -211,20 +211,23 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
 }
 
 // ----------------------------------------------------------------------
-// THE 5-ROW NLE MUSIC STAFF ENGINE
+// THE 5-ROW NLE MUSIC STAFF ENGINE (Words + Pauses)
 // ----------------------------------------------------------------------
 
-let isDragging = false;
+let isDraggingWord = false;
+let isDraggingPause = false;
 let dragNode = null;
 let dragIndex = -1;
+let dragPauseId = null;
 let dragStartX = 0;
 let originalWordStart = 0;
 
-function renderWordBlocks() {
+function renderTimelineItems() {
     const track = document.getElementById('word-track');
     if(!track) return;
     track.innerHTML = '';
     
+    // Inject Background Grid Lines
     track.innerHTML = `
         <div class="absolute inset-0 pointer-events-none flex flex-col justify-between py-1 z-0">
             <div class="h-10 border-b border-slate-200 border-dashed w-full"></div>
@@ -234,28 +237,72 @@ function renderWordBlocks() {
             <div class="h-10 w-full"></div>
         </div>
     `;
+
+    // 1. RENDER PAUSE BARS (Sub-Layer Z-0)
+    pauseBarsData.forEach(p => {
+        const node = document.createElement('div');
+        const yOffset = p.row * 42 + 4; // Subtly padded to fit rows perfectly
+        const xOffset = p.start * PX_PER_SEC;
+
+        node.className = 'absolute border rounded cursor-grab z-0 transition-opacity';
+        node.style.left = xOffset + 'px';
+        node.style.top = yOffset + 'px';
+        node.style.width = PX_PER_SEC + 'px'; // Exactly 1 Second
+        node.style.height = '34px';
+        
+        if (p.id === selectedPauseId) {
+            node.classList.add('bg-yellow-400', 'border-yellow-600', 'opacity-90', 'ring-2', 'ring-yellow-500');
+        } else {
+            node.classList.add('bg-yellow-300', 'border-yellow-400', 'opacity-60', 'hover:opacity-80');
+        }
+
+        node.onmousedown = (e) => {
+            e.stopPropagation();
+            selectPause(p.id);
+
+            isDraggingPause = true;
+            dragNode = node;
+            dragPauseId = p.id;
+            dragStartX = e.clientX;
+            originalWordStart = p.start;
+
+            node.classList.remove('cursor-grab');
+            node.classList.add('cursor-grabbing', 'z-40');
+        };
+        track.appendChild(node);
+    });
     
+    // 2. RENDER WORD BLOCKS (Top-Layer Z-10)
     currentWordsData.forEach((w, index) => {
         const node = document.createElement('div');
         const yOffset = (index % 5) * 42 + 8; 
         const xOffset = w.start * PX_PER_SEC;
         
-        node.className = 'absolute px-2 py-1 text-xs font-bold bg-white border rounded shadow-sm cursor-grab select-none z-10 transition-shadow';
+        node.className = 'absolute px-2 py-1 text-xs font-bold border rounded shadow-sm cursor-grab select-none z-10 transition-shadow';
         node.style.left = xOffset + 'px';
         node.style.top = yOffset + 'px';
         node.innerText = w.word;
         
-        if (index === selectedIndex) {
-            node.classList.add('border-blue-500', 'text-blue-600', 'ring-2', 'ring-blue-200');
+        // Is it tagged as a repair? Paint it Orange. Otherwise, standard styling.
+        if (w.isRepair) {
+            if (index === selectedIndex) {
+                node.classList.add('bg-orange-200', 'border-orange-600', 'text-orange-900', 'ring-2', 'ring-orange-400');
+            } else {
+                node.classList.add('bg-orange-100', 'border-orange-400', 'text-orange-800');
+            }
         } else {
-            node.classList.add('border-slate-300', 'text-slate-700');
+            if (index === selectedIndex) {
+                node.classList.add('bg-white', 'border-blue-500', 'text-blue-600', 'ring-2', 'ring-blue-200');
+            } else {
+                node.classList.add('bg-white', 'border-slate-300', 'text-slate-700');
+            }
         }
 
         node.onmousedown = (e) => {
             e.stopPropagation();
             selectWord(index);
             
-            isDragging = true;
+            isDraggingWord = true;
             dragNode = node;
             dragIndex = index;
             dragStartX = e.clientX;
@@ -271,20 +318,28 @@ function renderWordBlocks() {
     updateLegacyText();
 }
 
+// Global Drag Mouse Tracking
 window.addEventListener('mousemove', (e) => {
-    if (!isDragging || !dragNode) return;
+    if (!dragNode) return;
+    
     const deltaX = e.clientX - dragStartX;
-    const deltaSec = deltaX / PX_PER_SEC;
-    let newTime = Math.max(0, originalWordStart + deltaSec);
+    const newTime = Math.max(0, originalWordStart + deltaX / PX_PER_SEC);
     dragNode.style.left = (newTime * PX_PER_SEC) + 'px';
+
+    // If dragging a pause, we also let them change the ROW vertically
+    if (isDraggingPause) {
+        const trackRect = document.getElementById('word-track').getBoundingClientRect();
+        let relativeY = e.clientY - trackRect.top;
+        let newRow = Math.floor((relativeY - 4) / 42);
+        newRow = Math.max(0, Math.min(4, newRow));
+        dragNode.style.top = (newRow * 42 + 4) + 'px';
+    }
 });
 
 window.addEventListener('mouseup', (e) => {
-    if (isDragging && dragNode) {
-        isDragging = false;
+    if (isDraggingWord && dragNode) {
         const deltaX = e.clientX - dragStartX;
-        const deltaSec = deltaX / PX_PER_SEC;
-        let newTime = Math.max(0, originalWordStart + deltaSec);
+        const newTime = Math.max(0, originalWordStart + deltaX / PX_PER_SEC);
         
         const wordObj = currentWordsData[dragIndex];
         const duration = wordObj.end - wordObj.start;
@@ -294,17 +349,39 @@ window.addEventListener('mouseup', (e) => {
         currentWordsData.sort((a, b) => a.start - b.start);
         selectedIndex = currentWordsData.findIndex(item => item === wordObj);
 
+        isDraggingWord = false;
         dragNode = null;
-        renderWordBlocks();
+        renderTimelineItems();
+
+    } else if (isDraggingPause && dragNode) {
+        const deltaX = e.clientX - dragStartX;
+        const newTime = Math.max(0, originalWordStart + deltaX / PX_PER_SEC);
+        
+        const trackRect = document.getElementById('word-track').getBoundingClientRect();
+        let relativeY = e.clientY - trackRect.top;
+        let newRow = Math.floor((relativeY - 4) / 42);
+        newRow = Math.max(0, Math.min(4, newRow));
+
+        const pIndex = pauseBarsData.findIndex(x => x.id === dragPauseId);
+        if (pIndex > -1) {
+            pauseBarsData[pIndex].start = newTime;
+            pauseBarsData[pIndex].row = newRow;
+        }
+
+        isDraggingPause = false;
+        dragNode = null;
+        renderTimelineItems();
     }
 });
 
+
 // ----------------------------------------------------------------------
-// TOOLBAR & DOM BINDINGS
+// TOOLBAR & SELECTION LOGIC
 // ----------------------------------------------------------------------
 
 function selectWord(index) {
     selectedIndex = index;
+    selectedPauseId = null; // Unselect any pauses
     const w = currentWordsData[index];
     
     const tbContainer = document.getElementById('timeline-toolbar');
@@ -312,15 +389,36 @@ function selectWord(index) {
     const tbTime = document.getElementById('toolbar-word-time');
 
     if(tbContainer) tbContainer.classList.remove('hidden');
-    if(tbInput) tbInput.value = w.word;
+    if(tbInput) {
+        tbInput.disabled = false;
+        tbInput.value = w.word;
+    }
     if(tbTime) tbTime.innerText = formatTrueTime(w.start);
     
     if (analyzerSurfer) {
         const dur = analyzerSurfer.getDuration();
         if (dur > 0) analyzerSurfer.seekTo(w.start / dur);
     }
-    
-    renderWordBlocks();
+    renderTimelineItems();
+}
+
+function selectPause(id) {
+    selectedPauseId = id;
+    selectedIndex = -1; // Unselect any words
+    const p = pauseBarsData.find(x => x.id === id);
+
+    const tbContainer = document.getElementById('timeline-toolbar');
+    const tbInput = document.getElementById('toolbar-word-input');
+    const tbTime = document.getElementById('toolbar-word-time');
+
+    if(tbContainer) tbContainer.classList.remove('hidden');
+    if(tbInput) {
+        tbInput.value = "[PAUSE BAR SELECTED]";
+        tbInput.disabled = true; // Cannot rename a pause block
+    }
+    if(tbTime) tbTime.innerText = formatTrueTime(p.start);
+
+    renderTimelineItems();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -332,6 +430,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // P_COUNT BUTTON (Spawns a yellow Pause Bar)
+    const btnPCount = document.getElementById('btn-p-count');
+    if (btnPCount) {
+        btnPCount.addEventListener('click', () => {
+            let spawnTime = 0;
+            if (analyzerSurfer) spawnTime = analyzerSurfer.getCurrentTime();
+            
+            const newPause = { id: Date.now(), start: spawnTime, row: 0 };
+            pauseBarsData.push(newPause);
+            selectPause(newPause.id);
+        });
+    }
+
+    // R_COUNT BUTTON (Toggles Word to Orange Repair)
+    const btnRCount = document.getElementById('btn-r-count');
+    if (btnRCount) {
+        btnRCount.addEventListener('click', () => {
+            if (selectedIndex > -1 && currentWordsData[selectedIndex]) {
+                currentWordsData[selectedIndex].isRepair = !currentWordsData[selectedIndex].isRepair;
+                renderTimelineItems();
+            }
+        });
+    }
+
+    // Edit Word Text
     const tbInput = document.getElementById('toolbar-word-input');
     if (tbInput) {
         tbInput.addEventListener('keypress', (e) => {
@@ -339,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 if (selectedIndex > -1 && currentWordsData[selectedIndex]) {
                     currentWordsData[selectedIndex].word = tbInput.value.trim();
-                    renderWordBlocks();
+                    renderTimelineItems();
                     tbInput.blur();
                 }
             }
@@ -351,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAddBefore.addEventListener('click', () => {
             if (selectedIndex === -1) return;
             const ref = currentWordsData[selectedIndex];
-            const newWord = { word: "[Type here]", start: Math.max(0, ref.start - 0.2), end: ref.start };
+            const newWord = { word: "[Type here]", start: Math.max(0, ref.start - 0.2), end: ref.start, isRepair: false };
             currentWordsData.splice(selectedIndex, 0, newWord);
             selectWord(selectedIndex); 
         });
@@ -362,28 +485,45 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAddAfter.addEventListener('click', () => {
             if (selectedIndex === -1) return;
             const ref = currentWordsData[selectedIndex];
-            const newWord = { word: "[Type here]", start: ref.end, end: ref.end + 0.2 };
+            const newWord = { word: "[Type here]", start: ref.end, end: ref.end + 0.2, isRepair: false };
             currentWordsData.splice(selectedIndex + 1, 0, newWord);
             selectWord(selectedIndex + 1); 
         });
     }
 
-    const btnDeleteWord = document.getElementById('btn-delete-word');
-    if (btnDeleteWord) {
-        btnDeleteWord.addEventListener('click', () => {
-            if (selectedIndex === -1) return;
+    // Master Delete Engine (Handles Toolbar Button AND Keypresses)
+    const runDeletion = () => {
+        if (selectedPauseId !== null) {
+            pauseBarsData = pauseBarsData.filter(p => p.id !== selectedPauseId);
+            selectedPauseId = null;
+            document.getElementById('timeline-toolbar').classList.add('hidden');
+            renderTimelineItems();
+        } else if (selectedIndex > -1) {
             currentWordsData.splice(selectedIndex, 1);
             selectedIndex = -1;
-            const tbContainer = document.getElementById('timeline-toolbar');
-            if (tbContainer) tbContainer.classList.add('hidden');
+            document.getElementById('timeline-toolbar').classList.add('hidden');
             if (analyzerSurfer) analyzerSurfer.seekTo(0);
-            renderWordBlocks();
-        });
-    }
+            renderTimelineItems();
+        }
+    };
+
+    const btnDeleteWord = document.getElementById('btn-delete-word');
+    if (btnDeleteWord) btnDeleteWord.addEventListener('click', runDeletion);
+
+    // Hardware Keyboard Deletion Hook
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            // Ignore if PhD is actively typing in a text field
+            const tag = document.activeElement.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable) return;
+            runDeletion();
+        }
+    });
 
     const gridRepairs = document.getElementById('grid-repairs');
     if (gridRepairs) gridRepairs.addEventListener('input', recalculateRates);
 
+    // CSV Export
     const btnExportCsv = document.getElementById('btn-export-csv');
     if (btnExportCsv) {
         btnExportCsv.addEventListener('click', () => {
@@ -396,8 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('grid-pauses').innerText,
                 document.getElementById('grid-repairs').value,
                 document.getElementById('grid-org').value || "N/A",
-                document.getElementById('grid-prate').innerText,
-                document.getElementById('grid-rrate').innerText,
+                document.getElementById('grid-prate').innerText.replace('%', ''),
+                document.getElementById('grid-rrate').innerText.replace('%', ''),
                 document.getElementById('grid-notes').value || "None",
                 document.getElementById('grid-org-notes').value || "None",
                 document.getElementById('grid-ru-type').value || "None",
@@ -406,13 +546,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             const tsvString = rowData.join('\t');
-            
-            navigator.clipboard.writeText(tsvString).then(() => {
-                const originalText = btnExportCsv.innerHTML;
                 btnExportCsv.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied to Clipboard!`;
                 btnExportCsv.classList.replace('bg-emerald-600', 'bg-blue-600');
                 if(window.lucide) window.lucide.createIcons();
-                
                 setTimeout(() => {
                     btnExportCsv.innerHTML = originalText;
                     btnExportCsv.classList.replace('bg-blue-600', 'bg-emerald-600');
@@ -423,8 +559,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
 // ----------------------------------------------------------------------
-// DATA GRID LOGIC
+// DATA GRID LOGIC (Linked directly to explicit PhD tracking)
 // ----------------------------------------------------------------------
 
 function populateGridInitialData(fileName, startTimeSec) {
@@ -443,19 +580,21 @@ function populateGridInitialData(fileName, startTimeSec) {
 }
 
 function updateGridMetrics() {
+    // Exact overrides driven purely by the visual objects
     const wordCount = currentWordsData.length;
-    let pauseCount = 0;
-    
-    for (let i = 0; i < currentWordsData.length - 1; i++) {
-        const gap = currentWordsData[i+1].start - currentWordsData[i].end;
-        if (gap > 1.0) pauseCount++;
-    }
+    const manualPauseCount = pauseBarsData.length;
+    const manualRepairCount = currentWordsData.filter(w => w.isRepair).length;
 
     const gWords = document.getElementById('grid-words');
     const gPauses = document.getElementById('grid-pauses');
+    const gRepairs = document.getElementById('grid-repairs');
     
     if(gWords) gWords.innerText = wordCount;
-    if(gPauses) gPauses.innerText = pauseCount;
+    if(gPauses) gPauses.innerText = manualPauseCount;
+    if(gRepairs) {
+        gRepairs.value = manualRepairCount; 
+        gRepairs.classList.add('bg-orange-50', 'text-orange-800'); // Subtle visual link to the orange tags
+    }
     
     recalculateRates();
 }
@@ -477,8 +616,8 @@ function recalculateRates() {
     const prate = document.getElementById('grid-prate');
     const rrate = document.getElementById('grid-rrate');
     
-    if(prate) prate.innerText = pauseRate.toFixed(2);
-    if(rrate) rrate.innerText = repairRate.toFixed(2);
+    if(prate) prate.innerText = pauseRate.toFixed(2) + '%';
+    if(rrate) rrate.innerText = repairRate.toFixed(2) + '%';
 }
 
 function updateLegacyText() {
