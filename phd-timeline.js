@@ -1,6 +1,6 @@
 // ==========================================
 // THPS PhD TIMELINE & GRID ENGINE
-// Handles STT calls, NLE interactive words, and metrics
+// Handles STT chunking, NLE interactive words, and metrics
 // ==========================================
 
 let analyzerSurfer = null;
@@ -8,43 +8,127 @@ let currentWordsData = [];
 let clipStartTimeSec = 0; 
 let selectedIndex = -1;
 
-// TIMELINE SETTINGS
 const PX_PER_SEC = 100; // 100px equals 1 second. Ensures smooth spacing.
 
+// --- WAV ENCODER HELPERS ---
+function floatTo16BitPCM(output, offset, input) {
+    for (let i = 0; i < input.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+}
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+}
+function encodeWAV(samples, sampleRate) {
+    let buffer = new ArrayBuffer(44 + samples.length * 2);
+    let view = new DataView(buffer);
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+    floatTo16BitPCM(view, 44, samples);
+    return new Blob([view], { type: 'audio/wav' });
+}
+
+// --- MASTER INJECTION & CHUNKING ENGINE ---
 window.addEventListener('thps-inject-snip', async (e) => {
     const { blob, fileName, startTime } = e.detail;
     clipStartTimeSec = startTime; 
     
     const statusEl = document.getElementById('stt-status');
-    if(statusEl) statusEl.classList.remove('hidden');
-    
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = async () => {
-        const b64 = reader.result.split(',')[1];
-        
-        try {
-            const res = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ audioContent: b64, mimeType: 'audio/wav' })
-            });
-            
-            const sttData = await res.json();
-            if(statusEl) statusEl.classList.add('hidden');
-            
-            setupAnalyzerTimeline(blob, sttData.words || []);
-            populateGridInitialData(fileName, startTime);
-            
-        } catch (err) {
-            console.error("STT Error:", err);
-            if(statusEl) {
-                statusEl.innerText = "Error parsing STT";
-                statusEl.classList.replace('bg-blue-100', 'bg-red-100');
-                statusEl.classList.replace('text-blue-700', 'text-red-700');
-            }
+    if(statusEl) {
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = "Processing STT...";
+        statusEl.classList.remove('bg-red-100', 'text-red-700');
+        statusEl.classList.add('bg-blue-100', 'text-blue-700');
+    }
+
+    try {
+        // 1. Decode the incoming audio blob
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        // 2. Slice the audio into safe 30-second chunks for Google Cloud
+        const sampleRate = audioBuffer.sampleRate;
+        const channelData = audioBuffer.getChannelData(0); // Mono track
+        const chunkSize = sampleRate * 30; // 30 seconds
+
+        let wavChunks = [];
+        for(let i = 0; i < channelData.length; i += chunkSize) {
+            let segment = channelData.subarray(i, Math.min(i + chunkSize, channelData.length));
+            wavChunks.push(encodeWAV(segment, sampleRate));
         }
-    };
+
+        // 3. Send chunks to Vercel in parallel
+        const uploadPromises = wavChunks.map(async (chunkBlob, index) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(chunkBlob);
+                reader.onloadend = async () => {
+                    const base64data = reader.result.split(',')[1];
+                    try {
+                        const response = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ audioContent: base64data, mimeType: 'audio/wav' })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            resolve({ index: index, words: data.words || [] });
+                        } else {
+                            resolve({ index: index, words: [], error: `HTTP ${response.status}` });
+                        }
+                    } catch (e) {
+                        resolve({ index: index, words: [], error: e.message });
+                    }
+                };
+            });
+        });
+
+        // 4. Await all processing and sort them back into chronological order
+        const resolvedChunks = await Promise.all(uploadPromises);
+        resolvedChunks.sort((a, b) => a.index - b.index);
+
+        // 5. Stitch the timestamps back together across the 30-second gaps
+        let finalStitchedWords = [];
+        resolvedChunks.forEach(chunk => {
+            if (chunk.words && chunk.words.length > 0) {
+                chunk.words.forEach(w => {
+                    finalStitchedWords.push({
+                        word: w.word,
+                        start: w.start + (chunk.index * 30),
+                        end: w.end + (chunk.index * 30)
+                    });
+                });
+            }
+        });
+
+        if(statusEl) statusEl.classList.add('hidden');
+        
+        // 6. Push to UI
+        setupAnalyzerTimeline(blob, finalStitchedWords);
+        populateGridInitialData(fileName, startTime);
+
+    } catch (err) {
+        console.error("STT Extraction Error:", err);
+        if(statusEl) {
+            statusEl.innerText = "Error parsing Audio";
+            statusEl.classList.replace('bg-blue-100', 'bg-red-100');
+            statusEl.classList.replace('text-blue-700', 'text-red-700');
+        }
+    }
 });
 
 // Helper: Format accurate HH:MM:SS
@@ -65,38 +149,31 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
         progressColor: '#10b981',
         height: 96,
         normalize: true,
-        cursorColor: 'transparent', // We use our custom red playhead
-        interact: false // Disable direct wavesurfer clicking to prevent conflicts with our drag layer
+        cursorColor: 'transparent',
+        interact: false 
     });
     
     const fileURL = URL.createObjectURL(audioBlob);
     analyzerSurfer.load(fileURL);
     
-    // Sort array by start time to ensure perfect rendering
     currentWordsData = wordsArray.sort((a, b) => a.start - b.start);
     selectedIndex = -1;
     
     analyzerSurfer.on('ready', () => {
         const duration = analyzerSurfer.getDuration();
-        
-        // Stretch the internal timeline container based on the audio length
         const scrollArea = document.getElementById('master-scroll-area');
         if (scrollArea) {
             const pxWidth = Math.max(duration * PX_PER_SEC, scrollArea.clientWidth);
             document.getElementById('timeline-inner').style.width = pxWidth + 'px';
         }
-        
         renderWordBlocks();
     });
 
-    // MASTER PLAYBACK SYNC
     analyzerSurfer.on('timeupdate', (currentTime) => {
         const playhead = document.getElementById('master-playhead');
         if (playhead) {
             const leftPx = currentTime * PX_PER_SEC;
             playhead.style.left = leftPx + 'px';
-            
-            // Auto-Scroll the master container slightly ahead of playhead
             const scrollArea = document.getElementById('master-scroll-area');
             if (scrollArea && leftPx > scrollArea.scrollLeft + scrollArea.clientWidth - 100) {
                 scrollArea.scrollLeft = leftPx - (scrollArea.clientWidth / 2);
@@ -134,7 +211,6 @@ function renderWordBlocks() {
     if(!track) return;
     track.innerHTML = '';
     
-    // Re-inject the background grid lines so they stay underneath
     track.innerHTML = `
         <div class="absolute inset-0 pointer-events-none flex flex-col justify-between py-1 z-0">
             <div class="h-10 border-b border-slate-200 border-dashed w-full"></div>
@@ -147,8 +223,6 @@ function renderWordBlocks() {
     
     currentWordsData.forEach((w, index) => {
         const node = document.createElement('div');
-        
-        // We use absolute positioning. Modulo 5 ensures a perfect 5-row wrap!
         const yOffset = (index % 5) * 42 + 8; 
         const xOffset = w.start * PX_PER_SEC;
         
@@ -163,7 +237,6 @@ function renderWordBlocks() {
             node.classList.add('border-slate-300', 'text-slate-700');
         }
 
-        // DRAG AND SELECT INITIATION
         node.onmousedown = (e) => {
             e.stopPropagation();
             selectWord(index);
@@ -177,7 +250,6 @@ function renderWordBlocks() {
             node.classList.remove('cursor-grab');
             node.classList.add('cursor-grabbing', 'z-50', 'ring-4', 'ring-amber-200', 'border-amber-500', 'text-amber-700');
         };
-        
         track.appendChild(node);
     });
     
@@ -185,7 +257,6 @@ function renderWordBlocks() {
     updateLegacyText();
 }
 
-// Global Drag Handlers
 window.addEventListener('mousemove', (e) => {
     if (!isDragging || !dragNode) return;
     const deltaX = e.clientX - dragStartX;
@@ -201,13 +272,11 @@ window.addEventListener('mouseup', (e) => {
         const deltaSec = deltaX / PX_PER_SEC;
         let newTime = Math.max(0, originalWordStart + deltaSec);
         
-        // Update the master data array
         const wordObj = currentWordsData[dragIndex];
         const duration = wordObj.end - wordObj.start;
         wordObj.start = newTime;
         wordObj.end = newTime + duration;
 
-        // Automatically sort timeline to keep chronological sanity (modulo 5 updates automatically)
         currentWordsData.sort((a, b) => a.start - b.start);
         selectedIndex = currentWordsData.findIndex(item => item === wordObj);
 
@@ -217,7 +286,7 @@ window.addEventListener('mouseup', (e) => {
 });
 
 // ----------------------------------------------------------------------
-// TOOLBAR & DOM BINDINGS (Wrapped in DOMContentLoaded to prevent breaking)
+// TOOLBAR & DOM BINDINGS
 // ----------------------------------------------------------------------
 
 function selectWord(index) {
@@ -232,7 +301,6 @@ function selectWord(index) {
     if(tbInput) tbInput.value = w.word;
     if(tbTime) tbTime.innerText = formatTrueTime(w.start);
     
-    // Jump Seeker
     if (analyzerSurfer) {
         const dur = analyzerSurfer.getDuration();
         if (dur > 0) analyzerSurfer.seekTo(w.start / dur);
@@ -243,7 +311,6 @@ function selectWord(index) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Master Play Button
     const masterPlayBtn = document.getElementById('master-play-btn');
     if (masterPlayBtn) {
         masterPlayBtn.addEventListener('click', () => {
@@ -251,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Edit Word Text (Hits Enter)
     const tbInput = document.getElementById('toolbar-word-input');
     if (tbInput) {
         tbInput.addEventListener('keypress', (e) => {
@@ -259,69 +325,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 if (selectedIndex > -1 && currentWordsData[selectedIndex]) {
                     currentWordsData[selectedIndex].word = tbInput.value.trim();
-                    // We intentionally DO NOT jump the seeker here. It stays in place.
                     renderWordBlocks();
-                    tbInput.blur(); // Drop focus
+                    tbInput.blur();
                 }
             }
         });
     }
 
-    // [+ Add Back]
     const btnAddBefore = document.getElementById('btn-add-before');
     if (btnAddBefore) {
         btnAddBefore.addEventListener('click', () => {
             if (selectedIndex === -1) return;
             const ref = currentWordsData[selectedIndex];
-            
-            // Insert brand new blank element slightly before
             const newWord = { word: "[Type here]", start: Math.max(0, ref.start - 0.2), end: ref.start };
             currentWordsData.splice(selectedIndex, 0, newWord);
-            
-            // Select the new word automatically
             selectWord(selectedIndex); 
         });
     }
 
-    // [+ Add After]
     const btnAddAfter = document.getElementById('btn-add-after');
     if (btnAddAfter) {
         btnAddAfter.addEventListener('click', () => {
             if (selectedIndex === -1) return;
             const ref = currentWordsData[selectedIndex];
-            
             const newWord = { word: "[Type here]", start: ref.end, end: ref.end + 0.2 };
             currentWordsData.splice(selectedIndex + 1, 0, newWord);
-            
             selectWord(selectedIndex + 1); 
         });
     }
 
-    // [Delete]
     const btnDeleteWord = document.getElementById('btn-delete-word');
     if (btnDeleteWord) {
         btnDeleteWord.addEventListener('click', () => {
             if (selectedIndex === -1) return;
             currentWordsData.splice(selectedIndex, 1);
-            
             selectedIndex = -1;
             const tbContainer = document.getElementById('timeline-toolbar');
             if (tbContainer) tbContainer.classList.add('hidden');
-            
-            // Send Seeker back to 0:00 as requested
             if (analyzerSurfer) analyzerSurfer.seekTo(0);
-            
             renderWordBlocks();
         });
     }
 
-    // Grid Rate Listeners
     const gridRepairs = document.getElementById('grid-repairs');
-    if (gridRepairs) {
-        gridRepairs.addEventListener('input', recalculateRates);
-    }
+    if (gridRepairs) gridRepairs.addEventListener('input', recalculateRates);
 
-    // COPY ROW TO CLIPBOARD (Updated with all 15 columns)
     const btnExportCsv = document.getElementById('btn-export-csv');
     if (btnExportCsv) {
         btnExportCsv.addEventListener('click', () => {
@@ -359,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
 });
 
 // ----------------------------------------------------------------------
@@ -423,7 +470,5 @@ function recalculateRates() {
 function updateLegacyText() {
     const textStr = currentWordsData.map(w => w.word).join(" ");
     const legacyInput = document.getElementById('cba-inputText');
-    if (legacyInput) {
-        legacyInput.value = textStr;
-    }
+    if (legacyInput) legacyInput.value = textStr;
 }
