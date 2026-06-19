@@ -132,6 +132,36 @@ window.addEventListener('thps-inject-snip', async (e) => {
             }
         });
 
+        // Ensure words are sorted by start time
+        finalStitchedWords.sort((a, b) => a.start - b.start);
+
+        // NEW: Auto-prefill Pause Bars for >= 1.0s gaps
+        pauseBarsData = [];
+        let pauseIdCounter = Date.now();
+
+        if (finalStitchedWords.length > 0) {
+            // 1. Check for gap at the very beginning of the audio
+            if (finalStitchedWords[0].start >= 1.0) {
+                pauseBarsData.push({
+                    id: pauseIdCounter++,
+                    start: 0.0,
+                    row: 2 // Spawn in the middle (3rd) row
+                });
+            }
+
+            // 2. Check for gaps between words
+            for (let i = 0; i < finalStitchedWords.length - 1; i++) {
+                const gap = finalStitchedWords[i + 1].start - finalStitchedWords[i].end;
+                if (gap >= 1.0) {
+                    pauseBarsData.push({
+                        id: pauseIdCounter++,
+                        start: finalStitchedWords[i].end, // Spawn precisely at the end of the previous word
+                        row: 2 // Spawn in the middle (3rd) row
+                    });
+                }
+            }
+        }
+
         if(statusEl) statusEl.classList.add('hidden');
         
         setupAnalyzerTimeline(blob, finalStitchedWords);
