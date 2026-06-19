@@ -5,7 +5,7 @@
 
 let analyzerSurfer = null;
 let currentWordsData = [];
-let clipStartTimeSec = 0; // The true HH:MM:SS start of this clip
+let clipStartTimeSec = 0; 
 let selectedIndex = -1;
 
 // TIMELINE SETTINGS
@@ -16,7 +16,7 @@ window.addEventListener('thps-inject-snip', async (e) => {
     clipStartTimeSec = startTime; 
     
     const statusEl = document.getElementById('stt-status');
-    statusEl.classList.remove('hidden');
+    if(statusEl) statusEl.classList.remove('hidden');
     
     const reader = new FileReader();
     reader.readAsDataURL(blob);
@@ -31,16 +31,18 @@ window.addEventListener('thps-inject-snip', async (e) => {
             });
             
             const sttData = await res.json();
-            statusEl.classList.add('hidden');
+            if(statusEl) statusEl.classList.add('hidden');
             
             setupAnalyzerTimeline(blob, sttData.words || []);
             populateGridInitialData(fileName, startTime);
             
         } catch (err) {
             console.error("STT Error:", err);
-            statusEl.innerText = "Error parsing STT";
-            statusEl.classList.replace('bg-blue-100', 'bg-red-100');
-            statusEl.classList.replace('text-blue-700', 'text-red-700');
+            if(statusEl) {
+                statusEl.innerText = "Error parsing STT";
+                statusEl.classList.replace('bg-blue-100', 'bg-red-100');
+                statusEl.classList.replace('text-blue-700', 'text-red-700');
+            }
         }
     };
 });
@@ -79,8 +81,10 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
         
         // Stretch the internal timeline container based on the audio length
         const scrollArea = document.getElementById('master-scroll-area');
-        const pxWidth = Math.max(duration * PX_PER_SEC, scrollArea.clientWidth);
-        document.getElementById('timeline-inner').style.width = pxWidth + 'px';
+        if (scrollArea) {
+            const pxWidth = Math.max(duration * PX_PER_SEC, scrollArea.clientWidth);
+            document.getElementById('timeline-inner').style.width = pxWidth + 'px';
+        }
         
         renderWordBlocks();
     });
@@ -88,32 +92,32 @@ function setupAnalyzerTimeline(audioBlob, wordsArray) {
     // MASTER PLAYBACK SYNC
     analyzerSurfer.on('timeupdate', (currentTime) => {
         const playhead = document.getElementById('master-playhead');
-        const leftPx = currentTime * PX_PER_SEC;
-        playhead.style.left = leftPx + 'px';
-        
-        // Auto-Scroll the master container slightly ahead of playhead
-        const scrollArea = document.getElementById('master-scroll-area');
-        if (leftPx > scrollArea.scrollLeft + scrollArea.clientWidth - 100) {
-            scrollArea.scrollLeft = leftPx - (scrollArea.clientWidth / 2);
+        if (playhead) {
+            const leftPx = currentTime * PX_PER_SEC;
+            playhead.style.left = leftPx + 'px';
+            
+            // Auto-Scroll the master container slightly ahead of playhead
+            const scrollArea = document.getElementById('master-scroll-area');
+            if (scrollArea && leftPx > scrollArea.scrollLeft + scrollArea.clientWidth - 100) {
+                scrollArea.scrollLeft = leftPx - (scrollArea.clientWidth / 2);
+            }
         }
     });
 
     analyzerSurfer.on('play', () => {
-        document.getElementById('master-icon-play').classList.add('hidden');
-        document.getElementById('master-icon-pause').classList.remove('hidden');
+        const iconPlay = document.getElementById('master-icon-play');
+        const iconPause = document.getElementById('master-icon-pause');
+        if (iconPlay) iconPlay.classList.add('hidden');
+        if (iconPause) iconPause.classList.remove('hidden');
     });
     
     analyzerSurfer.on('pause', () => {
-        document.getElementById('master-icon-pause').classList.add('hidden');
-        document.getElementById('master-icon-play').classList.remove('hidden');
+        const iconPlay = document.getElementById('master-icon-play');
+        const iconPause = document.getElementById('master-icon-pause');
+        if (iconPause) iconPause.classList.add('hidden');
+        if (iconPlay) iconPlay.classList.remove('hidden');
     });
 }
-
-// Master Play Button
-document.getElementById('master-play-btn').addEventListener('click', () => {
-    if (analyzerSurfer) analyzerSurfer.playPause();
-});
-
 
 // ----------------------------------------------------------------------
 // THE 5-ROW NLE MUSIC STAFF ENGINE
@@ -127,6 +131,7 @@ let originalWordStart = 0;
 
 function renderWordBlocks() {
     const track = document.getElementById('word-track');
+    if(!track) return;
     track.innerHTML = '';
     
     // Re-inject the background grid lines so they stay underneath
@@ -212,81 +217,150 @@ window.addEventListener('mouseup', (e) => {
 });
 
 // ----------------------------------------------------------------------
-// TOOLBAR LOGIC
+// TOOLBAR & DOM BINDINGS (Wrapped in DOMContentLoaded to prevent breaking)
 // ----------------------------------------------------------------------
-
-const tbContainer = document.getElementById('timeline-toolbar');
-const tbInput = document.getElementById('toolbar-word-input');
-const tbTime = document.getElementById('toolbar-word-time');
 
 function selectWord(index) {
     selectedIndex = index;
     const w = currentWordsData[index];
     
-    tbContainer.classList.remove('hidden');
-    tbInput.value = w.word;
-    tbTime.innerText = formatTrueTime(w.start);
+    const tbContainer = document.getElementById('timeline-toolbar');
+    const tbInput = document.getElementById('toolbar-word-input');
+    const tbTime = document.getElementById('toolbar-word-time');
+
+    if(tbContainer) tbContainer.classList.remove('hidden');
+    if(tbInput) tbInput.value = w.word;
+    if(tbTime) tbTime.innerText = formatTrueTime(w.start);
     
     // Jump Seeker
     if (analyzerSurfer) {
         const dur = analyzerSurfer.getDuration();
-        analyzerSurfer.seekTo(w.start / dur);
+        if (dur > 0) analyzerSurfer.seekTo(w.start / dur);
     }
     
     renderWordBlocks();
 }
 
-// Edit Word Text (Hits Enter)
-tbInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        if (selectedIndex > -1 && currentWordsData[selectedIndex]) {
-            currentWordsData[selectedIndex].word = tbInput.value.trim();
-            // We intentionally DO NOT jump the seeker here. It stays in place.
-            renderWordBlocks();
-            tbInput.blur(); // Drop focus
-        }
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Master Play Button
+    const masterPlayBtn = document.getElementById('master-play-btn');
+    if (masterPlayBtn) {
+        masterPlayBtn.addEventListener('click', () => {
+            if (analyzerSurfer) analyzerSurfer.playPause();
+        });
     }
-});
 
-// [+ Add Back]
-document.getElementById('btn-add-before').addEventListener('click', () => {
-    if (selectedIndex === -1) return;
-    const ref = currentWordsData[selectedIndex];
-    
-    // Insert brand new blank element slightly before
-    const newWord = { word: "[Type here]", start: Math.max(0, ref.start - 0.2), end: ref.start };
-    currentWordsData.splice(selectedIndex, 0, newWord);
-    
-    // Select the new word automatically
-    selectWord(selectedIndex); 
-});
+    // Edit Word Text (Hits Enter)
+    const tbInput = document.getElementById('toolbar-word-input');
+    if (tbInput) {
+        tbInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex > -1 && currentWordsData[selectedIndex]) {
+                    currentWordsData[selectedIndex].word = tbInput.value.trim();
+                    // We intentionally DO NOT jump the seeker here. It stays in place.
+                    renderWordBlocks();
+                    tbInput.blur(); // Drop focus
+                }
+            }
+        });
+    }
 
-// [+ Add After]
-document.getElementById('btn-add-after').addEventListener('click', () => {
-    if (selectedIndex === -1) return;
-    const ref = currentWordsData[selectedIndex];
-    
-    const newWord = { word: "[Type here]", start: ref.end, end: ref.end + 0.2 };
-    currentWordsData.splice(selectedIndex + 1, 0, newWord);
-    
-    selectWord(selectedIndex + 1); 
-});
+    // [+ Add Back]
+    const btnAddBefore = document.getElementById('btn-add-before');
+    if (btnAddBefore) {
+        btnAddBefore.addEventListener('click', () => {
+            if (selectedIndex === -1) return;
+            const ref = currentWordsData[selectedIndex];
+            
+            // Insert brand new blank element slightly before
+            const newWord = { word: "[Type here]", start: Math.max(0, ref.start - 0.2), end: ref.start };
+            currentWordsData.splice(selectedIndex, 0, newWord);
+            
+            // Select the new word automatically
+            selectWord(selectedIndex); 
+        });
+    }
 
-// [Delete]
-document.getElementById('btn-delete-word').addEventListener('click', () => {
-    if (selectedIndex === -1) return;
-    currentWordsData.splice(selectedIndex, 1);
-    
-    selectedIndex = -1;
-    tbContainer.classList.add('hidden');
-    
-    // Send Seeker back to 0:00 as requested
-    if (analyzerSurfer) analyzerSurfer.seekTo(0);
-    
-    renderWordBlocks();
-});
+    // [+ Add After]
+    const btnAddAfter = document.getElementById('btn-add-after');
+    if (btnAddAfter) {
+        btnAddAfter.addEventListener('click', () => {
+            if (selectedIndex === -1) return;
+            const ref = currentWordsData[selectedIndex];
+            
+            const newWord = { word: "[Type here]", start: ref.end, end: ref.end + 0.2 };
+            currentWordsData.splice(selectedIndex + 1, 0, newWord);
+            
+            selectWord(selectedIndex + 1); 
+        });
+    }
 
+    // [Delete]
+    const btnDeleteWord = document.getElementById('btn-delete-word');
+    if (btnDeleteWord) {
+        btnDeleteWord.addEventListener('click', () => {
+            if (selectedIndex === -1) return;
+            currentWordsData.splice(selectedIndex, 1);
+            
+            selectedIndex = -1;
+            const tbContainer = document.getElementById('timeline-toolbar');
+            if (tbContainer) tbContainer.classList.add('hidden');
+            
+            // Send Seeker back to 0:00 as requested
+            if (analyzerSurfer) analyzerSurfer.seekTo(0);
+            
+            renderWordBlocks();
+        });
+    }
+
+    // Grid Rate Listeners
+    const gridRepairs = document.getElementById('grid-repairs');
+    if (gridRepairs) {
+        gridRepairs.addEventListener('input', recalculateRates);
+    }
+
+    // COPY ROW TO CLIPBOARD (Updated with all 15 columns)
+    const btnExportCsv = document.getElementById('btn-export-csv');
+    if (btnExportCsv) {
+        btnExportCsv.addEventListener('click', () => {
+            const rowData = [
+                document.getElementById('grid-pid').innerText,
+                document.getElementById('grid-session').innerText,
+                document.getElementById('grid-time').innerText,
+                document.getElementById('grid-task').value || "None",
+                document.getElementById('grid-words').innerText,
+                document.getElementById('grid-pauses').innerText,
+                document.getElementById('grid-repairs').value,
+                document.getElementById('grid-org').value || "N/A",
+                document.getElementById('grid-prate').innerText,
+                document.getElementById('grid-rrate').innerText,
+                document.getElementById('grid-notes').value || "None",
+                document.getElementById('grid-org-notes').value || "None",
+                document.getElementById('grid-ru-type').value || "None",
+                document.getElementById('grid-include').value || "Y",
+                document.getElementById('grid-complete').value || "Y"
+            ];
+
+            const tsvString = rowData.join('\t');
+            
+            navigator.clipboard.writeText(tsvString).then(() => {
+                const originalText = btnExportCsv.innerHTML;
+                btnExportCsv.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied to Clipboard!`;
+                btnExportCsv.classList.replace('bg-emerald-600', 'bg-blue-600');
+                if(window.lucide) window.lucide.createIcons();
+                
+                setTimeout(() => {
+                    btnExportCsv.innerHTML = originalText;
+                    btnExportCsv.classList.replace('bg-blue-600', 'bg-emerald-600');
+                    if(window.lucide) window.lucide.createIcons();
+                }, 2000);
+            });
+        });
+    }
+
+});
 
 // ----------------------------------------------------------------------
 // DATA GRID LOGIC
@@ -294,13 +368,17 @@ document.getElementById('btn-delete-word').addEventListener('click', () => {
 
 function populateGridInitialData(fileName, startTimeSec) {
     const parts = fileName.split('-');
-    document.getElementById('grid-pid').innerText = parts[0] || '-';
-    document.getElementById('grid-session').innerText = parts[2] || '-';
+    const gridPid = document.getElementById('grid-pid');
+    const gridSession = document.getElementById('grid-session');
+    const gridTime = document.getElementById('grid-time');
+    
+    if(gridPid) gridPid.innerText = parts[0] || '-';
+    if(gridSession) gridSession.innerText = parts[2] || '-';
     
     const h = Math.floor(startTimeSec / 3600).toString().padStart(2, '0');
     const m = Math.floor((startTimeSec % 3600) / 60).toString().padStart(2, '0');
     const s = Math.floor(startTimeSec % 60).toString().padStart(2, '0');
-    document.getElementById('grid-time').innerText = `${h}:${m}:${s}`;
+    if(gridTime) gridTime.innerText = `${h}:${m}:${s}`;
 }
 
 function updateGridMetrics() {
@@ -312,70 +390,40 @@ function updateGridMetrics() {
         if (gap > 1.0) pauseCount++;
     }
 
-    document.getElementById('grid-words').innerText = wordCount;
-    document.getElementById('grid-pauses').innerText = pauseCount;
+    const gWords = document.getElementById('grid-words');
+    const gPauses = document.getElementById('grid-pauses');
+    
+    if(gWords) gWords.innerText = wordCount;
+    if(gPauses) gPauses.innerText = pauseCount;
     
     recalculateRates();
 }
 
 function recalculateRates() {
-    const wCount = parseInt(document.getElementById('grid-words').innerText) || 0;
-    const pCount = parseInt(document.getElementById('grid-pauses').innerText) || 0;
-    const rCount = parseInt(document.getElementById('grid-repairs').value) || 0;
+    const wCountEl = document.getElementById('grid-words');
+    const pCountEl = document.getElementById('grid-pauses');
+    const rCountEl = document.getElementById('grid-repairs');
+    
+    if(!wCountEl || !pCountEl || !rCountEl) return;
+
+    const wCount = parseInt(wCountEl.innerText) || 0;
+    const pCount = parseInt(pCountEl.innerText) || 0;
+    const rCount = parseInt(rCountEl.value) || 0;
 
     const pauseRate = wCount > 0 ? (pCount / wCount) * 100 : 0;
     const repairRate = wCount > 0 ? (rCount / wCount) * 100 : 0;
 
-    document.getElementById('grid-prate').innerText = pauseRate.toFixed(2);
-    document.getElementById('grid-rrate').innerText = repairRate.toFixed(2);
+    const prate = document.getElementById('grid-prate');
+    const rrate = document.getElementById('grid-rrate');
+    
+    if(prate) prate.innerText = pauseRate.toFixed(2);
+    if(rrate) rrate.innerText = repairRate.toFixed(2);
 }
 
-document.getElementById('grid-repairs').addEventListener('input', recalculateRates);
-
-// Push timeline edits into the legacy text box so the old dashboard can function
 function updateLegacyText() {
     const textStr = currentWordsData.map(w => w.word).join(" ");
     const legacyInput = document.getElementById('cba-inputText');
     if (legacyInput) {
         legacyInput.value = textStr;
-        // Optionally trigger analyze() if you want the legacy dashboard to live-update
-        // window.analyze();
     }
 }
-
-// COPY ROW TO CLIPBOARD (Updated with all 15 columns)
-document.getElementById('btn-export-csv').addEventListener('click', () => {
-    const rowData = [
-        document.getElementById('grid-pid').innerText,
-        document.getElementById('grid-session').innerText,
-        document.getElementById('grid-time').innerText,
-        document.getElementById('grid-task').value || "None",
-        document.getElementById('grid-words').innerText,
-        document.getElementById('grid-pauses').innerText,
-        document.getElementById('grid-repairs').value,
-        document.getElementById('grid-org').value || "N/A",
-        document.getElementById('grid-prate').innerText,
-        document.getElementById('grid-rrate').innerText,
-        document.getElementById('grid-notes').value || "None",
-        document.getElementById('grid-org-notes').value || "None",
-        document.getElementById('grid-ru-type').value || "None",
-        document.getElementById('grid-include').value || "Y",
-        document.getElementById('grid-complete').value || "Y"
-    ];
-
-    const tsvString = rowData.join('\t');
-    
-    navigator.clipboard.writeText(tsvString).then(() => {
-        const btn = document.getElementById('btn-export-csv');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Copied to Clipboard!`;
-        btn.classList.replace('bg-emerald-600', 'bg-blue-600');
-        if(window.lucide) window.lucide.createIcons();
-        
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.classList.replace('bg-blue-600', 'bg-emerald-600');
-            if(window.lucide) window.lucide.createIcons();
-        }, 2000);
-    });
-});
