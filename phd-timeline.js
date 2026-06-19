@@ -156,7 +156,13 @@ document.getElementById('btn-export-csv').addEventListener('click', () => {
         document.getElementById('grid-org').value || "N/A",
         document.getElementById('grid-prate').innerText,
         document.getElementById('grid-rrate').innerText,
-        document.getElementById('grid-notes').value || "None"
+        document.getElementById('grid-notes').value || "None",
+        document.getElementById('grid-notes').value || "None",
+        document.getElementById('grid-org-notes').value || "None",
+        document.getElementById('grid-ru-type').value || "None",
+        document.getElementById('grid-include').value || "Y",
+        document.getElementById('grid-complete').value || "Y"
+    ];
     ];
 
     // Join with tabs for perfect Excel/Sheets pasting
