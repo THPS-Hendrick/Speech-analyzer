@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhD Analyzer Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/phd-snipper.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/phd-timeline.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-8 text-slate-800">
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-black uppercase tracking-widest mb-4">1. Local Video/Audio Extractor</h2>
+            
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <input type="text" id="phd-part-id" placeholder="Participant ID" class="p-2 border rounded-lg bg-slate-50">
+                <input type="date" id="phd-date" class="p-2 border rounded-lg bg-slate-50">
+                <input type="text" id="phd-session" placeholder="Session #" class="p-2 border rounded-lg bg-slate-50">
+            </div>
+
+            <input type="file" id="phd-media-upload" accept="video/*,audio/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+            
+            <div id="snipper-waveform" class="w-full h-32 bg-slate-100 rounded-lg mb-4 hidden border border-slate-200"></div>
+
+            <div id="snipper-actions" class="hidden flex gap-4">
+                <button id="btn-download-snip" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-700 transition">Download .WAV</button>
+                <button id="btn-inject-snip" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Inject to Analyzer</button>
+            </div>
+        </div>
+
+        <div id="analyzer-workspace" class="hidden bg-white p-6 rounded-2xl shadow-xl border-t-4 border-blue-600">
+            <h2 class="text-xl font-black uppercase tracking-widest mb-4">2. Acoustic Timeline Corrections</h2>
+            
+            <div id="stt-loading" class="hidden text-center p-8 text-blue-600 animate-pulse font-bold">
+                Hitting Vercel STT. Extracting precise word timings...
+            </div>
+
+            <div id="analyzer-waveform" class="w-full h-48 bg-slate-50 rounded-lg mb-4 relative overflow-hidden"></div>
+            
+            <div id="word-track" class="flex overflow-x-auto gap-2 p-4 bg-slate-100 rounded-lg min-h-[80px]"></div>
+        </div>
+
+        <div id="grid-workspace" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-black uppercase tracking-widest mb-4 flex justify-between">
+                3. PhD Data Grid
+                <button id="btn-export-csv" class="text-sm bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Copy Row to Clipboard</button>
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-500 uppercase tracking-wider text-[10px]">
+                            <th class="p-2 border">Participant_ID</th>
+                            <th class="p-2 border">Session</th>
+                            <th class="p-2 border">Word_Count</th>
+                            <th class="p-2 border">Pause_Count</th>
+                            <th class="p-2 border">Repair_Count</th>
+                            </tr>
+                    </thead>
+                    <tbody id="phd-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
