@@ -1,23 +1,39 @@
 // ==========================================
 // THPS PhD SNIPPER ENGINE
-// Handles local video/audio parsing & trimming
+// Handles local video/audio parsing, trimming, and playback
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const uploadInput = document.getElementById('phd-media-upload');
     const waveformContainer = document.getElementById('snipper-waveform');
     const actionsContainer = document.getElementById('snipper-actions');
-    const instructions = document.getElementById('snipper-instructions');
+    const controlsContainer = document.getElementById('snipper-controls');
+    
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    
+    const inputInTime = document.getElementById('phd-in-time');
+    const inputOutTime = document.getElementById('phd-out-time');
     
     let wavesurfer = null;
     let wsRegions = null;
+
+    // Helper: Convert Seconds to HH-MM-SS
+    const formatTime = (seconds) => {
+        const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+        const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+        const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${h}-${m}-${s}`;
+    };
 
     uploadInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         waveformContainer.classList.remove('hidden');
-        instructions.classList.remove('hidden');
+        controlsContainer.classList.remove('hidden');
+        controlsContainer.classList.add('flex');
         actionsContainer.classList.remove('hidden', 'flex');
         actionsContainer.classList.add('flex');
 
@@ -39,26 +55,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         wavesurfer.on('ready', () => {
             const duration = wavesurfer.getDuration();
-            wsRegions.addRegion({
-                start: Math.max(0, (duration / 2) - 15),
-                end: Math.min(duration, (duration / 2) + 15),
+            const start = Math.max(0, (duration / 2) - 15);
+            const end = Math.min(duration, (duration / 2) + 15);
+            
+            // Create initial region
+            const region = wsRegions.addRegion({
+                start: start,
+                end: end,
                 color: 'rgba(59, 130, 246, 0.3)',
                 resize: true,
                 drag: true,
             });
+
+            // Set initial input fields
+            inputInTime.value = formatTime(region.start);
+            inputOutTime.value = formatTime(region.end);
+        });
+
+        // Update IN/OUT fields dynamically when region is dragged/resized
+        wsRegions.on('region-updated', (region) => {
+            inputInTime.value = formatTime(region.start);
+            inputOutTime.value = formatTime(region.end);
+        });
+
+        // Toggle Play/Pause Icons during playback
+        wavesurfer.on('play', () => {
+            iconPlay.classList.add('hidden');
+            iconPause.classList.remove('hidden');
+        });
+        wavesurfer.on('pause', () => {
+            iconPause.classList.add('hidden');
+            iconPlay.classList.remove('hidden');
         });
     });
 
-    const getFileName = (startTimeSec) => {
+    // Handle Play/Pause Button
+    btnPlayPause.addEventListener('click', () => {
+        if (wavesurfer) wavesurfer.playPause();
+    });
+
+    // Updated Naming Convention: [ID]-[Date]-[Session]-IN[HH-MM-SS]-OUT[HH-MM-SS]
+    const getFileName = (startTimeSec, endTimeSec) => {
         const pId = document.getElementById('phd-part-id').value || 'P00';
         const date = document.getElementById('phd-date').value || 'YYMMDD';
         const session = document.getElementById('phd-session').value || 'S00';
         
-        const h = Math.floor(startTimeSec / 3600).toString().padStart(2, '0');
-        const m = Math.floor((startTimeSec % 3600) / 60).toString().padStart(2, '0');
-        const s = Math.floor(startTimeSec % 60).toString().padStart(2, '0');
+        const inStr = formatTime(startTimeSec);
+        const outStr = formatTime(endTimeSec);
         
-        return `${pId}-${date}-${session}-${h}-${m}-${s}`;
+        return `${pId}-${date}-${session}-IN${inStr}-OUT${outStr}`;
     };
 
     // Helper: Convert AudioBuffer to WAV Blob
@@ -68,9 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const out = new ArrayBuffer(length);
         const view = new DataView(out);
         const channels = [];
-        let sample = 0;
-        let offset = 0;
-        let pos = 0;
+        let sample = 0; let offset = 0; let pos = 0;
 
         const setUint16 = (data) => { view.setUint16(pos, data, true); pos += 2; };
         const setUint32 = (data) => { view.setUint32(pos, data, true); pos += 4; };
@@ -79,13 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setUint32(length - 8);
         setUint32(0x45564157); // "WAVE"
         setUint32(0x20746d66); // "fmt "
-        setUint32(16);
-        setUint16(1);
-        setUint16(numOfChan);
+        setUint32(16); setUint16(1); setUint16(numOfChan);
         setUint32(buffer.sampleRate);
         setUint32(buffer.sampleRate * 2 * numOfChan);
-        setUint16(numOfChan * 2);
-        setUint16(16);
+        setUint16(numOfChan * 2); setUint16(16);
         setUint32(0x61746164); // "data"
         setUint32(length - pos - 4);
 
@@ -128,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const renderedBuffer = await offlineCtx.startRendering();
         return {
             blob: bufferToWav(renderedBuffer),
-            fileName: getFileName(region.start),
+            fileName: getFileName(region.start, region.end),
             startTime: region.start
         };
     };
@@ -156,10 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('analyzer-workspace').classList.remove('hidden');
         document.getElementById('grid-workspace').classList.remove('hidden');
 
-        // Scroll to workspace
         document.getElementById('analyzer-workspace').scrollIntoView({ behavior: 'smooth' });
-
-        // Dispatch to Timeline Engine
         window.dispatchEvent(new CustomEvent('thps-inject-snip', { detail: data }));
+        
+        // Pause the snipper audio if it was playing
+        if(wavesurfer) wavesurfer.pause();
     });
 });
