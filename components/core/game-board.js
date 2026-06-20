@@ -67,8 +67,10 @@ class ThpsGameBoard extends HTMLElement {
 
                 <div class="flex flex-col items-center w-full">
                     
-                    <!-- HEADER & STARS -->
-                    <div class="max-w-6xl mx-auto w-full flex flex-col items-center justify-center gap-6 mb-6 md:mb-10 text-center mt-2">
+                    <!-- HEADER & STARS (Now Side-by-Side on Desktop) -->
+                    <div class="max-w-6xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-6 mb-6 md:mb-10 mt-2 px-2 md:px-8">
+                        
+                        <!-- Left: Title & Date (Centred to itself) -->
                         <div class="flex flex-col items-center gap-2">
                             <h1 class="text-4xl md:text-5xl uppercase tracking-wider text-slate-900 transition-colors flex items-center justify-center gap-3" style="font-family: 'Permanent Marker', cursive;">
                                 <span class="flex flex-col text-center leading-[0.9]">
@@ -81,6 +83,7 @@ class ThpsGameBoard extends HTMLElement {
                             </p>
                         </div>
 
+                        <!-- Right: Star Level Panel -->
                         <div class="flex flex-col items-center p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-lg bg-white border border-slate-200 gap-2 transition-all duration-300 w-auto">
                             <span id="board-level" class="text-sm md:text-base font-bold text-slate-500 uppercase tracking-widest">Level: Beginner</span>
                             <div class="flex gap-2 md:gap-3 mt-1" id="board-stars">
