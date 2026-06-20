@@ -78,19 +78,19 @@ class ThpsScoreSummary extends HTMLElement {
         };
 
         // 1. Content
-        this.querySelector('#sum-personal').textContent = \`\${data.personal}%\`;
+        this.querySelector('#sum-personal').textContent = `${data.personal}%`;
         let pStatus = 'just right'; 
         if (data.personal < 30) pStatus = 'not enough'; 
         else if (data.personal > 60) pStatus = 'too much'; 
         setEval('sum-personal-eval', pStatus, evalColor(pStatus));
 
-        this.querySelector('#sum-visual').textContent = \`\${data.visual}%\`;
+        this.querySelector('#sum-visual').textContent = `${data.visual}%`;
         let vStatus = 'just right'; 
         if (data.visual < 20) vStatus = 'not enough'; 
         else if (data.visual > 50) vStatus = 'too much'; 
         setEval('sum-visual-eval', vStatus, evalColor(vStatus));
 
-        this.querySelector('#sum-intangible').textContent = \`\${data.intangible}%\`;
+        this.querySelector('#sum-intangible').textContent = `${data.intangible}%`;
         let iStatus = 'just right'; 
         if (data.intangible > 45) iStatus = 'too much'; 
         else if (data.intangible >= 30) iStatus = 'bit much'; 
@@ -110,7 +110,7 @@ class ThpsScoreSummary extends HTMLElement {
             else if (data.sps > 5) spsStatus = 'strain'; 
             setEval('sum-sps-eval', spsStatus, evalColor(spsStatus));
 
-            this.querySelector('#sum-pause').textContent = \`\${data.pause.toFixed(0)}%\`;
+            this.querySelector('#sum-pause').textContent = `${data.pause.toFixed(0)}%`;
             let pzStatus = 'just right'; 
             if (data.pause < 10) pzStatus = 'too little'; 
             else if (data.pause > 30) pzStatus = 'too much'; 
@@ -137,7 +137,7 @@ class ThpsScoreSummary extends HTMLElement {
         else if (data.grade > 10) gradeStatus = 'complex'; 
         setEval('sum-grade-eval', gradeStatus, evalColor(gradeStatus));
 
-        this.querySelector('#sum-simple').textContent = \`\${data.simple}%\`;
+        this.querySelector('#sum-simple').textContent = `${data.simple}%`;
         let simpleStatus = 'just right'; 
         if (data.simple < 85) simpleStatus = 'complex'; 
         else if (data.simple > 95) simpleStatus = 'simple'; 
@@ -149,8 +149,8 @@ class ThpsScoreSummary extends HTMLElement {
             this.querySelector('#sum-time').textContent = "-";
         } else {
             let formattedScore = data.totalPoints % 1 === 0 ? data.totalPoints : data.totalPoints.toFixed(2);
-            this.querySelector('#sum-overallGrade').textContent = \`\${formattedScore} / 10\`;
-            this.querySelector('#sum-time').textContent = \`\${data.time.toFixed(0)}s\`;
+            this.querySelector('#sum-overallGrade').textContent = `${formattedScore} / 10`;
+            this.querySelector('#sum-time').textContent = `${data.time.toFixed(0)}s`;
         }
     }
 }
