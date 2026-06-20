@@ -108,7 +108,7 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- CARDS CONTAINER (Fixed classes to ensure they flip and glow) -->
+                    <!-- CARDS CONTAINER -->
                     <div id="board-cards-container" class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1 md:gap-6 mb-6">
                         ${this.generateCardsHTML()}
                     </div>
@@ -389,7 +389,7 @@ class ThpsGameBoard extends HTMLElement {
             if (el) {
                 el.innerHTML = `
                     <span class="text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 md:mb-2 shrink-0 border-b border-slate-200 w-full pb-1">${title}</span>
-                    <div id="${targetId}" class="flex-1 w-full flex flex-col gap-1.5 pb-2 overflow-y-auto res-scroll"></div>
+                    <div id="${targetId}" class="flex-1 w-full flex flex-col gap-2 pb-2 overflow-y-auto res-scroll justify-evenly"></div>
                 `;
                 el.className = "thps-front-face absolute inset-0 w-full h-full backface-hidden bg-slate-50 border-2 md:border-4 border-slate-300 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1.5 md:px-3 rotate-y-180 text-center shadow-inner pointer-events-auto transition-all duration-500";
             }
@@ -440,20 +440,20 @@ class ThpsGameBoard extends HTMLElement {
             const m = metrics[index];
             currentTotal += m.pts;
 
-            // Render Item into the Card
+            // Render Item into the Card (Stacked Layout)
             const container = this.querySelector(`#res-${m.cat}`);
             if (container) {
                 const row = document.createElement('div');
-                row.className = `flex justify-between items-center bg-white p-1 md:p-1.5 rounded-lg border border-slate-200 shadow-sm opacity-0 transform translate-y-4 transition-all duration-300 shrink-0`;
+                row.className = `flex flex-col items-center bg-white p-1 rounded-lg border border-slate-200 shadow-sm opacity-0 transform translate-y-4 transition-all duration-300 shrink-0 w-full`;
                 
                 let bgClass = m.pts === 1 ? 'bg-green-100 text-green-700 pop-green' : m.pts === 0.75 ? 'bg-amber-100 text-amber-700 pop-amber' : 'bg-red-100 text-red-700 pop-red';
                 if (m.pts === 0) bgClass = 'bg-slate-200 text-slate-600 pop-red';
 
                 row.innerHTML = `
-                    <span class="text-[8px] md:text-[10px] font-bold text-slate-600">${m.label}</span>
-                    <div class="flex items-center gap-1">
-                        <span class="text-[9px] md:text-xs font-black text-slate-800">${m.val}</span>
-                        <span class="text-[7px] md:text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${bgClass}">${m.pts > 0 ? '+'+m.pts : '0'}</span>
+                    <span class="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">${m.label}</span>
+                    <div class="flex items-center gap-1.5 w-full justify-center">
+                        <span class="text-[10px] md:text-sm font-black text-slate-800">${m.val}</span>
+                        <span class="text-[7px] md:text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${bgClass}">${m.pts > 0 ? '+'+m.pts : '0'}</span>
                     </div>
                 `;
                 container.appendChild(row);
@@ -482,8 +482,8 @@ class ThpsGameBoard extends HTMLElement {
         const timeContainer = this.querySelector('#res-time');
         if (timeContainer) {
             timeContainer.innerHTML += `
-                <div class="mt-auto pt-2 border-t border-slate-200 flex flex-col items-center justify-center transform scale-0 transition-transform duration-500" id="final-score-pop">
-                    <span class="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest">Final Grade</span>
+                <div class="mt-auto pt-2 border-t border-slate-200 flex flex-col items-center justify-center transform scale-0 transition-transform duration-500 w-full" id="final-score-pop">
+                    <span class="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Final Grade</span>
                     <span class="text-3xl md:text-4xl font-black text-slate-800">${override ? '- / 10' : total.toFixed(2)}</span>
                 </div>
             `;
