@@ -20,13 +20,11 @@ class ThpsGameBoard extends HTMLElement {
         this.render();
         this.setupListeners();
         
-        // Listen for the hub telling us to load a specific date
         window.addEventListener('thps-load-date', (e) => {
             this.currentDate = e.detail.dateStr || this.getAdelaideDateString();
             this.fetchDailyCards();
         });
 
-        // Auto-fetch if dropped on a page standalone
         this.fetchDailyCards();
     }
 
@@ -43,6 +41,15 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         this.innerHTML = `
+            <style>
+                .preserve-3d { transform-style: preserve-3d; }
+                .backface-hidden { backface-visibility: hidden; }
+                .rotate-y-180 { transform: rotateY(180deg) !important; }
+                .card-container { perspective: 1000px; }
+                .star-filled { fill: #eab308; color: #eab308; } 
+                .star-empty { fill: transparent; color: #94a3b8; } 
+                .star-hover { fill: #fde047 !important; color: #fde047 !important; } 
+            </style>
             <div class="flex flex-col items-center w-full">
                 
                 <!-- HEADER & STARS -->
@@ -159,20 +166,14 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     setupListeners() {
-        // Handle all clicks safely inside the component
         this.addEventListener('click', (e) => {
             const actionEl = e.target.closest('[data-action]');
             if (!actionEl) return;
-
             const action = actionEl.getAttribute('data-action');
-            if (action === 'toggle-card') {
-                this.toggleCard(actionEl.getAttribute('data-card'));
-            } else if (action === 'set-stars') {
-                this.setDifficulty(parseInt(actionEl.getAttribute('data-stars')));
-            }
+            if (action === 'toggle-card') this.toggleCard(actionEl.getAttribute('data-card'));
+            else if (action === 'set-stars') this.setDifficulty(parseInt(actionEl.getAttribute('data-stars')));
         });
 
-        // Hover effects for stars
         this.addEventListener('mouseover', (e) => {
             const star = e.target.closest('.board-star');
             if (star) {
@@ -206,9 +207,7 @@ class ThpsGameBoard extends HTMLElement {
                 const response = await fetch(this.dataSource + '?nocache=' + new Date().getTime());
                 if (response.ok) {
                     const data = await response.json();
-                    if (data[this.currentDate]) {
-                        this.todayData = data[this.currentDate];
-                    }
+                    if (data[this.currentDate]) this.todayData = data[this.currentDate];
                 }
             }
         } catch (error) {
@@ -217,13 +216,11 @@ class ThpsGameBoard extends HTMLElement {
             if (loadingEl) loadingEl.classList.add('hidden');
         }
 
-        // Apply text to cards
         this.querySelector('#text-challenge').innerText = this.todayData.challenge;
         this.querySelector('#text-sponsor').innerText = this.todayData.sponsor;
         this.querySelector('#text-script').innerText = this.todayData.script;
         this.querySelector('#text-micCheck').innerText = this.todayData.micCheck;
 
-        // Reset to Level 1
         this.setDifficulty(1);
     }
 
@@ -259,7 +256,6 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     updateDifficultyVisuals() {
-        // Calculate stars based on flipped cards
         let stars = 0;
         if (this.cardStates.challenge) stars += 1;
         if (this.cardStates.sponsor) stars += 1;
@@ -269,7 +265,6 @@ class ThpsGameBoard extends HTMLElement {
         stars = Math.max(0, Math.min(5, stars));
         this.currentStars = stars;
 
-        // Update Labels & Icons
         const levelLabels = { 0: "Blank", 1: "Beginner", 2: "Better", 3: "Brave", 4: "Bold", 5: "Brilliant!" };
         const levelTextEl = this.querySelector('#board-level');
         if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars] || 'Blank'}`;
@@ -287,11 +282,8 @@ class ThpsGameBoard extends HTMLElement {
             }
         }
 
-        // Broadcast to the rest of the App so the Timer/Firebase knows the wager!
         this.dispatchEvent(new CustomEvent('thps-game-state', { 
-            detail: { stars: this.currentStars, date: this.currentDate }, 
-            bubbles: true, 
-            composed: true 
+            detail: { stars: this.currentStars, date: this.currentDate }, bubbles: true, composed: true 
         }));
     }
 
@@ -316,5 +308,4 @@ class ThpsGameBoard extends HTMLElement {
         }
     }
 }
-
 customElements.define('thps-game-board', ThpsGameBoard);
