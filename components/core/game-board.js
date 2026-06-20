@@ -8,7 +8,7 @@ class ThpsGameBoard extends HTMLElement {
         if (this.isInitialized) return;
         this.isInitialized = true;
 
-        this.dataSource = this.getAttribute('data-source') || "[https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/mic-check-daily.json](https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/mic-check-daily.json)";
+        this.dataSource = this.getAttribute('data-source') || "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/mic-check-daily.json";
         
         this.cardStates = { challenge: false, sponsor: false, script: false, micCheck: false };
         this.gameState = 'IDLE'; 
@@ -72,7 +72,7 @@ class ThpsGameBoard extends HTMLElement {
 
             <div class="glass-panel p-5 sm:p-8 rounded-2xl border-t-4 border-slate-800 shadow-sm flex flex-col items-center bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
-                    <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
                 <div class="flex flex-col items-center w-full">
@@ -102,19 +102,16 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
-                    <div id="board-loading" class="max-w-6xl mx-auto text-center text-slate-500 mb-4 text-sm hidden">
-                        Fetching challenge...
-                    </div>
-
                     <!-- CARDS -->
                     <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-2 md:gap-6 mb-8 md:mb-12 perspective-1000">
                         
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="challenge">
                             <div id="card-challenge" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white pointer-events-none transition-all duration-500">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
-                                    <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Challenge</span>
-                                    <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <i data-lucide="refresh-cw" class="thps-chest-icon w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
+                                    <span class="thps-chest-title text-[8px] md:text-lg font-bold uppercase tracking-widest">Challenge</span>
+                                    <span class="thps-chest-subtitle text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                                 </div>
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl pointer-events-none">
                                     <span class="text-[7px] md:text-xs font-bold text-blue-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Challenge</span>
@@ -128,9 +125,10 @@ class ThpsGameBoard extends HTMLElement {
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="sponsor">
                             <div id="card-sponsor" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white pointer-events-none transition-all duration-500">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
-                                    <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Sponsor</span>
-                                    <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <i data-lucide="refresh-cw" class="thps-chest-icon w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
+                                    <span class="thps-chest-title text-[8px] md:text-lg font-bold uppercase tracking-widest">Sponsor</span>
+                                    <span class="thps-chest-subtitle text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                                 </div>
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl pointer-events-none">
                                     <span class="text-[7px] md:text-xs font-bold text-purple-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Sponsor</span>
@@ -144,9 +142,10 @@ class ThpsGameBoard extends HTMLElement {
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="script">
                             <div id="card-script" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white pointer-events-none transition-all duration-500">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
-                                    <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Script</span>
-                                    <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <i data-lucide="refresh-cw" class="thps-chest-icon w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
+                                    <span class="thps-chest-title text-[8px] md:text-lg font-bold uppercase tracking-widest">Script</span>
+                                    <span class="thps-chest-subtitle text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
+                                    <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                                 </div>
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl pointer-events-none">
                                     <span class="text-[7px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Script</span>
@@ -160,9 +159,10 @@ class ThpsGameBoard extends HTMLElement {
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="micCheck">
                             <div id="card-micCheck" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-[1.5px] md:border-[3px] border-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)] md:shadow-[0_0_15px_rgba(251,191,36,0.6)] flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-red-800 via-red-900 to-black pointer-events-none transition-all duration-500">
-                                    <i data-lucide="mic" class="text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
-                                    <span class="text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">Mic-Check</span>
-                                    <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">2 STARS</span>
+                                    <i data-lucide="mic" class="thps-chest-icon text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
+                                    <span class="thps-chest-title text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">Mic-Check</span>
+                                    <span class="thps-chest-subtitle bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">2 STARS</span>
+                                    <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                                 </div>
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-[1.5px] md:border-[3px] border-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)] md:shadow-[0_0_15px_rgba(251,191,36,0.6)] text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center pointer-events-none">
                                     <span class="text-[7px] md:text-xs font-bold text-red-800 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Mic-Check</span>
@@ -317,18 +317,27 @@ class ThpsGameBoard extends HTMLElement {
                 const cardEl = this.querySelector(`#card-${key}`);
                 if (cardEl) {
                     cardEl.classList.remove('rotate-y-180');
-                    
-                    setTimeout(() => {
-                        const backFace = cardEl.querySelector('.thps-chest-bg');
-                        if (backFace) {
-                            backFace.innerHTML = `
-                                <i data-lucide="loader-2" class="w-4 h-4 md:w-8 md:h-8 opacity-30 mb-1 md:mb-2 animate-spin"></i>
-                                <span class="text-[8px] md:text-sm font-bold uppercase tracking-widest opacity-50">${titles[index]}</span>
-                                <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4"></div>
-                            `;
-                            backFace.className = 'thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 transition-all duration-1000 bg-slate-900 border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-zelda-glow';
+                    const backFace = cardEl.querySelector('.thps-chest-bg');
+                    if (backFace) {
+                        const bIcon = backFace.querySelector('.thps-chest-icon');
+                        const bTitle = backFace.querySelector('.thps-chest-title');
+                        const bSubtitle = backFace.querySelector('.thps-chest-subtitle');
+                        const bResults = backFace.querySelector('.thps-card-results');
+                        
+                        if (bIcon) {
+                            bIcon.setAttribute('data-lucide', 'loader-2');
+                            bIcon.classList.add('animate-spin', 'opacity-30');
+                            bIcon.classList.remove('opacity-70');
                         }
-                    }, 250);
+                        if (bTitle) {
+                            bTitle.innerText = titles[index];
+                            bTitle.className = 'thps-chest-title text-[8px] md:text-sm font-bold uppercase tracking-widest opacity-50';
+                        }
+                        if (bSubtitle) bSubtitle.style.display = 'none';
+                        if (bResults) bResults.innerHTML = ''; 
+
+                        backFace.className = 'thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 transition-all duration-1000 bg-slate-900 border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-zelda-glow pointer-events-none';
+                    }
                 }
             });
 
@@ -338,8 +347,8 @@ class ThpsGameBoard extends HTMLElement {
         }
         else if (newState === 'SCORED') {
             icon.classList.remove('animate-spin');
-            icon.setAttribute('data-lucide', 'rotate-ccw'); // Switch to replay just in case
-            icon.classList.add('hidden'); // Hide it on the left
+            icon.setAttribute('data-lucide', 'rotate-ccw'); 
+            icon.classList.add('hidden'); 
             
             bar.classList.remove('animate-zelda-glow', 'border-amber-400');
             bar.style.boxShadow = '';
@@ -421,19 +430,22 @@ class ThpsGameBoard extends HTMLElement {
                 const backFace = cardEl.querySelector('.thps-chest-bg');
                 if (backFace) {
                     backFace.className = `thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center pointer-events-none transition-all duration-500`;
+                    
                     if (c.special) {
                         backFace.classList.add('bg-gradient-to-br', 'from-red-800', 'via-red-900', 'to-black', 'border-[1.5px]', 'md:border-[3px]', 'border-amber-400', 'shadow-[0_0_8px_rgba(251,191,36,0.6)]', 'md:shadow-[0_0_15px_rgba(251,191,36,0.6)]');
                         backFace.innerHTML = `
-                            <i data-lucide="${c.icon}" class="text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">${c.title}</span>
-                            <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">${c.star}</span>
+                            <i data-lucide="${c.icon}" class="thps-chest-icon text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
+                            <span class="thps-chest-title text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">${c.title}</span>
+                            <span class="thps-chest-subtitle bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">${c.star}</span>
+                            <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                         `;
                     } else {
-                        backFace.classList.add(c.bg, 'text-white', 'border-2', 'md:border-4', 'border-white', 'shadow-md', 'md:shadow-xl');
+                        backFace.classList.add(...c.bg.split(' '), 'text-white', 'border-2', 'md:border-4', 'border-white', 'shadow-md', 'md:shadow-xl');
                         backFace.innerHTML = `
-                            <i data-lucide="${c.icon}" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
-                            <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">${c.title}</span>
-                            <span class="text-white/70 text-[6px] md:text-xs mt-1 block">${c.star}</span>
+                            <i data-lucide="${c.icon}" class="thps-chest-icon w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
+                            <span class="thps-chest-title text-[8px] md:text-lg font-bold uppercase tracking-widest">${c.title}</span>
+                            <span class="thps-chest-subtitle text-white/70 text-[6px] md:text-xs mt-1 block">${c.star}</span>
+                            <div class="thps-card-results absolute inset-0 w-full h-full flex flex-col justify-center items-center opacity-0 transition-opacity duration-500 pt-6 px-1 md:px-4 pointer-events-none"></div>
                         `;
                     }
                 }
@@ -466,15 +478,17 @@ class ThpsGameBoard extends HTMLElement {
         // Remove the spinner/titles
         [cContent, cDelivery, cSimplicity, cTime].forEach(c => {
             c.classList.remove('opacity-0');
-            c.parentElement.querySelector('i').style.display = 'none';
-            c.parentElement.querySelector('span').style.display = 'none';
+            const icon = c.parentElement.querySelector('.thps-chest-icon');
+            const title = c.parentElement.querySelector('.thps-chest-title');
+            if (icon) icon.style.display = 'none';
+            if (title) title.style.display = 'none';
         });
 
         const makeRow = (label, val, pts, color) => `
             <div class="score-row flex flex-col items-center justify-center w-full opacity-0 scale-75 transition-all duration-500 ease-out">
                 <span class="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
                 <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-xs md:text-base font-black text-slate-100 leading-none">${val}</span>
+                    <span class="text-sm md:text-lg font-black text-slate-100 leading-none">${val}</span>
                     <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
                 </div>
             </div>
@@ -617,10 +631,16 @@ class ThpsGameBoard extends HTMLElement {
             if (loadingEl) loadingEl.classList.add('hidden');
         }
 
-        this.querySelector('#text-challenge').innerText = this.todayData.challenge;
-        this.querySelector('#text-sponsor').innerText = this.todayData.sponsor;
-        this.querySelector('#text-script').innerText = this.todayData.script;
-        this.querySelector('#text-micCheck').innerText = this.todayData.micCheck;
+        // Extremely safe text fetching to prevent split() crashes
+        const cText = this.todayData?.challenge || "Talk";
+        const sText = this.todayData?.sponsor || "something";
+        const scText = this.todayData?.script || "any";
+        const mText = this.todayData?.micCheck || "have fun";
+
+        this.querySelector('#text-challenge').innerText = cText;
+        this.querySelector('#text-sponsor').innerText = sText;
+        this.querySelector('#text-script').innerText = scText;
+        this.querySelector('#text-micCheck').innerText = mText;
 
         this.setDifficulty(1);
     }
