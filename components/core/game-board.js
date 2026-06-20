@@ -52,7 +52,7 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         // Unique Version Identifier for Cache Checking
-        const VERSION_TAG = "v.03:15:00 ACST";
+        const VERSION_TAG = "v.04:15:00 ACST";
 
         this.innerHTML = `
             <style>
@@ -213,7 +213,7 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- ACTION BAR (Integrated Timer) -->
+                    <!-- ACTION BAR (Integrated Timer & Sequence Engine) -->
                     <div id="gb-action-bar" data-action="timer-click" class="relative w-full max-w-4xl mx-auto mt-6 md:mt-8 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0 group/action">
                         <div id="gb-timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10"></div>
                         
@@ -326,9 +326,24 @@ class ThpsGameBoard extends HTMLElement {
             bar.classList.replace('bg-slate-800', 'bg-rose-600');
             bar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
             prog.style.width = '0%';
+            
+            // INTERNAL PROGRESS ANIMATOR (Fixes Bug 1)
+            this.playStartTime = Date.now();
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            this.internalTimer = setInterval(() => {
+                let elapsed = (Date.now() - this.playStartTime) / 1000;
+                if (elapsed <= 90) {
+                    prog.style.width = `${(elapsed / 90) * 100}%`;
+                } else {
+                    clearInterval(this.internalTimer);
+                }
+            }, 50);
+
             if (window.lucide) window.lucide.createIcons();
         } 
         else if (newState === 'ANALYZING') {
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            
             textLabel.innerText = "CHECKING YOUR MIC-CHECK SCORES...";
             icon.setAttribute('data-lucide', 'loader-2');
             icon.classList.add('animate-spin');
@@ -354,8 +369,19 @@ class ThpsGameBoard extends HTMLElement {
             });
 
             if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
+
+            // FAILSAFE TIMEOUT: Ensure we never freeze in infinite loading
+            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
+            this.analyzingTimeout = setTimeout(() => {
+                if (this.gameState === 'ANALYZING') {
+                    this.setGameState('SCORED', -1);
+                }
+            }, 12000); 
         }
         else if (newState === 'SCORED') {
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
+
             icon.classList.remove('animate-spin');
             icon.classList.add('hidden'); 
             
@@ -387,6 +413,8 @@ class ThpsGameBoard extends HTMLElement {
 
     resetBoardToIdle() {
         this.gameState = 'IDLE';
+        if (this.internalTimer) clearInterval(this.internalTimer);
+        if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
         
         const bar = this.querySelector('#gb-action-bar');
         const textLabel = this.querySelector('#gb-action-label');
@@ -455,6 +483,7 @@ class ThpsGameBoard extends HTMLElement {
     update(data) {
         try {
             if (this.gameState !== 'ANALYZING') return;
+            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout); // We got the data! Cancel the failsafe.
             
             const containers = this.querySelectorAll('.thps-card-results');
             if (containers.length < 4) return; 
@@ -550,17 +579,18 @@ class ThpsGameBoard extends HTMLElement {
 
             let time = data.time || 0;
             let totalPoints = data.totalPoints || 0;
+            let overrideGrade = data.overrideGrade || false;
 
             let timePts = '+1', timeColor = 'text-emerald-400';
             if (time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
             else if (time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
 
-            let finalGrade = data.overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
-            let finalGradeNum = data.overrideGrade ? -1 : totalPoints;
+            let finalGrade = overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
+            let finalGradeNum = overrideGrade ? -1 : totalPoints;
 
             cTime.innerHTML = `
                 <div class="w-full flex flex-col justify-evenly h-full pb-2">
-                    ${data.overrideGrade ? '' : makeRow('Time', time.toFixed(0) + 's', timePts, timeColor)}
+                    ${overrideGrade ? '' : makeRow('Time', time.toFixed(0) + 's', timePts, timeColor)}
                     <div class="score-row flex flex-col items-center justify-center w-full mt-auto">
                         <span class="text-[7px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">Final Grade</span>
                         <span class="text-3xl md:text-5xl font-black text-white leading-none">${finalGrade}</span>
