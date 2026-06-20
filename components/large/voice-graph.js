@@ -1,5 +1,5 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v2)
+// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v2.1)
 // Includes Fixed Heights, Synchronized Horizontal Scrolling, and Aligned Grids
 // ==========================================
 
@@ -7,10 +7,11 @@ class ThpsVoiceGraph extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <style>
-                .custom-scrollbar::-webkit-scrollbar { height: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; border-radius: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+                /* Upgraded Scrollbar: Thick borders act as padding to make the thumb 'shorter' and sleeker */
+                .custom-scrollbar::-webkit-scrollbar { height: 14px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 4px solid #f8fafc; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; border: 3px solid #f8fafc; }
             </style>
             <div class="glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-indigo-500 shadow-sm flex flex-col bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
                 
@@ -26,8 +27,8 @@ class ThpsVoiceGraph extends HTMLElement {
                     </div>
                 </div>
                 
-                <!-- NEW: SYNCHRONIZED SCROLL CONTAINER -->
-                <div class="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-slate-200 bg-slate-900 pb-2 custom-scrollbar relative" id="thps-scroll-wrapper">
+                <!-- NEW: SYNCHRONIZED SCROLL CONTAINER (Light background to prevent black bleed) -->
+                <div class="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-slate-200 bg-slate-50 pb-1 custom-scrollbar relative" id="thps-scroll-wrapper">
                     
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none thps-vg-placeholder z-50">
                         <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-800/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-700/50">Waiting for Audio...</span>
@@ -39,13 +40,13 @@ class ThpsVoiceGraph extends HTMLElement {
                         <!-- 1. Time Axis -->
                         <div class="thps-time-axis relative w-full h-7 border-b border-slate-700/50 bg-slate-800/90 shrink-0"></div>
 
-                        <!-- 2. Block Waveform Canvas -->
-                        <div class="w-full h-32 md:h-40 relative shrink-0">
+                        <!-- 2. Block Waveform Canvas (Dark background isolated here) -->
+                        <div class="w-full h-32 md:h-40 relative shrink-0 bg-slate-900">
                             <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
                         </div>
                         
                         <!-- 3. The Speech Staff -->
-                        <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 border-t border-slate-300 shrink-0 overflow-hidden">
+                        <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 shrink-0 overflow-hidden">
                             <!-- Staff Visual Lines -->
                             <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40">
                                 <div class="w-full h-px bg-slate-300"></div>
@@ -210,19 +211,21 @@ class ThpsVoiceGraph extends HTMLElement {
         axis.innerHTML = '';
         for (let i = 0; i <= duration; i++) {
             let xPos = i * PIXELS_PER_SEC;
-            let isMajor = i % 5 === 0;
+            let isMajor = (i % 5 === 0);
             
-            let tick = document.createElement('div');
-            tick.className = `absolute bottom-0 border-l border-slate-500/50 ${isMajor ? 'h-3' : 'h-1.5'}`;
-            tick.style.left = `${xPos}px`;
-            axis.appendChild(tick);
-            
-            if (isMajor || i === duration) {
+            if (isMajor) {
+                // Major marker: Just the centered text, no cut-off line
                 let label = document.createElement('span');
-                label.className = 'absolute bottom-3.5 text-[9px] text-slate-400 font-bold -translate-x-1/2 select-none';
+                label.className = 'absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold -translate-x-1/2 select-none';
                 label.style.left = `${xPos}px`;
                 label.innerText = `${i}s`;
                 axis.appendChild(label);
+            } else {
+                // Minor tick: Just a short line at the bottom edge
+                let tick = document.createElement('div');
+                tick.className = `absolute bottom-0 border-l border-slate-500/50 h-2`;
+                tick.style.left = `${xPos}px`;
+                axis.appendChild(tick);
             }
         }
 
