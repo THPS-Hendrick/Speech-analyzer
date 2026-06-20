@@ -4,37 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speech Analyzer App</title>
-    <!-- Tailwind CSS for Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- NLP & Chart.js -->
     <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     
-    <!-- FETCH EXTERNAL PAINT & BRAINS (GITHACK BYPASSES CACHES FOR DEVELOPMENT) -->
     <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
     
-    <!-- FETCH YOUR NEW MODULAR WIDGETS -->
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/text-input.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/tangible-text.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/upload-speech.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/visual-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/signal-noise.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/sentence-complexity.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/simple-language.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-mumble.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
 </head>
-<body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative">
+<body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
 
-    <!-- ========================================== -->
-    <!-- THE NEW WIDGET MANAGER MENU (THE SHELL)    -->
-    <!-- ========================================== -->
+    <!-- HIDDEN PROXY TEXTAREA: Keeps audio-processor.js connected even if the Text Input Widget is not spawned! -->
+    <textarea id="cba-inputText" class="hidden"></textarea>
 
-    <!-- Dark Overlay (Clicks close the menu) -->
+    <!-- THE NEW WIDGET MANAGER MENU -->
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
 
-    <!-- Sliding Drawer -->
     <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-slate-200">
-        
-        <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -47,14 +66,12 @@
             </button>
         </div>
 
-        <!-- Drawer Tabs -->
         <div class="flex w-full border-b border-slate-200 bg-white">
             <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Small</button>
             <button onclick="window.switchWidgetTab('medium')" id="tab-btn-medium" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Medium</button>
             <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Large</button>
         </div>
 
-        <!-- Drawer Tab Contents -->
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
             
             <!-- SMALL WIDGETS TAB -->
@@ -63,16 +80,29 @@
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-16 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-16 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-personal', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Personal Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-visual', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Visual Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-intangible', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Intangible Pill
+                        </div>
                     </div>
                 </div>
                 <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pace', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pace Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-mumble', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Mumble Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pause', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pause Pill
                         </div>
                     </div>
                 </div>
@@ -80,7 +110,15 @@
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-16 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-wps', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-violet-600 bg-white shadow-sm hover:border-violet-400 hover:bg-violet-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Words/Sent Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,24 +128,46 @@
                 <!-- Content Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-24 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-wpm-graph', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> WPM Graph
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-personal-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Personal Balance
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-visual-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Visual Balance
+                        </div>
                     </div>
                 </div>
                 <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-slate-200 rounded-xl h-24 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-gauge-mumble', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Gauge
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-mumble-card', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Card
                         </div>
                     </div>
                 </div>
                  <!-- Simplicity Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-24 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-signal-noise', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Signal Noise
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-sentence-complexity', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Sent. Complex
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-simple-language', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Simple Lang.
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-google-benchmark', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Google 10K
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,14 +178,25 @@
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-32 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-live-mic-timer', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Live Mic Timer
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-text-input', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Text Input
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-upload-speech', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Upload Speech
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
+                        </div>
                     </div>
                 </div>
                 <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-slate-200 rounded-xl h-32 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-voice-graph', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Voice Graph
                         </div>
                     </div>
@@ -134,60 +205,48 @@
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
-                        <div class="border-2 border-dashed border-slate-200 rounded-xl h-32 flex items-center justify-center text-[10px] font-bold text-slate-400 bg-white/50">Coming Soon</div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-score-summary', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Score Summary
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-tangible-text', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Tangible Text
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
     <!-- ========================================== -->
     <!-- MAIN SCREEN UI                             -->
     <!-- ========================================== -->
 
-    <!-- PRIMARY ACTION CONSOLE -->
-    <div class="max-w-4xl mx-auto w-full mt-4 md:mt-8 mb-8 md:mb-12 px-2 flex flex-col items-center">
-        <!-- Error Message Container -->
+    <!-- Error Message Container -->
+    <div class="max-w-4xl mx-auto w-full mt-4 md:mt-8 px-2 flex flex-col items-center">
         <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mb-6"></div>
-
-        <!-- The Action Bar -->
-        <div id="action-bar" class="relative w-full h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0" onclick="window.toggleRecording()">
-            <div id="timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all ease-linear overflow-hidden z-10"></div>
-            <div class="absolute inset-0 flex z-20 pointer-events-none">
-                <div class="flex flex-col items-center justify-end pb-2 border-r-[1.5px] border-white/30" style="width: 25%;"><span class="text-[9px] md:text-xs text-white/70 font-bold tracking-widest leading-none drop-shadow-md">0-1 min</span></div>
-                <div class="flex flex-col items-center justify-end pb-2 border-r-[1.5px] border-white/30" style="width: 25%;"><span class="text-[9px] md:text-xs text-white/70 font-bold tracking-widest leading-none drop-shadow-md">1-2 min</span></div>
-                <div class="flex flex-col items-center justify-end pb-2 border-r-[1.5px] border-white/30" style="width: 25%;"><span class="text-[9px] md:text-xs text-white/70 font-bold tracking-widest leading-none drop-shadow-md">2-3 min</span></div>
-                <div class="flex flex-col items-center justify-end pb-2 border-r-[1.5px] border-white/30" style="width: 20%;"><span class="text-[9px] md:text-xs text-white/70 font-bold tracking-widest leading-none drop-shadow-md">Wrap up</span></div>
-                <div class="flex flex-col items-center justify-end pb-2" style="width: 5%;"><span class="text-[9px] md:text-xs text-white/70 font-bold tracking-widest leading-none drop-shadow-md">error</span></div>
-            </div>
-            <span id="action-text" class="relative z-30 text-white font-black tracking-widest uppercase text-sm md:text-lg drop-shadow-md flex items-center gap-2">
-                <i id="toggle-icon" data-lucide="play" class="w-4 h-4 md:w-5 md:h-5"></i>
-                <span id="toggle-text">TAP TO START RECORDING</span>
-            </span>
-        </div>
-        <p class="text-[10px] text-slate-400 text-center leading-tight mt-3">Clicking the bar starts the microphone and timers automatically.</p>
     </div>
 
-    <!-- Celebration Panel -->
-    <div id="celebration-panel" class="hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center border transition-all duration-500 scale-95 opacity-0">
-        <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm">Waiting...</h2>
+    <!-- Celebration Panel (Static UI Placeholder) -->
+    <div id="celebration-panel" class="w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500">
+        <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400">Waiting for Audio...</h2>
         <div class="flex flex-row justify-center items-center gap-8 md:gap-16">
             <div class="flex flex-col items-center">
-                <span id="celeb-label-grade" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80">Final Grade</span>
-                <span id="celeb-grade" class="text-5xl md:text-7xl font-black drop-shadow-sm">- / 10</span>
+                <span id="celeb-label-grade" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Final Grade</span>
+                <span id="celeb-grade" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">- / 10</span>
             </div>
             <div id="celeb-divider" class="w-px h-20 bg-slate-300 opacity-50"></div>
             <div class="flex flex-col items-center">
-                <span id="celeb-label-time" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80">Time</span>
-                <span id="celeb-time" class="text-5xl md:text-7xl font-black drop-shadow-sm">-</span>
+                <span id="celeb-label-time" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Time</span>
+                <span id="celeb-time" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">-</span>
             </div>
         </div>
     </div>
 
     <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
         <div class="flex flex-col space-y-6 sm:space-y-8">
-            
             <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
 
                 <!-- PROCESSING PANEL -->
@@ -200,9 +259,7 @@
                     <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
                 </div>
                 
-                <!-- ========================================== -->
-                <!-- THE NEW TRACKMAN DASHBOARD AREA            -->
-                <!-- ========================================== -->
+                <!-- TRACKMAN DASHBOARD AREA -->
                 <div class="w-full">
                     <!-- Dashboard Header & Add Widget Button -->
                     <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
@@ -217,327 +274,27 @@
                     </div>
 
                     <!-- THE DROP ZONE (Grid Container) -->
-                    <!-- We use flex-wrap here so we can size the widgets perfectly -->
-                    <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start">
+                    <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
                         
-                        <!-- 1. The Small Pill (Sized to take up 1/3 of row on desktop, 1/2 on mobile) -->
-                        <div class="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)] cursor-move relative group">
-                            <thps-pill-pace></thps-pill-pace>
-                        </div>
-                        
-                        <!-- 2. The Medium Gauge (Sized to take up 1/3 of row on desktop, 1/2 on mobile) -->
-                        <div class="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)] cursor-move relative group">
-                            <thps-gauge-mumble></thps-gauge-mumble>
+                        <!-- DEFAULT WIDGETS -->
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-whats-this></thps-whats-this>
                         </div>
 
-                        <!-- 3. The Large Graph (Sized to take up the full row) -->
-                        <div class="w-full cursor-move relative group mt-2">
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-live-mic-timer></thps-live-mic-timer>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-score-summary></thps-score-summary>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
                             <thps-voice-graph></thps-voice-graph>
                         </div>
-
-                    </div>
-                </div>
-                <!-- ========================================== -->
-                
-                <!-- OLD SCORE SUMMARY DASHBOARD -->
-                <div id="cba-summaryCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-slate-800 shadow-sm transition-colors duration-300 mt-8">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4">
-                        <h2 class="text-lg font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Score Summary')">Legacy Score Summary</h2>
-                        <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="window.explain('Time')">
-                                <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Time:</span>
-                                <span id="sum-time" class="font-bold text-slate-800 text-sm pointer-events-none">-</span>
-                            </div>
-                            <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="window.explain('Grade')">
-                                Grade: <span id="cba-overallGrade" class="text-blue-600 pointer-events-none">- / 10</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <!-- Content -->
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="window.explain('Content')">Content</h3>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Personal')"><span class="score-label group-hover:text-blue-600 transition-colors">Personal:</span> <div class="flex items-center gap-1"><span id="sum-personal" class="score-value pointer-events-none">0%</span> <span id="sum-personal-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Visual')"><span class="score-label group-hover:text-blue-600 transition-colors">Visual:</span> <div class="flex items-center gap-1"><span id="sum-visual" class="score-value pointer-events-none">0%</span> <span id="sum-visual-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Intangible')"><span class="score-label group-hover:text-blue-600 transition-colors">Intangible:</span> <div class="flex items-center gap-1"><span id="sum-intangible" class="score-value pointer-events-none">0%</span> <span id="sum-intangible-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                        </div>
-                        <!-- Delivery -->
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="window.explain('Delivery')">Delivery</h3>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Words/min')"><span class="score-label group-hover:text-blue-600 transition-colors">Words/min:</span> <div class="flex items-center gap-1"><span id="sum-wpm" class="score-value pointer-events-none">-</span> <span id="sum-wpm-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Syllable/sec')"><span class="score-label group-hover:text-blue-600 transition-colors">Syllable/sec:</span> <div class="flex items-center gap-1"><span id="sum-sps" class="score-value pointer-events-none">-</span> <span id="sum-sps-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Pause %')"><span class="score-label group-hover:text-blue-600 transition-colors">Pause %:</span> <div class="flex items-center gap-1"><span id="sum-pause" class="score-value pointer-events-none">-</span> <span id="sum-pause-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                        </div>
-                        <!-- Simplicity -->
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="window.explain('Simplicity')">Simplicity</h3>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Words/Sent')"><span class="score-label group-hover:text-blue-600 transition-colors">Words/Sent:</span> <div class="flex items-center gap-1"><span id="sum-wps" class="score-value pointer-events-none">0</span> <span id="sum-wps-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Comp. Grade')"><span class="score-label group-hover:text-blue-600 transition-colors">Comp. Grade:</span> <div class="flex items-center gap-1"><span id="sum-grade" class="score-value pointer-events-none">0.0</span> <span id="sum-grade-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                            <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Simple %')"><span class="score-label group-hover:text-blue-600 transition-colors">Simple %:</span> <div class="flex items-center gap-1"><span id="sum-simple" class="score-value pointer-events-none">0%</span> <span id="sum-simple-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- 2.5 What does this mean? Panel -->
-                <div id="cba-explanationPanel" class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm bg-blue-50/30 transition-all duration-300">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
-                        <h3 id="cba-explanationTitle" class="text-sm font-bold text-blue-900 uppercase tracking-wider">What does this mean?</h3>
-                    </div>
-                    <div id="cba-explanationContent" class="text-sm text-slate-600 leading-relaxed border border-blue-100 bg-white/60 p-4 rounded-xl mt-3 min-h-[60px] flex items-center justify-center shadow-inner italic transition-opacity duration-300">
-                        Click on any term to learn more...
-                    </div>
-                </div>
-
-                <!-- Toggle Button for Extended Stats -->
-                <div class="relative flex items-center py-2 mt-4">
-                    <div class="flex-grow border-t border-slate-200"></div>
-                    <button onclick="window.toggleExtendedStats()" class="mx-4 flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-slate-200 text-slate-600 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-slate-50 hover:text-blue-600 transition-all shadow-sm active:scale-95 group">
-                        <span id="toggle-stats-text">Hide Your Stats</span>
-                        <i data-lucide="chevron-down" id="toggle-stats-icon" class="w-4 h-4 transition-transform duration-300 rotate-180 group-hover:-translate-y-0.5"></i>
-                    </button>
-                    <div class="flex-grow border-t border-slate-200"></div>
-                </div>
-
-                <!-- WRAPPER FOR EXTENDED STATS -->
-                <div id="cba-extendedStats" class="flex flex-col space-y-6 sm:space-y-8 w-full mt-2">
-
-                    <header class="mb-2 text-center pt-2">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Speech Analyzer Diagnostics</h2>
-                        <p class="text-slate-600 text-sm sm:text-base px-2">Raw transcript and detailed component metrics.</p>
-                    </header>
-
-                    <!-- 1. Text Input Section -->
-                    <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm transition-all duration-300">
-                        <label for="cba-inputText" class="block text-sm font-semibold text-slate-700 mb-2">Transcribed Audio / Manual Text Entry</label>
-                        
-                        <textarea id="cba-inputText" class="w-full h-48 sm:h-64 p-3 sm:p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all text-slate-700 leading-relaxed text-sm sm:text-base bg-white/50 overflow-y-auto" placeholder="Use the Action Bar above to speak, or paste your own text here..."></textarea>
-                        
-                        <div class="mt-4 flex flex-col sm:flex-row flex-wrap items-center gap-3">
-                            <button id="cba-analyzeBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50">
-                                Refresh Analysis
-                            </button>
-                            
-                            <button id="cba-clearBtn" class="w-full sm:w-auto bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm active:scale-95">
-                                Clear text
-                            </button>
-
-                            <button id="cba-copyBtn" class="hidden w-full sm:w-auto bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                                <span id="cba-copyBtnText">Copy Report</span>
-                            </button>
-
-                            <!-- Subtle Dictionary Status Indicator -->
-                            <div class="w-full sm:w-auto sm:ml-auto flex items-center justify-center sm:justify-end gap-2 text-xs font-medium text-slate-500">
-                                <span id="cba-dictDot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                                <span id="cba-dictText">Loading Dictionaries...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. Tangible Text Map -->
-                    <div id="cba-highlightContainer" class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-3 border-slate-100 gap-2">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-bold text-slate-700">Tangible Text Map</h3>
-                                <div class="group relative z-50">
-                                    <span class="flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded cursor-help">💡 Tip</span>
-                                    <div class="absolute left-0 w-56 sm:w-64 p-3 mt-1 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none font-normal normal-case tracking-normal z-50">
-                                        Green text represents Personal content (a specific person doing a specific thing). Red text represents Visual content (things people can see, like colours, sizes, groups, or common objects).
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs text-slate-600 font-medium">
-                                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border border-[#00B700]"></span> Personal</div>
-                                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-500/10 border-b border-red-500"></span> Visual (Underlined)</div>
-                                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border-b-2 border-red-500"></span> Overlap</div>
-                            </div>
-                        </div>
-                        <div id="cba-highlightedText" class="w-full h-80 sm:h-96 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic">Waiting for text...</div>
-                    </div>
-
-                    <!-- 4. Audio Metrics Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                        <!-- WPM Pace Card -->
-                        <div id="cba-wpmCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300 opacity-50">
-                            <div class="flex justify-between items-start cursor-pointer" id="cba-wpmToggleBtn">
-                                <div class="w-full">
-                                    <div class="flex justify-between items-start mb-1">
-                                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Speaking Pace</h3>
-                                    </div>
-                                    <div class="flex items-baseline gap-2">
-                                        <div id="cba-wpmScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0</div>
-                                        <span class="text-sm text-slate-500 font-medium">WPM Avg</span>
-                                    </div>
-                                </div>
-                                <svg class="w-5 h-5 ml-2 text-slate-400 transition-transform duration-300 transform flex-shrink-0" id="cba-wpmArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                            <div id="cba-wpmAccordion" class="cba-accordion-content border-t border-slate-100 pt-2">
-                                <p class="text-[10px] text-slate-500 mb-2 uppercase font-bold tracking-wide">Pace per 20-second interval</p>
-                                <canvas id="cba-wpmChart" height="150"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Mumble Meter Card -->
-                        <div id="cba-mumbleCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300 opacity-50">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mumble Meter</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2">
-                                <div id="cba-mumbleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                                <span class="text-sm text-slate-500">Syllables / Sec</span>
-                            </div>
-                            <div class="relative w-full h-2.5 rounded-full mt-5" style="background: linear-gradient(to right, #3b82f6, #10b981, #f97316, #ef4444);">
-                                <div id="cba-mumbleMarker" class="absolute top-1/2 -translate-y-1/2 w-3 h-5 bg-white border-2 border-slate-700 rounded-sm shadow-md transition-all duration-500" style="left: 0%; margin-left: -0.375rem;"></div>
-                            </div>
-                            <p id="cba-mumbleInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-500">Waiting for Audio...</p>
-                            <p id="cba-mumbleStats" class="text-[10px] sm:text-xs text-slate-400 mt-1">0.0s active / 0.0s pause / 0.0s total</p>
-                        </div>
-                    </div>
-
-                    <!-- 5. SCORE CARDS GRID -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                        
-                        <!-- Personal Balance -->
-                        <div id="cba-personalCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Personal Balance</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2"><div id="cba-personalScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div><span class="text-sm text-slate-500">of text</span></div>
-                            <div class="relative w-full mt-4">
-                                <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div id="cba-personalProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div></div>
-                            </div>
-                            <p id="cba-personalInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                            <p id="cba-personalCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                        </div>
-
-                        <!-- Visual Balance -->
-                        <div id="cba-visualCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Visual Balance</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2"><div id="cba-visualScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div><span class="text-sm text-slate-500">of text</span></div>
-                            <div class="relative w-full mt-4">
-                                <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div id="cba-visualProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div></div>
-                            </div>
-                            <p id="cba-visualInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                            <p id="cba-visualCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                        </div>
-                        
-                        <!-- Signal-Noise Ratio Card -->
-                        <div id="cba-snCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Signal-Noise Ratio</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2">
-                                <div id="cba-snScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                                <span class="text-sm text-slate-500">Avg words/sentence</span>
-                            </div>
-                            <div class="relative w-full mt-4">
-                                <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="cba-snProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-snToggleBtn">
-                                <p id="cba-snInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                            </div>
-                            <div id="cba-snAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                <div class="space-y-2 text-xs mb-5">
-                                    <div class="flex justify-between"><span class="text-slate-500">Total Words</span><span id="cba-statWords" class="font-bold text-slate-700">0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Total Sentences</span><span id="cba-statSentences" class="font-bold text-slate-700">0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Total Syllables</span><span id="cba-statSyllables" class="font-bold text-slate-700">0</span></div>
-                                </div>
-                                <div id="cba-snGrid" class="grid grid-cols-5 gap-1 w-fit mx-auto"></div>
-                                <div class="flex justify-center gap-3 mt-3 text-[10px] text-slate-500">
-                                    <div class="flex items-center gap-1"><div id="cba-legendRed" class="w-2.5 h-2.5 rounded-sm shadow-sm" style="background-color: #94a3b8;"></div> red: most important word</div>
-                                    <div class="flex items-center gap-1"><div class="w-2.5 h-2.5 bg-slate-800 rounded-sm shadow-sm"></div> black: other words</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sentence Complexity Rating -->
-                        <div id="cba-simpleComplexCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sentence Complexity</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-lg text-slate-500 font-semibold">Grade</span>
-                                <div id="cba-gradeLevel" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                            </div>
-                            <div class="relative w-full mt-4">
-                                <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="cba-gradeProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-readabilityToggleBtn">
-                                <p id="cba-gradeInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                            </div>
-                            <div id="cba-readabilityAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                <div class="space-y-2 text-xs">
-                                    <div class="flex justify-between border-b border-slate-100 pb-1 mb-1"><span class="font-bold text-slate-600">Average Grade</span><span id="cba-avgScore" class="font-bold text-blue-600">0.0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Flesch-Kincaid</span><span id="cba-fleschScore" class="font-bold text-slate-700">0.0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Gunning Fog</span><span id="cba-fogScore" class="font-bold text-slate-700">0.0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">SMOG Index</span><span id="cba-smogScore" class="font-bold text-slate-700">0.0</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Coleman-Liau</span><span id="cba-colemanScore" class="font-bold text-slate-700">0.0</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Simple Language -->
-                        <div id="cba-simpleCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Simple Language</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2">
-                                <div id="cba-simpleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div>
-                                <span class="text-sm text-slate-500">Core Vocab</span>
-                            </div>
-                            <div class="relative w-full mt-4 flex h-2 rounded-full overflow-hidden bg-slate-100">
-                                <div id="cba-simpleBar5yr" class="h-full bg-slate-300 transition-all duration-500" style="width: 0%"></div>
-                                <div id="cba-simpleBarEsl" class="h-full bg-slate-200 transition-all duration-500" style="width: 0%"></div>
-                                <div id="cba-simpleBarKit" class="h-full bg-slate-100 transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-simpleToggleBtn">
-                                <p id="cba-simpleInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                            </div>
-                            <div id="cba-simpleAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                <div class="space-y-2 text-xs">
-                                    <div class="flex justify-between"><span class="text-slate-500">5yr Old 1000</span><span id="cba-s5yr" class="font-bold text-slate-700">0%</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">ESL 2000</span><span id="cba-sEsl" class="font-bold text-slate-700">0%</span></div>
-                                    <div class="flex justify-between"><span class="text-slate-500">Kitchen 1000</span><span id="cba-sKit" class="font-bold text-slate-700">0%</span></div>
-                                    <div class="flex justify-between border-t border-slate-100 pt-1 mt-1"><span class="font-bold text-slate-500">Outside Vocab</span><span id="cba-sOut" class="font-bold text-slate-700">0%</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Google 10K Benchmark -->
-                        <div id="cba-googleCard" class="md:col-span-2 score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Google 10K Benchmark</h3>
-                            </div>
-                            <div class="flex items-baseline gap-2">
-                                <div id="cba-googleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div>
-                                <span class="text-sm text-slate-500">of text</span>
-                            </div>
-                            <div class="relative w-full mt-4">
-                                <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="cba-googleProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <p id="cba-googleInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                            <p id="cba-googleCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                        </div>
-
-                    </div>
-                </div> <!-- End of cba-extendedStats wrapper -->
             </div>
         </div>
     </div>
@@ -550,33 +307,46 @@
         
         let gameTimerInterval = null;
         let isActive = false;
-        
-        const inputEl = document.getElementById('cba-inputText');
+        let reportMarkdownText = "";
 
-        // NEW: WIDGET MENU LOGIC
+        const EXPLANATIONS_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/explanations.json"; 
+        let explanationsData = null;
+        const FALLBACK_EXPLANATIONS = {
+            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
+            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 30-60 is 0.75p, and going under 30s or over 90s cancels your Grade entirely.",
+            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
+            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions.",
+            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
+            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words.",
+            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time.",
+            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%.",
+            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%.",
+            "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
+            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
+            "Pause %": "The percentage of time you spend silent. Aim for 10-30%.",
+            "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
+            "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
+            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 85-95% is ideal."
+        };
+
         window.toggleWidgetMenu = function() {
             const drawer = document.getElementById('widget-menu-drawer');
             const overlay = document.getElementById('widget-menu-overlay');
 
             if (drawer.classList.contains('translate-x-full')) {
-                // Open Menu
                 overlay.classList.remove('hidden');
                 setTimeout(() => {
                     overlay.classList.remove('opacity-0');
                     drawer.classList.remove('translate-x-full');
                 }, 10);
             } else {
-                // Close Menu
                 overlay.classList.add('opacity-0');
                 drawer.classList.add('translate-x-full');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                }, 300); 
+                setTimeout(() => overlay.classList.add('hidden'), 300); 
             }
         };
 
         window.switchWidgetTab = function(size) {
-            // Reset all buttons
             ['small', 'medium', 'large'].forEach(s => {
                 const btn = document.getElementById(`tab-btn-${s}`);
                 const content = document.getElementById(`tab-content-${s}`);
@@ -584,8 +354,6 @@
                 content.classList.add('hidden');
                 content.classList.remove('block');
             });
-
-            // Activate chosen tab
             const activeBtn = document.getElementById(`tab-btn-${size}`);
             const activeContent = document.getElementById(`tab-content-${size}`);
             activeBtn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors";
@@ -600,28 +368,32 @@
             const timerProgress = document.getElementById('timer-progress');
             
             if (isActive) {
-                // STOP
                 clearInterval(gameTimerInterval);
                 isActive = false;
-                btnText.innerText = 'TAP TO START RECORDING';
-                btnIcon.setAttribute('data-lucide', 'play');
-                actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
-                actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-                if (typeof window.THPS.Audio.stopRecordingProcess === 'function') window.THPS.Audio.stopRecordingProcess();
+                if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                    actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                }
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                    window.THPS.Audio.stopRecordingProcess();
+                }
             } else {
-                // START
                 isActive = true;
-                btnText.innerText = 'TAP TO STOP';
-                btnIcon.setAttribute('data-lucide', 'square');
-                actionBar.classList.replace('bg-slate-800', 'bg-rose-600');
-                actionBar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
+                if(btnText) btnText.innerText = 'TAP TO STOP';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'square');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-slate-800', 'bg-rose-600');
+                    actionBar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
+                }
+                if(timerProgress) timerProgress.style.width = '0%';
                 
-                timerProgress.style.width = '0%';
+                if (window.clearAnalyzer) window.clearAnalyzer();
                 
-                const clearBtn = document.getElementById('cba-clearBtn');
-                if (clearBtn) clearBtn.click();
-                
-                if (typeof window.THPS.Audio.startRecordingProcess === 'function') window.THPS.Audio.startRecordingProcess();
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
+                    window.THPS.Audio.startRecordingProcess();
+                }
                 
                 if (gameTimerInterval) clearInterval(gameTimerInterval);
                 gameTimerInterval = setInterval(() => {
@@ -629,35 +401,23 @@
                     if (elapsedSecs >= 240) {
                         clearInterval(gameTimerInterval);
                         isActive = false;
-                        btnText.innerText = 'TAP TO START RECORDING';
-                        btnIcon.setAttribute('data-lucide', 'play');
-                        actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
-                        actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-                        if (typeof window.THPS.Audio.stopRecordingProcess === 'function') window.THPS.Audio.stopRecordingProcess();
+                        if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                        if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                        if(actionBar) {
+                            actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                            actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                        }
+                        if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                            window.THPS.Audio.stopRecordingProcess();
+                        }
                         if (window.lucide) window.lucide.createIcons();
                     } else {
-                        timerProgress.style.width = `${(elapsedSecs / 240) * 100}%`;
+                        if(timerProgress) timerProgress.style.width = `${(elapsedSecs / 240) * 100}%`;
                     }
                 }, 50);
             }
             if (window.lucide) window.lucide.createIcons();
         };
-
-        let wpmChartInstance = null;
-        let reportMarkdownText = "";
-
-        const setupAccordion = (btnId, contentId, arrowId = null) => {
-            const btn = document.getElementById(btnId);
-            if (btn) btn.addEventListener('click', () => {
-                document.getElementById(contentId).classList.toggle('cba-accordion-open');
-                if (arrowId) document.getElementById(arrowId).classList.toggle('rotate-180');
-            });
-        };
-        
-        setupAccordion('cba-readabilityToggleBtn', 'cba-readabilityAccordion');
-        setupAccordion('cba-wpmToggleBtn', 'cba-wpmAccordion', 'cba-wpmArrow');
-        setupAccordion('cba-snToggleBtn', 'cba-snAccordion'); 
-        setupAccordion('cba-simpleToggleBtn', 'cba-simpleAccordion'); 
 
         function updateCelebrationPanel(totalPoints, totalSecs, overrideGrade, recordedAudio, textLength) {
             const panel = document.getElementById('celebration-panel');
@@ -666,16 +426,19 @@
             const timeEl = document.getElementById('celeb-time');
 
             if (!recordedAudio && totalSecs === 0 && textLength === 0) {
-                panel.classList.add('hidden', 'scale-95', 'opacity-0');
+                // Return to Blank State
+                panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500";
+                comment.textContent = "Waiting for Audio...";
+                comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400";
+                gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
+                timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
+                document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
+                document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
+                document.getElementById('celeb-divider').className = "w-px h-20 bg-slate-300 opacity-50";
                 return;
             }
 
-            panel.classList.remove('hidden');
-            setTimeout(() => {
-                panel.classList.remove('scale-95', 'opacity-0');
-                panel.classList.add('scale-100', 'opacity-100');
-            }, 50);
-
+            // Set Data
             let finalScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
             gradeEl.textContent = overrideGrade ? "- / 10" : `${finalScore} / 10`;
             
@@ -687,14 +450,11 @@
                 timeEl.textContent = "-";
             }
 
-            panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center transform transition-all duration-500 scale-100 opacity-100 border border-slate-200";
-            
-            document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-500";
-            document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-500";
-            document.getElementById('celeb-divider').className = "w-px h-20 bg-slate-300 opacity-50";
-
-            panel.classList.remove('border-slate-200');
-            panel.classList.add('text-white');
+            // Apply success styling
+            panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center transition-all duration-500 text-white";
+            gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
+            timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
+            comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm";
             document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
             document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
             document.getElementById('celeb-divider').className = "w-px h-20 bg-white/40";
@@ -718,25 +478,25 @@
 
         window.analyze = function() {
             try {
-                if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') {
-                    console.warn("GitHub modules not loaded yet. Waiting...");
-                    return;
-                }
+                if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
             } catch(e) { return; }
             
             if (!window.THPS.NLP.dictsLoaded) return;
-            const text = inputEl.value.trim();
+            
+            let text = "";
+            const widgetEl = document.getElementById('cba-inputText-widget');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (widgetEl && widgetEl.value.trim() !== '') text = widgetEl.value.trim();
+            else if (hiddenEl) text = hiddenEl.value.trim();
             
             if (!text) {
-                document.getElementById('cba-highlightContainer').classList.add('hidden');
-                document.getElementById('cba-copyBtn').classList.add('hidden');
                 updateCelebrationPanel(0, 0, true, false, 0); 
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
                 return;
             }
 
-            // --- DELEGATE TO THE GITHUB BRAIN ---
             let timestamps = [];
-            if (window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) {
+            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) {
                 timestamps = window.THPS.Audio.wordTimestamps;
             }
             
@@ -751,52 +511,14 @@
 
             reportMarkdownText = newReportMarkdown; 
 
-            // --- SAFE UI UPDATERS ---
-            const safeSetText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-            const safeSetWidth = (id, widthPct) => { const el = document.getElementById(id); if (el) el.style.width = widthPct; };
-            const safeSetColor = (id, color) => { const el = document.getElementById(id); if (el) el.style.color = color; };
-            const safeSetBg = (id, color) => { const el = document.getElementById(id); if (el) el.style.backgroundColor = color; };
-            const safeSetBorder = (id, color) => { const el = document.getElementById(id); if (el) el.style.borderLeftColor = color; };
-
-            safeSetText('cba-statWords', numWords);
-            safeSetText('cba-statSentences', numSentences);
-            safeSetText('cba-statSyllables', totalSyllables);
-
-            const highlightContainer = document.getElementById('cba-highlightContainer');
-            if (highlightContainer) highlightContainer.classList.remove('hidden'); 
-            const copyBtn = document.getElementById('cba-copyBtn');
-            if (copyBtn) copyBtn.classList.remove('hidden'); 
-            const highlightTextEl = document.getElementById('cba-highlightedText');
-            if (highlightTextEl) highlightTextEl.innerHTML = highlightedHTML.replace(/\n/g, '<br>');
-
             let gPct = Math.round((google10kCount / numWords) * 100);
-            if (window.THPS.NLP.google10kSet.size > 0 && numWords > 0) {
-                safeSetText('cba-googleScore', `${gPct}%`);
-                safeSetWidth('cba-googleProgress', `${Math.min(100, Math.max(0, gPct))}%`);
-                safeSetText('cba-googleCount', `${google10kCount} out of ${numWords} words`);
-                let gColor = gPct > 80 ? "#10b981" : gPct > 60 ? "#f59e0b" : "#ef4444";
-                safeSetText('cba-googleInterpret', gPct > 80 ? "Highly Common" : gPct > 60 ? "Moderately Common" : "Highly Unique/Niche");
-                safeSetBorder('cba-googleCard', gColor);
-                safeSetBg('cba-googleProgress', gColor);
-                safeSetColor('cba-googleScore', gColor);
-            }
 
             let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
             let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
             let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
             let coreSimpleScore = s5yrPct + sEslPct + sKitPct; 
             
-            safeSetText('cba-simpleScore', `${coreSimpleScore}%`);
-            safeSetWidth('cba-simpleBar5yr', `${s5yrPct}%`);
-            safeSetWidth('cba-simpleBarEsl', `${sEslPct}%`);
-            safeSetWidth('cba-simpleBarKit', `${sKitPct}%`);
-            safeSetText('cba-s5yr', `${s5yrPct}%`);
-            safeSetText('cba-sEsl', `${sEslPct}%`);
-            safeSetText('cba-sKit', `${sKitPct}%`);
-            safeSetText('cba-sOut', `${Math.round((simpleCounts['outside'] / numWords) * 100) || 0}%`);
-            safeSetText('cba-simpleInterpret', coreSimpleScore > 85 ? "Extremely Accessible" : coreSimpleScore > 70 ? "Good Accessibility" : "Highly advanced vocabulary");
-
-            let elapsedSecs = window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
+            let elapsedSecs = window.THPS.Audio && window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
             let transcribedDuration = Math.min(240, elapsedSecs);
             
             let mumbleScore = 0; 
@@ -805,13 +527,7 @@
             let avgWpm = 0;
             let activeSpeakingSecs = 0;
 
-            const mmCard = document.getElementById('cba-mumbleCard');
-            const wCard = document.getElementById('cba-wpmCard');
-
-            if (window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                if (mmCard) mmCard.classList.remove('opacity-50');
-                if (wCard) wCard.classList.remove('opacity-50');
-
+            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
                 const periods = (text.match(/[.!?]/g) || []).length;
                 const commas = (text.match(/[,;:-]/g) || []).length;
                 
@@ -827,65 +543,6 @@
                 
                 avgWpm = Math.round((numWords / transcribedDuration) * 60);
                 mumbleScore = totalSyllables / activeSpeakingSecs;
-
-                let mColor, mText;
-                if (mumbleScore < 2.5) { mColor = "#3b82f6"; mText = "Slightly too slow"; } 
-                else if (mumbleScore < 4.0) { mColor = "#10b981"; mText = "Very clear, no mumble"; } 
-                else if (mumbleScore <= 5.5) { mColor = "#f97316"; mText = "Slight mumble"; } 
-                else { mColor = "#ef4444"; mText = "High Mumbling Risk"; } 
-
-                safeSetText('cba-mumbleScore', mumbleScore.toFixed(1));
-                safeSetText('cba-mumbleInterpret', mText);
-                safeSetColor('cba-mumbleInterpret', mColor);
-                safeSetColor('cba-mumbleScore', mColor);
-                if (mmCard) mmCard.style.borderLeftColor = mColor;
-                
-                const marker = document.getElementById('cba-mumbleMarker');
-                if (marker) marker.style.left = Math.min(100, Math.max(0, (mumbleScore / 8) * 100)) + "%";
-                safeSetText('cba-mumbleStats', `${activeSpeakingSecs.toFixed(1)}s active / ${estimatedPauseTime.toFixed(1)}s pause / ${transcribedDuration.toFixed(1)}s analyzed`);
-
-                safeSetText('cba-wpmScore', avgWpm);
-                const wpmScoreEl = document.getElementById('cba-wpmScore');
-                if (wpmScoreEl) wpmScoreEl.className = 'text-3xl sm:text-4xl font-bold text-amber-500';
-
-                let wpmDataArray = [];
-                let numIntervals = Math.ceil(transcribedDuration / 20);
-                for (let i = 0; i < numIntervals; i++) {
-                    let intervalDuration = (i === numIntervals - 1) ? (transcribedDuration % 20 || 20) : 20;
-                    let share = intervalDuration / transcribedDuration;
-                    let baseWords = numWords * share;
-                    let variation = 1 + (Math.sin(i * 1.5) * 0.12); 
-                    let intervalWords = Math.round(baseWords * variation);
-                    let intervalWpm = Math.round((intervalWords / intervalDuration) * 60);
-                    wpmDataArray.push(intervalWpm);
-                }
-
-                if (wpmChartInstance) wpmChartInstance.destroy();
-                const chartCanvas = document.getElementById('cba-wpmChart');
-                if (chartCanvas && typeof window.Chart !== 'undefined') {
-                    wpmChartInstance = new window.Chart(chartCanvas, {
-                        type: 'bar',
-                        data: { 
-                            labels: wpmDataArray.map((_, i) => `${(i+1)*20}s`), 
-                            datasets: [{ 
-                                label: 'WPM', 
-                                data: wpmDataArray, 
-                                backgroundColor: 'rgba(245, 158, 11, 0.5)', 
-                                borderColor: 'rgba(245, 158, 11, 1)', 
-                                borderWidth: 1, 
-                                borderRadius: 4 
-                            }] 
-                        },
-                        options: { responsive: true, scales: { y: { beginAtZero: true, suggestedMax: 180 } }, plugins: { legend: { display: false } } }
-                    });
-                }
-
-            } else {
-                if (mmCard) mmCard.classList.add('opacity-50');
-                if (wCard) wCard.classList.add('opacity-50');
-                safeSetText('cba-mumbleInterpret', "Waiting for Audio...");
-                const wpmScoreEl = document.getElementById('cba-wpmScore');
-                if (wpmScoreEl) wpmScoreEl.className = 'text-3xl sm:text-4xl font-bold text-slate-400';
             }
 
             let avgGrade = 0;
@@ -899,154 +556,65 @@
                 let smog = 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291;
                 let coleman = 0.0588 * ((letterCount / numWords) * 100) - 0.296 * ((numSentences / numWords) * 100) - 15.8;
                 avgGrade = ((Math.max(0, flesch)) + (Math.max(0, fog)) + (Math.max(0, smog)) + (Math.max(0, coleman))) / 4;
-                readability = { flesch: Math.max(0, flesch), fog: Math.max(0, fog), smog: Math.max(0, smog), coleman: Math.max(0, coleman) };
+                readability = { flesch: Math.max(0, flesch), fog: Math.max(0, fog), smog: Math.max(0, smog), coleman: Math.max(0, coleman), avgGrade: avgGrade };
             }
 
-            safeSetText('cba-avgScore', avgGrade.toFixed(1));
-            safeSetText('cba-fleschScore', readability.flesch.toFixed(1));
-            safeSetText('cba-fogScore', readability.fog.toFixed(1));
-            safeSetText('cba-smogScore', readability.smog.toFixed(1));
-            safeSetText('cba-colemanScore', readability.coleman.toFixed(1));
-
-            safeSetText('cba-gradeLevel', avgGrade.toFixed(1));
-            let gradeColor = avgGrade <= 4.4 ? "#f97316" : avgGrade <= 8.4 ? "#10b981" : avgGrade <= 9.5 ? "#00B700" : avgGrade <= 12.5 ? "#f59e0b" : "#ef4444";
-            safeSetText('cba-gradeInterpret', avgGrade <= 4.4 ? "Pitched to 5-10 yr old" : avgGrade <= 8.4 ? "Short & Simple" : avgGrade <= 9.5 ? "Perfect Plain English" : avgGrade <= 12.5 ? "Audience Strain" : "Too Complex");
-            safeSetColor('cba-gradeInterpret', gradeColor);
-            safeSetBorder('cba-simpleComplexCard', gradeColor);
-            safeSetBg('cba-gradeProgress', gradeColor);
-            safeSetWidth('cba-gradeProgress', `${Math.min(100, Math.max(0, (avgGrade / 18) * 100))}%`);
-
             let personalPercent = Math.round((personalCount / numWords) * 100);
-            safeSetText('cba-personalScore', `${personalPercent}%`);
-            let pColor = personalPercent <= 29 ? "#94a3b8" : personalPercent <= 44 ? "#10b981" : personalPercent <= 60 ? "#00B700" : "#a855f7";
-            safeSetText('cba-personalInterpret', personalPercent <= 29 ? "Highly Detached" : personalPercent <= 44 ? "Good Balance" : personalPercent <= 60 ? "Highly Personal" : "Overly Conversational?");
-            safeSetBorder('cba-personalCard', pColor);
-            safeSetBg('cba-personalProgress', pColor);
-            safeSetColor('cba-personalScore', pColor);
-            safeSetWidth('cba-personalProgress', `${Math.min(100, Math.max(0, personalPercent))}%`);
-
             let visualPercent = Math.round((visualCount / numWords) * 100);
-            safeSetText('cba-visualScore', `${visualPercent}%`);
-            let vColor = visualPercent <= 29 ? "#94a3b8" : visualPercent <= 44 ? "#10b981" : visualPercent <= 60 ? "#00B700" : "#a855f7";
-            safeSetText('cba-visualInterpret', visualPercent <= 29 ? "Very Intangible" : visualPercent <= 44 ? "Good" : visualPercent <= 60 ? "Very Vivid" : "Reaching poetic levels");
-            safeSetBorder('cba-visualCard', vColor);
-            safeSetBg('cba-visualProgress', vColor);
-            safeSetColor('cba-visualScore', vColor);
-            safeSetWidth('cba-visualProgress', `${Math.min(100, Math.max(0, visualPercent))}%`);
+            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
             let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
-            const avgWps = Math.round(avgWpsFloat);
-            safeSetText('cba-snScore', avgWpsFloat.toFixed(1));
-            let snColor = avgWps <= 9 ? "#00B700" : avgWps <= 16 ? "#6366f1" : avgWps <= 25 ? "#f59e0b" : "#ef4444";
-            safeSetText('cba-snInterpret', avgWps <= 9 ? "Very high signal, low noise" : avgWps <= 16 ? "High signal; moderate noise" : avgWps <= 25 ? "Moderate signal; high noise" : "Low signal; very high noise");
-            safeSetColor('cba-snInterpret', snColor);
-            safeSetBorder('cba-snCard', snColor);
-            safeSetColor('cba-snScore', snColor);
-            safeSetBg('cba-snProgress', snColor);
-            safeSetWidth('cba-snProgress', `${Math.min(100, Math.max(0, (avgWps / 40) * 100))}%`);
-
+            
             try {
                 let totalPoints = 0;
                 let overrideGrade = false;
 
-                const setEval = (id, text, colorClass) => {
-                    const el = document.getElementById(id);
-                    if(el) { 
-                        el.textContent = text; 
-                        el.className = `text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide ${colorClass} ml-1 pointer-events-none`; 
-                    }
-                };
+                if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
+                    if (elapsedSecs < 30) overrideGrade = true; 
+                    else if (elapsedSecs < 60) totalPoints += 0.75; 
+                    else if (elapsedSecs <= 90) totalPoints += 1.0; 
+                    else overrideGrade = true;
 
-                if (window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    let m = Math.floor(elapsedSecs / 60);
-                    let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
-                    document.getElementById('sum-time').textContent = `${m}:${s}`;
-                    totalPoints += 1.0;
+                    if (avgWpm < 100) totalPoints += 0.75; 
+                    else if (avgWpm > 150) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (mumbleScore < 3) totalPoints += 0.75; 
+                    else if (mumbleScore > 5) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (pausePercent < 10) totalPoints += 0.25; 
+                    else if (pausePercent > 30) totalPoints += 0.75; 
+                    else totalPoints += 1;
                 } else {
-                    document.getElementById('sum-time').textContent = "Text Only";
                     overrideGrade = true;
                 }
 
-                document.getElementById('sum-personal').textContent = `${personalPercent}%`;
-                let pStatus = 'just right'; let pColorClass = 'bg-green-100 text-green-700';
-                if (personalPercent < 30) { pStatus = 'not enough'; pColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else if (personalPercent > 60) { pStatus = 'too much'; pColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-personal-eval', pStatus, pColorClass);
+                if (personalPercent < 30) totalPoints += 0.25; 
+                else if (personalPercent > 60) totalPoints += 0.75; 
+                else totalPoints += 1;
 
-                document.getElementById('sum-visual').textContent = `${visualPercent}%`;
-                let vStatus = 'just right'; let vColorClass = 'bg-green-100 text-green-700';
-                if (visualPercent < 20) { vStatus = 'not enough'; vColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else if (visualPercent > 50) { vStatus = 'too much'; vColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-visual-eval', vStatus, vColorClass);
+                if (visualPercent < 20) totalPoints += 0.25; 
+                else if (visualPercent > 50) totalPoints += 0.75; 
+                else totalPoints += 1;
 
-                let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
-                document.getElementById('sum-intangible').textContent = `${intangiblePercent}%`;
-                let iStatus = 'just right'; let iColorClass = 'bg-green-100 text-green-700';
-                if (intangiblePercent > 45) { iStatus = 'too much'; iColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else if (intangiblePercent >= 30) { iStatus = 'bit much'; iColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-intangible-eval', iStatus, iColorClass);
+                if (intangiblePercent > 45) totalPoints += 0.25; 
+                else if (intangiblePercent >= 30) totalPoints += 0.75; 
+                else totalPoints += 1;
 
-                if (window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    document.getElementById('sum-wpm').textContent = avgWpm;
-                    let wpmStatus = 'just right'; let wpmColorClass = 'bg-green-100 text-green-700';
-                    if (avgWpm < 100) { wpmStatus = 'speed up'; wpmColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                    else if (avgWpm > 150) { wpmStatus = 'strain'; wpmColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                    else { totalPoints += 1; }
-                    setEval('sum-wpm-eval', wpmStatus, wpmColorClass);
+                if (avgWpsFloat < 5) totalPoints += 0.75; 
+                else if (avgWpsFloat > 15) totalPoints += 0.25; 
+                else totalPoints += 1;
 
-                    document.getElementById('sum-sps').textContent = mumbleScore.toFixed(1);
-                    let spsStatus = 'just right'; let spsColorClass = 'bg-green-100 text-green-700';
-                    if (mumbleScore < 3) { spsStatus = 'speed up'; spsColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                    else if (mumbleScore > 5) { spsStatus = 'strain'; spsColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                    else { totalPoints += 1; }
-                    setEval('sum-sps-eval', spsStatus, spsColorClass);
+                if (avgGrade < 5) totalPoints += 0.75; 
+                else if (avgGrade > 10) totalPoints += 0.25; 
+                else totalPoints += 1;
 
-                    document.getElementById('sum-pause').textContent = `${pausePercent.toFixed(0)}%`;
-                    let pzStatus = 'just right'; let pzColorClass = 'bg-green-100 text-green-700';
-                    if (pausePercent < 10) { pzStatus = 'too little'; pzColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                    else if (pausePercent > 30) { pzStatus = 'too much'; pzColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                    else { totalPoints += 1; }
-                    setEval('sum-pause-eval', pzStatus, pzColorClass);
-                } else {
-                    document.getElementById('sum-wpm').textContent = "-";
-                    document.getElementById('sum-sps').textContent = "-";
-                    document.getElementById('sum-pause').textContent = "-";
-                    const fallbackEl = (id) => { const el = document.getElementById(id); if(el) { el.textContent = 'Text Only'; el.className = 'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none'; }};
-                    fallbackEl('sum-wpm-eval'); fallbackEl('sum-sps-eval'); fallbackEl('sum-pause-eval');
-                }
+                if (coreSimpleScore < 85) totalPoints += 0.25; 
+                else if (coreSimpleScore > 95) totalPoints += 0.75; 
+                else totalPoints += 1;
 
-                document.getElementById('sum-wps').textContent = avgWpsFloat.toFixed(1);
-                let wpsStatus = 'just right'; let wpsColorClass = 'bg-green-100 text-green-700';
-                if (avgWpsFloat < 5) { wpsStatus = 'simple'; wpsColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else if (avgWpsFloat > 15) { wpsStatus = 'complex'; wpsColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else { totalPoints += 1; }
-                setEval('sum-wps-eval', wpsStatus, wpsColorClass);
-
-                document.getElementById('sum-grade').textContent = avgGrade.toFixed(1);
-                let gradeStatus = 'just right'; let gradeColorClass = 'bg-green-100 text-green-700';
-                if (avgGrade < 5) { gradeStatus = 'simple'; gradeColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else if (avgGrade > 10) { gradeStatus = 'complex'; gradeColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else { totalPoints += 1; }
-                setEval('sum-grade-eval', gradeStatus, gradeColorClass);
-
-                document.getElementById('sum-simple').textContent = `${coreSimpleScore}%`;
-                let simpleStatus = 'just right'; let simpleColorClass = 'bg-green-100 text-green-700';
-                if (coreSimpleScore < 85) { simpleStatus = 'complex'; simpleColorClass = 'bg-red-100 text-red-700'; totalPoints += 0.25; }
-                else if (coreSimpleScore > 95) { simpleStatus = 'simple'; simpleColorClass = 'bg-amber-100 text-amber-700'; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-simple-eval', simpleStatus, simpleColorClass);
-                
-                if (overrideGrade) {
-                    document.getElementById('cba-overallGrade').textContent = "- / 10";
-                } else {
-                    let formattedScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
-                    document.getElementById('cba-overallGrade').textContent = `${formattedScore} / 10`;
-                }
-
-                updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio.recordedAudio, text.length);
+                updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio ? window.THPS.Audio.recordedAudio : false, text.length);
 
                 // --- THE TRACKMAN BROADCAST ---
                 window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
@@ -1058,16 +626,32 @@
                         personal: personalPercent,
                         visual: visualPercent,
                         text: text,
-                        wordTimestamps: wordTimestamps 
+                        wordTimestamps: wordTimestamps,
+                        volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
+                        pause: pausePercent,
+                        intangible: intangiblePercent,
+                        wps: avgWpsFloat,
+                        simple: coreSimpleScore,
+                        totalPoints: totalPoints,
+                        overrideGrade: overrideGrade,
+                        recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
+                        highlightedHTML: highlightedHTML,
+                        reportMarkdownText: reportMarkdownText,
+                        numWords: numWords,
+                        numSentences: numSentences,
+                        totalSyllables: totalSyllables,
+                        google10kCount: google10kCount,
+                        simpleCounts: simpleCounts,
+                        readability: readability
                     } 
                 }));
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
         };
 
-        document.getElementById('cba-copyBtn').addEventListener('click', () => {
+        window.copyReportToClipboard = function() {
             let cleanMarkdown = reportMarkdownText.trim().replace(/\n/g, '\n\n').replace(/ +/g, ' ');
-            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- EXECUTIVE SUMMARY ---\n[Grade] ${document.getElementById('cba-overallGrade').textContent}\n[Content] Personal: ${document.getElementById('sum-personal').textContent} | Visual: ${document.getElementById('sum-visual').textContent} | Intangible: ${document.getElementById('sum-intangible').textContent}\n[Delivery] WPM: ${document.getElementById('sum-wpm').textContent} | Syllables/sec: ${document.getElementById('sum-sps').textContent} | Pause Time: ${document.getElementById('sum-pause').textContent}\n[Simplicity] Words/Sent: ${document.getElementById('sum-wps').textContent} | Grade: ${document.getElementById('sum-grade').textContent} | Simple %: ${document.getElementById('sum-simple').textContent}\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
+            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
             
             const el = document.createElement('textarea');
             el.value = report;
@@ -1075,19 +659,11 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
+        };
 
-            const btnText = document.getElementById('cba-copyBtnText');
-            btnText.textContent = "Copied to Clipboard!";
-            setTimeout(() => { btnText.textContent = "Copy Report"; }, 2500);
-        });
-
-        document.getElementById('cba-analyzeBtn').addEventListener('click', window.analyze);
-        
-        document.getElementById('cba-clearBtn').addEventListener('click', () => { 
-            inputEl.value = ''; 
-            document.getElementById('cba-highlightContainer').classList.add('hidden'); 
-            document.getElementById('cba-copyBtn').classList.add('hidden'); 
-            document.getElementById('celebration-panel').classList.add('hidden', 'scale-95', 'opacity-0');
+        window.clearAnalyzer = function() {
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl) hiddenEl.value = '';
             
             const procPanel = document.getElementById('cba-processing-panel');
             if (procPanel) procPanel.classList.add('hidden');
@@ -1096,99 +672,22 @@
                 window.THPS.Audio.recordedAudio = false; 
                 window.THPS.Audio.lastRecordedDuration = 0;
                 window.THPS.Audio.wordTimestamps = []; 
-            }
-
-            // Clear out the extended stats
-            const statIds = ['cba-statWords', 'cba-statSentences', 'cba-statSyllables'];
-            statIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = "0"; });
-            
-            const scoreIds = ['cba-avgScore', 'cba-fleschScore', 'cba-fogScore', 'cba-smogScore', 'cba-colemanScore'];
-            scoreIds.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = "0.0"; });
-
-            const summaryIds = ['sum-personal', 'sum-visual', 'sum-intangible', 'sum-time', 'sum-wpm', 'sum-sps', 'sum-pause', 'sum-wps', 'sum-grade', 'sum-simple'];
-            summaryIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = id === 'sum-time' || id.includes('wpm') || id.includes('sps') || id.includes('pause') ? "-" : "0";
-                const evalEl = document.getElementById(id + '-eval');
-                if (evalEl) {
-                    evalEl.textContent = "WAIT";
-                    evalEl.className = "text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none";
-                }
-            });
-            document.getElementById('cba-overallGrade').textContent = "- / 10";
-            document.getElementById('cba-explanationTitle').textContent = "What does this mean?";
-            document.getElementById('cba-explanationContent').innerHTML = "Click on any term to learn more...";
-            document.getElementById('cba-explanationContent').classList.add('italic', 'justify-center');
-            
-            if (wpmChartInstance) {
-                wpmChartInstance.destroy();
-                wpmChartInstance = null;
+                window.THPS.Audio.volumeData = [];
             }
             
-            window.analyze(); 
-        });
-
-        inputEl.addEventListener('input', () => { 
-            if (window.THPS && window.THPS.Audio) window.THPS.Audio.recordedAudio = false; 
-            if (inputEl.value.length === 0) { window.analyze(); document.getElementById('cba-copyBtn').classList.add('hidden'); }
-        });
-
-        window.onload = () => {
-            try {
-                if(window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
-                    window.THPS.NLP.loadDictionaries();
-                } else {
-                    console.warn("Waiting for GitHub module...");
-                }
-            } catch(e) { console.error(e); }
-            fetchExplanations();
-            if (window.lucide) window.lucide.createIcons();
+            window.analyze();
         };
-
-        window.addEventListener('thps-dicts-loaded', () => {
-            document.getElementById('cba-analyzeBtn').disabled = false;
-            document.getElementById('cba-dictDot').classList.replace('bg-amber-500', 'bg-green-500');
-            document.getElementById('cba-dictDot').classList.remove('animate-pulse');
-            document.getElementById('cba-dictText').textContent = "Dictionaries Active";
-        });
-
-        const EXPLANATIONS_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/explanations.json"; 
-        let explanationsData = null;
-
-        const FALLBACK_EXPLANATIONS = {
-            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('GOOD') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. In the Analyzer, there are no limits—you are awarded 1 point regardless of how long you speak.",
-            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
-            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions. Keep your ideas (Intangibles) conscise & meaningful.",
-            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
-            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words, and see what academic grade or english fluency is needed to understand you",
-            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time. Too little is detached; too much is self-centred.",
-            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%. Good visual balance makes your speech memorable.",
-            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%. If this goes over 45%, your speech may sound like an academic paper instead of an engaging talk.",
-            "Words/min": "Your speaking pace. 100-150 words per minute is 'GOOD'. Slower sounds hesitant, while faster can strain the audience.",
-            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
-            "Pause %": "The percentage of time you spend silent. Aim for 10-30%. Pause is about 400 milliseconds or more and gives the audience time to process your ideas.",
-            "Words/Sent": "The average length of your sentences. Aim for 5-15 words. If each sentence has 1 point, then avoid diluting your ideas with excess words.",
-            "Comp. Grade": "The reading grade level of your speech (based on academic reading studies, sentence length & syllable length). A grade of 5-10 is 'GOOD' and plain english. Anything higher is too complex for spoken word.",
-            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. The best communicators use 85-95% simple words to explain complex ideas."
-        };
-
-        async function fetchExplanations() {
-            try {
-                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
-                if (res.ok) explanationsData = await res.json();
-            } catch (e) {
-                console.warn("Using fallback explanations for 'What does this mean' panel.");
-            }
-        }
 
         window.explain = function(term) {
-            const panel = document.getElementById('cba-explanationPanel');
             const titleEl = document.getElementById('cba-explanationTitle');
             const contentEl = document.getElementById('cba-explanationContent');
+            if (!titleEl || !contentEl) return;
             
-            panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
-            setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
+            const panel = titleEl.closest('.glass-panel');
+            if (panel) {
+                panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
+                setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
+            }
 
             titleEl.innerText = term;
             contentEl.classList.remove('italic', 'justify-center');
@@ -1202,27 +701,29 @@
             }, 150);
         };
 
-        window.toggleExtendedStats = function() {
-            const statsContainer = document.getElementById('cba-extendedStats');
-            const btnText = document.getElementById('toggle-stats-text');
-            const btnIcon = document.getElementById('toggle-stats-icon');
-
-            if (statsContainer.classList.contains('hidden')) {
-                statsContainer.classList.remove('hidden');
-                statsContainer.classList.add('flex');
-                btnText.innerText = 'Hide Your Stats';
-                btnIcon.classList.add('rotate-180');
-                btnIcon.classList.remove('group-hover:-translate-y-0.5');
-                btnIcon.classList.add('group-hover:translate-y-0.5');
-            } else {
-                statsContainer.classList.add('hidden');
-                statsContainer.classList.remove('flex');
-                btnText.innerText = 'See Your Stats';
-                btnIcon.classList.remove('rotate-180');
-                btnIcon.classList.add('group-hover:translate-y-0.5');
-                btnIcon.classList.remove('group-hover:-translate-y-0.5');
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'cba-inputText-widget') {
+                const hiddenEl = document.getElementById('cba-inputText');
+                if (hiddenEl) hiddenEl.value = e.target.value;
             }
+        });
+        
+        async function fetchExplanations() {
+            try {
+                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
+                if (res.ok) explanationsData = await res.json();
+            } catch (e) {
+                console.warn("Using fallback explanations for 'What does this mean' panel.");
+            }
+        }
+
+        window.onload = () => {
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
+                window.THPS.NLP.loadDictionaries();
+            }
+            fetchExplanations();
         };
+
     </script>
 </body>
 </html>
