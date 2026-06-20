@@ -52,7 +52,7 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         // Unique Version Identifier for Cache Checking
-        const VERSION_TAG = "v.02:15:00 ACST";
+        const VERSION_TAG = "v.03:15:00 ACST";
 
         this.innerHTML = `
             <style>
@@ -326,24 +326,9 @@ class ThpsGameBoard extends HTMLElement {
             bar.classList.replace('bg-slate-800', 'bg-rose-600');
             bar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
             prog.style.width = '0%';
-            
-            // INTERNAL PROGRESS ANIMATOR (Fixes Bug 1)
-            this.playStartTime = Date.now();
-            if (this.internalTimer) clearInterval(this.internalTimer);
-            this.internalTimer = setInterval(() => {
-                let elapsed = (Date.now() - this.playStartTime) / 1000;
-                if (elapsed <= 90) {
-                    prog.style.width = `${(elapsed / 90) * 100}%`;
-                } else {
-                    clearInterval(this.internalTimer);
-                }
-            }, 50);
-
             if (window.lucide) window.lucide.createIcons();
         } 
         else if (newState === 'ANALYZING') {
-            if (this.internalTimer) clearInterval(this.internalTimer);
-            
             textLabel.innerText = "CHECKING YOUR MIC-CHECK SCORES...";
             icon.setAttribute('data-lucide', 'loader-2');
             icon.classList.add('animate-spin');
@@ -369,18 +354,8 @@ class ThpsGameBoard extends HTMLElement {
             });
 
             if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
-
-            // FAILSAFE TIMEOUT (Fixes Bug 2: Returns to "Check your scores" if Vercel fails)
-            this.analyzingTimeout = setTimeout(() => {
-                if (this.gameState === 'ANALYZING') {
-                    this.setGameState('SCORED', -1);
-                }
-            }, 15000); 
         }
         else if (newState === 'SCORED') {
-            if (this.internalTimer) clearInterval(this.internalTimer);
-            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
-
             icon.classList.remove('animate-spin');
             icon.classList.add('hidden'); 
             
@@ -412,8 +387,6 @@ class ThpsGameBoard extends HTMLElement {
 
     resetBoardToIdle() {
         this.gameState = 'IDLE';
-        if (this.internalTimer) clearInterval(this.internalTimer);
-        if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
         
         const bar = this.querySelector('#gb-action-bar');
         const textLabel = this.querySelector('#gb-action-label');
@@ -474,10 +447,14 @@ class ThpsGameBoard extends HTMLElement {
         if (window.clearAnalyzer) window.clearAnalyzer();
     }
 
+    updateProgress(elapsedSecs) {
+        const prog = this.querySelector('#gb-timer-progress');
+        if (prog) prog.style.width = `${(elapsedSecs / 90) * 100}%`;
+    }
+
     update(data) {
         try {
             if (this.gameState !== 'ANALYZING') return;
-            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout); // We got the data!
             
             const containers = this.querySelectorAll('.thps-card-results');
             if (containers.length < 4) return; 
@@ -499,12 +476,10 @@ class ThpsGameBoard extends HTMLElement {
                 </div>
             `;
 
-            // Defaults to prevent crashes if data is missing
             let personal = data.personal || 0;
             let visual = data.visual || 0;
             let intangible = data.intangible || 0;
 
-            // Content
             let pPts = '+1', pColor = 'text-emerald-400';
             if (personal < 30) { pPts = '+0.25'; pColor = 'text-rose-400'; }
             else if (personal > 60) { pPts = '+0.75'; pColor = 'text-amber-400'; }
@@ -529,7 +504,6 @@ class ThpsGameBoard extends HTMLElement {
             let sps = data.sps || 0;
             let pause = data.pause || 0;
 
-            // Delivery
             let wpmPts = '+1', wpmColor = 'text-emerald-400';
             if (wpm < 100) { wpmPts = '+0.75'; wpmColor = 'text-amber-400'; }
             else if (wpm > 150) { wpmPts = '+0.25'; wpmColor = 'text-rose-400'; }
@@ -554,7 +528,6 @@ class ThpsGameBoard extends HTMLElement {
             let grade = data.grade || 0;
             let simple = data.simple || 0;
 
-            // Simplicity
             let wpsPts = '+1', wpsColor = 'text-emerald-400';
             if (wps < 5) { wpsPts = '+0.75'; wpsColor = 'text-amber-400'; }
             else if (wps > 15) { wpsPts = '+0.25'; wpsColor = 'text-rose-400'; }
@@ -578,7 +551,6 @@ class ThpsGameBoard extends HTMLElement {
             let time = data.time || 0;
             let totalPoints = data.totalPoints || 0;
 
-            // Time & Final Grade
             let timePts = '+1', timeColor = 'text-emerald-400';
             if (time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
             else if (time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
@@ -603,6 +575,73 @@ class ThpsGameBoard extends HTMLElement {
             console.error("Game Board Update Error:", err);
             this.setGameState('SCORED', -1);
         }
+    }
+
+    // --- RESTORED FUNCTIONS ---
+
+    setDifficulty(stars) {
+        if (stars === 1) this.cardStates = { challenge: false, sponsor: true, script: false, micCheck: false };
+        else if (stars === 2) this.cardStates = { challenge: false, sponsor: true, script: true, micCheck: false };
+        else if (stars === 3) this.cardStates = { challenge: true, sponsor: true, script: true, micCheck: false };
+        else if (stars === 4) this.cardStates = { challenge: false, sponsor: true, script: true, micCheck: true };
+        else if (stars === 5) this.cardStates = { challenge: true, sponsor: true, script: true, micCheck: true };
+        else this.cardStates = { challenge: false, sponsor: false, script: false, micCheck: false };
+
+        ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
+            const cardEl = this.querySelector(`#gb-card-${key}`);
+            if (cardEl) {
+                if (this.cardStates[key]) cardEl.classList.add('rotate-y-180');
+                else cardEl.classList.remove('rotate-y-180');
+            }
+        });
+
+        this.updateDifficultyVisuals();
+        this.updateAdLib();
+    }
+
+    toggleCard(key) {
+        this.cardStates[key] = !this.cardStates[key];
+        const cardEl = this.querySelector(`#gb-card-${key}`);
+        if (cardEl) {
+            if (this.cardStates[key]) cardEl.classList.add('rotate-y-180');
+            else cardEl.classList.remove('rotate-y-180');
+        }
+        this.updateDifficultyVisuals();
+        this.updateAdLib();
+    }
+
+    updateDifficultyVisuals() {
+        let stars = 0;
+        if (this.cardStates.challenge) stars += 1;
+        if (this.cardStates.sponsor) stars += 1;
+        if (this.cardStates.script) stars += 1;
+        if (this.cardStates.micCheck) stars += 2;
+        
+        stars = Math.max(0, Math.min(5, stars));
+        this.currentStars = stars;
+
+        const levelLabels = { 0: "Blank", 1: "Beginner", 2: "Better", 3: "Brave", 4: "Bold", 5: "Brilliant!" };
+        const levelTextEl = this.querySelector('#gb-board-level');
+        if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars] || 'Blank'}`;
+
+        for (let i = 1; i <= 5; i++) {
+            const starEl = this.querySelector(`.board-star[data-stars="${i}"]`);
+            if (starEl) {
+                if (i <= stars) {
+                    starEl.classList.remove('star-empty');
+                    starEl.classList.add('star-filled');
+                } else {
+                    starEl.classList.remove('star-filled');
+                    starEl.classList.add('star-empty');
+                }
+            }
+        }
+
+        this.dispatchEvent(new CustomEvent('thps-game-state', { 
+            detail: { stars: this.currentStars, date: this.currentDate }, 
+            bubbles: true, 
+            composed: true 
+        }));
     }
 
     async fetchDailyCards() {
