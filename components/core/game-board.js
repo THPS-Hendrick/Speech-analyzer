@@ -55,7 +55,7 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         // Unique Version Identifier for Cache Checking
-        const VERSION_TAG = "v.01:14:52 ACST";
+        const VERSION_TAG = "v.01:26:41 ACST";
 
         this.innerHTML = `
             <style>
