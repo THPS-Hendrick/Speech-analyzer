@@ -1,5 +1,5 @@
 // ==========================================
-// THPS WIDGET: LARGE GAME BOARD (STAGE 1: UI RESTORE)
+// THPS WIDGET: LARGE GAME BOARD (STAGES 2 & 3: PIPELINE & MATH)
 // Contains Cards, Star Selector, Mad-Lib Engine, and Timer Bar
 // ==========================================
 
@@ -52,7 +52,7 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         // Unique Version Identifier for Cache Checking
-        const VERSION_TAG = "v.03:45:00 ACST";
+        const VERSION_TAG = "v.04:00:00 ACST";
 
         this.innerHTML = `
             <style>
@@ -311,7 +311,6 @@ class ThpsGameBoard extends HTMLElement {
         const textLabel = this.querySelector('#gb-action-label');
         const icon = this.querySelector('#gb-action-icon');
         const prog = this.querySelector('#gb-timer-progress');
-        const markers = this.querySelector('#gb-timer-markers');
         const restartBtn = this.querySelector('#gb-action-restart');
 
         if (newState === 'PLAYING') {
@@ -352,10 +351,10 @@ class ThpsGameBoard extends HTMLElement {
             bar.classList.remove('bg-rose-600', 'hover:bg-rose-500');
             bar.classList.add('bg-slate-800', 'hover:bg-slate-800');
             prog.style.width = '0%';
-            markers.classList.add('opacity-0');
 
             if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
 
+            // FAILSAFE TIMEOUT: Ensure we never freeze
             if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
             this.analyzingTimeout = setTimeout(() => {
                 if (this.gameState === 'ANALYZING') {
@@ -425,7 +424,6 @@ class ThpsGameBoard extends HTMLElement {
         const textLabel = this.querySelector('#gb-action-label');
         const icon = this.querySelector('#gb-action-icon');
         const prog = this.querySelector('#gb-timer-progress');
-        const markers = this.querySelector('#gb-timer-markers');
         const restartBtn = this.querySelector('#gb-action-restart');
         
         textLabel.innerText = "TAP TO START GAME";
@@ -437,8 +435,6 @@ class ThpsGameBoard extends HTMLElement {
         
         prog.className = 'absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10';
         prog.style.width = '0%';
-        
-        markers.classList.remove('opacity-0');
         
         restartBtn.classList.remove('opacity-100', 'pointer-events-auto');
         restartBtn.classList.add('opacity-0', 'pointer-events-none');
@@ -570,10 +566,12 @@ class ThpsGameBoard extends HTMLElement {
             let totalPoints = data.totalPoints || 0;
             let overrideGrade = data.overrideGrade || false;
 
-            // Notice we do NOT touch the Time score math here. Stage 3 will handle that.
-            let timePts = '+1', timeColor = 'text-emerald-400';
-            if (time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
-            else if (time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
+            // NEW MATH LOGIC (STAGE 3): Controls how Time impacts display
+            let timePts = '', timeColor = '';
+            if (time < 20 || time >= 80) { timePts = '0'; timeColor = 'text-slate-500'; }
+            else if (time >= 20 && time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
+            else if (time >= 40 && time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
+            else if (time >= 60 && time < 80) { timePts = '+1'; timeColor = 'text-emerald-400'; }
 
             let finalGrade = overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
             let finalGradeNum = overrideGrade ? -1 : totalPoints;
