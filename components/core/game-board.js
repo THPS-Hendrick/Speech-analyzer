@@ -52,7 +52,7 @@ class ThpsGameBoard extends HTMLElement {
 
     render() {
         // Unique Version Identifier for Cache Checking
-        const VERSION_TAG = "v.05:30:00 ACST";
+        const VERSION_TAG = "v.06:00:00 ACST";
 
         this.innerHTML = `
             <style>
@@ -316,10 +316,18 @@ class ThpsGameBoard extends HTMLElement {
     handleActionBarClick() {
         if (this.gameState === 'IDLE') {
             this.setGameState('PLAYING');
-            if (window.toggleTimerAndMic) window.toggleTimerAndMic();
+            try {
+                if (window.toggleTimerAndMic) window.toggleTimerAndMic();
+            } catch (e) {
+                console.error("External timer toggle failed:", e);
+            }
         } else if (this.gameState === 'PLAYING') {
             this.setGameState('ANALYZING');
-            if (window.toggleTimerAndMic) window.toggleTimerAndMic();
+            try {
+                if (window.toggleTimerAndMic) window.toggleTimerAndMic();
+            } catch (e) {
+                console.error("External timer stop failed:", e);
+            }
         }
     }
 
@@ -346,7 +354,16 @@ class ThpsGameBoard extends HTMLElement {
                 if (elapsed <= 90) {
                     prog.style.width = `${(elapsed / 90) * 100}%`;
                 } else {
+                    // Auto-stop at 90 seconds
                     clearInterval(this.internalTimer);
+                    if (this.gameState === 'PLAYING') {
+                        this.setGameState('ANALYZING');
+                        try {
+                            if (window.toggleTimerAndMic) window.toggleTimerAndMic();
+                        } catch (e) {
+                            console.error("Auto-stop failed:", e);
+                        }
+                    }
                 }
             }, 50);
 
@@ -363,6 +380,21 @@ class ThpsGameBoard extends HTMLElement {
             bar.classList.add('bg-slate-800', 'hover:bg-slate-800');
             prog.style.width = '0%';
             markers.classList.add('opacity-0');
+
+            this.querySelectorAll('.thps-chest-initial').forEach(el => el.classList.add('opacity-0'));
+            this.querySelectorAll('.thps-chest-analyzing').forEach(el => el.classList.remove('opacity-0'));
+
+            ['challenge', 'sponsor', 'script', 'micCheck'].forEach((key) => {
+                const cardEl = this.querySelector(`#gb-card-${key}`);
+                if (cardEl) {
+                    cardEl.classList.remove('rotate-y-180');
+                    const backFace = cardEl.querySelector('.thps-chest-bg');
+                    if (backFace) {
+                        backFace.classList.add('bg-slate-900', 'border-slate-700');
+                        backFace.classList.remove('bg-blue-600', 'bg-purple-600', 'bg-emerald-700', 'bg-gradient-to-br', 'from-red-800', 'via-red-900', 'to-black');
+                    }
+                }
+            });
 
             if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
 
@@ -479,11 +511,6 @@ class ThpsGameBoard extends HTMLElement {
         if (window.clearAnalyzer) window.clearAnalyzer();
     }
 
-    updateProgress(elapsedSecs) {
-        const prog = this.querySelector('#gb-timer-progress');
-        if (prog) prog.style.width = `${(elapsedSecs / 90) * 100}%`;
-    }
-
     update(data) {
         try {
             if (this.gameState !== 'ANALYZING') return;
@@ -497,6 +524,8 @@ class ThpsGameBoard extends HTMLElement {
             const cSimplicity = containers[2];
             const cTime = containers[3];
             
+            this.querySelectorAll('.thps-chest-analyzing').forEach(el => el.classList.add('opacity-0'));
+
             const makeRow = (label, val, pts, color) => `
                 <div class="score-row flex flex-col items-center justify-center w-full mt-1">
                     <span class="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
@@ -600,6 +629,7 @@ class ThpsGameBoard extends HTMLElement {
                 </div>
             `;
 
+            containers.forEach(c => c.classList.remove('opacity-0'));
             this.setGameState('SCORED', finalGradeNum);
 
         } catch (err) {
