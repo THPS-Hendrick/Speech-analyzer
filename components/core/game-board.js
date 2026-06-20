@@ -1,6 +1,6 @@
 // ==========================================
 // THPS CORE WIDGET: GAME BOARD v3.0
-// Contains Cards, Mad-Libs, Action Bar, and The Zelda Drip-Feed Engine
+// Contains Cards, Star Selector, Mad-Libs, Action Bar, and The Zelda Drip-Feed Engine
 // ==========================================
 
 class ThpsGameBoard extends HTMLElement {
@@ -15,7 +15,7 @@ class ThpsGameBoard extends HTMLElement {
         this.currentStars = 0;
         this.currentDate = this.getAdelaideDateString();
         
-        // State Machine: IDLE -> PLAYING -> ANALYZING -> REVEAL -> SCORED
+        // State Machine: IDLE -> PLAYING -> ANALYZING -> REVEAL_PENDING -> REVEAL -> SCORED
         this.gameState = 'IDLE'; 
         this.analyzingStartTime = 0;
         this.timerInterval = null;
@@ -28,6 +28,7 @@ class ThpsGameBoard extends HTMLElement {
             this.fetchDailyCards();
         });
 
+        // The Event Listener that catches the Analyzer's scores
         window.addEventListener('thps-dashboard-update', (e) => this.handleScorePayload(e.detail));
 
         this.fetchDailyCards();
@@ -78,7 +79,7 @@ class ThpsGameBoard extends HTMLElement {
                 .res-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
             </style>
 
-            <div id="board-master-wrapper" class="glass-panel p-5 sm:p-8 rounded-2xl border-t-4 border-slate-800 shadow-sm flex flex-col items-center bg-white relative w-full h-full transition-all duration-700 group">
+            <div id="board-master-wrapper" class="glass-panel p-5 sm:p-8 rounded-2xl border-t-4 border-slate-800 shadow-sm flex flex-col items-center bg-white relative w-full h-full transition-all duration-700 group cursor-move">
                 
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -107,7 +108,7 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- CARDS CONTAINER -->
+                    <!-- CARDS CONTAINER (Fixed classes to ensure they flip and glow) -->
                     <div id="board-cards-container" class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1 md:gap-6 mb-6">
                         ${this.generateCardsHTML()}
                     </div>
@@ -140,10 +141,12 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
 
                         <!-- Text & Icons -->
-                        <span id="action-text" class="relative z-30 text-white font-black tracking-widest uppercase text-sm md:text-lg drop-shadow-md flex items-center gap-2 transition-all duration-300">
+                        <span id="action-text" class="relative z-30 text-white font-black tracking-widest uppercase text-sm md:text-lg drop-shadow-md flex items-center gap-2 transition-all duration-300 pointer-events-none">
                             <i id="toggle-icon" data-lucide="play" class="w-4 h-4 md:w-5 md:h-5"></i>
                             <span id="toggle-text">TAP TO START GAME</span>
                         </span>
+                        <!-- Score Display Label for Progress Bar Mode -->
+                        <span id="pb-text" class="hidden relative z-30 text-white font-black tracking-widest uppercase text-sm md:text-lg drop-shadow-md flex items-center gap-2 transition-all duration-300 pointer-events-none"></span>
 
                         <!-- Confetti & Golden Mic -->
                         <div id="confetti-container" class="absolute inset-0 pointer-events-none z-10 overflow-visible"></div>
@@ -167,17 +170,17 @@ class ThpsGameBoard extends HTMLElement {
                 <div id="card-${id}" class="relative w-full h-full cursor-pointer transition-all duration-[800ms] transform-gpu preserve-3d">
                     
                     <!-- THE BACK FACE (The Chest) -->
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 shadow-md md:shadow-xl hover:brightness-110 transition-all duration-500 thps-chest-bg ${id === 'micCheck' ? 'bg-gradient-to-br from-red-800 via-red-900 to-black border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)]' : `bg-${colorClass} border-white text-white`}">
-                        <i data-lucide="${icon}" class="w-4 h-4 md:w-8 md:h-8 mb-1 md:mb-2 thps-chest-icon ${id === 'micCheck' ? 'text-amber-400 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'opacity-70'}"></i>
-                        <span class="thps-chest-title font-bold uppercase tracking-widest text-[8px] md:text-lg ${id === 'micCheck' ? 'text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]' : ''}">${titleText}</span>
-                        <span class="thps-chest-sub mt-1 block text-[6px] md:text-xs ${id === 'micCheck' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full inline-block shadow-sm border border-amber-200' : 'text-white/70'}">${id === 'micCheck' ? '2 STARS' : '1 Star'}</span>
+                    <div class="thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 shadow-md md:shadow-xl hover:brightness-110 transition-all duration-500 pointer-events-none ${id === 'micCheck' ? 'bg-gradient-to-br from-red-800 via-red-900 to-black border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)]' : `bg-${colorClass} border-white text-white`}">
+                        <i data-lucide="${icon}" class="thps-chest-icon w-4 h-4 md:w-8 md:h-8 mb-1 md:mb-2 transition-all ${id === 'micCheck' ? 'text-amber-400 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'opacity-70'}"></i>
+                        <span class="thps-chest-title font-bold uppercase tracking-widest text-[8px] md:text-lg transition-all ${id === 'micCheck' ? 'text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]' : ''}">${titleText}</span>
+                        <span class="thps-chest-sub mt-1 block text-[6px] md:text-xs transition-all ${id === 'micCheck' ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full inline-block shadow-sm border border-amber-200' : 'text-white/70'}">${id === 'micCheck' ? '2 STARS' : '1 Star'}</span>
                     </div>
                     
                     <!-- THE FRONT FACE (Prompt or Results) -->
-                    <div class="thps-front-face absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl">
-                        <span class="text-[7px] md:text-xs font-bold text-${colorClass.replace('-600','-700').replace('-700','-800')} uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">${titleText}</span>
-                        <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6">
-                            <span class="text-[9px] sm:text-sm md:text-xl font-serif font-bold leading-tight text-center" id="text-${id}"></span>
+                    <div class="thps-front-face absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl pointer-events-none transition-all duration-500">
+                        <span class="text-[7px] md:text-xs font-bold text-${colorClass.replace('-600','-700').replace('-700','-800')} uppercase tracking-widest mb-1.5 md:mb-4 shrink-0 transition-all">${titleText}</span>
+                        <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6 transition-all">
+                            <span class="text-[9px] sm:text-sm md:text-xl font-serif font-bold leading-tight text-center transition-all" id="text-${id}"></span>
                         </div>
                     </div>
 
@@ -214,9 +217,9 @@ class ThpsGameBoard extends HTMLElement {
         // Hover logic for stars
         this.addEventListener('mouseover', (e) => {
             if (this.gameState !== 'IDLE') return;
-            const actionEl = e.target.closest('[data-action="set-stars"]');
-            if (actionEl) {
-                const count = parseInt(actionEl.getAttribute('data-stars'));
+            const star = e.target.closest('.board-star');
+            if (star) {
+                const count = parseInt(star.getAttribute('data-stars'));
                 for (let i = 1; i <= 5; i++) {
                     const s = this.querySelector(`.board-star[data-stars="${i}"]`);
                     if (s) s.classList[i <= count ? 'add' : 'remove']('star-hover');
@@ -272,7 +275,10 @@ class ThpsGameBoard extends HTMLElement {
             this.timerInterval = setInterval(() => {
                 elapsed += 0.05;
                 timerProgress.style.width = `${(elapsed / 90) * 100}%`;
-                if (elapsed >= 90) this.handleActionBarClick(); // Force stop at 90s
+                if (elapsed >= 90) {
+                    // Limit Reached: Automatically hit stop
+                    this.handleActionBarClick(); 
+                }
             }, 50);
 
         } else if (newState === 'ANALYZING') {
@@ -291,7 +297,7 @@ class ThpsGameBoard extends HTMLElement {
             recInd.classList.add('hidden');
             this.querySelector('#board-title').classList.add('text-glow');
             this.querySelector('#board-stars-panel').classList.add('golden-glow', 'border-amber-400');
-            this.querySelector('#adlib-wrapper').classList.add('opacity-0', 'pointer-events-none', 'h-0', 'overflow-hidden'); // Hide prompt smoothly
+            this.querySelector('#adlib-wrapper').classList.add('opacity-0', 'pointer-events-none', 'h-0', 'overflow-hidden', 'my-0', 'py-0'); // Hide prompt smoothly
 
             // Flip all cards to Chests (back face)
             ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
@@ -301,18 +307,22 @@ class ThpsGameBoard extends HTMLElement {
                     
                     // Transform the chest visuals to look like locked anticipation vaults
                     const bg = cardEl.querySelector('.thps-chest-bg');
-                    bg.className = "absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 shadow-md md:shadow-xl transition-all duration-500 thps-chest-bg border-amber-400 bg-gradient-to-br from-slate-900 to-black shadow-[0_0_15px_rgba(251,191,36,0.5)] golden-glow";
+                    if(bg) bg.className = "thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center border-2 md:border-4 shadow-md md:shadow-xl transition-all duration-500 border-amber-400 bg-gradient-to-br from-slate-900 to-black shadow-[0_0_15px_rgba(251,191,36,0.5)] golden-glow pointer-events-none";
                     
                     const icon = cardEl.querySelector('.thps-chest-icon');
-                    icon.className = "w-5 h-5 md:w-10 md:h-10 mb-2 thps-chest-icon text-amber-400 animate-pulse";
-                    icon.setAttribute('data-lucide', 'sparkles');
+                    if(icon) {
+                        icon.className = "thps-chest-icon w-5 h-5 md:w-10 md:h-10 mb-2 text-amber-400 animate-pulse transition-all";
+                        icon.setAttribute('data-lucide', 'sparkles');
+                    }
                     
                     const title = cardEl.querySelector('.thps-chest-title');
-                    title.className = "thps-chest-title font-bold uppercase tracking-widest text-[8px] md:text-sm text-amber-200";
+                    if(title) title.className = "thps-chest-title font-bold uppercase tracking-widest text-[8px] md:text-sm text-amber-200 transition-all";
                     
                     const sub = cardEl.querySelector('.thps-chest-sub');
-                    sub.className = "thps-chest-sub mt-2 block text-[10px] md:text-lg font-serif text-amber-500/80";
-                    sub.innerText = "Calculating...";
+                    if(sub) {
+                        sub.className = "thps-chest-sub mt-2 block text-[10px] md:text-lg font-serif text-amber-500/80 transition-all";
+                        sub.innerText = "Calculating...";
+                    }
                 }
             });
 
@@ -320,7 +330,6 @@ class ThpsGameBoard extends HTMLElement {
             this.querySelector('#card-sponsor .thps-chest-title').innerText = "DELIVERY";
             this.querySelector('#card-script .thps-chest-title').innerText = "SIMPLICITY";
             this.querySelector('#card-micCheck .thps-chest-title').innerText = "TIME";
-
         }
         if (window.lucide) window.lucide.createIcons();
     }
@@ -335,7 +344,9 @@ class ThpsGameBoard extends HTMLElement {
     // THE DRIP FEED SEQUENCE
     // ==========================================
     handleScorePayload(data) {
+        // LOCK: Ignore Vercel updates unless we are actively waiting for the first one!
         if (this.gameState !== 'ANALYZING') return;
+        this.gameState = 'REVEAL_PENDING'; // Locks out subsequent updates
 
         // Ensure the "Zelda Glow" plays for at least 2.5 seconds to build tension
         const timeElapsed = Date.now() - this.analyzingStartTime;
@@ -375,11 +386,13 @@ class ThpsGameBoard extends HTMLElement {
         // 2. Prepare the Front Faces for Results
         const setFront = (id, title, targetId) => {
             const el = this.querySelector(`#${id} .thps-front-face`);
-            el.innerHTML = `
-                <span class="text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 md:mb-2 shrink-0 border-b border-slate-200 w-full pb-1">${title}</span>
-                <div id="${targetId}" class="flex-1 w-full flex flex-col gap-1.5 pb-2 overflow-y-auto res-scroll"></div>
-            `;
-            el.className = "thps-front-face absolute inset-0 w-full h-full backface-hidden bg-slate-50 border-2 md:border-4 border-slate-300 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1.5 md:px-3 rotate-y-180 text-center shadow-inner pointer-events-auto";
+            if (el) {
+                el.innerHTML = `
+                    <span class="text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1 md:mb-2 shrink-0 border-b border-slate-200 w-full pb-1">${title}</span>
+                    <div id="${targetId}" class="flex-1 w-full flex flex-col gap-1.5 pb-2 overflow-y-auto res-scroll"></div>
+                `;
+                el.className = "thps-front-face absolute inset-0 w-full h-full backface-hidden bg-slate-50 border-2 md:border-4 border-slate-300 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1.5 md:px-3 rotate-y-180 text-center shadow-inner pointer-events-auto transition-all duration-500";
+            }
         };
 
         setFront('card-challenge', 'Content', 'res-content');
@@ -403,12 +416,15 @@ class ThpsGameBoard extends HTMLElement {
         const actionBar = this.querySelector('#action-bar');
         const pbFill = this.querySelector('#pb-fill');
         const pbNotch = this.querySelector('#pb-notch');
+        const actionText = this.querySelector('#action-text');
         const pbText = this.querySelector('#pb-text');
         
         actionBar.className = "relative w-full max-w-3xl mx-auto mt-6 h-16 md:h-20 bg-slate-800 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-700 shadow-xl z-30 transition-all duration-500 shrink-0 cursor-pointer hover:bg-slate-700";
         this.querySelector('#timer-progress').classList.add('hidden');
+        actionText.classList.add('hidden');
         pbFill.classList.remove('hidden');
         pbNotch.classList.remove('hidden');
+        pbText.classList.remove('hidden');
         
         let currentTotal = 0;
         let index = 0;
@@ -504,7 +520,7 @@ class ThpsGameBoard extends HTMLElement {
             pbFill.className = "absolute left-0 top-0 h-full bg-yellow-400 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-yellow-500');
             pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2 text-yellow-900"></i> PERFECT 10!`;
-            pbText.className = "relative z-30 text-yellow-900 font-black tracking-widest uppercase text-lg md:text-2xl drop-shadow-sm transition-all duration-300 flex items-center";
+            pbText.className = "relative z-30 text-yellow-900 font-black tracking-widest uppercase text-sm md:text-2xl drop-shadow-sm transition-all duration-300 flex items-center pointer-events-none";
             
             // Golden Mic Reveal
             const mic = this.querySelector('#golden-mic');
@@ -532,7 +548,7 @@ class ThpsGameBoard extends HTMLElement {
             const angle = Math.random() * Math.PI * 2;
             const velocity = 50 + Math.random() * 100;
             const tx = Math.cos(angle) * velocity;
-            const ty = Math.sin(angle) * velocity - 50; // slightly upward
+            const ty = Math.sin(angle) * velocity - 50; 
             
             conf.animate([
                 { transform: 'translate(-50%, -50%) rotate(0deg) scale(1)', opacity: 1 },
