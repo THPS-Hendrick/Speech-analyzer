@@ -193,7 +193,7 @@ class ThpsGameBoard extends HTMLElement {
                     </div>
 
                     <!-- ACTION BAR (Absorbed Timer & Progress Bar) -->
-                    <div id="action-bar" class="relative w-full max-w-3xl mx-auto mt-6 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all duration-500 shrink-0">
+                    <div id="action-bar" class="relative w-full max-w-3xl mx-auto mt-6 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all duration-500 shrink-0 hover:bg-slate-700">
                         
                         <!-- Dynamic Background Fills -->
                         <div id="timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all ease-linear overflow-hidden z-10"></div>
@@ -219,9 +219,12 @@ class ThpsGameBoard extends HTMLElement {
                         <!-- Score Display Label for Progress Bar Mode -->
                         <span id="pb-text" class="hidden relative z-30 text-white font-black tracking-widest uppercase text-sm md:text-lg drop-shadow-md flex items-center gap-2 transition-all duration-300 pointer-events-none"></span>
 
+                        <!-- Restart Icon -->
+                        <i id="action-bar-restart" data-lucide="rotate-ccw" class="absolute right-4 md:right-6 w-5 h-5 md:w-6 md:h-6 text-white opacity-0 pointer-events-none transition-opacity duration-300 z-40"></i>
+
                         <!-- Confetti & Golden Mic -->
                         <div id="confetti-container" class="absolute inset-0 pointer-events-none z-10 overflow-visible"></div>
-                        <svg id="golden-mic" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 text-yellow-400 opacity-0 scale-50 transition-all duration-1000 ease-out drop-shadow-[0_0_15px_rgba(250,204,21,1)] z-40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                        <svg id="golden-mic" class="absolute right-12 md:right-16 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 text-yellow-400 opacity-0 scale-50 transition-all duration-1000 ease-out drop-shadow-[0_0_15px_rgba(250,204,21,1)] z-40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
 
                     </div>
                     
@@ -284,9 +287,12 @@ class ThpsGameBoard extends HTMLElement {
     // THE STATE MACHINE & ANIMATION LOGIC
     // ==========================================
     handleActionBarClick() {
-        if (this.gameState === 'IDLE' || this.gameState === 'SCORED') {
-            if (this.gameState === 'SCORED') this.resetBoardToIdle();
-            
+        if (this.gameState === 'SCORED') {
+            this.resetBoardToIdle();
+            return; // Stop here! Let the user breathe before clicking again to record.
+        }
+
+        if (this.gameState === 'IDLE') {
             if (window.clearAnalyzer) window.clearAnalyzer();
             if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
                 window.THPS.Audio.startRecordingProcess();
@@ -343,7 +349,7 @@ class ThpsGameBoard extends HTMLElement {
             recInd.classList.add('hidden');
             this.querySelector('#board-title').classList.add('text-glow');
             this.querySelector('#board-stars-panel').classList.add('golden-glow', 'border-amber-400');
-            this.querySelector('#adlib-wrapper').classList.add('opacity-0', 'pointer-events-none', 'h-0', 'overflow-hidden', 'my-0', 'py-0'); // Hide prompt smoothly
+            // We NO LONGER hide the adlib wrapper here so the user can see it in their recording reel!
 
             // Flip all cards to Chests (back face) with Glowing Borders
             ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
@@ -382,8 +388,109 @@ class ThpsGameBoard extends HTMLElement {
 
     resetBoardToIdle() {
         this.gameState = 'IDLE';
-        this.render(); // Completely wipe the UI clean
-        this.fetchDailyCards(); // Re-apply today's data and card flips
+        
+        // 1. Restore the Action Bar exactly
+        const actionBar = this.querySelector('#action-bar');
+        actionBar.className = "relative w-full max-w-3xl mx-auto mt-6 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all duration-500 shrink-0 hover:bg-slate-700";
+        
+        const timerProgress = this.querySelector('#timer-progress');
+        timerProgress.classList.remove('hidden');
+        timerProgress.style.width = '0%';
+        timerProgress.className = "absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all ease-linear overflow-hidden z-10";
+
+        this.querySelector('#pb-fill').classList.add('hidden');
+        this.querySelector('#pb-notch').classList.add('hidden');
+        this.querySelector('#timer-segments').classList.remove('hidden');
+        
+        const actionText = this.querySelector('#action-text');
+        actionText.classList.remove('hidden');
+        actionText.innerHTML = `<i id="toggle-icon" data-lucide="play" class="w-4 h-4 md:w-5 md:h-5"></i> <span id="toggle-text">TAP TO START GAME</span>`;
+        
+        const pbText = this.querySelector('#pb-text');
+        pbText.classList.add('hidden');
+        pbText.innerHTML = '';
+        
+        // Hide Restart Icon
+        const restartIcon = this.querySelector('#action-bar-restart');
+        if (restartIcon) {
+            restartIcon.classList.add('opacity-0', 'pointer-events-none');
+            restartIcon.classList.remove('opacity-100', 'pointer-events-auto');
+        }
+
+        // Hide Golden Mic
+        const mic = this.querySelector('#golden-mic');
+        if (mic) {
+            mic.classList.add('opacity-0', 'scale-50');
+            mic.classList.remove('opacity-100', 'scale-100', 'rotate-12');
+        }
+
+        // 2. Rebuild the Original Cards (Front and Back)
+        const restoreFrontFace = (key, colorClass, title, text) => {
+            const face = this.querySelector(`#card-${key} .thps-front-face`);
+            if (face) {
+                face.className = `thps-front-face absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 text-center shadow-md md:shadow-xl pointer-events-none transition-all duration-500`;
+                face.innerHTML = `
+                    <span class="text-[7px] md:text-xs font-bold ${colorClass} uppercase tracking-widest mb-1.5 md:mb-4 shrink-0 transition-all">${title}</span>
+                    <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6 transition-all">
+                        <span class="text-[9px] sm:text-sm md:text-xl font-serif font-bold leading-tight text-center transition-all" id="text-${key}">${text}</span>
+                    </div>
+                `;
+            }
+            
+            // Restore Chest BG styling (remove golden glow)
+            const bg = this.querySelector(`#card-${key} .thps-chest-bg`);
+            if (bg) {
+                if (key === 'challenge') bg.className = "thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white hover:brightness-110 pointer-events-none transition-all duration-500";
+                if (key === 'sponsor') bg.className = "thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white hover:brightness-110 pointer-events-none transition-all duration-500";
+                if (key === 'script') bg.className = "thps-chest-bg absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl flex flex-col items-center justify-center p-1 text-center shadow-md md:shadow-xl border-2 md:border-4 border-white hover:brightness-110 pointer-events-none transition-all duration-500";
+                if (key === 'micCheck') bg.className = "thps-chest-bg absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-[1.5px] md:border-[3px] border-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)] md:shadow-[0_0_15px_rgba(251,191,36,0.6)] flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-red-800 via-red-900 to-black hover:brightness-110 pointer-events-none transition-all duration-500";
+                
+                const titleEl = bg.querySelector('.thps-chest-title');
+                if (titleEl) {
+                    if (key !== 'micCheck') titleEl.className = "thps-chest-title text-[8px] md:text-lg font-bold uppercase tracking-widest transition-all";
+                    else titleEl.className = "thps-chest-title text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)] transition-all";
+                    titleEl.innerText = key === 'micCheck' ? 'Mic-Check' : key.charAt(0).toUpperCase() + key.slice(1);
+                }
+
+                const subEl = bg.querySelector('.thps-chest-sub');
+                if (subEl) {
+                    if (key !== 'micCheck') subEl.className = "thps-chest-sub text-white/70 text-[6px] md:text-xs mt-1 block transition-all";
+                    else subEl.className = "thps-chest-sub bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200 transition-all";
+                    subEl.innerText = key === 'micCheck' ? '2 STARS' : '1 Star';
+                }
+                
+                const iconEl = bg.querySelector('.thps-chest-icon');
+                if (iconEl) {
+                    if (key !== 'micCheck') {
+                        iconEl.className = "thps-chest-icon w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2 transition-all";
+                        iconEl.setAttribute('data-lucide', 'refresh-cw');
+                    } else {
+                        iconEl.className = "thps-chest-icon text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] transition-all";
+                        iconEl.setAttribute('data-lucide', 'mic');
+                    }
+                }
+            }
+        };
+
+        restoreFrontFace('challenge', 'text-blue-600', 'Challenge', this.todayData.challenge);
+        restoreFrontFace('sponsor', 'text-purple-600', 'Sponsor', this.todayData.sponsor);
+        restoreFrontFace('script', 'text-emerald-600', 'Script', this.todayData.script);
+        restoreFrontFace('micCheck', 'text-red-800', 'Mic-Check', this.todayData.micCheck);
+
+        // Re-apply flip states exactly as they were according to `this.cardStates`
+        ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
+            const cardEl = this.querySelector(`#card-${key}`);
+            if (cardEl) {
+                if (this.cardStates[key]) cardEl.classList.add('rotate-y-180');
+                else cardEl.classList.remove('rotate-y-180');
+            }
+        });
+        
+        // Wipe confetti
+        const confettiContainer = this.querySelector('#confetti-container');
+        if (confettiContainer) confettiContainer.innerHTML = '';
+
+        if (window.lucide) window.lucide.createIcons();
     }
 
     // ==========================================
@@ -548,33 +655,36 @@ class ThpsGameBoard extends HTMLElement {
             }, 100);
         }
 
+        // Show the Restart Icon
+        const restartIcon = this.querySelector('#action-bar-restart');
+        if (restartIcon) {
+            restartIcon.classList.remove('opacity-0', 'pointer-events-none');
+            restartIcon.classList.add('opacity-100', 'pointer-events-auto');
+        }
+
         if (override) {
             pbFill.style.width = '100%';
             pbFill.className = "absolute left-0 top-0 h-full bg-slate-600 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-slate-800');
-            pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2"></i> CHECK YOUR SCORES`;
-            if (window.lucide) window.lucide.createIcons();
-            return;
-        }
-
-        if (total < 5.0) {
+            pbText.innerHTML = `CHECK YOUR SCORES`;
+        } else if (total < 5.0) {
             pbFill.className = "absolute left-0 top-0 h-full bg-slate-500 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-slate-600');
-            pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2"></i> SCORE: ${total.toFixed(2)} - CHECK YOUR SCORES`;
+            pbText.innerHTML = `SCORE: ${total.toFixed(2)} - CHECK YOUR SCORES`;
         } else if (total < 8.5) {
             pbFill.className = "absolute left-0 top-0 h-full bg-amber-500 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-amber-600');
-            pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2"></i> SCORE: ${total.toFixed(2)} - SO CLOSE!`;
+            pbText.innerHTML = `SCORE: ${total.toFixed(2)} - SO CLOSE!`;
         } else if (total < 10.0) {
             pbFill.className = "absolute left-0 top-0 h-full bg-emerald-500 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-emerald-600');
-            pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2"></i> SCORE: ${total.toFixed(2)} - YOU DID IT!`;
+            pbText.innerHTML = `SCORE: ${total.toFixed(2)} - YOU DID IT!`;
             this.fireConfetti();
         } else {
             // PERFECT 10
             pbFill.className = "absolute left-0 top-0 h-full bg-yellow-400 transition-all duration-500";
             actionBar.classList.replace('border-slate-700', 'border-yellow-500');
-            pbText.innerHTML = `<i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5 inline mr-2 text-yellow-900"></i> PERFECT 10!`;
+            pbText.innerHTML = `PERFECT 10!`;
             pbText.className = "relative z-30 text-yellow-900 font-black tracking-widest uppercase text-sm md:text-2xl drop-shadow-sm transition-all duration-300 flex items-center pointer-events-none";
             
             // Golden Mic Reveal
