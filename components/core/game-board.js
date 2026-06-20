@@ -34,9 +34,6 @@ class ThpsGameBoard extends HTMLElement {
         window.addEventListener('thps-game-stop', () => {
             if (this.gameState === 'PLAYING') this.setGameState('ANALYZING');
         });
-        window.addEventListener('thps-timer-tick', (e) => {
-            if (this.gameState === 'PLAYING') this.updateProgress(e.detail.elapsed);
-        });
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
 
         this.fetchDailyCards();
@@ -54,8 +51,8 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     render() {
-        // Unique Version Identifier
-        const VERSION_TAG = "v.01:45:00 ACST";
+        // Unique Version Identifier for Cache Checking
+        const VERSION_TAG = "v.02:15:00 ACST";
 
         this.innerHTML = `
             <style>
@@ -218,7 +215,7 @@ class ThpsGameBoard extends HTMLElement {
 
                     <!-- ACTION BAR (Integrated Timer) -->
                     <div id="gb-action-bar" data-action="timer-click" class="relative w-full max-w-4xl mx-auto mt-6 md:mt-8 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0 group/action">
-                        <div id="gb-timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-300 ease-out overflow-hidden z-10"></div>
+                        <div id="gb-timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10"></div>
                         
                         <div id="gb-timer-markers" class="absolute inset-0 flex z-20 pointer-events-none opacity-100 transition-opacity">
                             <div class="flex flex-col items-center justify-end pb-2 border-r-[1.5px] border-white/30" style="width: 22.222%;">
@@ -311,8 +308,6 @@ class ThpsGameBoard extends HTMLElement {
         } else if (this.gameState === 'PLAYING') {
             this.setGameState('ANALYZING');
             if (window.toggleTimerAndMic) window.toggleTimerAndMic();
-        } else if (this.gameState === 'SCORED') {
-            // Wait for restart button click
         }
     }
 
@@ -331,9 +326,24 @@ class ThpsGameBoard extends HTMLElement {
             bar.classList.replace('bg-slate-800', 'bg-rose-600');
             bar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
             prog.style.width = '0%';
+            
+            // INTERNAL PROGRESS ANIMATOR (Fixes Bug 1)
+            this.playStartTime = Date.now();
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            this.internalTimer = setInterval(() => {
+                let elapsed = (Date.now() - this.playStartTime) / 1000;
+                if (elapsed <= 90) {
+                    prog.style.width = `${(elapsed / 90) * 100}%`;
+                } else {
+                    clearInterval(this.internalTimer);
+                }
+            }, 50);
+
             if (window.lucide) window.lucide.createIcons();
         } 
         else if (newState === 'ANALYZING') {
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            
             textLabel.innerText = "CHECKING YOUR MIC-CHECK SCORES...";
             icon.setAttribute('data-lucide', 'loader-2');
             icon.classList.add('animate-spin');
@@ -358,11 +368,19 @@ class ThpsGameBoard extends HTMLElement {
                 }
             });
 
-            if (window.lucide) {
-                setTimeout(() => window.lucide.createIcons(), 300);
-            }
+            if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
+
+            // FAILSAFE TIMEOUT (Fixes Bug 2: Returns to "Check your scores" if Vercel fails)
+            this.analyzingTimeout = setTimeout(() => {
+                if (this.gameState === 'ANALYZING') {
+                    this.setGameState('SCORED', -1);
+                }
+            }, 15000); 
         }
         else if (newState === 'SCORED') {
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
+
             icon.classList.remove('animate-spin');
             icon.classList.add('hidden'); 
             
@@ -394,6 +412,8 @@ class ThpsGameBoard extends HTMLElement {
 
     resetBoardToIdle() {
         this.gameState = 'IDLE';
+        if (this.internalTimer) clearInterval(this.internalTimer);
+        if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
         
         const bar = this.querySelector('#gb-action-bar');
         const textLabel = this.querySelector('#gb-action-label');
@@ -409,7 +429,7 @@ class ThpsGameBoard extends HTMLElement {
         
         bar.className = 'relative w-full max-w-4xl mx-auto mt-6 md:mt-8 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0 group/action';
         
-        prog.className = 'absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-300 ease-out overflow-hidden z-10';
+        prog.className = 'absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10';
         prog.style.width = '0%';
         
         markers.classList.remove('opacity-0');
@@ -454,182 +474,135 @@ class ThpsGameBoard extends HTMLElement {
         if (window.clearAnalyzer) window.clearAnalyzer();
     }
 
-    updateProgress(elapsedSecs) {
-        const prog = this.querySelector('#gb-timer-progress');
-        if (prog) prog.style.width = `${(elapsedSecs / 90) * 100}%`;
-    }
-
     update(data) {
-        if (this.gameState !== 'ANALYZING') return;
-        
-        const containers = this.querySelectorAll('.thps-card-results');
-        if (containers.length < 4) return; 
-        
-        const cContent = containers[0];
-        const cDelivery = containers[1];
-        const cSimplicity = containers[2];
-        const cTime = containers[3];
-        
-        this.querySelectorAll('.thps-chest-analyzing').forEach(el => el.classList.add('opacity-0'));
+        try {
+            if (this.gameState !== 'ANALYZING') return;
+            if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout); // We got the data!
+            
+            const containers = this.querySelectorAll('.thps-card-results');
+            if (containers.length < 4) return; 
+            
+            const cContent = containers[0];
+            const cDelivery = containers[1];
+            const cSimplicity = containers[2];
+            const cTime = containers[3];
+            
+            this.querySelectorAll('.thps-chest-analyzing').forEach(el => el.classList.add('opacity-0'));
 
-        const makeRow = (label, val, pts, color) => `
-            <div class="score-row flex flex-col items-center justify-center w-full">
-                <span class="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-xs md:text-base font-black text-slate-100 leading-none">${val}</span>
-                    <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+            const makeRow = (label, val, pts, color) => `
+                <div class="score-row flex flex-col items-center justify-center w-full">
+                    <span class="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-xs md:text-base font-black text-slate-100 leading-none">${val}</span>
+                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
-        // Content
-        let pPts = '+1', pColor = 'text-emerald-400';
-        if (data.personal < 30) { pPts = '+0.25'; pColor = 'text-rose-400'; }
-        else if (data.personal > 60) { pPts = '+0.75'; pColor = 'text-amber-400'; }
-        
-        let vPts = '+1', vColor = 'text-emerald-400';
-        if (data.visual < 20) { vPts = '+0.25'; vColor = 'text-rose-400'; }
-        else if (data.visual > 50) { vPts = '+0.75'; vColor = 'text-amber-400'; }
+            // Defaults to prevent crashes if data is missing
+            let personal = data.personal || 0;
+            let visual = data.visual || 0;
+            let intangible = data.intangible || 0;
 
-        let iPts = '+1', iColor = 'text-emerald-400';
-        if (data.intangible > 45) { iPts = '+0.25'; iColor = 'text-rose-400'; }
-        else if (data.intangible >= 30) { iPts = '+0.75'; iColor = 'text-amber-400'; }
+            // Content
+            let pPts = '+1', pColor = 'text-emerald-400';
+            if (personal < 30) { pPts = '+0.25'; pColor = 'text-rose-400'; }
+            else if (personal > 60) { pPts = '+0.75'; pColor = 'text-amber-400'; }
+            
+            let vPts = '+1', vColor = 'text-emerald-400';
+            if (visual < 20) { vPts = '+0.25'; vColor = 'text-rose-400'; }
+            else if (visual > 50) { vPts = '+0.75'; vColor = 'text-amber-400'; }
 
-        cContent.innerHTML = `
-            <div class="w-full flex flex-col justify-evenly h-full pb-2">
-                ${makeRow('Personal', Math.round(data.personal) + '%', pPts, pColor)}
-                ${makeRow('Visual', Math.round(data.visual) + '%', vPts, vColor)}
-                ${makeRow('Intangible', Math.round(data.intangible) + '%', iPts, iColor)}
-            </div>
-        `;
+            let iPts = '+1', iColor = 'text-emerald-400';
+            if (intangible > 45) { iPts = '+0.25'; iColor = 'text-rose-400'; }
+            else if (intangible >= 30) { iPts = '+0.75'; iColor = 'text-amber-400'; }
 
-        // Delivery
-        let wpmPts = '+1', wpmColor = 'text-emerald-400';
-        if (data.wpm < 100) { wpmPts = '+0.75'; wpmColor = 'text-amber-400'; }
-        else if (data.wpm > 150) { wpmPts = '+0.25'; wpmColor = 'text-rose-400'; }
-
-        let spsPts = '+1', spsColor = 'text-emerald-400';
-        if (data.sps < 3) { spsPts = '+0.75'; spsColor = 'text-amber-400'; }
-        else if (data.sps > 5) { spsPts = '+0.25'; spsColor = 'text-rose-400'; }
-
-        let pzPts = '+1', pzColor = 'text-emerald-400';
-        if (data.pause < 10) { pzPts = '+0.25'; pzColor = 'text-rose-400'; }
-        else if (data.pause > 30) { pzPts = '+0.75'; pzColor = 'text-amber-400'; }
-
-        cDelivery.innerHTML = `
-            <div class="w-full flex flex-col justify-evenly h-full pb-2">
-                ${makeRow('Words / min', data.wpm, wpmPts, wpmColor)}
-                ${makeRow('Mumble', data.sps.toFixed(1), spsPts, spsColor)}
-                ${makeRow('Pause', data.pause.toFixed(0) + '%', pzPts, pzColor)}
-            </div>
-        `;
-
-        // Simplicity
-        let wpsPts = '+1', wpsColor = 'text-emerald-400';
-        if (data.wps < 5) { wpsPts = '+0.75'; wpsColor = 'text-amber-400'; }
-        else if (data.wps > 15) { wpsPts = '+0.25'; wpsColor = 'text-rose-400'; }
-
-        let gradePts = '+1', gradeColor = 'text-emerald-400';
-        if (data.grade < 5) { gradePts = '+0.75'; gradeColor = 'text-amber-400'; }
-        else if (data.grade > 10) { gradePts = '+0.25'; gradeColor = 'text-rose-400'; }
-
-        let simplePts = '+1', simpleColor = 'text-emerald-400';
-        if (data.simple < 85) { simplePts = '+0.25'; simpleColor = 'text-rose-400'; }
-        else if (data.simple > 95) { simplePts = '+0.75'; simpleColor = 'text-amber-400'; }
-
-        cSimplicity.innerHTML = `
-            <div class="w-full flex flex-col justify-evenly h-full pb-2">
-                ${makeRow('Words / idea', data.wps.toFixed(1), wpsPts, wpsColor)}
-                ${makeRow('Reading Lvl', data.grade.toFixed(1), gradePts, gradeColor)}
-                ${makeRow('Simple Vocab', data.simple + '%', simplePts, simpleColor)}
-            </div>
-        `;
-
-        // Time & Final Grade
-        let timePts = '+1', timeColor = 'text-emerald-400';
-        if (data.time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
-        else if (data.time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
-
-        let finalGrade = data.overrideGrade ? "-" : (data.totalPoints % 1 === 0 ? data.totalPoints : data.totalPoints.toFixed(2));
-        let finalGradeNum = data.overrideGrade ? -1 : data.totalPoints;
-
-        cTime.innerHTML = `
-            <div class="w-full flex flex-col justify-evenly h-full pb-2">
-                ${data.overrideGrade ? '' : makeRow('Time', data.time.toFixed(0) + 's', timePts, timeColor)}
-                <div class="score-row flex flex-col items-center justify-center w-full mt-auto">
-                    <span class="text-[7px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">Final Grade</span>
-                    <span class="text-3xl md:text-5xl font-black text-white leading-none">${finalGrade}</span>
+            cContent.innerHTML = `
+                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                    ${makeRow('Personal', Math.round(personal) + '%', pPts, pColor)}
+                    ${makeRow('Visual', Math.round(visual) + '%', vPts, vColor)}
+                    ${makeRow('Intangible', Math.round(intangible) + '%', iPts, iColor)}
                 </div>
-            </div>
-        `;
+            `;
 
-        containers.forEach(c => c.classList.remove('opacity-0'));
-        this.setGameState('SCORED', finalGradeNum);
-    }
+            let wpm = data.wpm || 0;
+            let sps = data.sps || 0;
+            let pause = data.pause || 0;
 
-    setDifficulty(stars) {
-        if (stars === 1) this.cardStates = { challenge: false, sponsor: true, script: false, micCheck: false };
-        else if (stars === 2) this.cardStates = { challenge: false, sponsor: true, script: true, micCheck: false };
-        else if (stars === 3) this.cardStates = { challenge: true, sponsor: true, script: true, micCheck: false };
-        else if (stars === 4) this.cardStates = { challenge: false, sponsor: true, script: true, micCheck: true };
-        else if (stars === 5) this.cardStates = { challenge: true, sponsor: true, script: true, micCheck: true };
-        else this.cardStates = { challenge: false, sponsor: false, script: false, micCheck: false };
+            // Delivery
+            let wpmPts = '+1', wpmColor = 'text-emerald-400';
+            if (wpm < 100) { wpmPts = '+0.75'; wpmColor = 'text-amber-400'; }
+            else if (wpm > 150) { wpmPts = '+0.25'; wpmColor = 'text-rose-400'; }
 
-        ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
-            const cardEl = this.querySelector(`#gb-card-${key}`);
-            if (cardEl) {
-                if (this.cardStates[key]) cardEl.classList.add('rotate-y-180');
-                else cardEl.classList.remove('rotate-y-180');
-            }
-        });
+            let spsPts = '+1', spsColor = 'text-emerald-400';
+            if (sps < 3) { spsPts = '+0.75'; spsColor = 'text-amber-400'; }
+            else if (sps > 5) { spsPts = '+0.25'; spsColor = 'text-rose-400'; }
 
-        this.updateDifficultyVisuals();
-        this.updateAdLib();
-    }
+            let pzPts = '+1', pzColor = 'text-emerald-400';
+            if (pause < 10) { pzPts = '+0.25'; pzColor = 'text-rose-400'; }
+            else if (pause > 30) { pzPts = '+0.75'; pzColor = 'text-amber-400'; }
 
-    toggleCard(key) {
-        this.cardStates[key] = !this.cardStates[key];
-        const cardEl = this.querySelector(`#gb-card-${key}`);
-        if (cardEl) {
-            if (this.cardStates[key]) cardEl.classList.add('rotate-y-180');
-            else cardEl.classList.remove('rotate-y-180');
+            cDelivery.innerHTML = `
+                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                    ${makeRow('Words / min', wpm, wpmPts, wpmColor)}
+                    ${makeRow('Mumble', sps.toFixed(1), spsPts, spsColor)}
+                    ${makeRow('Pause', pause.toFixed(0) + '%', pzPts, pzColor)}
+                </div>
+            `;
+
+            let wps = data.wps || 0;
+            let grade = data.grade || 0;
+            let simple = data.simple || 0;
+
+            // Simplicity
+            let wpsPts = '+1', wpsColor = 'text-emerald-400';
+            if (wps < 5) { wpsPts = '+0.75'; wpsColor = 'text-amber-400'; }
+            else if (wps > 15) { wpsPts = '+0.25'; wpsColor = 'text-rose-400'; }
+
+            let gradePts = '+1', gradeColor = 'text-emerald-400';
+            if (grade < 5) { gradePts = '+0.75'; gradeColor = 'text-amber-400'; }
+            else if (grade > 10) { gradePts = '+0.25'; gradeColor = 'text-rose-400'; }
+
+            let simplePts = '+1', simpleColor = 'text-emerald-400';
+            if (simple < 85) { simplePts = '+0.25'; simpleColor = 'text-rose-400'; }
+            else if (simple > 95) { simplePts = '+0.75'; simpleColor = 'text-amber-400'; }
+
+            cSimplicity.innerHTML = `
+                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                    ${makeRow('Words / idea', wps.toFixed(1), wpsPts, wpsColor)}
+                    ${makeRow('Reading Lvl', grade.toFixed(1), gradePts, gradeColor)}
+                    ${makeRow('Simple Vocab', simple + '%', simplePts, simpleColor)}
+                </div>
+            `;
+
+            let time = data.time || 0;
+            let totalPoints = data.totalPoints || 0;
+
+            // Time & Final Grade
+            let timePts = '+1', timeColor = 'text-emerald-400';
+            if (time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
+            else if (time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
+
+            let finalGrade = data.overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
+            let finalGradeNum = data.overrideGrade ? -1 : totalPoints;
+
+            cTime.innerHTML = `
+                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                    ${data.overrideGrade ? '' : makeRow('Time', time.toFixed(0) + 's', timePts, timeColor)}
+                    <div class="score-row flex flex-col items-center justify-center w-full mt-auto">
+                        <span class="text-[7px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">Final Grade</span>
+                        <span class="text-3xl md:text-5xl font-black text-white leading-none">${finalGrade}</span>
+                    </div>
+                </div>
+            `;
+
+            containers.forEach(c => c.classList.remove('opacity-0'));
+            this.setGameState('SCORED', finalGradeNum);
+
+        } catch (err) {
+            console.error("Game Board Update Error:", err);
+            this.setGameState('SCORED', -1);
         }
-        this.updateDifficultyVisuals();
-        this.updateAdLib();
-    }
-
-    updateDifficultyVisuals() {
-        let stars = 0;
-        if (this.cardStates.challenge) stars += 1;
-        if (this.cardStates.sponsor) stars += 1;
-        if (this.cardStates.script) stars += 1;
-        if (this.cardStates.micCheck) stars += 2;
-        
-        stars = Math.max(0, Math.min(5, stars));
-        this.currentStars = stars;
-
-        const levelLabels = { 0: "Blank", 1: "Beginner", 2: "Better", 3: "Brave", 4: "Bold", 5: "Brilliant!" };
-        const levelTextEl = this.querySelector('#gb-board-level');
-        if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars] || 'Blank'}`;
-
-        for (let i = 1; i <= 5; i++) {
-            const starEl = this.querySelector(`.board-star[data-stars="${i}"]`);
-            if (starEl) {
-                if (i <= stars) {
-                    starEl.classList.remove('star-empty');
-                    starEl.classList.add('star-filled');
-                } else {
-                    starEl.classList.remove('star-filled');
-                    starEl.classList.add('star-empty');
-                }
-            }
-        }
-
-        this.dispatchEvent(new CustomEvent('thps-game-state', { 
-            detail: { stars: this.currentStars, date: this.currentDate }, 
-            bubbles: true, 
-            composed: true 
-        }));
     }
 
     async fetchDailyCards() {
