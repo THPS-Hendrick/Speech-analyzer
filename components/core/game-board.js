@@ -214,7 +214,7 @@ class ThpsGameBoard extends HTMLElement {
             if (actionEl) {
                 const count = parseInt(actionEl.getAttribute('data-stars'));
                 for (let i = 1; i <= 5; i++) {
-                    const s = this.querySelector(`i[data-stars="${i}"]`);
+                    const s = this.querySelector(`.board-star[data-stars="${i}"]`);
                     if (s) s.classList[i <= count ? 'add' : 'remove']('star-hover');
                 }
             }
@@ -223,7 +223,7 @@ class ThpsGameBoard extends HTMLElement {
         this.addEventListener('mouseout', (e) => {
             if (e.target.closest('#board-stars')) {
                 for (let i = 1; i <= 5; i++) {
-                    const s = this.querySelector(`i[data-stars="${i}"]`);
+                    const s = this.querySelector(`.board-star[data-stars="${i}"]`);
                     if (s) s.classList.remove('star-hover');
                 }
             }
@@ -311,7 +311,7 @@ class ThpsGameBoard extends HTMLElement {
         if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars] || 'Blank'}`;
 
         for (let i = 1; i <= 5; i++) {
-            const starEl = this.querySelector(`i[data-stars="${i}"]`);
+            const starEl = this.querySelector(`.board-star[data-stars="${i}"]`);
             if (starEl) {
                 if (i <= stars) {
                     starEl.classList.remove('star-empty');
