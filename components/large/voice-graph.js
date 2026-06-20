@@ -1,5 +1,5 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (TIMESTAMPS)
+// THPS WIDGET: LARGE VOICE GRAPH (TIMESTAMPS & SPEECH STAFF)
 // ==========================================
 
 class ThpsVoiceGraph extends HTMLElement {
@@ -19,6 +19,7 @@ class ThpsVoiceGraph extends HTMLElement {
                     </div>
                 </div>
                 
+                <!-- WAVEFORM CANVAS -->
                 <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden relative">
                     <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none thps-vg-placeholder">
@@ -26,7 +27,19 @@ class ThpsVoiceGraph extends HTMLElement {
                     </div>
                 </div>
                 
-                <div class="thps-word-ladder mt-4 flex flex-wrap gap-1 w-full max-h-32 overflow-y-auto content-start"></div>
+                <!-- THE SPEECH STAFF -->
+                <div class="relative w-full h-[110px] mt-4 bg-slate-50/50 border border-slate-200 rounded-lg overflow-x-hidden overflow-y-visible">
+                    <!-- Staff Visual Lines -->
+                    <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40">
+                        <div class="w-full h-px bg-slate-300"></div>
+                        <div class="w-full h-px bg-slate-300"></div>
+                        <div class="w-full h-px bg-slate-300"></div>
+                        <div class="w-full h-px bg-slate-300"></div>
+                        <div class="w-full h-px bg-slate-300"></div>
+                    </div>
+                    <!-- Words Container -->
+                    <div class="thps-staff-words relative w-full h-full"></div>
+                </div>
             </div>
         `;
 
@@ -41,23 +54,23 @@ class ThpsVoiceGraph extends HTMLElement {
     }
 
     update(data) {
-        // If there are no timestamps (i.e. manual text entry), ignore.
+        // If there are no timestamps, ignore.
         if (!data.wordTimestamps || data.wordTimestamps.length === 0) return;
         
         this.querySelector('.thps-vg-placeholder').style.display = 'none';
         
         const canvas = this.querySelector('.thps-vg-canvas');
-        const ladder = this.querySelector('.thps-word-ladder');
+        const staff = this.querySelector('.thps-staff-words');
         const duration = data.time || 1;
         
-        // High DPI Canvas Scaling
+        // --- 1. SETUP CANVAS ---
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width * 2;
         canvas.height = rect.height * 2;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 1. Draw 5-Second Grid Markers
+        // Draw 5-Second Grid Markers
         ctx.strokeStyle = 'rgba(255,255,255,0.1)';
         ctx.lineWidth = 1;
         for(let i=0; i<duration; i+=5) {
@@ -65,7 +78,7 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
         }
 
-        // 2. Draw The Timestamp Waveform!
+        // Draw The Timestamp Waveform
         ctx.beginPath();
         ctx.moveTo(0, canvas.height / 2);
         
@@ -74,7 +87,7 @@ class ThpsVoiceGraph extends HTMLElement {
             let endX = (w.end / duration) * canvas.width;
             let midX = (startX + endX) / 2;
             
-            // Random visual height just for the demo waveform (since we don't track decibels yet)
+            // Random visual height just for the demo waveform
             let height = (canvas.height/2) * 0.8 * (0.5 + Math.random()*0.5); 
             
             ctx.lineTo(startX, canvas.height/2);
@@ -83,7 +96,7 @@ class ThpsVoiceGraph extends HTMLElement {
         });
         
         ctx.lineTo(canvas.width, canvas.height / 2);
-        ctx.strokeStyle = '#6366f1'; // Indigo
+        ctx.strokeStyle = '#6366f1'; 
         ctx.lineWidth = 3;
         ctx.stroke();
         
@@ -93,13 +106,27 @@ class ThpsVoiceGraph extends HTMLElement {
         ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
         ctx.fill();
 
-        // 3. Draw The Word Ladder
-        ladder.innerHTML = '';
-        data.wordTimestamps.forEach(w => {
+        // --- 2. DRAW THE SPEECH STAFF ---
+        staff.innerHTML = '';
+        data.wordTimestamps.forEach((w, index) => {
             const span = document.createElement('span');
             span.innerText = w.word;
-            span.className = 'text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200 shadow-sm';
-            ladder.appendChild(span);
+            
+            // Horizontal position: Mapping exactly to the timestamp!
+            const leftPercent = (w.start / duration) * 100;
+            
+            // Vertical position: Modulo 5 maps it to row 0, 1, 2, 3, 4, then repeats
+            const row = index % 5;
+            
+            span.className = 'absolute text-[9px] px-1 py-0.5 bg-white text-slate-700 font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default';
+            
+            // Prevent words clipping off the right edge
+            span.style.left = `${Math.min(95, leftPercent)}%`; 
+            
+            // Distribute across the 5 rows (0%, 20%, 40%, 60%, 80%) with a slight pixel offset to align with the visual lines
+            span.style.top = `calc(${row * 20}% + 4px)`; 
+            
+            staff.appendChild(span);
         });
     }
 }
