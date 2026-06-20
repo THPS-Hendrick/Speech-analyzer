@@ -1,6 +1,6 @@
 // ==========================================
 // THPS AUDIO PROCESSOR ENGINE
-// Handles Microphone, WAV Chunking, and Vercel STT Integration (with Timestamps)
+// Handles Microphone, WAV Chunking, and Vercel STT Integration
 // ==========================================
 
 window.THPS = window.THPS || {};
@@ -10,11 +10,14 @@ window.THPS.Audio.isRecording = false;
 window.THPS.Audio.recordedAudio = false;
 window.THPS.Audio.recordStartTime = 0;
 window.THPS.Audio.lastRecordedDuration = 0;
-window.THPS.Audio.wordTimestamps = []; // NEW: Global storage for accurate word timings
+window.THPS.Audio.wordTimestamps = []; 
+window.THPS.Audio.volumeData = []; // NEW PHASE 1: Real-time intensity tracking
 
 let audioCtx = null;
 let sourceNode = null;
 let processorNode = null;
+let analyserNode = null; // NEW: The acoustic listener
+let volumeInterval = null; // NEW: The 100ms timer
 let audioBuffers = [];
 let totalSamplesRecorded = 0;
 
@@ -52,6 +55,12 @@ function encodeWAV(samples, sampleRate) {
 window.THPS.Audio.stopRecordingProcess = async function() {
     if (!window.THPS.Audio.isRecording) return;
     window.THPS.Audio.isRecording = false;
+
+    // Stop tracking volume
+    if (volumeInterval) {
+        clearInterval(volumeInterval);
+        volumeInterval = null;
+    }
     
     const inputEl = document.getElementById('cba-inputText');
     if (inputEl) inputEl.placeholder = "Processing Parallel Audio Streams...";
@@ -63,7 +72,9 @@ window.THPS.Audio.stopRecordingProcess = async function() {
     window.THPS.Audio.lastRecordedDuration = elapsedSecs;
     window.THPS.Audio.recordedAudio = true;
     
+    // Safely tear down all audio nodes
     if (processorNode) { processorNode.disconnect(); processorNode = null; }
+    if (analyserNode) { analyserNode.disconnect(); analyserNode = null; }
     if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
     if (window.THPS.Audio.audioStream) { window.THPS.Audio.audioStream.getTracks().forEach(t => t.stop()); }
     if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
@@ -79,7 +90,7 @@ window.THPS.Audio.stopRecordingProcess = async function() {
     }
 
     const sampleRate = 16000;
-    const chunkSize = sampleRate * 30; // 30-Second Parallel Slicer
+    const chunkSize = sampleRate * 30; // 30-Second Slicer
     let wavChunks = [];
     
     for(let i = 0; i < totalSamplesRecorded; i += chunkSize) {
@@ -108,7 +119,7 @@ window.THPS.Audio.stopRecordingProcess = async function() {
                         resolve({ 
                             index: index, 
                             transcript: data.transcript ? data.transcript.trim() : '',
-                            words: data.words || [] // NEW: Capture the timestamp array
+                            words: data.words || [] 
                         });
                     } else {
                         resolve({ index: index, transcript: '', words: [], error: `HTTP ${response.status}` });
@@ -125,7 +136,6 @@ window.THPS.Audio.stopRecordingProcess = async function() {
 
     try {
         const resolvedChunks = await Promise.all(uploadPromises);
-        
         resolvedChunks.sort((a, b) => a.index - b.index); 
         
         const finalStitchedTranscript = resolvedChunks
@@ -133,7 +143,6 @@ window.THPS.Audio.stopRecordingProcess = async function() {
             .filter(t => t.length > 0)
             .join(' ');
             
-        // NEW: Stitch the exact timestamps together, offsetting them by exactly 30s per chunk!
         let finalStitchedWords = [];
         resolvedChunks.forEach(chunk => {
             if (chunk.words && chunk.words.length > 0) {
@@ -147,13 +156,11 @@ window.THPS.Audio.stopRecordingProcess = async function() {
             }
         });
         
-        // Save the timestamps to the global memory so the NLP Brain can find them
         window.THPS.Audio.wordTimestamps = finalStitchedWords;
         
         if (finalStitchedTranscript.length > 0) {
             if (inputEl) inputEl.value = finalStitchedTranscript;
         } else {
-            console.warn("Parallel Chunk Errors:", resolvedChunks);
             if (errorMsgBox) {
                 errorMsgBox.innerHTML = `<strong>Google Cloud Error:</strong> Failed to generate transcript from audio chunks.<br><span class="text-xs font-semibold text-red-600">Ensure microphone was clearly recording.</span>`;
                 errorMsgBox.classList.remove('hidden');
@@ -184,7 +191,9 @@ window.THPS.Audio.startRecordingProcess = async function() {
     audioBuffers = [];
     totalSamplesRecorded = 0;
     window.THPS.Audio.recordStartTime = Date.now();
-    window.THPS.Audio.wordTimestamps = []; // Reset on new recording
+    
+    window.THPS.Audio.wordTimestamps = []; 
+    window.THPS.Audio.volumeData = []; // Reset the volume tracker
     
     const inputEl = document.getElementById('cba-inputText');
     if (inputEl) inputEl.placeholder = "Listening... speak clearly into your microphone.";
@@ -198,6 +207,34 @@ window.THPS.Audio.startRecordingProcess = async function() {
         sourceNode = audioCtx.createMediaStreamSource(window.THPS.Audio.audioStream);
         processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
         
+        // --- THE NEW DECIBEL TRACKER ---
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 2048;
+        sourceNode.connect(analyserNode);
+
+        // Every 100 milliseconds, capture the exact intensity of the microphone
+        volumeInterval = setInterval(() => {
+            if (!window.THPS.Audio.isRecording) return;
+            
+            const dataArray = new Float32Array(analyserNode.fftSize);
+            analyserNode.getFloatTimeDomainData(dataArray);
+
+            let sumSquares = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sumSquares += dataArray[i] * dataArray[i];
+            }
+            
+            let rms = Math.sqrt(sumSquares / dataArray.length);
+            let db = 20 * Math.log10(Math.max(rms, 0.0001)); // Convert to Decibels
+            
+            window.THPS.Audio.volumeData.push({
+                time: (Date.now() - window.THPS.Audio.recordStartTime) / 1000, // Exact seconds
+                rms: rms,
+                db: db
+            });
+        }, 100);
+        // -------------------------------
+
         processorNode.onaudioprocess = function(e) {
             if (!window.THPS.Audio.isRecording) return;
             
