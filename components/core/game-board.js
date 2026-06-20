@@ -1,5 +1,5 @@
 // ==========================================
-// THPS WIDGET: LARGE GAME BOARD (STAGE 4: FINAL REVEAL)
+// THPS WIDGET: LARGE GAME BOARD (FINAL UI POLISH)
 // Contains Cards, Star Selector, Mad-Lib Engine, and Timer Bar
 // ==========================================
 
@@ -43,7 +43,7 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     render() {
-        const VERSION_TAG = "v.FINAL.01";
+        const VERSION_TAG = "v.FINAL.02";
 
         this.innerHTML = `
             <style>
@@ -92,8 +92,10 @@ class ThpsGameBoard extends HTMLElement {
                         Fetching challenge...
                     </div>
 
+                    <!-- CARDS (Dual-Layer Architecture) -->
                     <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-2 md:gap-6 mb-8 md:mb-12 perspective-1000">
                         
+                        <!-- Challenge Card -->
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="challenge">
                             <div id="gb-card-challenge" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
@@ -101,7 +103,7 @@ class ThpsGameBoard extends HTMLElement {
                                     <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Challenge</span>
                                     <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
                                 </div>
-                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
+                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
                                     <div class="thps-prompt-view flex flex-col items-center w-full h-full">
                                         <span class="text-[7px] md:text-xs font-bold text-blue-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Challenge</span>
                                         <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6">
@@ -109,13 +111,14 @@ class ThpsGameBoard extends HTMLElement {
                                         </div>
                                     </div>
                                     <div class="thps-result-view hidden flex-col items-center w-full h-full">
-                                        <span class="text-[7px] md:text-xs font-bold text-blue-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Content</span>
-                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-2 md:pb-6"></div>
+                                        <span class="text-[7px] md:text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1 md:mb-2 shrink-0">Content</span>
+                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-1 md:pb-2"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Sponsor Card -->
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="sponsor">
                             <div id="gb-card-sponsor" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
@@ -123,7 +126,7 @@ class ThpsGameBoard extends HTMLElement {
                                     <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Sponsor</span>
                                     <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
                                 </div>
-                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
+                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
                                     <div class="thps-prompt-view flex flex-col items-center w-full h-full">
                                         <span class="text-[7px] md:text-xs font-bold text-purple-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Sponsor</span>
                                         <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6">
@@ -131,13 +134,14 @@ class ThpsGameBoard extends HTMLElement {
                                         </div>
                                     </div>
                                     <div class="thps-result-view hidden flex-col items-center w-full h-full">
-                                        <span class="text-[7px] md:text-xs font-bold text-purple-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Delivery</span>
-                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-2 md:pb-6"></div>
+                                        <span class="text-[7px] md:text-[10px] font-bold text-purple-600 uppercase tracking-widest mb-1 md:mb-2 shrink-0">Delivery</span>
+                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-1 md:pb-2"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Script Card -->
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="script">
                             <div id="gb-card-script" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
@@ -145,7 +149,7 @@ class ThpsGameBoard extends HTMLElement {
                                     <span class="text-[8px] md:text-lg font-bold uppercase tracking-widest">Script</span>
                                     <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
                                 </div>
-                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
+                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-2 md:border-4 border-slate-200 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
                                     <div class="thps-prompt-view flex flex-col items-center w-full h-full">
                                         <span class="text-[7px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Script</span>
                                         <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6">
@@ -153,13 +157,14 @@ class ThpsGameBoard extends HTMLElement {
                                         </div>
                                     </div>
                                     <div class="thps-result-view hidden flex-col items-center w-full h-full">
-                                        <span class="text-[7px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Simplicity</span>
-                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-2 md:pb-6"></div>
+                                        <span class="text-[7px] md:text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1 md:mb-2 shrink-0">Simplicity</span>
+                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-1 md:pb-2"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Mic-Check Card -->
                         <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="micCheck">
                             <div id="gb-card-micCheck" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl shadow-md md:shadow-xl border-[1.5px] md:border-[3px] border-amber-400 bg-gradient-to-br from-red-800 via-red-900 to-black flex flex-col items-center justify-center p-1 md:p-6 text-center pointer-events-none">
@@ -167,7 +172,7 @@ class ThpsGameBoard extends HTMLElement {
                                     <span class="text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]">Mic-Check</span>
                                     <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">2 STARS</span>
                                 </div>
-                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-[1.5px] md:border-[3px] border-amber-400 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-6 px-1 md:px-4 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
+                                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border-[1.5px] md:border-[3px] border-amber-400 text-slate-800 rounded-lg md:rounded-xl flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 rotate-y-180 shadow-md md:shadow-xl pointer-events-none overflow-hidden">
                                     <div class="thps-prompt-view flex flex-col items-center w-full h-full">
                                         <span class="text-[7px] md:text-xs font-bold text-red-800 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Mic-Check</span>
                                         <div class="flex-1 w-full flex items-center justify-center pb-2 md:pb-6">
@@ -175,14 +180,15 @@ class ThpsGameBoard extends HTMLElement {
                                         </div>
                                     </div>
                                     <div class="thps-result-view hidden flex-col items-center w-full h-full">
-                                        <span class="text-[7px] md:text-xs font-bold text-red-800 uppercase tracking-widest mb-1.5 md:mb-4 shrink-0">Time & Score</span>
-                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-2 md:pb-6"></div>
+                                        <span class="text-[7px] md:text-[10px] font-bold text-red-800 uppercase tracking-widest mb-1 md:mb-2 shrink-0">Time & Score</span>
+                                        <div class="thps-card-results flex-1 w-full flex flex-col justify-evenly pb-1 md:pb-2"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- AD-LIB PANEL -->
                     <div id="gb-board-adlib-panel" class="max-w-5xl mx-auto w-full px-4 flex flex-col items-center transition-all duration-500">
                         <div class="w-full bg-slate-50 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-slate-200 text-center transition-all duration-500">
                             <h2 class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 transition-colors">Today's Daily Mic-Check is...</h2>
@@ -192,6 +198,7 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
+                    <!-- ACTION BAR (Integrated Timer & Sequence Engine) -->
                     <div id="gb-action-bar" data-action="timer-click" class="relative w-full max-w-4xl mx-auto mt-6 md:mt-8 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0 group/action">
                         <div id="gb-timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10"></div>
                         
@@ -218,6 +225,7 @@ class ThpsGameBoard extends HTMLElement {
                             <span id="gb-action-label">TAP TO START GAME</span>
                         </span>
 
+                        <!-- Restart Button -->
                         <div id="gb-action-restart" data-action="timer-restart" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 bg-white/20 hover:bg-white/30 p-2 rounded-full opacity-0 pointer-events-none transition-all hover:scale-110 active:scale-95 text-white">
                             <i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </div>
@@ -507,12 +515,13 @@ class ThpsGameBoard extends HTMLElement {
             const cSimplicity = containers[2];
             const cTime = containers[3];
 
+            // TWEAKED FOR SMALLER HEIGHT: Compressed margins, padding, and text sizing
             const makeRow = (label, val, pts, color) => `
-                <div class="score-row flex flex-col items-center justify-center w-full mt-1">
-                    <span class="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-xs md:text-base font-black text-slate-700 leading-none">${val}</span>
-                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+                <div class="flex flex-col items-center justify-center w-full shrink-0">
+                    <span class="text-[6px] md:text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 md:mb-1 text-center">${label}</span>
+                    <div class="flex items-center gap-1 md:gap-1.5">
+                        <span class="text-[10px] md:text-[13px] font-black text-slate-700 leading-none">${val}</span>
+                        <span class="text-[6px] md:text-[9px] font-bold px-1 py-0.5 md:px-1.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
                     </div>
                 </div>
             `;
@@ -534,7 +543,7 @@ class ThpsGameBoard extends HTMLElement {
             else if (intangible >= 30) { iPts = '+0.75'; iColor = 'text-amber-400'; }
 
             cContent.innerHTML = `
-                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                <div class="w-full h-full flex flex-col justify-evenly items-center pb-1">
                     ${makeRow('Personal', Math.round(personal) + '%', pPts, pColor)}
                     ${makeRow('Visual', Math.round(visual) + '%', vPts, vColor)}
                     ${makeRow('Intangible', Math.round(intangible) + '%', iPts, iColor)}
@@ -558,7 +567,7 @@ class ThpsGameBoard extends HTMLElement {
             else if (pause > 30) { pzPts = '+0.75'; pzColor = 'text-amber-400'; }
 
             cDelivery.innerHTML = `
-                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                <div class="w-full h-full flex flex-col justify-evenly items-center pb-1">
                     ${makeRow('Words / min', wpm, wpmPts, wpmColor)}
                     ${makeRow('Mumble', sps.toFixed(1), spsPts, spsColor)}
                     ${makeRow('Pause', pause.toFixed(0) + '%', pzPts, pzColor)}
@@ -582,7 +591,7 @@ class ThpsGameBoard extends HTMLElement {
             else if (simple > 95) { simplePts = '+0.75'; simpleColor = 'text-amber-400'; }
 
             cSimplicity.innerHTML = `
-                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                <div class="w-full h-full flex flex-col justify-evenly items-center pb-1">
                     ${makeRow('Words / idea', wps.toFixed(1), wpsPts, wpsColor)}
                     ${makeRow('Reading Lvl', grade.toFixed(1), gradePts, gradeColor)}
                     ${makeRow('Simple Vocab', simple + '%', simplePts, simpleColor)}
@@ -602,12 +611,13 @@ class ThpsGameBoard extends HTMLElement {
             let finalGrade = overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
             let finalGradeNum = overrideGrade ? -1 : totalPoints;
 
+            // Compressed height for Final Grade section
             cTime.innerHTML = `
-                <div class="w-full flex flex-col justify-evenly h-full pb-2">
+                <div class="w-full h-full flex flex-col justify-evenly items-center pb-1">
                     ${overrideGrade ? '' : makeRow('Time', time.toFixed(0) + 's', timePts, timeColor)}
-                    <div class="score-row flex flex-col items-center justify-center w-full mt-auto">
-                        <span class="text-[7px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-2">Final Grade</span>
-                        <span class="text-3xl md:text-5xl font-black text-blue-600 leading-none">${finalGrade}</span>
+                    <div class="flex flex-col items-center justify-center w-full mt-1 md:mt-2 shrink-0">
+                        <span class="text-[6px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1 md:mb-1.5">Final Grade</span>
+                        <span class="text-2xl md:text-4xl font-black text-blue-600 leading-none">${finalGrade}</span>
                     </div>
                 </div>
             `;
