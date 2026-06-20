@@ -1,6 +1,6 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v2.1)
-// Includes Fixed Heights, Synchronized Horizontal Scrolling, and Aligned Grids
+// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v2.2)
+// Includes Canvas Pause Bars and Speech Staff Pace Backgrounds
 // ==========================================
 
 class ThpsVoiceGraph extends HTMLElement {
@@ -48,14 +48,14 @@ class ThpsVoiceGraph extends HTMLElement {
                         <!-- 3. The Speech Staff -->
                         <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 shrink-0 overflow-hidden">
                             <!-- Staff Visual Lines -->
-                            <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40">
+                            <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40 z-0">
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                             </div>
-                            <!-- Words injected via JS -->
+                            <!-- Words and Pace Backgrounds injected via JS -->
                         </div>
 
                     </div>
@@ -105,16 +105,13 @@ class ThpsVoiceGraph extends HTMLElement {
         
         this.querySelector('.thps-vg-placeholder').style.display = 'none';
         
-        // Use either the timer duration or the end of the last word, whichever is longer
         const duration = Math.max(data.time || 1, Math.ceil(data.wordTimestamps[data.wordTimestamps.length - 1].end));
         
         // Setup Fixed Pixel Scaling (50 pixels = 1 second)
-        // This ensures 7s looks perfect on mobile (~350px) and 20s spans desktop (~1000px)
         const PIXELS_PER_SEC = 50;
         const scrollWrapper = this.querySelector('#thps-scroll-wrapper');
         const track = this.querySelector('.thps-sync-track');
         
-        // Total track width must accommodate all audio, but fill container if very short
         const trackWidth = Math.max(duration * PIXELS_PER_SEC, scrollWrapper.clientWidth);
         track.style.width = `${trackWidth}px`;
         
@@ -122,26 +119,31 @@ class ThpsVoiceGraph extends HTMLElement {
         const axis = this.querySelector('.thps-time-axis');
         const staff = this.querySelector('.thps-staff-words');
         
-        // --- PHD MATH PHASE 1: PAUSE VARIANCE ---
-        let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
+        // Arrays for UI elements
         let pauses = []; 
+        let chunkPaces = []; // Used for the background pace bars
+
+        let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
+        let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
+        let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         
+        // --- PHD MATH PHASE 1: PAUSE VARIANCE ---
         for (let i = 0; i < data.wordTimestamps.length - 1; i++) {
             let gap = data.wordTimestamps[i+1].start - data.wordTimestamps[i].start;
             if (gap >= 0.500) {
-                pauses.push({ start: data.wordTimestamps[i].start, duration: gap });
-                if (gap < 0.650) pauseCounts.vShort++;
-                else if (gap < 0.800) pauseCounts.short++;
-                else if (gap < 0.950) pauseCounts.norm++;
-                else if (gap < 1.100) pauseCounts.long++;
-                else pauseCounts.vLong++;
+                let pColor = '', pY = 0;
+                
+                if (gap < 0.650) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; } // slate-300 (Top)
+                else if (gap < 0.800) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; } // blue-400
+                else if (gap < 0.950) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; } // emerald-500 (Middle)
+                else if (gap < 1.100) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; } // amber-400
+                else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; } // rose-500 (Bottom)
+
+                pauses.push({ start: data.wordTimestamps[i].start, duration: gap, color: pColor, yPct: pY });
             }
         }
 
         // --- PHD MATH PHASE 2: PACE & VOICE VARIANCE (3s CHUNKS) ---
-        let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
-        let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-        
         let validChunks = [];
         let totalDb = 0;
         let numChunks = Math.ceil(duration / 3);
@@ -159,11 +161,15 @@ class ThpsVoiceGraph extends HTMLElement {
             });
             
             if (sylCount > 0) {
-                if (sylCount <= 8) paceCounts.vSlow++;
-                else if (sylCount <= 10) paceCounts.slow++;
-                else if (sylCount <= 13) paceCounts.norm++;
-                else if (sylCount <= 15) paceCounts.fast++;
-                else paceCounts.vFast++;
+                let paceColor = '', paceRow = 0;
+
+                if (sylCount <= 8) { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; } // Top row
+                else if (sylCount <= 10) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; }
+                else if (sylCount <= 13) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; }
+                else if (sylCount <= 15) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; }
+                else { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; } // Bottom row
+                
+                chunkPaces.push({ start: chunkStart, width: 3, color: paceColor, row: paceRow });
             }
 
             // B) Voice Math (Intensity Filtered by Pauses)
@@ -214,14 +220,14 @@ class ThpsVoiceGraph extends HTMLElement {
             let isMajor = (i % 5 === 0);
             
             if (isMajor) {
-                // Major marker: Just the centered text, no cut-off line
+                // Major marker: Just the centered text
                 let label = document.createElement('span');
                 label.className = 'absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold -translate-x-1/2 select-none';
                 label.style.left = `${xPos}px`;
                 label.innerText = `${i}s`;
                 axis.appendChild(label);
             } else {
-                // Minor tick: Just a short line at the bottom edge
+                // Minor tick
                 let tick = document.createElement('div');
                 tick.className = `absolute bottom-0 border-l border-slate-500/50 h-2`;
                 tick.style.left = `${xPos}px`;
@@ -229,12 +235,12 @@ class ThpsVoiceGraph extends HTMLElement {
             }
         }
 
-        // --- VISUAL PAINTING 2: CANVAS BLOCKS ---
+        // --- VISUAL PAINTING 2: CANVAS BLOCKS & PAUSE BARS ---
         const canvasHeight = canvas.parentElement.clientHeight;
         canvas.width = trackWidth * 2; // HDPI scaling
         canvas.height = canvasHeight * 2;
         const ctx = canvas.getContext('2d');
-        ctx.scale(2, 2); // Normalize drawing coordinates
+        ctx.scale(2, 2); 
         
         ctx.clearRect(0, 0, trackWidth, canvasHeight);
         
@@ -246,7 +252,7 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
         }
 
-        // Draw the Solid Intensity Blocks based on exact percentages
+        // A) Draw Solid Intensity Blocks
         validChunks.forEach(vc => {
             let x = vc.start * PIXELS_PER_SEC;
             let w = 3 * PIXELS_PER_SEC;
@@ -256,21 +262,57 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.fillStyle = vc.color;
             ctx.shadowBlur = 10;
             ctx.shadowColor = vc.color;
-            ctx.fillRect(x, y, w - 2, h); // -2px to leave a crisp gap between blocks
+            ctx.fillRect(x, y, w - 2, h); 
             ctx.shadowBlur = 0;
         });
 
-        // --- VISUAL PAINTING 3: SPEECH STAFF ---
-        staff.innerHTML = '';
+        // B) Draw Pause Overlay Bars
+        pauses.forEach(p => {
+            let x = p.start * PIXELS_PER_SEC;
+            let w = p.duration * PIXELS_PER_SEC;
+            let h = canvasHeight * 0.10; // 10% height of the acoustic timeline
+            let y = (p.yPct * canvasHeight) - (h / 2); // Placed at calculated vertical %
+            
+            ctx.fillStyle = p.color;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = p.color;
+            
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, h, 4);
+                ctx.fill();
+            } else {
+                ctx.fillRect(x, y, w, h);
+            }
+            
+            ctx.shadowBlur = 0;
+        });
+
+        // --- VISUAL PAINTING 3: SPEECH STAFF (PACE BARS & WORDS) ---
+        // Clean out old text but keep the visual grid lines
+        staff.querySelectorAll('.staff-item').forEach(el => el.remove());
+
+        // A) Draw Pace Background Bars (z-index 0)
+        chunkPaces.forEach(cp => {
+            const bar = document.createElement('div');
+            bar.className = 'staff-item absolute opacity-30 pointer-events-none rounded-sm z-0';
+            bar.style.backgroundColor = cp.color;
+            bar.style.left = `${cp.start * PIXELS_PER_SEC}px`;
+            bar.style.width = `${cp.width * PIXELS_PER_SEC}px`;
+            bar.style.top = `${cp.row * 20}%`;
+            bar.style.height = `20%`;
+            staff.appendChild(bar);
+        });
+
+        // B) Draw Word Spans (z-index 10+)
         data.wordTimestamps.forEach((w, index) => {
             const span = document.createElement('span');
             span.innerText = w.word;
             
-            // Map strictly to the fixed timeline
             const xPos = w.start * PIXELS_PER_SEC; 
             const row = index % 5;
             
-            span.className = 'absolute text-[9px] px-1 py-0.5 bg-white text-slate-700 font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default';
+            span.className = 'staff-item absolute text-[9px] px-1 py-0.5 bg-white text-slate-700 font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default';
             span.style.left = `${xPos}px`; 
             span.style.top = `calc(${row * 20}% + 4px)`; 
             
