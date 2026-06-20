@@ -290,4 +290,44 @@ class ThpsGameBoard extends HTMLElement {
         if (this.cardStates.challenge) stars += 1;
         if (this.cardStates.sponsor) stars += 1;
         if (this.cardStates.script) stars += 1;
-        if (this.cardStates.mic
+        if (this.cardStates.micCheck) stars += 2;
+        stars = Math.max(0, Math.min(5, stars));
+        this.currentStars = stars;
+        for (let i = 1; i <= 5; i++) {
+            const starEl = this.querySelector(`.board-star[data-stars="${i}"]`);
+            if (starEl) {
+                if (i <= stars) { starEl.classList.remove('star-empty'); starEl.classList.add('star-filled'); } 
+                else { starEl.classList.remove('star-filled'); starEl.classList.add('star-empty'); }
+            }
+        }
+    }
+
+    async fetchDailyCards() {
+        try {
+            if (!this.dataSource.includes("YOUR_USERNAME")) {
+                const response = await fetch(this.dataSource + '?nocache=' + new Date().getTime());
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data[this.currentDate]) this.todayData = data[this.currentDate];
+                }
+            }
+        } catch (error) {}
+        this.querySelector('#gb-text-challenge').innerText = this.todayData?.challenge || 'Talk';
+        this.querySelector('#gb-text-sponsor').innerText = this.todayData?.sponsor || 'Something';
+        this.querySelector('#gb-text-script').innerText = this.todayData?.script || 'Near Far';
+        this.querySelector('#gb-text-micCheck').innerText = this.todayData?.micCheck || 'Use your hands';
+        this.setDifficulty(1);
+    }
+
+    updateAdLib() {
+        const cText = this.todayData?.challenge || 'Talk';
+        const sText = this.todayData?.sponsor || 'something you like';
+        const scText = this.todayData?.script || 'any';
+        const mText = this.todayData?.micCheck || 'to have fun';
+        const adlibEl = this.querySelector('#gb-board-adlib');
+        if (adlibEl) {
+            adlibEl.innerHTML = `<span class="font-bold text-blue-700">${cText}</span> about <span class="font-bold text-purple-700">${sText}</span>, with <span class="font-bold text-emerald-700">${scText}</span> examples, and don't forget to <span class="font-bold text-red-600">${mText}</span>!`;
+        }
+    }
+}
+customElements.define('thps-game-board', ThpsGameBoard);
