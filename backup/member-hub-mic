@@ -4,75 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Mic-Check Members Hub</title>
-    <!-- Tailwind CSS for Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- UMD builds guaranteed to work globally on Squarespace -->
     <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/calendar-grid.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/game-board.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/text-input.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/tangible-text.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/visual-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/signal-noise.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/sentence-complexity.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/simple-language.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-mumble.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Permanent+Marker&display=swap');
         
-        /* Game CSS */
-        .preserve-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg) !important; }
-        .card-container { perspective: 1000px; }
-        
-        /* Star styling */
-        .star-filled { fill: #eab308; color: #eab308; } 
-        .star-empty { fill: transparent; color: #94a3b8; } 
-        .star-hover { fill: #fde047 !important; color: #fde047 !important; } 
-
-        /* Timer Pulse */
-        @keyframes custom-pulse {
-            0%, 100% { background-color: rgb(220 38 38); }
-            50% { background-color: rgb(185 28 28); }
-        }
-        .time-up-bg { animation: custom-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; border-color: rgb(220 38 38) !important; }
-        .time-up-text { color: white !important; }
-
-        /* Timer Stage Colors */
-        .timer-stage-1 { background-color: #dcfce7; border-color: #86efac; color: #166534; }
-        .timer-stage-2 { background-color: #106030; border-color: #106030; color: white; }
-        
-        /* Analyzer CSS */
-        #cba-wrapper { font-family: 'Inter', sans-serif; background-color: transparent; }
-        #cba-wrapper .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
-        #cba-wrapper .score-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        @media (min-width: 1024px) { #cba-wrapper .score-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); } }
-
-        /* Highlight Colors */
-        #cba-wrapper .personal-word { color: #00B700; font-weight: 600; background-color: rgba(0, 183, 0, 0.1); padding: 0 2px; border-radius: 3px; }
-        #cba-wrapper .visual-word { color: #ef4444; font-weight: 600; text-decoration: underline; text-decoration-color: #ef4444; text-underline-offset: 2px; background-color: rgba(239, 68, 68, 0.05); padding: 0 2px; border-radius: 3px; }
-        #cba-wrapper .overlap-word { color: #ef4444; font-weight: 700; background-color: rgba(0, 183, 0, 0.15); border-bottom: 2px solid #ef4444; padding: 0 2px; border-radius: 3px; }
-        
-        /* Accordion Animations */
-        .cba-accordion-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        .cba-accordion-open { max-height: 500px; opacity: 1; margin-top: 1rem; }
-        
-        /* New Score Summary Alignments */
-        .score-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; line-height: 1.25rem; }
-        .score-label { color: #475569; flex: 1; }
-        .score-value { font-weight: 700; color: #1e293b; width: 3rem; text-align: right; }
-        .score-eval { font-size: 0.625rem; font-weight: 700; padding: 0.125rem 0.5rem; border-radius: 0.25rem; text-transform: uppercase; letter-spacing: 0.025em; width: 5.5rem; text-align: center; margin-left: 0.75rem; }
-
-        /* Custom Scrollbar for Hub Menu */
         .styled-scrollbar::-webkit-scrollbar { width: 6px; }
         .styled-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .styled-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
 
         #body-bg { overflow-x: hidden; width: 100%; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="w-full mx-auto bg-slate-50 transition-colors duration-300 min-h-screen p-2 md:p-8 flex flex-col items-center justify-start" id="body-bg">
 
-    <!-- ========================================== -->
-    <!-- VIEW 1: MEMBERS HUB (MENU GRID)            -->
-    <!-- ========================================== -->
+    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
+    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-slate-200">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Widget Library</h2>
+            </div>
+            <button onclick="window.toggleWidgetMenu()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex w-full border-b border-slate-200 bg-white">
+            <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Small</button>
+            <button onclick="window.switchWidgetTab('medium')" id="tab-btn-medium" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Medium</button>
+            <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Large</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+            <div id="tab-content-small" class="block space-y-8">
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-personal', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Personal Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-visual', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Visual Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-intangible', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Intangible Pill
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pace', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pace Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-mumble', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Mumble Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pause', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pause Pill
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-wps', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-violet-600 bg-white shadow-sm hover:border-violet-400 hover:bg-violet-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Words/Sent Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-medium" class="hidden space-y-8">
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-wpm-graph', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> WPM Graph
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-personal-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Personal Balance
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-visual-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Visual Balance
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-gauge-mumble', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Gauge
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-mumble-card', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Card
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-signal-noise', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Signal Noise
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-sentence-complexity', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Sent. Complex
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-simple-language', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Simple Lang.
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-google-benchmark', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Google 10K
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-large" class="hidden space-y-8">
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-text-input', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Text Input
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-voice-graph', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Voice Graph
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-game-board', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-800 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Game Board
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-score-summary', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Score Summary
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-tangible-text', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Tangible Text
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div id="view-menu" class="w-full max-w-6xl mx-auto flex flex-col items-center animate-in fade-in duration-500">
         
         <div class="w-full flex flex-col items-center mb-8 px-2">
@@ -87,15 +223,12 @@
                 <div id="db-status" class="mt-2 text-[10px] font-bold px-3 py-1 bg-amber-100 text-amber-700 rounded-full animate-pulse">Connecting to Save Data...</div>
             </div>
 
-            <!-- Gamification Score Panels -->
             <div class="flex justify-center gap-4 md:gap-12 w-full">
-                <!-- Golden Mic Checks -->
                 <div class="flex flex-col items-center bg-gradient-to-b from-yellow-50 to-amber-100 border border-amber-200 rounded-2xl p-3 shadow-sm w-36 md:w-44 transition-all hover:scale-105 hover:shadow-md">
                     <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-amber-700 text-center mb-1 leading-tight">Golden<br>Mic-Checks</span>
                     <span id="golden-count" class="text-3xl md:text-4xl font-black text-amber-600 drop-shadow-sm">0</span>
                 </div>
 
-                <!-- Star Count -->
                 <div class="flex flex-col items-center bg-gradient-to-b from-slate-50 to-blue-50 border border-blue-200 rounded-2xl p-3 shadow-sm w-36 md:w-44 transition-all hover:scale-105 hover:shadow-md">
                     <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-700 text-center mb-1 leading-tight">Total<br>Star Count</span>
                     <div class="flex items-center gap-1">
@@ -106,513 +239,59 @@
             </div>
         </div>
 
-        <!-- Scrollable 7-Column Grid -->
         <div class="w-full relative">
-            <!-- Top Fade -->
             <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-slate-50 to-transparent z-10 pointer-events-none"></div>
-            
             <div id="grid-scroll-container" class="w-full max-h-[65vh] overflow-y-auto pb-16 pt-2 px-2 styled-scrollbar">
                 <div id="menu-grid" class="w-full grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 md:gap-4">
-                    <!-- Grid is generated by JavaScript -->
-                </div>
+                    </div>
             </div>
-            
-            <!-- Bottom Fade -->
             <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none"></div>
         </div>
     </div>
 
 
-    <!-- ========================================== -->
-    <!-- VIEW 2: MASTER GAME APP                    -->
-    <!-- ========================================== -->
     <div id="view-game" class="hidden w-full max-w-6xl mx-auto flex-col items-center animate-in slide-in-from-bottom-8 duration-500 pb-16">
         
-        <!-- Navigation Bar -->
         <div class="w-full flex justify-start mb-6 md:mb-8">
-            <button onclick="closeGameView()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold uppercase tracking-widest text-xs transition-colors bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm hover:shadow-md">
+            <button onclick="window.closeGameView()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold uppercase tracking-widest text-xs transition-colors bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm hover:shadow-md">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Hub
             </button>
         </div>
 
-        <!-- Header Section -->
-        <div class="max-w-6xl mx-auto w-full flex flex-col items-center justify-center gap-6 mb-6 md:mb-10 text-center">
-            
-            <!-- Top: Title and Date -->
-            <div class="flex flex-col items-center gap-2">
-                <h1 class="text-4xl md:text-5xl uppercase tracking-wider text-slate-900 transition-colors flex items-center justify-center gap-3" style="font-family: 'Permanent Marker', cursive;">
-                    <span class="flex flex-col text-center leading-[0.9]">
-                        <span>Daily</span>
-                        <span>Mic-Check</span>
-                    </span>
-                </h1>
-                <p class="text-sm md:text-lg text-slate-500 font-medium transition-colors mt-2">
-                    Date: <span id="display-date">Loading...</span>
-                </p>
-            </div>
-
-            <!-- Bottom: Larger Difficulty Stars -->
-            <div class="flex flex-col items-center p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-lg bg-white border border-slate-200 gap-2 transition-all duration-300 w-auto">
-                <span id="level-text" class="text-sm md:text-base font-bold text-slate-500 uppercase tracking-widest">Level: beginner</span>
-                <div id="star-container" class="flex gap-2 md:gap-3 mt-1" onmouseleave="resetStarsHover()">
-                    <i data-lucide="star" class="w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty cursor-pointer" id="star-1" onmouseover="hoverStars(1)" onclick="setDifficulty(1)"></i>
-                    <i data-lucide="star" class="w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty cursor-pointer" id="star-2" onmouseover="hoverStars(2)" onclick="setDifficulty(2)"></i>
-                    <i data-lucide="star" class="w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty cursor-pointer" id="star-3" onmouseover="hoverStars(3)" onclick="setDifficulty(3)"></i>
-                    <i data-lucide="star" class="w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty cursor-pointer" id="star-4" onmouseover="hoverStars(4)" onclick="setDifficulty(4)"></i>
-                    <i data-lucide="star" class="w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty cursor-pointer" id="star-5" onmouseover="hoverStars(5)" onclick="setDifficulty(5)"></i>
+        <div class="w-full max-w-6xl mx-auto mb-16 mt-2">
+            <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Your Dashboard</h2>
+                    <p class="text-xs text-slate-500 mt-1">Configure your metrics to match your speaking goals.</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Info message while loading -->
-        <div id="loading-msg" class="max-w-6xl mx-auto text-center text-slate-500 mb-4 text-sm hidden">
-            Fetching challenge...
-        </div>
-
-        <!-- Card Grid -->
-        <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1 md:gap-6 mb-8 md:mb-12">
-            <!-- Challenge Card -->
-            <div class="card-container h-36 sm:h-56 md:h-80" onclick="toggleCard('challenge')">
-                <div id="card-challenge" class="relative w-full h-full transition-all duration-500 transform-gpu preserve-3d">
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-blue-600 to-blue-800">
-                        <i data-lucide="refresh-cw" class="text-white w-4 h-4 md:w-8 md:h-8 mb-1 md:mb-4 opacity-50"></i>
-                        <span class="text-white font-bold text-[8px] md:text-lg uppercase tracking-tighter">Challenge</span>
-                        <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
-                    </div>
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-white rotate-y-180">
-                        <span class="text-[7px] md:text-xs font-bold uppercase tracking-widest mb-1 md:mb-4 text-blue-700">Challenge</span>
-                        <p id="text-challenge" class="text-[9px] sm:text-sm md:text-xl font-serif font-semibold text-gray-800 leading-tight"></p>
-                    </div>
-                </div>
+                <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
+                    <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                    <span class="hidden sm:inline">Add Widget</span>
+                </button>
             </div>
 
-            <!-- Sponsor Card -->
-            <div class="card-container h-36 sm:h-56 md:h-80" onclick="toggleCard('sponsor')">
-                <div id="card-sponsor" class="relative w-full h-full transition-all duration-500 transform-gpu preserve-3d">
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-purple-600 to-purple-800">
-                        <i data-lucide="refresh-cw" class="text-white w-4 h-4 md:w-8 md:h-8 mb-1 md:mb-4 opacity-50"></i>
-                        <span class="text-white font-bold text-[8px] md:text-lg uppercase tracking-tighter">Sponsor</span>
-                        <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
-                    </div>
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-white rotate-y-180">
-                        <span class="text-[7px] md:text-xs font-bold uppercase tracking-widest mb-1 md:mb-4 text-purple-700">Sponsor</span>
-                        <p id="text-sponsor" class="text-[9px] sm:text-sm md:text-xl font-serif font-semibold text-gray-800 leading-tight"></p>
-                    </div>
-                </div>
+<div class="w-full mb-4 max-w-5xl mx-auto px-4 flex flex-col items-center">
+                <div id="cba-errorMsg" class="hidden mt-4 text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-left w-full mb-4"></div>
+                <textarea id="cba-inputText" class="hidden"></textarea>
             </div>
 
-            <!-- Script Card -->
-            <div class="card-container h-36 sm:h-56 md:h-80" onclick="toggleCard('script')">
-                <div id="card-script" class="relative w-full h-full transition-all duration-500 transform-gpu preserve-3d">
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-emerald-600 to-emerald-800">
-                        <i data-lucide="refresh-cw" class="text-white w-4 h-4 md:w-8 md:h-8 mb-1 md:mb-4 opacity-50"></i>
-                        <span class="text-white font-bold text-[8px] md:text-lg uppercase tracking-tighter">Script</span>
-                        <span class="text-white/70 text-[6px] md:text-xs mt-1 block">1 Star</span>
-                    </div>
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-white shadow-md md:shadow-xl flex flex-col items-center justify-center p-1 md:p-6 text-center bg-white rotate-y-180">
-                        <span class="text-[7px] md:text-xs font-bold uppercase tracking-widest mb-1 md:mb-4 text-emerald-700">Script</span>
-                        <p id="text-script" class="text-[9px] sm:text-sm md:text-xl font-serif font-semibold text-gray-800 leading-tight"></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mic-Check Card -->
-            <div class="card-container h-36 sm:h-56 md:h-80" onclick="toggleCard('micCheck')">
-                <div id="card-micCheck" class="relative w-full h-full transition-all duration-500 transform-gpu preserve-3d">
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)] flex flex-col items-center justify-center p-1 md:p-6 text-center bg-gradient-to-br from-red-800 via-red-900 to-black">
-                        <i data-lucide="mic" class="text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 animate-pulse drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 font-black text-[8px] md:text-lg uppercase tracking-tighter">Mic-Check</span>
-                        <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold px-2 py-0.5 rounded-full text-[6px] md:text-xs mt-2 inline-block shadow-sm border border-amber-200">2 STARS</span>
-                    </div>
-                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl border-2 md:border-4 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.5)] flex flex-col items-center justify-center p-1 md:p-6 text-center bg-white rotate-y-180">
-                        <span class="text-[7px] md:text-xs font-bold uppercase tracking-widest mb-1 md:mb-4 text-red-800">Mic-Check</span>
-                        <p id="text-micCheck" class="text-[9px] sm:text-sm md:text-xl font-serif font-semibold text-gray-800 leading-tight"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dynamic Ad-Lib Panel & Timer Controls -->
-        <div class="max-w-5xl mx-auto w-full mb-8 md:mb-12 px-4 flex flex-col items-center">
-            <div id="madlib-panel" class="w-full bg-white p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-lg border border-slate-200 text-center transition-all duration-500">
-                <h2 id="madlib-heading" class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 transition-colors">Today's Daily Mic-Check is...</h2>
-                <p id="ad-lib-sentence" class="text-lg md:text-3xl font-serif text-slate-700 leading-relaxed md:leading-loose transition-colors">
-                    Loading...
-                </p>
+<!-- THE DROP ZONE (Grid Container) -->
+            <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
                 
-                <div id="cba-errorMsg" class="hidden mt-4 text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-left w-full"></div>
-
-                <!-- Timer & Action Console -->
-                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 w-full max-w-xl mx-auto">
-                    
-                    <!-- Timer Display -->
-                    <div id="timer-container" class="relative flex items-center justify-center bg-white border border-slate-200 px-6 py-3 rounded-xl shadow-inner min-w-[140px] transition-colors duration-300">
-                        <div id="cba-recordingIndicator" class="hidden absolute -top-1 -right-1 flex h-4 w-4">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-600"></span>
-                        </div>
-                        <div id="timer-display" class="text-4xl md:text-5xl font-mono font-bold tracking-widest text-slate-800 transition-colors">
-                            1:30
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex gap-3 w-full sm:w-auto">
-                        <button onclick="toggleTimerAndMic()" id="timer-toggle" class="flex-1 sm:flex-none bg-[#106030] hover:bg-green-800 text-white font-bold text-sm md:text-base uppercase tracking-widest py-3 px-6 md:px-8 rounded-xl shadow-md transition-transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
-                            <i id="toggle-icon" data-lucide="mic" class="w-5 h-5"></i>
-                            <span id="toggle-text">Start Mic & Timer</span>
-                        </button>
-                        <button onclick="resetTimer()" class="flex-1 sm:flex-none bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm md:text-base uppercase tracking-widest py-3 px-6 rounded-xl shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
-                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-                            <span class="hidden md:inline">Reset</span>
-                        </button>
-                    </div>
+                <!-- DEFAULT WIDGETS FOR THE HUB -->
+                <div class="w-full mt-2 cursor-move relative group">
+                    <thps-game-board id="main-game-board" data-source="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/refs/heads/main/mic-check-daily.json" class="w-full"></thps-game-board>
                 </div>
-            </div>
-        </div>
-
-        <!-- Celebration Panel -->
-        <div id="celebration-panel" class="hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center border transition-all duration-500 scale-95 opacity-0">
-            <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm">Waiting...</h2>
-            <div class="flex flex-row justify-center items-center gap-8 md:gap-16">
-                <div class="flex flex-col items-center">
-                    <span id="celeb-label-grade" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80">Final Grade</span>
-                    <span id="celeb-grade" class="text-5xl md:text-7xl font-black drop-shadow-sm">- / 10</span>
-                </div>
-                <div id="celeb-divider" class="w-px h-20 bg-slate-300 opacity-50"></div>
-                <div class="flex flex-col items-center">
-                    <span id="celeb-label-time" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80">Time</span>
-                    <span id="celeb-time" class="text-5xl md:text-7xl font-black drop-shadow-sm">-</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Balance Analyzer Integrations -->
-        <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
-            <div class="flex flex-col space-y-6 sm:space-y-8">
                 
-                <!-- ALL RESULTS CONTAINER -->
-                <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
-                    
-                    <!-- LOADING / PROCESSING PANEL -->
-                    <div id="cba-processing-panel" class="hidden score-card glass-panel p-8 rounded-2xl border-t-4 border-blue-500 shadow-md bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center transition-all duration-300">
-                        <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner">
-                            <i data-lucide="refresh-cw" class="w-8 h-8 text-blue-600 animate-spin"></i>
-                            <i data-lucide="mic" class="w-4 h-4 text-blue-800 absolute"></i>
-                        </div>
-                        <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-slate-800 drop-shadow-sm text-center">We're checkin' on your Mic-Check...</h2>
-                        <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
-                    </div>
-
-                    <!-- 2. SCORE SUMMARY DASHBOARD -->
-                    <div id="cba-summaryCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-slate-800 shadow-sm transition-colors duration-300">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4">
-                            <h2 class="text-lg font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors" onclick="explain('Score Summary')">Score Summary</h2>
-                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="explain('Time')">
-                                    <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Time:</span>
-                                    <span id="sum-time" class="font-bold text-slate-800 text-sm pointer-events-none">-</span>
-                                    <span id="sum-time-eval" class="score-eval bg-slate-100 text-slate-500 ml-1 pointer-events-none">Waiting</span>
-                                </div>
-                                <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="explain('Grade')">
-                                    Grade: <span id="cba-overallGrade" class="text-blue-600 pointer-events-none">- / 10</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <!-- Content -->
-                            <div class="space-y-3">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="explain('Content')">Content</h3>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Personal')"><span class="score-label group-hover:text-blue-600 transition-colors">Personal:</span> <span id="sum-personal" class="score-value pointer-events-none">0%</span> <span id="sum-personal-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Visual')"><span class="score-label group-hover:text-blue-600 transition-colors">Visual:</span> <span id="sum-visual" class="score-value pointer-events-none">0%</span> <span id="sum-visual-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Intangible')"><span class="score-label group-hover:text-blue-600 transition-colors">Intangible:</span> <span id="sum-intangible" class="score-value pointer-events-none">0%</span> <span id="sum-intangible-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                            </div>
-                            <!-- Delivery -->
-                            <div class="space-y-3">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="explain('Delivery')">Delivery</h3>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Words/min')"><span class="score-label group-hover:text-blue-600 transition-colors">Words/min:</span> <span id="sum-wpm" class="score-value pointer-events-none">-</span> <span id="sum-wpm-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Syllable/sec')"><span class="score-label group-hover:text-blue-600 transition-colors">Syllable/sec:</span> <span id="sum-sps" class="score-value pointer-events-none">-</span> <span id="sum-sps-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Pause %')"><span class="score-label group-hover:text-blue-600 transition-colors">Pause %:</span> <span id="sum-pause" class="score-value pointer-events-none">-</span> <span id="sum-pause-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                            </div>
-                            <!-- Simplicity -->
-                            <div class="space-y-3">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="explain('Simplicity')">Simplicity</h3>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Words/Sent')"><span class="score-label group-hover:text-blue-600 transition-colors">Words/Sent:</span> <span id="sum-wps" class="score-value pointer-events-none">0</span> <span id="sum-wps-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Comp. Grade')"><span class="score-label group-hover:text-blue-600 transition-colors">Comp. Grade:</span> <span id="sum-grade" class="score-value pointer-events-none">0.0</span> <span id="sum-grade-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="explain('Simple %')"><span class="score-label group-hover:text-blue-600 transition-colors">Simple %:</span> <span id="sum-simple" class="score-value pointer-events-none">0%</span> <span id="sum-simple-eval" class="score-eval bg-slate-100 text-slate-500 pointer-events-none">Waiting</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2.5 What does this mean? Panel -->
-                    <div id="cba-explanationPanel" class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm bg-blue-50/30 transition-all duration-300">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
-                            <h3 id="cba-explanationTitle" class="text-sm font-bold text-blue-900 uppercase tracking-wider">What does this mean?</h3>
-                        </div>
-                        <div id="cba-explanationContent" class="text-sm text-slate-600 leading-relaxed border border-blue-100 bg-white/60 p-4 rounded-xl mt-3 min-h-[60px] flex items-center justify-center shadow-inner italic transition-opacity duration-300">
-                            Click on any term to learn more...
-                        </div>
-                    </div>
-
-                    <!-- Toggle Button for Extended Stats -->
-                    <div class="relative flex items-center py-2">
-                        <div class="flex-grow border-t border-slate-200"></div>
-                        <button onclick="toggleExtendedStats()" class="mx-4 flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-slate-200 text-slate-600 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-slate-50 hover:text-blue-600 transition-all shadow-sm active:scale-95 group">
-                            <span id="toggle-stats-text">See Your Stats</span>
-                            <i data-lucide="chevron-down" id="toggle-stats-icon" class="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5"></i>
-                        </button>
-                        <div class="flex-grow border-t border-slate-200"></div>
-                    </div>
-
-                    <!-- WRAPPER FOR EXTENDED STATS -->
-                    <div id="cba-extendedStats" class="hidden flex-col space-y-6 sm:space-y-8 w-full">
-
-                        <header class="mb-2 text-center pt-4">
-                            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Speech Analyzer Diagnostics</h2>
-                            <p class="text-slate-600 text-sm sm:text-base px-2">Raw transcript and detailed component metrics.</p>
-                        </header>
-
-                        <!-- 1. Text Input Section -->
-                        <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm transition-all duration-300">
-                            <label for="cba-inputText" class="block text-sm font-semibold text-slate-700 mb-2">Transcribed Audio / Manual Text Entry</label>
-                            
-                            <textarea id="cba-inputText" class="w-full h-32 sm:h-48 p-3 sm:p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all text-slate-700 leading-relaxed text-sm sm:text-base bg-white/50" placeholder="Use the Start button above to speak, or paste your own text here..."></textarea>
-                            
-                            <div class="mt-4 flex flex-col sm:flex-row flex-wrap items-center gap-3">
-                                <button id="cba-analyzeBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50">
-                                    Refresh Analysis
-                                </button>
-                                
-                                <button id="cba-clearBtn" class="w-full sm:w-auto bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm active:scale-95">
-                                    Clear text
-                                </button>
-
-                                <button id="cba-copyBtn" class="hidden w-full sm:w-auto bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                                    <span id="cba-copyBtnText">Copy Report</span>
-                                </button>
-
-                                <!-- Subtle Dictionary Status Indicator -->
-                                <div class="w-full sm:w-auto sm:ml-auto flex items-center justify-center sm:justify-end gap-2 text-xs font-medium text-slate-500">
-                                    <span id="cba-dictDot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                                    <span id="cba-dictText">Loading Dictionaries...</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Tangible Text Map -->
-                        <div id="cba-highlightContainer" class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-3 border-slate-100 gap-2">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-bold text-slate-700">Tangible Text Map</h3>
-                                    <div class="group relative z-50">
-                                        <span class="flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded cursor-help">💡 Tip</span>
-                                        <div class="absolute left-0 w-56 sm:w-64 p-3 mt-1 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none font-normal normal-case tracking-normal z-50">
-                                            Green text represents Personal content (a specific person doing a specific thing). Red text represents Visual content (things people can see, like colours, sizes, groups, or common objects).
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs text-slate-600 font-medium">
-                                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border border-[#00B700]"></span> Personal</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-500/10 border-b border-red-500"></span> Visual (Underlined)</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border-b-2 border-red-500"></span> Overlap</div>
-                                </div>
-                            </div>
-                            <div id="cba-highlightedText" class="w-full h-64 sm:h-80 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic">Waiting for text...</div>
-                        </div>
-
-                        <!-- 4. Audio Metrics Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                            <!-- WPM Pace Card -->
-                            <div id="cba-wpmCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300 opacity-50">
-                                <div class="flex justify-between items-start cursor-pointer" id="cba-wpmToggleBtn">
-                                    <div class="w-full">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Speaking Pace</h3>
-                                        </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <div id="cba-wpmScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0</div>
-                                            <span class="text-sm text-slate-500 font-medium">WPM Avg</span>
-                                        </div>
-                                    </div>
-                                    <svg class="w-5 h-5 ml-2 text-slate-400 transition-transform duration-300 transform flex-shrink-0" id="cba-wpmArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                                <div id="cba-wpmAccordion" class="cba-accordion-content border-t border-slate-100 pt-2">
-                                    <p class="text-[10px] text-slate-500 mb-2 uppercase font-bold tracking-wide">Pace per 20-second interval</p>
-                                    <canvas id="cba-wpmChart" height="150"></canvas>
-                                </div>
-                            </div>
-
-                            <!-- Mumble Meter Card -->
-                            <div id="cba-mumbleCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300 opacity-50">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Mumble Meter</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <div id="cba-mumbleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                                    <span class="text-sm text-slate-500">Syllables / Sec</span>
-                                </div>
-                                <div class="relative w-full h-2.5 rounded-full mt-5" style="background: linear-gradient(to right, #3b82f6, #10b981, #f97316, #ef4444);">
-                                    <div id="cba-mumbleMarker" class="absolute top-1/2 -translate-y-1/2 w-3 h-5 bg-white border-2 border-slate-700 rounded-sm shadow-md transition-all duration-500" style="left: 0%; margin-left: -0.375rem;"></div>
-                                </div>
-                                <p id="cba-mumbleInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-500">Waiting for Audio...</p>
-                                <p id="cba-mumbleStats" class="text-[10px] sm:text-xs text-slate-400 mt-1">0.0s active / 0.0s pause / 0.0s total</p>
-                            </div>
-                        </div>
-
-                        <!-- 5. SCORE CARDS GRID -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                            
-                            <!-- Personal Balance -->
-                            <div id="cba-personalCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Personal Balance</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2"><div id="cba-personalScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div><span class="text-sm text-slate-500">of text</span></div>
-                                <div class="relative w-full mt-4">
-                                    <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div id="cba-personalProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div></div>
-                                </div>
-                                <p id="cba-personalInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                                <p id="cba-personalCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                            </div>
-
-                            <!-- Visual Balance -->
-                            <div id="cba-visualCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Visual Balance</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2"><div id="cba-visualScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div><span class="text-sm text-slate-500">of text</span></div>
-                                <div class="relative w-full mt-4">
-                                    <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div id="cba-visualProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div></div>
-                                </div>
-                                <p id="cba-visualInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                                <p id="cba-visualCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                            </div>
-                            
-                            <!-- Signal-Noise Ratio Card -->
-                            <div id="cba-snCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Signal-Noise Ratio</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <div id="cba-snScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                                    <span class="text-sm text-slate-500">Avg words/sentence</span>
-                                </div>
-                                <div class="relative w-full mt-4">
-                                    <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                        <div id="cba-snProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-snToggleBtn">
-                                    <p id="cba-snInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                    <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                                </div>
-                                <div id="cba-snAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                    <div class="space-y-2 text-xs mb-5">
-                                        <div class="flex justify-between"><span class="text-slate-500">Total Words</span><span id="cba-statWords" class="font-bold text-slate-700">0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Total Sentences</span><span id="cba-statSentences" class="font-bold text-slate-700">0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Total Syllables</span><span id="cba-statSyllables" class="font-bold text-slate-700">0</span></div>
-                                    </div>
-                                    <div id="cba-snGrid" class="grid grid-cols-5 gap-1 w-fit mx-auto"></div>
-                                    <div class="flex justify-center gap-3 mt-3 text-[10px] text-slate-500">
-                                        <div class="flex items-center gap-1"><div id="cba-legendRed" class="w-2.5 h-2.5 rounded-sm shadow-sm" style="background-color: #94a3b8;"></div> red: most important word</div>
-                                        <div class="flex items-center gap-1"><div class="w-2.5 h-2.5 bg-slate-800 rounded-sm shadow-sm"></div> black: other words</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Sentence Complexity Rating -->
-                            <div id="cba-simpleComplexCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sentence Complexity</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-lg text-slate-500 font-semibold">Grade</span>
-                                    <div id="cba-gradeLevel" class="text-3xl sm:text-4xl font-bold text-slate-400">0.0</div>
-                                </div>
-                                <div class="relative w-full mt-4">
-                                    <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                        <div id="cba-gradeProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-readabilityToggleBtn">
-                                    <p id="cba-gradeInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                    <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                                </div>
-                                <div id="cba-readabilityAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                    <div class="space-y-2 text-xs">
-                                        <div class="flex justify-between border-b border-slate-100 pb-1 mb-1"><span class="font-bold text-slate-600">Average Grade</span><span id="cba-avgScore" class="font-bold text-blue-600">0.0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Flesch-Kincaid</span><span id="cba-fleschScore" class="font-bold text-slate-700">0.0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Gunning Fog</span><span id="cba-fogScore" class="font-bold text-slate-700">0.0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">SMOG Index</span><span id="cba-smogScore" class="font-bold text-slate-700">0.0</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Coleman-Liau</span><span id="cba-colemanScore" class="font-bold text-slate-700">0.0</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Simple Language -->
-                            <div id="cba-simpleCard" class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Simple Language</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <div id="cba-simpleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div>
-                                    <span class="text-sm text-slate-500">Core Vocab</span>
-                                </div>
-                                <div class="relative w-full mt-4 flex h-2 rounded-full overflow-hidden bg-slate-100">
-                                    <div id="cba-simpleBar5yr" class="h-full bg-slate-300 transition-all duration-500" style="width: 0%"></div>
-                                    <div id="cba-simpleBarEsl" class="h-full bg-slate-200 transition-all duration-500" style="width: 0%"></div>
-                                    <div id="cba-simpleBarKit" class="h-full bg-slate-100 transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                                <div class="flex justify-between items-center mt-3 cursor-pointer" id="cba-simpleToggleBtn">
-                                    <p id="cba-simpleInterpret" class="text-xs sm:text-sm font-medium text-slate-600">Waiting...</p>
-                                    <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide hover:bg-slate-200 transition-colors">More Metrics</span>
-                                </div>
-                                <div id="cba-simpleAccordion" class="cba-accordion-content border-t border-slate-100 pt-3">
-                                    <div class="space-y-2 text-xs">
-                                        <div class="flex justify-between"><span class="text-slate-500">5yr Old 1000</span><span id="cba-s5yr" class="font-bold text-slate-700">0%</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">ESL 2000</span><span id="cba-sEsl" class="font-bold text-slate-700">0%</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-500">Kitchen 1000</span><span id="cba-sKit" class="font-bold text-slate-700">0%</span></div>
-                                        <div class="flex justify-between border-t border-slate-100 pt-1 mt-1"><span class="font-bold text-slate-500">Outside Vocab</span><span id="cba-sOut" class="font-bold text-slate-700">0%</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Google 10K Benchmark -->
-                            <div id="cba-googleCard" class="md:col-span-2 score-card glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-slate-300 shadow-sm transition-colors duration-300">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Google 10K Benchmark</h3>
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <div id="cba-googleScore" class="text-3xl sm:text-4xl font-bold text-slate-400">0%</div>
-                                    <span class="text-sm text-slate-500">of text</span>
-                                </div>
-                                <div class="relative w-full mt-4">
-                                    <div class="absolute left-1/2 -top-1.5 w-0.5 h-5 bg-slate-300 z-10 rounded-full transform -translate-x-1/2"></div>
-                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                        <div id="cba-googleProgress" class="h-full transition-all duration-500 bg-slate-300" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                <p id="cba-googleInterpret" class="text-xs sm:text-sm font-medium mt-3 text-slate-600">Waiting...</p>
-                                <p id="cba-googleCount" class="text-[10px] sm:text-xs text-slate-400 mt-1">0 out of 0 words</p>
-                            </div>
-
-                        </div>
-                    </div> <!-- End of cba-extendedStats wrapper -->
+                <!-- ADDED RECORD REEL BY DEFAULT -->
+                <div class="w-full mt-2 cursor-move relative group">
+                    <thps-record-reel></thps-record-reel>
                 </div>
+
             </div>
         </div>
-    </div> <!-- END VIEW 2: MASTER GAME APP -->
 
-    <!-- ========================================== -->
-    <!-- FIREBASE (DATABASE) & MENU LOGIC           -->
-    <!-- ========================================== -->
-    <script type="module">
+    </div> <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -620,7 +299,6 @@
         let db, auth, currentUser;
         window.userScores = {}; // Global memory cache of scores
 
-        // YOUR OFFICIAL FIREBASE CONFIG KEYS
         const firebaseConfig = {
             apiKey: "AIzaSyBOZBkKXHQvmyhpGPBj_Ca1kaaOcS4CFm0",
             authDomain: "member-mic-check.firebaseapp.com",
@@ -637,7 +315,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Silently assign users a unique ID so we can save their personal scores
                 await signInAnonymously(auth);
 
                 onAuthStateChanged(auth, (user) => {
@@ -653,14 +330,13 @@
                 });
             } catch (error) {
                 console.error("Firebase init error:", error);
-                document.getElementById('db-status').innerText = "Database Connection Failed - Check Firebase Setup";
+                document.getElementById('db-status').innerText = "Database Connection Failed";
                 window.renderMenuGrid();
             }
         }
 
         function listenToScores() {
             if (!currentUser) return;
-            // Clean production path for your database
             const scoresRef = collection(db, 'users', currentUser.uid, 'micCheckScores');
             onSnapshot(scoresRef, (snapshot) => {
                 window.userScores = {};
@@ -680,9 +356,7 @@
             let shouldSave = true;
             
             if (existing) {
-                // Highest stars priority
                 if (existing.stars > stars) shouldSave = false;
-                // If equal stars, highest score priority
                 if (existing.stars === stars && existing.score >= score) shouldSave = false;
             }
 
@@ -692,14 +366,13 @@
             }
         };
 
-        // --- MENU GRID GENERATOR ---
         function getAdelaideDateObj() {
             const formatter = new Intl.DateTimeFormat('en-US', { 
                 timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' 
             });
             const parts = formatter.formatToParts(new Date());
             const year = parseInt(parts.find(p => p.type === 'year').value);
-            const month = parseInt(parts.find(p => p.type === 'month').value) - 1; // 0-indexed month
+            const month = parseInt(parts.find(p => p.type === 'month').value) - 1; 
             const day = parseInt(parts.find(p => p.type === 'day').value);
             return new Date(year, month, day);
         }
@@ -708,7 +381,6 @@
             const gridEl = document.getElementById('menu-grid');
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             
-            // Date parameters (Jan 1, 2026 -> Tomorrow)
             const startDate = new Date(2026, 0, 1);
             const todayObj = getAdelaideDateObj();
             const tomorrowObj = new Date(todayObj);
@@ -753,7 +425,7 @@
                             goldenCount++;
                             scoreColor = 'text-yellow-400 drop-shadow-md font-black';
                         } else if (score >= 8.5) {
-                            totalStars += stars; // Star boost!
+                            totalStars += stars; 
                             scoreColor = 'text-green-500';
                         } else if (score >= 7) {
                             scoreColor = 'text-orange-500';
@@ -775,7 +447,7 @@
                     const todayRing = isToday ? 'ring-2 ring-blue-400 ring-offset-2' : '';
 
                     htmlContent += `
-                        <div ${todayId} onclick="openGameView('${dateKey}')" class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group ${todayRing}">
+                        <div ${todayId} onclick="window.openGameView('${dateKey}')" class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group ${todayRing}">
                             <span class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors mb-2">${displayStr}</span>
                             <div class="flex gap-0.5 mb-1">
                                 ${starsHtml}
@@ -789,12 +461,10 @@
             
             gridEl.innerHTML = htmlContent;
             
-            // Update Headers
             document.getElementById('star-count').innerText = totalStars;
             document.getElementById('golden-count').innerText = goldenCount;
             if (window.lucide) window.lucide.createIcons();
 
-            // Auto-Scroll to Today
             setTimeout(() => {
                 const todayBtn = document.getElementById('btn-today');
                 const scrollContainer = document.getElementById('grid-scroll-container');
@@ -807,199 +477,79 @@
             }, 300);
         };
 
-        // Initialize App
         initFirebase();
-
     </script>
 
-    <!-- ========================================== -->
-    <!-- STANDARD GAME & UI LOGIC                   -->
-    <!-- ========================================== -->
     <script>
-        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/refs/heads/main/mic-check-daily.json";
-        
-        let cardStates = { challenge: false, sponsor: false, script: false, micCheck: false };
-        let timeLeft = 90;
-        let isActive = false;
-        let gameTimerInterval = null;
-        let currentPlayDate = null; // Tracks which date is actively open in the game view
+        // GLOBALS TO BREAK SQUARESPACE SANDBOX
+        window.thps_isActive = false;
+        window.thps_currentPlayDate = null; 
+        window.thps_currentGameStars = 0; 
+        window.thps_recordStartTime = 0;
+        window.thps_recordedAudio = false;
+        window.lastRecordedDuration = 0; 
 
-        const FALLBACK_TODAY = {
-            challenge: "Entertain us",
-            sponsor: "Socks",
-            script: "Near Far",
-            micCheck: "No hands at all"
+        // Dashboard Manager Logic
+        window.toggleWidgetMenu = function() {
+            const drawer = document.getElementById('widget-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if (drawer.classList.contains('translate-x-full')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                overlay.classList.add('opacity-0');
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => overlay.classList.add('hidden'), 300); 
+            }
         };
 
-        // ==========================================
-        // VIEW NAVIGATION
-        // ==========================================
+        window.switchWidgetTab = function(size) {
+            ['small', 'medium', 'large'].forEach(s => {
+                const btn = document.getElementById(`tab-btn-${s}`);
+                const content = document.getElementById(`tab-content-${s}`);
+                btn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            const activeBtn = document.getElementById(`tab-btn-${size}`);
+            const activeContent = document.getElementById(`tab-content-${size}`);
+            activeBtn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors";
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+        };
+
+        // Listen for the Game Board changing difficulty
+        window.addEventListener('thps-game-state', (e) => {
+            window.thps_currentGameStars = e.detail.stars;
+        });
+
         window.openGameView = function(dateStr) {
-            currentPlayDate = dateStr;
+            window.thps_currentPlayDate = dateStr;
             document.getElementById('view-menu').classList.add('hidden');
             document.getElementById('view-game').classList.remove('hidden');
+            document.getElementById('view-game').classList.add('flex');
             window.scrollTo(0, 0);
             
-            // Wipe analyzer clean before new game
-            const clearBtn = document.getElementById('cba-clearBtn');
-            if (clearBtn) clearBtn.click();
-            
-            fetchDailyCards(dateStr);
+            if (window.clearAnalyzer) window.clearAnalyzer();
+            window.dispatchEvent(new CustomEvent('thps-load-date', { detail: { dateStr: dateStr } }));
         };
 
         window.closeGameView = function() {
-            currentPlayDate = null;
+            window.thps_currentPlayDate = null;
             document.getElementById('view-game').classList.add('hidden');
+            document.getElementById('view-game').classList.remove('flex');
             document.getElementById('view-menu').classList.remove('hidden');
-            if (window.renderMenuGrid) window.renderMenuGrid(); // Refresh grid scores
+            
+            if (window.renderMenuGrid) window.renderMenuGrid(); 
             window.scrollTo(0, 0);
         };
 
         // ==========================================
-        // GAME LOGIC (CARDS & AD-LIBS)
-        // ==========================================
-        async function fetchDailyCards(targetDateStr) {
-            document.getElementById('display-date').innerText = targetDateStr;
-            document.getElementById('loading-msg').classList.remove('hidden');
-
-            let todaysCards = FALLBACK_TODAY;
-            let fetchedSuccessful = false;
-            
-            const errorMsgBox = document.getElementById('cba-errorMsg');
-            if (errorMsgBox) errorMsgBox.classList.add('hidden');
-
-            let urlsToTry = [
-                GITHUB_JSON_URL,
-                GITHUB_JSON_URL.endsWith('.json') ? GITHUB_JSON_URL : GITHUB_JSON_URL + ".json"
-            ];
-
-            for (let url of urlsToTry) {
-                if (fetchedSuccessful) break;
-                try {
-                    if (url.includes("YOUR_USERNAME")) continue;
-                    const response = await fetch(url + '?nocache=' + new Date().getTime());
-                    if (response.ok) {
-                        const rawText = await response.text();
-                        
-                        if (rawText.includes("const speech") || rawText.includes("module.exports") || rawText.includes("api/transcribe")) {
-                            console.error("Collision Detected: This URL contains JavaScript code instead of JSON challenge data.");
-                            if (errorMsgBox) {
-                                errorMsgBox.innerHTML = `<strong>GitHub Configuration Error:</strong> The URL you provided contains your Vercel backend JavaScript code instead of your daily challenge JSON data! <br><span class="text-xs font-normal">Your challenge cards must live in a separate JSON file on GitHub. Falling back to default cards.</span>`;
-                                errorMsgBox.classList.remove('hidden');
-                            }
-                            break; 
-                        }
-                        
-                        const data = JSON.parse(rawText);
-                        if (data[targetDateStr]) {
-                            todaysCards = data[targetDateStr];
-                            fetchedSuccessful = true;
-                        }
-                    }
-                } catch (error) {
-                    console.warn(`Attempt failed for: ${url}`, error);
-                }
-            }
-
-            document.getElementById('loading-msg').classList.add('hidden');
-
-            document.getElementById('text-challenge').innerText = todaysCards.challenge;
-            document.getElementById('text-sponsor').innerText = todaysCards.sponsor;
-            document.getElementById('text-script').innerText = todaysCards.script;
-            document.getElementById('text-micCheck').innerText = todaysCards.micCheck;
-
-            // Initialize to Level 1
-            window.setDifficulty(1);
-        }
-
-        window.hoverStars = function(count) {
-            for (let i = 1; i <= 5; i++) {
-                const starEl = document.getElementById(`star-${i}`);
-                if (i <= count) starEl.classList.add('star-hover');
-                else starEl.classList.remove('star-hover');
-            }
-        };
-
-        window.resetStarsHover = function() {
-            for (let i = 1; i <= 5; i++) {
-                const starEl = document.getElementById(`star-${i}`);
-                if (starEl) starEl.classList.remove('star-hover');
-            }
-        };
-
-        window.toggleCard = function(key) {
-            cardStates[key] = !cardStates[key];
-            const cardEl = document.getElementById(`card-${key}`);
-            if (cardStates[key]) cardEl.classList.add('rotate-y-180');
-            else cardEl.classList.remove('rotate-y-180');
-
-            // Calculate dynamic stars based on current card states
-            let currentStars = 0;
-            if (cardStates.challenge) currentStars += 1;
-            if (cardStates.sponsor) currentStars += 1;
-            if (cardStates.script) currentStars += 1;
-            if (cardStates.micCheck) currentStars += 2;
-            
-            updateDifficultyVisuals(currentStars);
-            updateAdLib();
-        };
-
-        window.setDifficulty = function(stars) {
-            if (stars === 1) cardStates = { challenge: false, sponsor: true, script: false, micCheck: false };
-            else if (stars === 2) cardStates = { challenge: false, sponsor: true, script: true, micCheck: false };
-            else if (stars === 3) cardStates = { challenge: true, sponsor: true, script: true, micCheck: false };
-            else if (stars === 4) cardStates = { challenge: false, sponsor: true, script: true, micCheck: true };
-            else if (stars === 5) cardStates = { challenge: true, sponsor: true, script: true, micCheck: true };
-
-            ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
-                const cardEl = document.getElementById(`card-${key}`);
-                if (cardStates[key]) {
-                    cardEl.classList.add('rotate-y-180');
-                } else {
-                    cardEl.classList.remove('rotate-y-180');
-                }
-            });
-
-            updateDifficultyVisuals(stars);
-            updateAdLib();
-        };
-
-        function updateDifficultyVisuals(stars) {
-            const levelLabels = { 0: "beginner", 1: "beginner", 2: "better", 3: "brave", 4: "bold", 5: "brilliant!" };
-            const levelTextEl = document.getElementById('level-text');
-            if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars]}`;
-
-            for (let i = 1; i <= 5; i++) {
-                const starEl = document.getElementById(`star-${i}`);
-                if (i <= stars) {
-                    starEl.classList.remove('star-empty');
-                    starEl.classList.add('star-filled');
-                } else {
-                    starEl.classList.remove('star-filled');
-                    starEl.classList.add('star-empty');
-                }
-            }
-        }
-
-        function updateAdLib() {
-            const cText = document.getElementById('text-challenge').innerText;
-            const sText = document.getElementById('text-sponsor').innerText;
-            const scText = document.getElementById('text-script').innerText;
-            const mText = document.getElementById('text-micCheck').innerText;
-
-            const formattedScText = scText.trim().split(/\s+/).join(' + ');
-            const blankStyle = "font-medium text-slate-400 underline decoration-slate-300 decoration-dashed underline-offset-8";
-            
-            const challengeStr = cardStates.challenge ? `<span class="font-bold text-blue-700">${cText}</span>` : `<span class="${blankStyle}">Talk</span>`;
-            const sponsorStr = cardStates.sponsor ? `<span class="font-bold text-purple-700">${sText}</span>` : `<span class="${blankStyle}">something you like</span>`;
-            const scriptStr = cardStates.script ? `<span class="font-bold text-emerald-700">${formattedScText}</span>` : `<span class="${blankStyle}">any</span>`;
-            const micCheckStr = cardStates.micCheck ? `to <span class="font-bold text-rose-600">${mText}</span>` : `<span class="${blankStyle}">to have fun</span>`;
-
-            document.getElementById('ad-lib-sentence').innerHTML = `${challengeStr} about ${sponsorStr}, with ${scriptStr} examples, and don't forget ${micCheckStr}!`;
-        }
-
-        // ==========================================
-        // DICTIONARIES (ANALYZER)
+        // DICTIONARIES
         // ==========================================
         const DICT_URLS = {
             simple: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/simple.json",
@@ -1052,11 +602,6 @@
                 } catch(e) { }
 
                 dictsLoaded = true;
-                document.getElementById('cba-analyzeBtn').disabled = false;
-                document.getElementById('cba-dictDot').classList.replace('bg-amber-500', 'bg-green-500');
-                document.getElementById('cba-dictDot').classList.remove('animate-pulse');
-                document.getElementById('cba-dictText').textContent = "Dictionaries Active";
-
             } catch (e) { console.error("Dict Load Error", e); }
         }
 
@@ -1064,7 +609,6 @@
         // PARALLEL CHUNKING ENGINE (RAW PCM/WAV)
         // ==========================================
         
-        // Helper 1: Convert Float32 audio to 16-bit PCM for pristine WAV formatting
         function floatTo16BitPCM(output, offset, input) {
             for (let i = 0; i < input.length; i++, offset += 2) {
                 let s = Math.max(-1, Math.min(1, input[i]));
@@ -1072,12 +616,10 @@
             }
         }
 
-        // Helper 2: Write string to DataView
         function writeString(view, offset, string) {
             for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
         }
 
-        // Helper 3: Package PCM data into valid WAV Blobs for Google Cloud
         function encodeWAV(samples, sampleRate) {
             let buffer = new ArrayBuffer(44 + samples.length * 2);
             let view = new DataView(buffer);
@@ -1086,8 +628,8 @@
             writeString(view, 8, 'WAVE');
             writeString(view, 12, 'fmt ');
             view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true); // PCM Format
-            view.setUint16(22, 1, true); // Mono channel
+            view.setUint16(20, 1, true); 
+            view.setUint16(22, 1, true); 
             view.setUint32(24, sampleRate, true);
             view.setUint32(28, sampleRate * 2, true);
             view.setUint16(32, 2, true);
@@ -1103,63 +645,24 @@
         let processorNode = null;
         let audioBuffers = [];
         let totalSamplesRecorded = 0;
-        
-        let isRecording = false;
-        let recordStartTime = 0;
-        let recordedAudio = false;
-        window.lastRecordedDuration = 0; 
-
-        const inputEl = document.getElementById('cba-inputText');
-        const timerDisplay = document.getElementById('timer-display');
-
-        function updateTimerUI() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = (timeLeft % 60).toString().padStart(2, '0');
-            timerDisplay.innerText = `${minutes}:${seconds}`;
-
-            const timerContainer = document.getElementById('timer-container');
-
-            timerContainer.classList.remove('time-up-bg', 'timer-stage-1', 'timer-stage-2', 'bg-white');
-            timerDisplay.classList.remove('time-up-text', 'text-slate-800', 'text-white', 'text-[#166534]');
-
-            if (timeLeft <= 4) {
-                timerContainer.classList.add('time-up-bg');
-                timerDisplay.classList.add('time-up-text');
-            } else if (timeLeft <= 30) {
-                timerContainer.classList.add('timer-stage-2');
-                timerDisplay.classList.add('text-white');
-            } else if (timeLeft <= 60) {
-                timerContainer.classList.add('timer-stage-1');
-                timerDisplay.classList.add('text-[#166534]');
-            } else {
-                timerContainer.classList.add('bg-white');
-                timerDisplay.classList.add('text-slate-800');
-            }
-        }
+        let globalWordTimestamps = [];
 
         window.stopRecordingProcess = async function() {
-            if (!isRecording) return;
-            isRecording = false;
+            if (!window.thps_isRecording) return;
+            window.thps_isRecording = false;
             
-            document.getElementById('cba-recordingIndicator').classList.add('hidden');
-            inputEl.placeholder = "Processing Parallel Audio Streams...";
+            // Broadcast that recording has stopped
+            window.dispatchEvent(new Event('thps-game-stop'));
             
-            const procPanel = document.getElementById('cba-processing-panel');
-            if (procPanel) procPanel.classList.remove('hidden');
-            
-            const elapsedSecs = (Date.now() - recordStartTime) / 1000;
+            const elapsedSecs = (Date.now() - window.thps_recordStartTime) / 1000;
             window.lastRecordedDuration = elapsedSecs;
-            recordedAudio = true;
+            window.thps_recordedAudio = true;
             
-            // 1. Teardown audio nodes safely
             if (processorNode) { processorNode.disconnect(); processorNode = null; }
             if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-            if (audioStream) { audioStream.getTracks().forEach(t => t.stop()); }
+            if (window.audioStream) { window.audioStream.getTracks().forEach(t => t.stop()); }
             if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
 
-            document.getElementById('cba-analyzeBtn').disabled = true;
-
-            // 2. Flatten raw PCM data into a master array
             let masterFloatArray = new Float32Array(totalSamplesRecorded);
             let writeOffset = 0;
             for(let i = 0; i < audioBuffers.length; i++) {
@@ -1167,9 +670,8 @@
                 writeOffset += audioBuffers[i].length;
             }
 
-            // 3. The 30-Second Parallel Slicer
             const sampleRate = 16000;
-            const chunkSize = sampleRate * 30; // Exactly 30 seconds of samples
+            const chunkSize = sampleRate * 30;
             let wavChunks = [];
             
             for(let i = 0; i < totalSamplesRecorded; i += chunkSize) {
@@ -1177,7 +679,6 @@
                 wavChunks.push(encodeWAV(segment, sampleRate));
             }
 
-            // 4. The Parallel Delivery Pipeline
             const uploadPromises = wavChunks.map(async (blob, index) => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
@@ -1188,20 +689,17 @@
                             const response = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    audioContent: base64data,
-                                    mimeType: 'audio/wav' // Explicitly tell backend this is raw WAV
-                                })
+                                body: JSON.stringify({ audioContent: base64data, mimeType: 'audio/wav' })
                             });
                             
                             if (response.ok) {
                                 const data = await response.json();
-                                resolve({ index: index, transcript: data.transcript ? data.transcript.trim() : '' });
+                                resolve({ index: index, transcript: data.transcript ? data.transcript.trim() : '', words: data.words || [] });
                             } else {
-                                resolve({ index: index, transcript: '', error: `HTTP ${response.status}` });
+                                resolve({ index: index, transcript: '', words: [], error: `HTTP ${response.status}` });
                             }
                         } catch (e) {
-                            resolve({ index: index, transcript: '', error: e.message });
+                            resolve({ index: index, transcript: '', words: [], error: e.message });
                         }
                     };
                 });
@@ -1209,85 +707,76 @@
 
             const errorMsgBox = document.getElementById('cba-errorMsg');
             if (errorMsgBox) errorMsgBox.classList.add('hidden');
+            
+            // Get the live text box element securely
+            const inputBox = document.getElementById('cba-inputText');
 
             try {
-                // Wait for all 30-second blocks to transcribe simultaneously
                 const resolvedChunks = await Promise.all(uploadPromises);
+                resolvedChunks.sort((a, b) => a.index - b.index); 
                 
-                // 5. The Restitching Phase
-                resolvedChunks.sort((a, b) => a.index - b.index); // Re-order chronologically
                 const finalStitchedTranscript = resolvedChunks
                     .map(r => r.transcript)
                     .filter(t => t.length > 0)
                     .join(' ');
+                    
+                globalWordTimestamps = [];
+                resolvedChunks.forEach(chunk => {
+                    if (chunk.words && chunk.words.length > 0) {
+                        chunk.words.forEach(w => {
+                            globalWordTimestamps.push({
+                                word: w.word,
+                                start: w.start + (chunk.index * 30),
+                                end: w.end + (chunk.index * 30)
+                            });
+                        });
+                    }
+                });
                 
                 if (finalStitchedTranscript.length > 0) {
-                    inputEl.value = finalStitchedTranscript;
+                    if (inputBox) inputBox.value = finalStitchedTranscript;
                 } else {
-                    console.warn("Parallel Chunk Errors:", resolvedChunks);
                     if (errorMsgBox) {
                         errorMsgBox.innerHTML = `<strong>Google Cloud Error:</strong> Failed to generate transcript from audio chunks.<br><span class="text-xs font-semibold text-red-600">Ensure microphone was clearly recording.</span>`;
                         errorMsgBox.classList.remove('hidden');
                     }
-                    inputEl.value = "";
+                    if (inputBox) inputBox.value = "";
                 }
             } catch (globalError) {
-                console.error("Parallel Framework Error:", globalError);
                 if (errorMsgBox) {
                     errorMsgBox.innerHTML = `<strong>Delivery Pipeline Error:</strong> Vercel chunk processing failed.<br><span class="text-xs font-semibold text-red-600">Details: ${globalError.message}</span>`;
                     errorMsgBox.classList.remove('hidden');
                 }
-                inputEl.value = "";
+                if (inputBox) inputBox.value = "";
             }
             
-            document.getElementById('cba-analyzeBtn').disabled = false;
             window.analyze();
-            if (procPanel) procPanel.classList.add('hidden');
-            
             audioBuffers = []; masterFloatArray = null;
         };
 
         window.startRecordingProcess = async function() {
-            isRecording = true;
-            recordedAudio = true; 
+            window.thps_isRecording = true;
+            window.thps_recordedAudio = true; 
             audioBuffers = [];
             totalSamplesRecorded = 0;
-            recordStartTime = Date.now();
-            
-            document.getElementById('cba-recordingIndicator').classList.remove('hidden');
-            inputEl.placeholder = "Listening... speak clearly into your microphone.";
+            window.thps_recordStartTime = Date.now();
+            globalWordTimestamps = [];
 
             try {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+                window.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
                 
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContextClass({ sampleRate: 16000 });
                 
-                sourceNode = audioCtx.createMediaStreamSource(audioStream);
-                // 4096 buffer size is safe for cross-platform stability
+                sourceNode = audioCtx.createMediaStreamSource(window.audioStream);
                 processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
                 
                 processorNode.onaudioprocess = function(e) {
-                    if (!isRecording) return;
+                    if (!window.thps_isRecording) return;
                     
                     const channelData = e.inputBuffer.getChannelData(0);
-                    // Copy data to avoid reference mutation bugs
                     audioBuffers.push(new Float32Array(channelData));
                     totalSamplesRecorded += channelData.length;
-                    
-                    // The 90-Second Game Over Rule
-                    if ((Date.now() - recordStartTime) >= 90000) {
-                        clearInterval(gameTimerInterval);
-                        const btnText = document.getElementById('toggle-text');
-                        btnText.innerText = 'Start Mic & Timer';
-                        document.getElementById('toggle-icon').setAttribute('data-lucide', 'mic');
-                        document.getElementById('timer-toggle').classList.replace('bg-amber-500', 'bg-[#106030]');
-                        document.getElementById('timer-toggle').classList.replace('hover:bg-amber-600', 'hover:bg-green-800');
-                        isActive = false;
-                        if (window.lucide) window.lucide.createIcons();
-                        
-                        window.stopRecordingProcess();
-                    }
                 };
 
                 sourceNode.connect(processorNode);
@@ -1306,104 +795,20 @@
         };
 
         window.toggleTimerAndMic = function() {
-            const btnText = document.getElementById('toggle-text');
-            const btnIcon = document.getElementById('toggle-icon');
-            const toggleBtn = document.getElementById('timer-toggle');
-            
-            if (isActive) {
-                clearInterval(gameTimerInterval);
-                isActive = false;
-                btnText.innerText = 'Start Mic & Timer';
-                btnIcon.setAttribute('data-lucide', 'mic');
-                toggleBtn.classList.replace('bg-amber-500', 'bg-[#106030]');
-                toggleBtn.classList.replace('hover:bg-amber-600', 'hover:bg-green-800');
-                window.stopRecordingProcess();
+            if (window.thps_isActive) {
+                window.thps_isActive = false;
+                if (window.stopRecordingProcess) window.stopRecordingProcess();
             } else {
-                if (timeLeft <= 0) return;
-                isActive = true;
-                btnText.innerText = 'Pause & Transcribe';
-                btnIcon.setAttribute('data-lucide', 'square');
-                toggleBtn.classList.replace('bg-[#106030]', 'bg-amber-500');
-                toggleBtn.classList.replace('hover:bg-green-800', 'hover:bg-amber-600');
-                
-                window.startRecordingProcess();
-                
-                if (gameTimerInterval) clearInterval(gameTimerInterval);
-                gameTimerInterval = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        updateTimerUI();
-                    } else {
-                        clearInterval(gameTimerInterval);
-                        isActive = false;
-                        btnText.innerText = 'Start Mic & Timer';
-                        btnIcon.setAttribute('data-lucide', 'mic');
-                        toggleBtn.classList.replace('bg-amber-500', 'bg-[#106030]');
-                        toggleBtn.classList.replace('hover:bg-amber-600', 'hover:bg-green-800');
-                        window.stopRecordingProcess();
-                        if (window.lucide) window.lucide.createIcons();
-                    }
-                }, 1000);
+                window.thps_isActive = true;
+                if (window.clearAnalyzer) window.clearAnalyzer();
+                if (window.startRecordingProcess) window.startRecordingProcess();
             }
-            if (window.lucide) window.lucide.createIcons();
-        };
-
-        window.resetTimer = function() {
-            clearInterval(gameTimerInterval);
-            if (isRecording) window.stopRecordingProcess();
-            
-            const procPanel = document.getElementById('cba-processing-panel');
-            if (procPanel) procPanel.classList.add('hidden');
-            
-            isActive = false;
-            timeLeft = 90;
-            
-            const btnText = document.getElementById('toggle-text');
-            const btnIcon = document.getElementById('toggle-icon');
-            const toggleBtn = document.getElementById('timer-toggle');
-            
-            btnText.innerText = 'Start Mic & Timer';
-            btnIcon.setAttribute('data-lucide', 'mic');
-            toggleBtn.classList.replace('bg-amber-500', 'bg-[#106030]');
-            toggleBtn.classList.replace('hover:bg-amber-600', 'hover:bg-green-800');
-            
-            updateTimerUI();
-            
-            const clearBtn = document.getElementById('cba-clearBtn');
-            if (clearBtn) clearBtn.click();
-            
-            if (window.lucide) window.lucide.createIcons();
         };
 
         // ==========================================
         // ANALYZER PROCESSING ENGINE
         // ==========================================
-        let wpmChartInstance = null;
         let reportMarkdownText = "";
-
-        const getPillColorClass = (points, isTime = false) => {
-            if (isTime) {
-                if (points === 0) return 'bg-slate-100 text-slate-700'; 
-                if (points === 0.75) return 'bg-amber-100 text-amber-700';
-                return 'bg-green-100 text-green-700'; 
-            }
-            if (points === 1) return 'bg-green-100 text-green-700';
-            if (points === 0.75) return 'bg-amber-100 text-amber-700';
-            return 'bg-rose-100 text-rose-700'; 
-        };
-
-        const setupAccordion = (btnId, contentId, arrowId = null) => {
-            const btn = document.getElementById(btnId);
-            if (btn) btn.addEventListener('click', () => {
-                document.getElementById(contentId).classList.toggle('cba-accordion-open');
-                if (arrowId) document.getElementById(arrowId).classList.toggle('rotate-180');
-            });
-        };
-        
-        setupAccordion('cba-readabilityToggleBtn', 'cba-readabilityAccordion');
-        setupAccordion('cba-wpmToggleBtn', 'cba-wpmAccordion', 'cba-wpmArrow');
-        setupAccordion('cba-snToggleBtn', 'cba-snAccordion'); 
-        setupAccordion('cba-simpleToggleBtn', 'cba-simpleAccordion'); 
 
         function countSyllables(word) {
             word = word.toLowerCase().replace(/[^a-z]/g, '');
@@ -1414,72 +819,15 @@
             return syllables ? syllables.length : 1;
         }
 
-        function updateCelebrationPanel(totalPoints, totalSecs, overrideGrade, recordedAudio, textLength) {
-            const panel = document.getElementById('celebration-panel');
-            const comment = document.getElementById('celeb-comment');
-            const gradeEl = document.getElementById('celeb-grade');
-            const timeEl = document.getElementById('celeb-time');
-
-            if (!recordedAudio && totalSecs === 0 && textLength === 0) {
-                panel.classList.add('hidden', 'scale-95', 'opacity-0');
-                return;
-            }
-
-            panel.classList.remove('hidden');
-            setTimeout(() => {
-                panel.classList.remove('scale-95', 'opacity-0');
-                panel.classList.add('scale-100', 'opacity-100');
-            }, 50);
-
-            let finalScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
-            gradeEl.textContent = overrideGrade ? "- / 10" : `${finalScore} / 10`;
-            timeEl.textContent = totalSecs > 0 ? `${totalSecs.toFixed(0)}s` : "-";
-
-            panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center transform transition-all duration-500 scale-100 opacity-100 border border-slate-200";
-            
-            document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-500";
-            document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-500";
-            document.getElementById('celeb-divider').className = "w-px h-20 bg-slate-300 opacity-50";
-
-            if (totalSecs < 30 && recordedAudio) {
-                comment.textContent = "You spoke under 30 seconds";
-                panel.classList.add('bg-slate-200', 'text-slate-800');
-            } else if (totalSecs > 90 && recordedAudio) {
-                comment.textContent = "You spoke over 90 seconds";
-                panel.classList.add('bg-slate-200', 'text-slate-800');
-            } else {
-                panel.classList.remove('border-slate-200');
-                panel.classList.add('text-white');
-                document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
-                document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
-                document.getElementById('celeb-divider').className = "w-px h-20 bg-white/40";
-
-                if (!overrideGrade) {
-                    if (totalPoints >= 8.5) {
-                        comment.textContent = "Wow! Those are some nice scores!";
-                        panel.classList.add('bg-gradient-to-br', 'from-emerald-600', 'to-teal-800');
-                    } else if (totalPoints >= 7) {
-                        comment.textContent = "Well said! Check out those scores";
-                        panel.classList.add('bg-gradient-to-br', 'from-blue-600', 'to-indigo-800');
-                    } else {
-                        comment.textContent = "Check your scores and have another go!";
-                        panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
-                    }
-                } else {
-                    comment.textContent = "Check your scores and have another go!";
-                    panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
-                }
-            }
-        }
-
         window.analyze = function() {
             if (!dictsLoaded) return;
-            const text = inputEl.value.trim();
+            
+            // Get the live text box element securely
+            const inputBox = document.getElementById('cba-inputText');
+            const text = inputBox ? inputBox.value.trim() : '';
             
             if (!text) {
-                document.getElementById('cba-highlightContainer').classList.add('hidden');
-                document.getElementById('cba-copyBtn').classList.add('hidden');
-                updateCelebrationPanel(0, 0, true, false, 0); 
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
                 return;
             }
 
@@ -1616,37 +964,7 @@
             const numSentences = Math.max(1, sentences.length);
             const numWords = Math.max(1, words.length);
 
-            document.getElementById('cba-highlightContainer').classList.remove('hidden'); 
-            document.getElementById('cba-copyBtn').classList.remove('hidden'); 
-            document.getElementById('cba-highlightedText').innerHTML = highlightedHTML.replace(/\n/g, '<br>');
-
-            let gPct = Math.round((google10kCount / numWords) * 100);
-            if (google10kSet.size > 0 && numWords > 0) {
-                document.getElementById('cba-googleScore').textContent = `${gPct}%`;
-                document.getElementById('cba-googleProgress').style.width = `${Math.min(100, Math.max(0, gPct))}%`;
-                document.getElementById('cba-googleCount').textContent = `${google10kCount} out of ${numWords} words`;
-                let gColor = gPct > 80 ? "#10b981" : gPct > 60 ? "#f59e0b" : "#ef4444";
-                document.getElementById('cba-googleInterpret').textContent = gPct > 80 ? "Highly Common" : gPct > 60 ? "Moderately Common" : "Highly Unique/Niche";
-                document.getElementById('cba-googleCard').style.borderLeftColor = gColor;
-                document.getElementById('cba-googleProgress').style.backgroundColor = gColor;
-                document.getElementById('cba-googleScore').style.color = gColor;
-            }
-
-            let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
-            let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
-            let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
-            let coreSimpleScore = s5yrPct + sEslPct + sKitPct; 
-            document.getElementById('cba-simpleScore').textContent = `${coreSimpleScore}%`;
-            document.getElementById('cba-simpleBar5yr').style.width = `${s5yrPct}%`;
-            document.getElementById('cba-simpleBarEsl').style.width = `${sEslPct}%`;
-            document.getElementById('cba-simpleBarKit').style.width = `${sKitPct}%`;
-            document.getElementById('cba-s5yr').textContent = `${s5yrPct}%`;
-            document.getElementById('cba-sEsl').textContent = `${sEslPct}%`;
-            document.getElementById('cba-sKit').textContent = `${sKitPct}%`;
-            document.getElementById('cba-sOut').textContent = `${Math.round((simpleCounts['outside'] / numWords) * 100) || 0}%`;
-            document.getElementById('cba-simpleInterpret').textContent = coreSimpleScore > 85 ? "Extremely Accessible" : coreSimpleScore > 70 ? "Good Accessibility" : "Highly advanced vocabulary";
-
-            let elapsedSecs = recordedAudio ? (window.lastRecordedDuration || 0) : 0;
+            let elapsedSecs = window.thps_recordedAudio ? (window.lastRecordedDuration || 0) : 0;
             let transcribedDuration = Math.min(90, elapsedSecs);
             
             let mumbleScore = 0; 
@@ -1655,13 +973,7 @@
             let avgWpm = 0;
             let activeSpeakingSecs = 0;
 
-            const mmCard = document.getElementById('cba-mumbleCard');
-            const wCard = document.getElementById('cba-wpmCard');
-
-            if (recordedAudio && elapsedSecs > 0) {
-                mmCard.classList.remove('opacity-50');
-                wCard.classList.remove('opacity-50');
-
+            if (window.thps_recordedAudio && elapsedSecs > 0) {
                 const periods = (text.match(/[.!?]/g) || []).length;
                 const commas = (text.match(/[,;:-]/g) || []).length;
                 
@@ -1677,364 +989,94 @@
                 
                 avgWpm = Math.round((numWords / transcribedDuration) * 60);
                 mumbleScore = totalSyllables / activeSpeakingSecs;
-
-                let mColor, mText;
-                if (mumbleScore < 2.5) { mColor = "#3b82f6"; mText = "Slightly too slow"; } 
-                else if (mumbleScore < 4.0) { mColor = "#10b981"; mText = "Very clear, no mumble"; } 
-                else if (mumbleScore <= 5.5) { mColor = "#f97316"; mText = "Slight mumble"; } 
-                else { mColor = "#ef4444"; mText = "High Mumbling Risk"; } 
-
-                document.getElementById('cba-mumbleScore').textContent = mumbleScore.toFixed(1);
-                document.getElementById('cba-mumbleInterpret').textContent = mText;
-                document.getElementById('cba-mumbleInterpret').style.color = mColor;
-                document.getElementById('cba-mumbleScore').style.color = mColor;
-                mmCard.style.borderLeftColor = mColor;
-                document.getElementById('cba-mumbleMarker').style.left = Math.min(100, Math.max(0, (mumbleScore / 8) * 100)) + "%";
-                document.getElementById('cba-mumbleStats').textContent = `${activeSpeakingSecs.toFixed(1)}s active / ${estimatedPauseTime.toFixed(1)}s pause / ${transcribedDuration.toFixed(1)}s analyzed`;
-
-                document.getElementById('cba-wpmScore').textContent = avgWpm;
-                document.getElementById('cba-wpmScore').classList.replace('text-slate-400', 'text-amber-500');
-
-                let wpmData = [];
-                let numIntervals = Math.ceil(transcribedDuration / 20);
-                for (let i = 0; i < numIntervals; i++) {
-                    let intervalDuration = (i === numIntervals - 1) ? (transcribedDuration % 20 || 20) : 20;
-                    let share = intervalDuration / transcribedDuration;
-                    let baseWords = numWords * share;
-                    let variation = 1 + (Math.sin(i * 1.5) * 0.12); 
-                    let intervalWords = Math.round(baseWords * variation);
-                    let intervalWpm = Math.round((intervalWords / intervalDuration) * 60);
-                    wpmData.push(intervalWpm);
-                }
-
-                if (wpmChartInstance) wpmChartInstance.destroy();
-                wpmChartInstance = new window.Chart(document.getElementById('cba-wpmChart'), {
-                    type: 'bar',
-                    data: { 
-                        labels: wpmData.map((_, i) => `${(i+1)*20}s`), 
-                        datasets: [{ 
-                            label: 'WPM', 
-                            data: wpmData, 
-                            backgroundColor: 'rgba(245, 158, 11, 0.5)', 
-                            borderColor: 'rgba(245, 158, 11, 1)', 
-                            borderWidth: 1, 
-                            borderRadius: 4 
-                        }] 
-                    },
-                    options: { responsive: true, scales: { y: { beginAtZero: true, suggestedMax: 180 } }, plugins: { legend: { display: false } } }
-                });
-
-            } else {
-                mmCard.classList.add('opacity-50');
-                wCard.classList.add('opacity-50');
-                document.getElementById('cba-mumbleInterpret').textContent = "Waiting for Audio...";
-                document.getElementById('cba-wpmScore').classList.replace('text-amber-500', 'text-slate-400');
             }
 
-            let avgGrade = ((Math.max(0, (0.39 * (numWords / numSentences)) + (11.8 * (totalSyllables / numWords)) - 15.59)) + (Math.max(0, 0.4 * ((numWords / numSentences) + 100 * (complexWordCount / numWords)))) + (Math.max(0, 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291)) + (Math.max(0, 0.0588 * ((letterCount / numWords) * 100) - 0.296 * ((numSentences / numWords) * 100) - 15.8))) / 4;
-            document.getElementById('cba-gradeLevel').textContent = avgGrade.toFixed(1);
-            let gradeColor = avgGrade <= 4.4 ? "#f97316" : avgGrade <= 8.4 ? "#10b981" : avgGrade <= 9.5 ? "#00B700" : gradeColor = avgGrade <= 12.5 ? "#f59e0b" : "#ef4444";
-            document.getElementById('cba-gradeInterpret').textContent = avgGrade <= 4.4 ? "Pitched to 5-10 yr old" : avgGrade <= 8.4 ? "Short & Simple" : avgGrade <= 9.5 ? "Perfect Plain English" : avgGrade <= 12.5 ? "Audience Strain" : "Too Complex";
-            document.getElementById('cba-gradeInterpret').style.color = gradeColor;
-            document.getElementById('cba-simpleComplexCard').style.borderLeftColor = gradeColor;
-            document.getElementById('cba-gradeProgress').style.backgroundColor = gradeColor;
-            document.getElementById('cba-gradeProgress').style.width = `${Math.min(100, Math.max(0, (avgGrade / 18) * 100))}%`;
+            let flesch = Math.max(0, (0.39 * (numWords / numSentences)) + (11.8 * (totalSyllables / numWords)) - 15.59);
+            let fog = Math.max(0, 0.4 * ((numWords / numSentences) + 100 * (complexWordCount / numWords)));
+            let smog = Math.max(0, 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291);
+            let coleman = Math.max(0, 0.0588 * ((letterCount / numWords) * 100) - 0.296 * ((numSentences / numWords) * 100) - 15.8);
+            let avgGrade = (flesch + fog + smog + coleman) / 4;
 
             let personalPercent = Math.round((personalCount / numWords) * 100);
-            document.getElementById('cba-personalScore').textContent = `${personalPercent}%`;
-            let pColor = personalPercent <= 29 ? "#94a3b8" : personalPercent <= 44 ? "#10b981" : personalPercent <= 60 ? "#00B700" : "#a855f7";
-            document.getElementById('cba-personalInterpret').textContent = personalPercent <= 29 ? "Highly Detached" : personalPercent <= 44 ? "Good Balance" : personalPercent <= 60 ? "Highly Personal" : "Overly Conversational?";
-            document.getElementById('cba-personalCard').style.borderLeftColor = pColor;
-            document.getElementById('cba-personalProgress').style.backgroundColor = pColor;
-            document.getElementById('cba-personalScore').style.color = pColor;
-            document.getElementById('cba-personalProgress').style.width = `${Math.min(100, Math.max(0, personalPercent))}%`;
-
             let visualPercent = Math.round((visualCount / numWords) * 100);
-            document.getElementById('cba-visualScore').textContent = `${visualPercent}%`;
-            let vColor = visualPercent <= 29 ? "#94a3b8" : visualPercent <= 44 ? "#10b981" : visualPercent <= 60 ? "#00B700" : "#a855f7";
-            document.getElementById('cba-visualInterpret').textContent = visualPercent <= 29 ? "Very Intangible" : visualPercent <= 44 ? "Good" : visualPercent <= 60 ? "Very Vivid" : "Reaching poetic levels";
-            document.getElementById('cba-visualCard').style.borderLeftColor = vColor;
-            document.getElementById('cba-visualProgress').style.backgroundColor = vColor;
-            document.getElementById('cba-visualScore').style.color = vColor;
-            document.getElementById('cba-visualProgress').style.width = `${Math.min(100, Math.max(0, visualPercent))}%`;
+            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
             let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
-            const avgWps = Math.round(avgWpsFloat);
-            document.getElementById('cba-snScore').textContent = avgWpsFloat.toFixed(1);
-            let snColor = avgWps <= 9 ? "#00B700" : avgWps <= 16 ? "#6366f1" : avgWps <= 25 ? "#f59e0b" : "#ef4444";
-            document.getElementById('cba-snInterpret').textContent = avgWps <= 9 ? "Very high signal, low noise" : avgWps <= 16 ? "High signal; moderate noise" : avgWps <= 25 ? "Moderate signal; high noise" : "Low signal; very high noise";
-            document.getElementById('cba-snInterpret').style.color = snColor;
-            document.getElementById('cba-snCard').style.borderLeftColor = snColor;
-            document.getElementById('cba-snScore').style.color = snColor;
-            document.getElementById('cba-snProgress').style.backgroundColor = snColor;
-            document.getElementById('cba-snProgress').style.width = `${Math.min(100, Math.max(0, (avgWps / 40) * 100))}%`;
+            
+            let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
+            let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
+            let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
+            let coreSimpleScore = s5yrPct + sEslPct + sKitPct; 
 
             try {
                 let totalPoints = 0;
                 let overrideGrade = false;
 
-                const setEval = (id, text, points, isTime = false) => {
-                    const el = document.getElementById(id);
-                    if(el) { 
-                        el.textContent = text; 
-                        el.className = `score-eval ${getPillColorClass(points, isTime)}`; 
-                    }
-                };
+                if (window.thps_recordedAudio && elapsedSecs > 0) {
+                    if (elapsedSecs < 20) { overrideGrade = true; } 
+                    else if (elapsedSecs >= 20 && elapsedSecs < 40) { totalPoints += 0.25; } 
+                    else if (elapsedSecs >= 40 && elapsedSecs < 60) { totalPoints += 0.75; } 
+                    else if (elapsedSecs >= 60 && elapsedSecs < 80) { totalPoints += 1.0; } 
+                    else if (elapsedSecs >= 80) { overrideGrade = true; }
 
-                let timeStatus = 'Waiting';
-                let timePts = 0;
-                if (recordedAudio && elapsedSecs > 0) {
-                    document.getElementById('sum-time').textContent = `${elapsedSecs.toFixed(0)}s`;
-                    if (elapsedSecs < 30) {
-                        timeStatus = 'not enough';
-                        timePts = 0;
-                        overrideGrade = true;
-                    } else if (elapsedSecs < 60) {
-                        timeStatus = 'pretty good!';
-                        timePts = 0.75;
-                        totalPoints += 0.75;
-                    } else if (elapsedSecs <= 90) {
-                        timeStatus = 'just right';
-                        timePts = 1.0;
-                        totalPoints += 1.0;
-                    } else {
-                        timeStatus = 'too much';
-                        timePts = 0;
-                        overrideGrade = true;
-                    }
+                    if (avgWpm < 100) totalPoints += 0.75; 
+                    else if (avgWpm > 150) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (mumbleScore < 3) totalPoints += 0.75; 
+                    else if (mumbleScore > 5) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (pausePercent < 10) totalPoints += 0.25; 
+                    else if (pausePercent > 30) totalPoints += 0.75; 
+                    else totalPoints += 1;
                 } else {
-                    document.getElementById('sum-time').textContent = "-";
-                    timeStatus = 'Text Only';
                     overrideGrade = true;
                 }
-                setEval('sum-time-eval', timeStatus, timePts, true);
 
-                document.getElementById('sum-personal').textContent = `${personalPercent}%`;
-                let pStatus = 'just right'; let pPts = 1;
-                if (personalPercent < 30) { pStatus = 'not enough'; pPts = 0.25; totalPoints += 0.25; }
-                else if (personalPercent > 60) { pStatus = 'too much'; pPts = 0.75; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-personal-eval', pStatus, pPts);
+                if (personalPercent < 30) totalPoints += 0.25; else if (personalPercent > 60) totalPoints += 0.75; else totalPoints += 1;
+                if (visualPercent < 20) totalPoints += 0.25; else if (visualPercent > 50) totalPoints += 0.75; else totalPoints += 1;
+                if (intangiblePercent > 45) totalPoints += 0.25; else if (intangiblePercent >= 30) totalPoints += 0.75; else totalPoints += 1;
+                if (avgWpsFloat < 5) totalPoints += 0.75; else if (avgWpsFloat > 15) totalPoints += 0.25; else totalPoints += 1;
+                if (avgGrade < 5) totalPoints += 0.75; else if (avgGrade > 10) totalPoints += 0.25; else totalPoints += 1;
+                if (coreSimpleScore < 85) totalPoints += 0.25; else if (coreSimpleScore > 95) totalPoints += 0.75; else totalPoints += 1;
 
-                document.getElementById('sum-visual').textContent = `${visualPercent}%`;
-                let vStatus = 'just right'; let vPts = 1;
-                if (visualPercent < 20) { vStatus = 'not enough'; vPts = 0.25; totalPoints += 0.25; }
-                else if (visualPercent > 50) { vStatus = 'too much'; vPts = 0.75; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-visual-eval', vStatus, vPts);
+                // 1. BROADCAST FIRST (Guarantees widgets receive data even if other panels fail)
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
+                    detail: { 
+                        sps: mumbleScore, wpm: avgWpm, grade: avgGrade, time: elapsedSecs,
+                        personal: personalPercent, visual: visualPercent, text: text,
+                        wordTimestamps: globalWordTimestamps || [], volumeData: [], pause: pausePercent,
+                        intangible: intangiblePercent, wps: avgWpsFloat, simple: coreSimpleScore,
+                        totalPoints: totalPoints, overrideGrade: overrideGrade, recordedAudio: window.thps_recordedAudio,
+                        highlightedHTML: highlightedHTML, reportMarkdownText: reportMarkdownText,
+                        numWords: numWords, numSentences: numSentences, totalSyllables: totalSyllables,
+                        google10kCount: google10kCount, simpleCounts: simpleCounts,
+                        readability: { flesch, fog, smog, coleman, avgGrade }
+                    } 
+                }));
 
-                let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
-                document.getElementById('sum-intangible').textContent = `${intangiblePercent}%`;
-                let iStatus = 'just right'; let iPts = 1;
-                if (intangiblePercent > 45) { iStatus = 'too much'; iPts = 0.25; totalPoints += 0.25; }
-                else if (intangiblePercent >= 30) { iStatus = 'bit much'; iPts = 0.75; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-intangible-eval', iStatus, iPts);
-
-                if (recordedAudio && elapsedSecs > 0) {
-                    document.getElementById('sum-wpm').textContent = avgWpm;
-                    let wpmStatus = 'just right'; let wpmPts = 1;
-                    if (avgWpm < 100) { wpmStatus = 'speed up'; wpmPts = 0.75; totalPoints += 0.75; }
-                    else if (avgWpm > 150) { wpmStatus = 'strain'; wpmPts = 0.25; totalPoints += 0.25; }
-                    else { totalPoints += 1; }
-                    setEval('sum-wpm-eval', wpmStatus, wpmPts);
-
-                    document.getElementById('sum-sps').textContent = mumbleScore.toFixed(1);
-                    let spsStatus = 'just right'; let spsPts = 1;
-                    if (mumbleScore < 3) { spsStatus = 'speed up'; spsPts = 0.75; totalPoints += 0.75; }
-                    else if (mumbleScore > 5) { spsStatus = 'strain'; spsPts = 0.25; totalPoints += 0.25; }
-                    else { totalPoints += 1; }
-                    setEval('sum-sps-eval', spsStatus, spsPts);
-
-                    document.getElementById('sum-pause').textContent = `${pausePercent.toFixed(0)}%`;
-                    let pzStatus = 'just right'; let pzPts = 1;
-                    if (pausePercent < 10) { pzStatus = 'too little'; pzPts = 0.25; totalPoints += 0.25; }
-                    else if (pausePercent > 30) { pzStatus = 'too much'; pzPts = 0.75; totalPoints += 0.75; }
-                    else { totalPoints += 1; }
-                    setEval('sum-pause-eval', pzStatus, pzPts);
-                } else {
-                    document.getElementById('sum-wpm').textContent = "-";
-                    document.getElementById('sum-sps').textContent = "-";
-                    document.getElementById('sum-pause').textContent = "-";
-                    const fallbackEl = (id) => { const el = document.getElementById(id); if(el) { el.textContent = 'Text Only'; el.className = 'score-eval bg-slate-100 text-slate-500'; }};
-                    fallbackEl('sum-wpm-eval'); fallbackEl('sum-sps-eval'); fallbackEl('sum-pause-eval');
-                }
-
-                document.getElementById('sum-wps').textContent = avgWpsFloat.toFixed(1);
-                let wpsStatus = 'just right'; let wpsPts = 1;
-                if (avgWpsFloat < 5) { wpsStatus = 'too simple'; wpsPts = 0.75; totalPoints += 0.75; }
-                else if (avgWpsFloat > 15) { wpsStatus = 'too complex'; wpsPts = 0.25; totalPoints += 0.25; }
-                else { totalPoints += 1; }
-                setEval('sum-wps-eval', wpsStatus, wpsPts);
-
-                document.getElementById('sum-grade').textContent = avgGrade.toFixed(1);
-                let gradeStatus = 'just right'; let gradePts = 1;
-                if (avgGrade < 5) { gradeStatus = 'too simple'; gradePts = 0.75; totalPoints += 0.75; }
-                else if (avgGrade > 10) { gradeStatus = 'too complex'; gradePts = 0.25; totalPoints += 0.25; }
-                else { totalPoints += 1; }
-                setEval('sum-grade-eval', gradeStatus, gradePts);
-
-                document.getElementById('sum-simple').textContent = `${coreSimpleScore}%`;
-                let simpleStatus = 'just right'; let simplePts = 1;
-                if (coreSimpleScore < 85) { simpleStatus = 'too complex'; simplePts = 0.25; totalPoints += 0.25; }
-                else if (coreSimpleScore > 95) { simpleStatus = 'too simple'; simplePts = 0.75; totalPoints += 0.75; }
-                else { totalPoints += 1; }
-                setEval('sum-simple-eval', simpleStatus, simplePts);
-                
-                if (overrideGrade) {
-                    document.getElementById('cba-overallGrade').textContent = "- / 10";
-                } else {
-                    let formattedScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
-                    document.getElementById('cba-overallGrade').textContent = `${formattedScore} / 10`;
-                }
-
-                updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, recordedAudio, text.length);
-
-                let playedStars = 0;
-                if (cardStates.challenge) playedStars += 1;
-                if (cardStates.sponsor) playedStars += 1;
-                if (cardStates.script) playedStars += 1;
-                if (cardStates.micCheck) playedStars += 2;
-                
-                if (window.dbSaveScore && currentPlayDate && !overrideGrade) {
-                    window.dbSaveScore(currentPlayDate, playedStars, totalPoints);
+                if (window.dbSaveScore && window.thps_currentPlayDate && !overrideGrade) {
+                    window.dbSaveScore(window.thps_currentPlayDate, window.thps_currentGameStars, totalPoints);
                 }
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
         };
 
-        document.getElementById('cba-copyBtn').addEventListener('click', () => {
-            let cleanMarkdown = reportMarkdownText.trim().replace(/\n/g, '\n\n').replace(/ +/g, ' ');
-            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- EXECUTIVE SUMMARY ---\n[Grade] ${document.getElementById('cba-overallGrade').textContent}\n[Content] Personal: ${document.getElementById('sum-personal').textContent} | Visual: ${document.getElementById('sum-visual').textContent} | Intangible: ${document.getElementById('sum-intangible').textContent}\n[Delivery] WPM: ${document.getElementById('sum-wpm').textContent} | Syllables/sec: ${document.getElementById('sum-sps').textContent} | Pause Time: ${document.getElementById('sum-pause').textContent}\n[Simplicity] Words/Sent: ${document.getElementById('sum-wps').textContent} | Grade: ${document.getElementById('sum-grade').textContent} | Simple %: ${document.getElementById('sum-simple').textContent}\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
-            
-            const el = document.createElement('textarea');
-            el.value = report;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            const btnText = document.getElementById('cba-copyBtnText');
-            btnText.textContent = "Copied to Clipboard!";
-            setTimeout(() => { btnText.textContent = "Copy Report"; }, 2500);
-        });
-
-        document.getElementById('cba-analyzeBtn').addEventListener('click', window.analyze);
-        
-        document.getElementById('cba-clearBtn').addEventListener('click', () => { 
-            inputEl.value = ''; 
-            document.getElementById('cba-highlightContainer').classList.add('hidden'); 
-            document.getElementById('cba-copyBtn').classList.add('hidden'); 
-            document.getElementById('celebration-panel').classList.add('hidden', 'scale-95', 'opacity-0');
-            
-            const procPanel = document.getElementById('cba-processing-panel');
-            if (procPanel) procPanel.classList.add('hidden');
-            
-            recordedAudio = false; 
-
-            const summaryIds = ['sum-personal', 'sum-visual', 'sum-intangible', 'sum-time', 'sum-wpm', 'sum-sps', 'sum-pause', 'sum-wps', 'sum-grade', 'sum-simple'];
-            summaryIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = id === 'sum-time' || id.includes('wpm') || id.includes('sps') || id.includes('pause') ? "-" : "0";
-                const evalEl = document.getElementById(id + '-eval');
-                if (evalEl) {
-                    evalEl.textContent = "Waiting";
-                    evalEl.className = "score-eval bg-slate-100 text-slate-500";
-                }
-            });
-            document.getElementById('cba-overallGrade').textContent = "- / 10";
-            document.getElementById('cba-explanationTitle').textContent = "What does this mean?";
-            document.getElementById('cba-explanationContent').innerHTML = "Click on any term to learn more...";
-            document.getElementById('cba-explanationContent').classList.add('italic', 'justify-center');
+        window.clearAnalyzer = function() {
+            const inputBox = document.getElementById('cba-inputText');
+            if (inputBox) inputBox.value = ''; 
+            window.thps_recordedAudio = false; 
             window.analyze(); 
-        });
-
-        inputEl.addEventListener('input', () => { 
-            recordedAudio = false; 
-            if (inputEl.value.length === 0) { window.analyze(); document.getElementById('cba-copyBtn').classList.add('hidden'); }
-        });
+        };
 
         window.onload = () => {
             loadDictionaries();
-            fetchExplanations();
             if (window.lucide) window.lucide.createIcons();
             
-            if (window.renderMenuGrid) window.renderMenuGrid();
-        };
-
-        // ==========================================
-        // EXPLANATION PANEL LOGIC
-        // ==========================================
-        const EXPLANATIONS_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/explanations.json"; 
-        let explanationsData = null;
-
-        const FALLBACK_EXPLANATIONS = {
-            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 30-60 is 0.75p, and going under 30s or over 90s cancels your Grade entirely.",
-            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points. Speaking over 90s or under 30s cancels your Grade entirely",
-            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions. Keep your ideas (Intangibles) conscise & meaningful.",
-            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
-            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words, and see what academic grade or english fluency is needed to understand you",
-            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time. Too little is detached; too much is self-centred.",
-            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%. Good visual balance makes your speech memorable.",
-            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%. If this goes over 45%, your speech may sound like an academic paper instead of an engaging talk.",
-            "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'. Slower sounds hesitant, while faster can strain the audience.",
-            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
-            "Pause %": "The percentage of time you spend silent. Aim for 10-30%. Pause is about 400 milliseconds or more and gives the audience time to process your ideas.",
-            "Words/Sent": "The average length of your sentences. Aim for 5-15 words. If each sentence has 1 point, then avoid diluting your ideas with excess words.",
-            "Comp. Grade": "The reading grade level of your speech (based on academic reading studies, sentence length & syllable length). A grade of 5-10 is 'just right' and plain english. Anything higher is too complex for spoken word.",
-            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. The best communicators use 85-95% simple words to explain complex ideas."
-        };
-
-        async function fetchExplanations() {
-            try {
-                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
-                if (res.ok) explanationsData = await res.json();
-            } catch (e) {
-                console.warn("Using fallback explanations for 'What does this mean' panel.");
-            }
-        }
-
-        window.explain = function(term) {
-            const panel = document.getElementById('cba-explanationPanel');
-            const titleEl = document.getElementById('cba-explanationTitle');
-            const contentEl = document.getElementById('cba-explanationContent');
-            
-            panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
-            setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
-
-            titleEl.innerText = term;
-            contentEl.classList.remove('italic', 'justify-center');
-            contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
-
             setTimeout(() => {
-                let text = (explanationsData && explanationsData[term]) 
-                           ? explanationsData[term] 
-                           : (FALLBACK_EXPLANATIONS[term] || `Detailed explanation for "${term}" will appear here soon.`);
-                contentEl.innerHTML = text;
-            }, 150);
-        };
-
-        window.toggleExtendedStats = function() {
-            const statsContainer = document.getElementById('cba-extendedStats');
-            const btnText = document.getElementById('toggle-stats-text');
-            const btnIcon = document.getElementById('toggle-stats-icon');
-
-            if (statsContainer.classList.contains('hidden')) {
-                statsContainer.classList.remove('hidden');
-                statsContainer.classList.add('flex');
-                btnText.innerText = 'Hide Your Stats';
-                btnIcon.classList.add('rotate-180');
-                btnIcon.classList.remove('group-hover:translate-y-0.5');
-                btnIcon.classList.add('group-hover:-translate-y-0.5');
-            } else {
-                statsContainer.classList.add('hidden');
-                statsContainer.classList.remove('flex');
-                btnText.innerText = 'See Your Stats';
-                btnIcon.classList.remove('rotate-180');
-                btnIcon.classList.add('group-hover:translate-y-0.5');
-                btnIcon.classList.remove('group-hover:-translate-y-0.5');
-            }
+                if (window.renderMenuGrid) window.renderMenuGrid();
+            }, 100);
         };
     </script>
 </body>
