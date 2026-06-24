@@ -503,7 +503,7 @@ class ThpsGameBoard extends HTMLElement {
                     <span class="text-[7px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
                     <div class="flex items-center gap-1 md:gap-1.5">
                         <span class="text-xs md:text-base font-black text-slate-700 leading-none">${val}</span>
-                        <span class="text-[7px] md:text-[9px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-100 border border-slate-200 ${color}">${pts}</span>
+                        <span class="text-[7px] md:text-[9px] font-bold px-1.5 py-0.5 rounded text-white bg-transparent border border-transparent ${color}">${pts}</span>
                     </div>
                 </div>
             `;
