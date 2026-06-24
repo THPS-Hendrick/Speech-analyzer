@@ -52,12 +52,16 @@
         .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
 
         #body-bg { overflow-x: hidden; width: 100%; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        /* DASHBOARD LOCK PROTECTION */
+        #thps-dashboard-grid:not(.edit-mode-active) .thps-close-btn { display: none !important; }
+        #thps-dashboard-grid:not(.edit-mode-active) .cursor-move { cursor: default !important; }
     </style>
 </head>
 <body class="w-full mx-auto bg-slate-50 transition-colors duration-300 min-h-screen p-2 md:p-8 flex flex-col items-center justify-start" id="body-bg">
 
-    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
-    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-slate-200">
+    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
+    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -259,38 +263,43 @@
         </div>
 
         <div class="w-full max-w-6xl mx-auto mb-16 mt-2">
+            
             <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Your Dashboard</h2>
                     <p class="text-xs text-slate-500 mt-1">Configure your metrics to match your speaking goals.</p>
                 </div>
-                <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
-                    <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
-                    <span class="hidden sm:inline">Add Widget</span>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
+                        <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
+                        <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                    </button>
+                    <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
+                        <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                        <span class="hidden sm:inline">Add Widget</span>
+                    </button>
+                </div>
             </div>
 
-<div class="w-full mb-4 max-w-5xl mx-auto px-4 flex flex-col items-center">
+            <div class="w-full mb-4 max-w-5xl mx-auto px-4 flex flex-col items-center">
                 <div id="cba-errorMsg" class="hidden mt-4 text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-left w-full mb-4"></div>
                 <textarea id="cba-inputText" class="hidden"></textarea>
             </div>
 
-<!-- THE DROP ZONE (Grid Container) -->
             <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
                 
-                <!-- DEFAULT WIDGETS FOR THE HUB -->
                 <div class="w-full mt-2 cursor-move relative group">
                     <thps-game-board id="main-game-board" data-source="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/refs/heads/main/mic-check-daily.json" class="w-full"></thps-game-board>
                 </div>
                 
-                <!-- ADDED RECORD REEL BY DEFAULT -->
                 <div class="w-full mt-2 cursor-move relative group">
                     <thps-record-reel></thps-record-reel>
-               </div>
+                </div>
 
-              <div class="w-full mt-2 cursor-move relative group">
-              <thps-score-summary></thps-score-summary>
-               </div>
+                <div class="w-full mt-2 cursor-move relative group">
+                    <thps-score-summary></thps-score-summary>
+                </div>
+
             </div>
         </div>
 
@@ -491,6 +500,53 @@
         window.thps_recordStartTime = 0;
         window.thps_recordedAudio = false;
         window.lastRecordedDuration = 0; 
+
+        // ==========================================
+        // EDIT MODE (LOCK/UNLOCK) LOGIC
+        // ==========================================
+        window.thps_editMode = false; // Locked by default
+
+        window.toggleEditMode = function() {
+            window.thps_editMode = !window.thps_editMode;
+            const grid = document.getElementById('thps-dashboard-grid');
+            const btnIcon = document.getElementById('edit-mode-icon');
+            const btnText = document.getElementById('edit-mode-text');
+            const btnEl = document.getElementById('toggle-edit-mode-btn');
+
+            if (window.thps_editMode) {
+                // UNLOCKED STATE (Edit Mode)
+                grid.classList.add('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'unlock');
+                btnText.innerText = 'Edit Mode';
+                btnEl.classList.replace('bg-slate-100', 'bg-rose-100');
+                btnEl.classList.replace('text-slate-500', 'text-rose-600');
+                btnEl.classList.replace('border-slate-200', 'border-rose-200');
+                
+                if (window.THPS?.Dashboard?.sortableInstance) {
+                    window.THPS.Dashboard.sortableInstance.option("disabled", false);
+                }
+            } else {
+                // LOCKED STATE
+                grid.classList.remove('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'lock');
+                btnText.innerText = 'Locked';
+                btnEl.classList.replace('bg-rose-100', 'bg-slate-100');
+                btnEl.classList.replace('text-rose-600', 'text-slate-500');
+                btnEl.classList.replace('border-rose-200', 'border-slate-200');
+                
+                if (window.THPS?.Dashboard?.sortableInstance) {
+                    window.THPS.Dashboard.sortableInstance.option("disabled", true);
+                }
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Failsafe: Ensure it locks automatically on load
+        setTimeout(() => {
+            if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
+                window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+        }, 1000);
 
         // Dashboard Manager Logic
         window.toggleWidgetMenu = function() {
@@ -1044,20 +1100,21 @@
                 if (avgGrade < 5) totalPoints += 0.75; else if (avgGrade > 10) totalPoints += 0.25; else totalPoints += 1;
                 if (coreSimpleScore < 85) totalPoints += 0.25; else if (coreSimpleScore > 95) totalPoints += 0.75; else totalPoints += 1;
 
-                // 1. BROADCAST FIRST (Guarantees widgets receive data even if other panels fail)
-                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
-                    detail: { 
-                        sps: mumbleScore, wpm: avgWpm, grade: avgGrade, time: elapsedSecs,
-                        personal: personalPercent, visual: visualPercent, text: text,
-                        wordTimestamps: globalWordTimestamps || [], volumeData: [], pause: pausePercent,
-                        intangible: intangiblePercent, wps: avgWpsFloat, simple: coreSimpleScore,
-                        totalPoints: totalPoints, overrideGrade: overrideGrade, recordedAudio: window.thps_recordedAudio,
-                        highlightedHTML: highlightedHTML, reportMarkdownText: reportMarkdownText,
-                        numWords: numWords, numSentences: numSentences, totalSyllables: totalSyllables,
-                        google10kCount: google10kCount, simpleCounts: simpleCounts,
-                        readability: { flesch, fog, smog, coleman, avgGrade }
-                    } 
-                }));
+                // 1. SAVE TO CACHE & BROADCAST FIRST
+                const payload = { 
+                    sps: mumbleScore, wpm: avgWpm, grade: avgGrade, time: elapsedSecs,
+                    personal: personalPercent, visual: visualPercent, text: text,
+                    wordTimestamps: globalWordTimestamps || [], volumeData: [], pause: pausePercent,
+                    intangible: intangiblePercent, wps: avgWpsFloat, simple: coreSimpleScore,
+                    totalPoints: totalPoints, overrideGrade: overrideGrade, recordedAudio: window.thps_recordedAudio,
+                    highlightedHTML: highlightedHTML, reportMarkdownText: reportMarkdownText,
+                    numWords: numWords, numSentences: numSentences, totalSyllables: totalSyllables,
+                    google10kCount: google10kCount, simpleCounts: simpleCounts,
+                    readability: { flesch, fog, smog, coleman, avgGrade }
+                };
+                
+                window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
 
                 if (window.dbSaveScore && window.thps_currentPlayDate && !overrideGrade) {
                     window.dbSaveScore(window.thps_currentPlayDate, window.thps_currentGameStars, totalPoints);
@@ -1070,6 +1127,7 @@
             const inputBox = document.getElementById('cba-inputText');
             if (inputBox) inputBox.value = ''; 
             window.thps_recordedAudio = false; 
+            window.thps_lastPayload = null; // WIPE THE CACHE
             window.analyze(); 
         };
 
