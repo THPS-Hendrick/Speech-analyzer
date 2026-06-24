@@ -1,5 +1,5 @@
 // ==========================================
-// THPS WIDGET: LARGE GAME BOARD (FINAL UI POLISH)
+// THPS WIDGET: LARGE GAME BOARD (SHORTS-OPTIMIZED UI)
 // Contains Cards, Star Selector, Mad-Lib Engine, and Timer Bar
 // ==========================================
 
@@ -43,7 +43,7 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     render() {
-        const VERSION_TAG = "v.FINAL.02";
+        const VERSION_TAG = "v.FINAL.03";
 
         this.innerHTML = `
             <style>
@@ -56,7 +56,7 @@ class ThpsGameBoard extends HTMLElement {
                 .star-hover { fill: #fde047 !important; color: #fde047 !important; } 
             </style>
 
-            <div class="glass-panel p-5 sm:p-8 rounded-2xl border-t-4 border-slate-800 shadow-sm flex flex-col items-center bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
+            <div class="glass-panel p-2 sm:p-4 rounded-2xl border-t-4 border-slate-800 shadow-sm flex flex-col items-center bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
                 
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50" title="${VERSION_TAG}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -64,27 +64,21 @@ class ThpsGameBoard extends HTMLElement {
 
                 <div class="flex flex-col items-center w-full">
                     
-                    <div id="gb-board-header-row" class="max-w-6xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-6 mb-6 md:mb-10 mt-2 px-2 md:px-8 transition-all duration-500">
-                        <div class="flex flex-col items-center gap-2">
-                            <h1 id="gb-board-title" class="text-4xl md:text-5xl uppercase tracking-wider text-slate-900 transition-colors flex items-center justify-center gap-3" style="font-family: 'Permanent Marker', cursive;">
-                                <span class="flex flex-col text-center leading-[0.9]">
-                                    <span>Daily</span>
-                                    <span>Mic-Check</span>
-                                </span>
+                    <div id="gb-board-header-row" class="w-full flex justify-between items-center px-1 md:px-2 mb-3 md:mb-6 mt-1 transition-all duration-500">
+                        <div class="flex flex-col items-start gap-0.5">
+                            <h1 id="gb-board-title" class="text-xl sm:text-3xl uppercase tracking-wider text-slate-900 leading-none transition-colors" style="font-family: 'Permanent Marker', cursive;">
+                                Daily Mic-Check
                             </h1>
-                            <p class="text-sm md:text-lg text-slate-500 font-medium transition-colors mt-2">
+                            <p class="text-[10px] md:text-xs text-slate-500 font-medium transition-colors">
                                 Date: <span id="gb-board-date">${this.currentDate}</span>
                             </p>
                         </div>
-                        <div id="gb-board-star-panel" class="flex flex-col items-center p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-lg bg-white border border-slate-200 gap-2 transition-all duration-500 w-auto">
-                            <span id="gb-board-level" class="text-sm md:text-base font-bold text-slate-500 uppercase tracking-widest">Level: Beginner</span>
-                            <div class="flex gap-2 md:gap-3 mt-1" id="gb-board-stars">
-                                <div data-action="set-stars" data-stars="1" class="cursor-pointer"><i data-lucide="star" data-stars="1" class="board-star w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty pointer-events-none"></i></div>
-                                <div data-action="set-stars" data-stars="2" class="cursor-pointer"><i data-lucide="star" data-stars="2" class="board-star w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty pointer-events-none"></i></div>
-                                <div data-action="set-stars" data-stars="3" class="cursor-pointer"><i data-lucide="star" data-stars="3" class="board-star w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty pointer-events-none"></i></div>
-                                <div data-action="set-stars" data-stars="4" class="cursor-pointer"><i data-lucide="star" data-stars="4" class="board-star w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty pointer-events-none"></i></div>
-                                <div data-action="set-stars" data-stars="5" class="cursor-pointer"><i data-lucide="star" data-stars="5" class="board-star w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 star-empty pointer-events-none"></i></div>
-                            </div>
+                        <div class="flex gap-1 md:gap-1.5" id="gb-board-stars">
+                            <div data-action="set-stars" data-stars="1" class="cursor-pointer"><i data-lucide="star" data-stars="1" class="board-star w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 star-empty pointer-events-none"></i></div>
+                            <div data-action="set-stars" data-stars="2" class="cursor-pointer"><i data-lucide="star" data-stars="2" class="board-star w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 star-empty pointer-events-none"></i></div>
+                            <div data-action="set-stars" data-stars="3" class="cursor-pointer"><i data-lucide="star" data-stars="3" class="board-star w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 star-empty pointer-events-none"></i></div>
+                            <div data-action="set-stars" data-stars="4" class="cursor-pointer"><i data-lucide="star" data-stars="4" class="board-star w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 star-empty pointer-events-none"></i></div>
+                            <div data-action="set-stars" data-stars="5" class="cursor-pointer"><i data-lucide="star" data-stars="5" class="board-star w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 star-empty pointer-events-none"></i></div>
                         </div>
                     </div>
 
@@ -92,11 +86,9 @@ class ThpsGameBoard extends HTMLElement {
                         Fetching challenge...
                     </div>
 
-                    <!-- CARDS (Dual-Layer Architecture) -->
-                    <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-2 md:gap-6 mb-8 md:mb-12 perspective-1000">
+                    <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1.5 md:gap-4 mb-3 md:mb-6 perspective-1000">
                         
-                        <!-- Challenge Card -->
-                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="challenge">
+                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="challenge">
                             <div id="gb-card-challenge" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -118,8 +110,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <!-- Sponsor Card -->
-                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="sponsor">
+                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="sponsor">
                             <div id="gb-card-sponsor" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -141,8 +132,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <!-- Script Card -->
-                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="script">
+                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="script">
                             <div id="gb-card-script" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -164,8 +154,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <!-- Mic-Check Card -->
-                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="micCheck">
+                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="micCheck">
                             <div id="gb-card-micCheck" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl shadow-md md:shadow-xl border-[1.5px] md:border-[3px] border-amber-400 bg-gradient-to-br from-red-800 via-red-900 to-black flex flex-col items-center justify-center p-1 md:p-6 text-center pointer-events-none">
                                     <i data-lucide="mic" class="text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
@@ -188,17 +177,15 @@ class ThpsGameBoard extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- AD-LIB PANEL -->
-                    <div id="gb-board-adlib-panel" class="max-w-5xl mx-auto w-full px-4 flex flex-col items-center transition-all duration-500">
-                        <div class="w-full bg-slate-50 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-slate-200 text-center transition-all duration-500">
-                            <h2 class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 transition-colors">Today's Daily Mic-Check is...</h2>
-                            <p id="gb-board-adlib" class="text-lg md:text-3xl font-serif text-slate-700 leading-relaxed md:leading-loose transition-colors">
+                    <div id="gb-board-adlib-panel" class="max-w-5xl mx-auto w-full px-2 md:px-4 flex flex-col items-center transition-all duration-500">
+                        <div class="w-full bg-slate-50 p-3 md:p-5 rounded-xl border border-slate-200 text-center transition-all duration-500">
+                            <h2 class="text-[9px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 transition-colors">Today's Daily Mic-Check (Level: <span id="gb-board-level-title">Beginner</span>)</h2>
+                            <p id="gb-board-adlib" class="text-sm md:text-xl font-serif text-slate-700 leading-snug transition-colors">
                                 Loading...
                             </p>
                         </div>
                     </div>
 
-                    <!-- ACTION BAR (Integrated Timer & Sequence Engine) -->
                     <div id="gb-action-bar" data-action="timer-click" class="relative w-full max-w-4xl mx-auto mt-6 md:mt-8 h-16 md:h-20 bg-slate-800 cursor-pointer overflow-hidden flex items-center justify-center rounded-2xl border-2 border-slate-900 shadow-xl z-30 transition-all hover:bg-slate-700 shrink-0 group/action">
                         <div id="gb-timer-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out overflow-hidden z-10"></div>
                         
@@ -225,7 +212,6 @@ class ThpsGameBoard extends HTMLElement {
                             <span id="gb-action-label">TAP TO START GAME</span>
                         </span>
 
-                        <!-- Restart Button -->
                         <div id="gb-action-restart" data-action="timer-restart" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 bg-white/20 hover:bg-white/30 p-2 rounded-full opacity-0 pointer-events-none transition-all hover:scale-110 active:scale-95 text-white">
                             <i data-lucide="rotate-ccw" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </div>
@@ -353,7 +339,6 @@ class ThpsGameBoard extends HTMLElement {
             prog.style.width = '0%';
             markers.classList.add('opacity-0');
 
-            // Hide initial faces, wait for data
             this.querySelectorAll('.thps-chest-initial').forEach(el => el.classList.add('opacity-0'));
             
             ['challenge', 'sponsor', 'script', 'micCheck'].forEach((key) => {
@@ -370,7 +355,6 @@ class ThpsGameBoard extends HTMLElement {
 
             if (window.lucide) setTimeout(() => window.lucide.createIcons(), 300);
 
-            // 15 Second failsafe so the board doesn't freeze if data never comes
             if (this.analyzingTimeout) clearTimeout(this.analyzingTimeout);
             this.analyzingTimeout = setTimeout(() => {
                 if (this.gameState === 'ANALYZING') {
@@ -408,7 +392,6 @@ class ThpsGameBoard extends HTMLElement {
 
             textLabel.innerText = msg;
 
-            // SYNCHRONIZED FLIP REVEAL
             ['challenge', 'sponsor', 'script', 'micCheck'].forEach(key => {
                 const cardEl = this.querySelector(`#gb-card-${key}`);
                 if (cardEl) {
@@ -515,13 +498,12 @@ class ThpsGameBoard extends HTMLElement {
             const cSimplicity = containers[2];
             const cTime = containers[3];
 
-            // TWEAKED FOR SMALLER HEIGHT: Compressed margins, padding, and text sizing
             const makeRow = (label, val, pts, color) => `
                 <div class="flex flex-col items-center justify-center w-full shrink-0">
-                    <span class="text-[6px] md:text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 md:mb-1 text-center">${label}</span>
-                    <div class="flex items-center gap-1 md:gap-1.5">
-                        <span class="text-[10px] md:text-[13px] font-black text-slate-700 leading-none">${val}</span>
-                        <span class="text-[6px] md:text-[9px] font-bold px-1 py-0.5 md:px-1.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+                    <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
+                    <div class="flex items-center gap-1.5 md:gap-2">
+                        <span class="text-xs md:text-base font-black text-slate-700 leading-none">${val}</span>
+                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
                     </div>
                 </div>
             `;
@@ -611,7 +593,6 @@ class ThpsGameBoard extends HTMLElement {
             let finalGrade = overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
             let finalGradeNum = overrideGrade ? -1 : totalPoints;
 
-            // Compressed height for Final Grade section
             cTime.innerHTML = `
                 <div class="w-full h-full flex flex-col justify-evenly items-center pb-1">
                     ${overrideGrade ? '' : makeRow('Time', time.toFixed(0) + 's', timePts, timeColor)}
@@ -672,8 +653,8 @@ class ThpsGameBoard extends HTMLElement {
         this.currentStars = stars;
 
         const levelLabels = { 0: "Blank", 1: "Beginner", 2: "Better", 3: "Brave", 4: "Bold", 5: "Brilliant!" };
-        const levelTextEl = this.querySelector('#gb-board-level');
-        if (levelTextEl) levelTextEl.innerText = `Level: ${levelLabels[stars] || 'Blank'}`;
+        const levelTextEl = this.querySelector('#gb-board-level-title'); // UPDATED: Targets Mad-Lib panel title
+        if (levelTextEl) levelTextEl.innerText = levelLabels[stars] || 'Blank';
 
         for (let i = 1; i <= 5; i++) {
             const starEl = this.querySelector(`.board-star[data-stars="${i}"]`);
