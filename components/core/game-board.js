@@ -503,7 +503,7 @@ class ThpsGameBoard extends HTMLElement {
                     <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
                     <div class="flex items-center gap-1.5 md:gap-2">
                         <span class="text-xs md:text-base font-black text-slate-700 leading-none">${val}</span>
-                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-100 border border-slate-200 ${color}">${pts}</span>
                     </div>
                 </div>
             `;
@@ -512,15 +512,15 @@ class ThpsGameBoard extends HTMLElement {
             let visual = data.visual || 0;
             let intangible = data.intangible || 0;
 
-            let pPts = '+1', pColor = 'text-emerald-400';
+            let pPts = '+1.00', pColor = 'text-emerald-400';
             if (personal < 30) { pPts = '+0.25'; pColor = 'text-rose-400'; }
             else if (personal > 60) { pPts = '+0.75'; pColor = 'text-amber-400'; }
             
-            let vPts = '+1', vColor = 'text-emerald-400';
+            let vPts = '+1.00', vColor = 'text-emerald-400';
             if (visual < 20) { vPts = '+0.25'; vColor = 'text-rose-400'; }
             else if (visual > 50) { vPts = '+0.75'; vColor = 'text-amber-400'; }
 
-            let iPts = '+1', iColor = 'text-emerald-400';
+            let iPts = '+1.00', iColor = 'text-emerald-400';
             if (intangible > 45) { iPts = '+0.25'; iColor = 'text-rose-400'; }
             else if (intangible >= 30) { iPts = '+0.75'; iColor = 'text-amber-400'; }
 
@@ -536,15 +536,15 @@ class ThpsGameBoard extends HTMLElement {
             let sps = data.sps || 0;
             let pause = data.pause || 0;
 
-            let wpmPts = '+1', wpmColor = 'text-emerald-400';
+            let wpmPts = '+1.00', wpmColor = 'text-emerald-400';
             if (wpm < 100) { wpmPts = '+0.75'; wpmColor = 'text-amber-400'; }
             else if (wpm > 150) { wpmPts = '+0.25'; wpmColor = 'text-rose-400'; }
 
-            let spsPts = '+1', spsColor = 'text-emerald-400';
+            let spsPts = '+1.00', spsColor = 'text-emerald-400';
             if (sps < 3) { spsPts = '+0.75'; spsColor = 'text-amber-400'; }
             else if (sps > 5) { spsPts = '+0.25'; spsColor = 'text-rose-400'; }
 
-            let pzPts = '+1', pzColor = 'text-emerald-400';
+            let pzPts = '+1.00', pzColor = 'text-emerald-400';
             if (pause < 10) { pzPts = '+0.25'; pzColor = 'text-rose-400'; }
             else if (pause > 30) { pzPts = '+0.75'; pzColor = 'text-amber-400'; }
 
@@ -560,15 +560,15 @@ class ThpsGameBoard extends HTMLElement {
             let grade = data.grade || 0;
             let simple = data.simple || 0;
 
-            let wpsPts = '+1', wpsColor = 'text-emerald-400';
+            let wpsPts = '+1.00', wpsColor = 'text-emerald-400';
             if (wps < 5) { wpsPts = '+0.75'; wpsColor = 'text-amber-400'; }
             else if (wps > 15) { wpsPts = '+0.25'; wpsColor = 'text-rose-400'; }
 
-            let gradePts = '+1', gradeColor = 'text-emerald-400';
+            let gradePts = '+1.00', gradeColor = 'text-emerald-400';
             if (grade < 5) { gradePts = '+0.75'; gradeColor = 'text-amber-400'; }
             else if (grade > 10) { gradePts = '+0.25'; gradeColor = 'text-rose-400'; }
 
-            let simplePts = '+1', simpleColor = 'text-emerald-400';
+            let simplePts = '+1.00', simpleColor = 'text-emerald-400';
             if (simple < 85) { simplePts = '+0.25'; simpleColor = 'text-rose-400'; }
             else if (simple > 95) { simplePts = '+0.75'; simpleColor = 'text-amber-400'; }
 
@@ -588,7 +588,7 @@ class ThpsGameBoard extends HTMLElement {
             if (time < 20 || time >= 80) { timePts = '0'; timeColor = 'text-slate-500'; }
             else if (time >= 20 && time < 40) { timePts = '+0.25'; timeColor = 'text-rose-400'; }
             else if (time >= 40 && time < 60) { timePts = '+0.75'; timeColor = 'text-amber-400'; }
-            else if (time >= 60 && time < 80) { timePts = '+1'; timeColor = 'text-emerald-400'; }
+            else if (time >= 60 && time < 80) { timePts = '+1.00'; timeColor = 'text-emerald-400'; }
 
             let finalGrade = overrideGrade ? "-" : (totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2));
             let finalGradeNum = overrideGrade ? -1 : totalPoints;
