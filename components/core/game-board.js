@@ -43,7 +43,7 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     render() {
-        const VERSION_TAG = "v.FINAL.04";
+        const VERSION_TAG = "v.FINAL.05";
 
         this.innerHTML = `
             <style>
@@ -76,7 +76,7 @@ class ThpsGameBoard extends HTMLElement {
 
                     <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1.5 md:gap-4 mb-3 md:mb-6 perspective-1000">
                         
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="challenge">
+                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="challenge">
                             <div id="gb-card-challenge" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 text-center pointer-events-none thps-chest-bg">
                                     <div class="thps-chest-initial w-full flex flex-col items-center transition-opacity duration-300">
@@ -107,7 +107,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="sponsor">
+                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="sponsor">
                             <div id="gb-card-sponsor" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 text-center pointer-events-none thps-chest-bg">
                                     <div class="thps-chest-initial w-full flex flex-col items-center transition-opacity duration-300">
@@ -138,7 +138,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="script">
+                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="script">
                             <div id="gb-card-script" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 text-center pointer-events-none thps-chest-bg">
                                     <div class="thps-chest-initial w-full flex flex-col items-center transition-opacity duration-300">
@@ -169,7 +169,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="micCheck">
+                        <div class="card-container h-40 sm:h-56 md:h-80" data-action="toggle-card" data-card="micCheck">
                             <div id="gb-card-micCheck" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-red-800 via-red-900 to-black text-amber-400 rounded-lg md:rounded-xl shadow-md md:shadow-xl border-[1.5px] md:border-[3px] border-amber-400 flex flex-col items-center pt-2 md:pt-4 px-1 md:px-3 text-center pointer-events-none thps-chest-bg">
                                     <div class="thps-chest-initial w-full flex flex-col items-center transition-opacity duration-300">
@@ -501,12 +501,13 @@ class ThpsGameBoard extends HTMLElement {
             const cSimplicity = containers[2];
             const cTime = containers[3];
 
+            // RESTORED CUSTOM BADGE DESIGN
             const makeRow = (label, val, pts, color) => `
                 <div class="flex flex-col items-center justify-center w-full shrink-0">
-                    <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
-                    <div class="flex items-center gap-1.5 md:gap-2">
+                    <span class="text-[7px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-center">${label}</span>
+                    <div class="flex items-center gap-1 md:gap-1.5">
                         <span class="text-xs md:text-base font-black text-slate-700 leading-none">${val}</span>
-                        <span class="text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-slate-800 border border-slate-700 ${color}">${pts}</span>
+                        <span class="text-[7px] md:text-[9px] font-bold px-1.5 py-0.5 rounded text-white bg-transparent border border-transparent ${color}">${pts}</span>
                     </div>
                 </div>
             `;
