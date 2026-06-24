@@ -15,7 +15,8 @@ window.THPS.Dashboard.initGrid = function() {
 
     // Initialize the SortableJS library on our grid
     if (typeof Sortable !== 'undefined') {
-        window.THPS.Dashboard.sortable = new Sortable(grid, {
+        // UPDATED: Standardized name so the HTML Lock Button can pause the engine
+        window.THPS.Dashboard.sortableInstance = new Sortable(grid, {
             animation: 250,                     
             ghostClass: 'opacity-40',           
             dragClass: 'scale-105',             
