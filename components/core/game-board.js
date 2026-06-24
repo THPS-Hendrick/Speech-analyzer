@@ -43,7 +43,7 @@ class ThpsGameBoard extends HTMLElement {
     }
 
     render() {
-        const VERSION_TAG = "v.FINAL.03";
+        const VERSION_TAG = "v.FINAL.3.1";
 
         this.innerHTML = `
             <style>
@@ -88,7 +88,7 @@ class ThpsGameBoard extends HTMLElement {
 
                     <div class="max-w-6xl mx-auto w-full grid grid-cols-4 gap-1.5 md:gap-4 mb-3 md:mb-6 perspective-1000">
                         
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="challenge">
+                        <div class="card-container h-40 sm:h-48 md:h-64" data-action="toggle-card" data-card="challenge">
                             <div id="gb-card-challenge" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-blue-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -110,7 +110,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="sponsor">
+                        <div class="card-container h-40 sm:h-48 md:h-64" data-action="toggle-card" data-card="sponsor">
                             <div id="gb-card-sponsor" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-purple-600 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -132,7 +132,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="script">
+                        <div class="card-container h-40 sm:h-48 md:h-64" data-action="toggle-card" data-card="script">
                             <div id="gb-card-script" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden bg-emerald-700 text-white rounded-lg md:rounded-xl shadow-md md:shadow-xl border-2 md:border-4 border-white flex flex-col items-center justify-center p-1 text-center pointer-events-none">
                                     <i data-lucide="refresh-cw" class="w-4 h-4 md:w-8 md:h-8 opacity-70 mb-1 md:mb-2"></i>
@@ -154,7 +154,7 @@ class ThpsGameBoard extends HTMLElement {
                             </div>
                         </div>
 
-                        <div class="card-container h-36 sm:h-48 md:h-64" data-action="toggle-card" data-card="micCheck">
+                        <div class="card-container h-40 sm:h-48 md:h-64" data-action="toggle-card" data-card="micCheck">
                             <div id="gb-card-micCheck" class="relative w-full h-full cursor-pointer transition-all duration-500 transform-gpu preserve-3d">
                                 <div class="absolute inset-0 w-full h-full backface-hidden rounded-lg md:rounded-xl shadow-md md:shadow-xl border-[1.5px] md:border-[3px] border-amber-400 bg-gradient-to-br from-red-800 via-red-900 to-black flex flex-col items-center justify-center p-1 md:p-6 text-center pointer-events-none">
                                     <i data-lucide="mic" class="text-amber-400 w-5 h-5 md:w-10 md:h-10 mb-1 md:mb-3 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]"></i>
