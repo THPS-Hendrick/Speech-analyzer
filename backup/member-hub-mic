@@ -286,8 +286,11 @@
                 <!-- ADDED RECORD REEL BY DEFAULT -->
                 <div class="w-full mt-2 cursor-move relative group">
                     <thps-record-reel></thps-record-reel>
-                </div>
+               </div>
 
+              <div class="w-full mt-2 cursor-move relative group">
+              <thps-score-summary></thps-score-summary>
+               </div>
             </div>
         </div>
 
