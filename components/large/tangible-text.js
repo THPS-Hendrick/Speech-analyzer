@@ -28,11 +28,18 @@ class ThpsTangibleText extends HTMLElement {
                 <div class="thps-highlighted-text w-full h-80 sm:h-96 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic">Waiting for text...</div>
             </div>
         `;
+        
         this.querySelector('.thps-close-btn').addEventListener('click', () => {
             const wrapper = this.closest('.cursor-move');
             if (wrapper) wrapper.remove(); else this.remove();
         });
+        
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
+
+        // NEW: THE "WAKE-UP" CATCH-UP CHECK
+        if (window.thps_lastPayload) {
+            setTimeout(() => this.update(window.thps_lastPayload), 50);
+        }
     }
 
     update(data) {
