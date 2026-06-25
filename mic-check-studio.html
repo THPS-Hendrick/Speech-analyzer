@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Mic-Check Studio</title>
     
+    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- NLP Engine (Compromise) -->
     <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
     
-    <script src="components/large/gameboard-animated.js"></script>
+    <!-- THPS NLP Scorer Engine -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+
+    <!-- The New Animated Gameboard Widget (Githack Absolute Path) -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/gameboard-animated.js?v=3"></script>
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -18,11 +24,21 @@
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
 
+    <!-- The Studio Canvas -->
     <div class="w-full max-w-[368px] mx-auto relative">
         <thps-gameboard-animated></thps-gameboard-animated>
     </div>
 
+    <!-- The Engine (Vanilla JS) -->
     <script>
+        // --- 0. INITIALIZATION ---
+        window.onload = () => {
+            // Pre-load the dictionaries silently in the background
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
+                window.THPS.NLP.loadDictionaries();
+            }
+        };
+
         // --- 1. HARDWARE STATE ---
         let stream = null;
         let mediaRecorder = null;
@@ -33,7 +49,6 @@
         let audioBuffers = [];
         let totalSamplesRecorded = 0;
         let recordStartTime = 0;
-        let globalWordTimestamps = [];
 
         window.thps_isRecording = false;
 
@@ -59,15 +74,17 @@
             return new Blob([view], { type: 'audio/wav' });
         }
 
-        // --- 3. STUDIO EVENT LISTENERS ---
-        window.addEventListener('thps-studio-start', async () => {
+        // --- 3. STUDIO EVENT LISTENERS (The 5-Step Creator Sequence) ---
+        
+        // STEP 1: Turn on Camera & Start Video Recording
+        window.addEventListener('thps-studio-start-camera', async () => {
             const widget = document.querySelector('thps-gameboard-animated');
             const videoEl = widget.querySelector('#studio-video');
             const camOff = widget.querySelector('#studio-cam-off');
             const recDot = widget.querySelector('#studio-rec-dot');
 
             try {
-                // Request A/V Hardware
+                // Request Hardware
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
                     audio: { channelCount: 1 } 
@@ -79,7 +96,7 @@
                 camOff.classList.add('hidden');
                 recDot.classList.remove('hidden');
 
-                // Setup Video Recorder
+                // Setup and Start Video Recorder INSTANTLY
                 let mimeType = 'video/webm;codecs=vp8,opus';
                 if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
                 else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
@@ -88,7 +105,6 @@
                 recordedVideoChunks = [];
                 mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedVideoChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
-                    // Auto-Download Video upon stopping
                     const blob = new Blob(recordedVideoChunks, { type: mediaRecorder.mimeType });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -99,56 +115,57 @@
                 };
                 mediaRecorder.start();
 
-                // Setup Audio AI Pipeline
-                audioBuffers = [];
-                totalSamplesRecorded = 0;
-                globalWordTimestamps = [];
-                recordStartTime = Date.now();
-                
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContextClass({ sampleRate: 16000 });
-                sourceNode = audioCtx.createMediaStreamSource(stream);
-                processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
-                
-                processorNode.onaudioprocess = function(e) {
-                    if (!window.thps_isRecording) return;
-                    const channelData = e.inputBuffer.getChannelData(0);
-                    audioBuffers.push(new Float32Array(channelData));
-                    totalSamplesRecorded += channelData.length;
-                };
-
-                sourceNode.connect(processorNode);
-                processorNode.connect(audioCtx.destination);
-
-                window.thps_isRecording = true;
-                widget.setGameState('PLAYING');
+                // Move UI to Phase 2
+                widget.setGameState('CAMERA_ON');
 
             } catch (err) {
-                console.error("Camera/Mic Error:", err);
-                alert("Camera and Microphone access is strictly required for Studio Mode.");
+                console.error("Camera Error:", err);
+                alert("Camera and Microphone access is required to use Studio Mode.");
             }
         });
 
-        window.addEventListener('thps-studio-stop', async () => {
+        // STEP 2: Start Game (Connect Google AI to existing stream)
+        window.addEventListener('thps-studio-start-game', () => {
+            const widget = document.querySelector('thps-gameboard-animated');
+            
+            audioBuffers = [];
+            totalSamplesRecorded = 0;
+            recordStartTime = Date.now();
+            
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass({ sampleRate: 16000 });
+            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing stream
+            processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+            
+            processorNode.onaudioprocess = function(e) {
+                if (!window.thps_isRecording) return;
+                const channelData = e.inputBuffer.getChannelData(0);
+                audioBuffers.push(new Float32Array(channelData));
+                totalSamplesRecorded += channelData.length;
+            };
+
+            sourceNode.connect(processorNode);
+            processorNode.connect(audioCtx.destination);
+
+            window.thps_isRecording = true;
+            widget.setGameState('PLAYING');
+        });
+
+        // STEP 3 & 4: Stop Game & Analyze (THE TRUE BRAIN)
+        window.addEventListener('thps-studio-stop-game', () => {
             if (!window.thps_isRecording) return;
             window.thps_isRecording = false;
             
             const widget = document.querySelector('thps-gameboard-animated');
-            widget.querySelector('#studio-rec-dot').classList.add('hidden');
             widget.setGameState('ANALYZING');
             
             const elapsedSecs = (Date.now() - recordStartTime) / 1000;
 
-            // Stop Video
-            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-
-            // Stop Audio
+            // Stop Google AI, but leave MediaRecorder (Video) running!
             if (processorNode) processorNode.disconnect();
             if (sourceNode) sourceNode.disconnect();
-            if (stream) stream.getTracks().forEach(t => t.stop());
             if (audioCtx) audioCtx.close();
 
-            // Package Audio for Vercel
             let masterArray = new Float32Array(totalSamplesRecorded);
             let offset = 0;
             for(let i=0; i<audioBuffers.length; i++) {
@@ -168,35 +185,121 @@
                     });
                     
                     let transcript = "";
+                    let wordTimestamps = [];
                     if (res.ok) {
                         const data = await res.json();
                         transcript = data.transcript || "";
+                        wordTimestamps = data.words || [];
                     }
                     
-                    // Simple Mock Analyzer (Replace with your full NLP logic if needed)
-                    // For the studio demo, we calculate a rough score based on transcript length & time.
-                    const words = transcript.split(/\s+/).filter(w => w.trim().length > 0);
-                    const wpm = Math.round((words.length / elapsedSecs) * 60) || 0;
-                    
-                    let totalPts = 0;
-                    if (elapsedSecs > 20) totalPts += 2;
-                    if (wpm > 100 && wpm < 150) totalPts += 3;
-                    if (words.length > 30) totalPts += 3.5;
+                    if (!transcript.trim() || typeof window.THPS?.NLP?.analyzeTranscript !== 'function') {
+                         window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { overrideGrade: true } }));
+                         return;
+                    }
 
-                    // Send payload back to the widget!
+                    // --- THE REAL NLP ENGINE MATH ---
+                    const nlpData = window.THPS.NLP.analyzeTranscript(transcript, wordTimestamps);
+                    const { numWords, numSentences, totalSyllables, letterCount, complexWordCount, personalCount, visualCount, simpleCounts } = nlpData;
+
+                    // 1. Time & Pauses
+                    const periods = (transcript.match(/[.!?]/g) || []).length;
+                    const commas = (transcript.match(/[,;:-]/g) || []).length;
+                    let estimatedPauseTime = (periods * 1.3) + (commas * 0.5);
+                    const transcribedDuration = Math.min(90, elapsedSecs);
+                    
+                    let minAllowedPause = transcribedDuration * 0.10;
+                    let maxAllowedPause = transcribedDuration * 0.40;
+                    estimatedPauseTime = Math.max(minAllowedPause, Math.min(maxAllowedPause, estimatedPauseTime));
+                    
+                    const activeSpeakingSecs = transcribedDuration - estimatedPauseTime;
+                    const pausePercent = (estimatedPauseTime / transcribedDuration) * 100;
+                    
+                    const avgWpm = Math.round((numWords / transcribedDuration) * 60);
+                    const mumbleScore = activeSpeakingSecs > 0 ? (totalSyllables / activeSpeakingSecs) : 0;
+
+                    // 2. Readability
+                    let avgGrade = 0;
+                    if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
+                         const readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
+                         avgGrade = readability.avgGrade;
+                    }
+
+                    // 3. Percentages
+                    const personalPercent = Math.round((personalCount / numWords) * 100);
+                    const visualPercent = Math.round((visualCount / numWords) * 100);
+                    const intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+                    const avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
+
+                    let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
+                    let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
+                    let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
+                    const coreSimpleScore = s5yrPct + sEslPct + sKitPct;
+
+                    // 4. THE 10-POINT GRADING SYSTEM
+                    let totalPoints = 0;
+                    let overrideGrade = false;
+
+                    // Time Constraints
+                    if (elapsedSecs < 20) overrideGrade = true; 
+                    else if (elapsedSecs < 40) totalPoints += 0.25; 
+                    else if (elapsedSecs < 60) totalPoints += 0.75; 
+                    else if (elapsedSecs <= 90) totalPoints += 1.0; 
+                    else overrideGrade = true;
+
+                    // Delivery
+                    if (avgWpm < 100) totalPoints += 0.75; 
+                    else if (avgWpm > 150) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (mumbleScore < 3) totalPoints += 0.75; 
+                    else if (mumbleScore > 5) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (pausePercent < 10) totalPoints += 0.25; 
+                    else if (pausePercent > 30) totalPoints += 0.75; 
+                    else totalPoints += 1;
+
+                    // Content
+                    if (personalPercent < 30) totalPoints += 0.25; 
+                    else if (personalPercent > 60) totalPoints += 0.75; 
+                    else totalPoints += 1;
+
+                    if (visualPercent < 20) totalPoints += 0.25; 
+                    else if (visualPercent > 50) totalPoints += 0.75; 
+                    else totalPoints += 1;
+
+                    if (intangiblePercent > 45) totalPoints += 0.25; 
+                    else if (intangiblePercent >= 30) totalPoints += 0.75; 
+                    else totalPoints += 1;
+
+                    // Simplicity
+                    if (avgWpsFloat < 5) totalPoints += 0.75; 
+                    else if (avgWpsFloat > 15) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (avgGrade < 5) totalPoints += 0.75; 
+                    else if (avgGrade > 10) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (coreSimpleScore < 85) totalPoints += 0.25; 
+                    else if (coreSimpleScore > 95) totalPoints += 0.75; 
+                    else totalPoints += 1;
+
+                    // Trigger Phase 5 (Scored) by dispatching to the animated widget
                     window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
                         detail: { 
-                            overrideGrade: elapsedSecs < 10,
-                            totalPoints: totalPts,
-                            wpm: wpm,
-                            personal: 45,
-                            visual: 25,
-                            time: elapsedSecs,
-                            simple: 85,
-                            grade: 6.5,
-                            pause: 15,
-                            sps: 3.2,
-                            wps: 12
+                            overrideGrade: overrideGrade,
+                            totalPoints: totalPoints,
+                            personal: personalPercent,
+                            visual: visualPercent,
+                            intangible: intangiblePercent,
+                            wpm: avgWpm,
+                            sps: mumbleScore,
+                            pause: pausePercent,
+                            simple: coreSimpleScore,
+                            wps: avgWpsFloat,
+                            grade: avgGrade,
+                            time: elapsedSecs
                         } 
                     }));
 
@@ -207,19 +310,26 @@
             };
         });
 
-        window.addEventListener('thps-studio-retry', () => {
+        // STEP 5: Save, Download, and Reset
+        window.addEventListener('thps-studio-save-video', () => {
             const widget = document.querySelector('thps-gameboard-animated');
             const videoEl = widget.querySelector('#studio-video');
             const camOff = widget.querySelector('#studio-cam-off');
+            const recDot = widget.querySelector('#studio-rec-dot');
             
+            // Stop Video Recorder (triggers auto-download)
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            
+            // Reset UI
             videoEl.classList.add('hidden');
             videoEl.srcObject = null;
             camOff.classList.remove('hidden');
+            recDot.classList.add('hidden');
             
             widget.setGameState('IDLE');
         });
 
-        if (window.lucide) window.lucide.createIcons();
     </script>
 </body>
 </html>
