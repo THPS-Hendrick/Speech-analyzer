@@ -15,7 +15,6 @@ class ThpsVoiceGraph extends HTMLElement {
             </style>
             <div class="glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-indigo-500 shadow-sm flex flex-col bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
                 
-                <!-- SELF DESTRUCT BUTTON -->
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
@@ -27,27 +26,21 @@ class ThpsVoiceGraph extends HTMLElement {
                     </div>
                 </div>
                 
-                <!-- NEW: SYNCHRONIZED SCROLL CONTAINER (Light background to prevent black bleed) -->
                 <div class="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-slate-200 bg-slate-50 pb-1 custom-scrollbar relative" id="thps-scroll-wrapper">
                     
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none thps-vg-placeholder z-50">
                         <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-800/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-700/50">Waiting for Audio...</span>
                     </div>
 
-                    <!-- The Track: Grows wide based on duration to maintain fixed pixels-per-second -->
                     <div class="thps-sync-track relative flex flex-col" style="min-width: 100%;">
                         
-                        <!-- 1. Time Axis -->
                         <div class="thps-time-axis relative w-full h-7 border-b border-slate-700/50 bg-slate-800/90 shrink-0"></div>
 
-                        <!-- 2. Block Waveform Canvas (Dark background isolated here) -->
                         <div class="w-full h-32 md:h-40 relative shrink-0 bg-slate-900">
                             <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
                         </div>
                         
-                        <!-- 3. The Speech Staff -->
                         <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 shrink-0 overflow-hidden">
-                            <!-- Staff Visual Lines -->
                             <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40 z-0">
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
@@ -55,25 +48,20 @@ class ThpsVoiceGraph extends HTMLElement {
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                             </div>
-                            <!-- Words and Pace Backgrounds injected via JS -->
-                        </div>
+                            </div>
 
                     </div>
                 </div>
 
-                <!-- THE PHD VARIANCE PANELS -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <!-- Pause Variance -->
                     <div class="flex flex-col">
                         <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Pause Var.</h4>
                         <div class="thps-bar-container-pause flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
-                    <!-- Voice Variance (Now Vertical!) -->
                     <div class="flex flex-col h-full">
                         <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Voice Var.</h4>
                         <div class="thps-bar-container-voice flex-1 flex items-end"></div>
                     </div>
-                    <!-- Pace Variance -->
                     <div class="flex flex-col">
                         <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Pace Var.</h4>
                         <div class="thps-bar-container-pace flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
@@ -312,7 +300,15 @@ class ThpsVoiceGraph extends HTMLElement {
             const xPos = w.start * PIXELS_PER_SEC; 
             const row = index % 5;
             
-            span.className = 'staff-item absolute text-[9px] px-1 py-0.5 bg-white text-slate-700 font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default';
+            // Default styling
+            let textColorCls = 'text-slate-700';
+            
+            // Apply NLP Color Codes
+            if (w.colorType === 'personal') textColorCls = 'text-emerald-500';
+            else if (w.colorType === 'visual') textColorCls = 'text-rose-500';
+            else if (w.colorType === 'overlap') textColorCls = 'text-fuchsia-600';
+            
+            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white ${textColorCls} font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default`;
             span.style.left = `${xPos}px`; 
             span.style.top = `calc(${row * 20}% + 4px)`; 
             
