@@ -136,14 +136,14 @@
                 fileExt = 'webm';
                 let mimeType = 'video/webm;codecs=vp8,opus';
 
-// Fallback to a generic webm container if vp8/opus specifically isn't supported
-if (!MediaRecorder.isTypeSupported(mimeType)) {
-    if (MediaRecorder.isTypeSupported('video/webm')) {
-        mimeType = 'video/webm'; 
-    } else {
-        mimeType = ''; // Let the browser dictate its own default
-    }
-}
+                // Fallback to a generic webm container if vp8/opus specifically isn't supported
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    if (MediaRecorder.isTypeSupported('video/webm')) {
+                     mimeType = 'video/webm'; 
+                } else {
+                   mimeType = ''; // Let the browser dictate its own default
+                   }
+                }
                 
                 mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
                 recordedVideoChunks = [];
