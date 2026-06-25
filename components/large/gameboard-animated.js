@@ -30,7 +30,6 @@ class ThpsGameboardAnimated extends HTMLElement {
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
                 
-                /* Custom Animations */
                 @keyframes slideUpFade {
                     0% { opacity: 0; transform: translateY(20px); }
                     100% { opacity: 1; transform: translateY(0); }
@@ -46,27 +45,20 @@ class ThpsGameboardAnimated extends HTMLElement {
                 }
                 .animate-pulse-dark { animation: pulseDark 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
                 .animate-pulse-dark * { opacity: 0.5; color: white !important; fill: white !important; }
-
-                /* Hiding elements smoothly */
-                .hide-smooth {
-                    height: 0 !important;
-                    opacity: 0 !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                    overflow: hidden !important;
-                    pointer-events: none !important;
-                }
             </style>
 
             <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800">
                 
-                <div class="pt-6 pb-2 text-center shrink-0">
+                <!-- 1. HEADER (Tightened Padding) -->
+                <div class="pt-4 pb-1 text-center shrink-0">
                     <h1 class="text-4xl text-[#1a2332] tracking-wide leading-none" style="font-family: 'Permanent Marker', cursive;">DAILY MIC-CHECK</h1>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Date: <span id="studio-date">${this.currentDate}</span></p>
                 </div>
 
-                <div id="stats-container" class="px-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center h-[110px]">
+                <!-- 2. STATS & SETUP AREA -->
+                <div id="stats-container" class="px-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[110px]">
                     
+                    <!-- Phase 1-3: Setup Cards -->
                     <div id="setup-cards" class="grid grid-cols-4 gap-2 h-full transition-all duration-300">
                         <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-blue-600 shadow-md setup-card">
                             <span class="text-[9px] font-bold tracking-wider mb-1">CHALLENGE</span>
@@ -89,15 +81,19 @@ class ThpsGameboardAnimated extends HTMLElement {
                         </div>
                     </div>
 
+                    <!-- Phase 4: Final Results (Hidden) -->
                     <div id="results-cards" class="hidden h-full flex-col w-full">
+                        <!-- Hero Score -->
                         <div class="flex flex-col items-center justify-center mb-3 animate-slide-up" style="animation-delay: 0.1s;">
                             <div class="flex items-center gap-2 mb-1" id="res-stars"></div>
-                            <h2 class="text-[48px] font-black text-slate-800 leading-none tracking-tighter" id="res-score-hero">0.0</h2>
+                            <h2 class="text-[42px] font-black text-slate-800 leading-none tracking-tighter" id="res-score-hero">0.0</h2>
                             <p class="text-[11px] font-bold tracking-widest text-blue-600 uppercase" id="res-msg">Checking...</p>
                         </div>
 
+                        <!-- Granular Stats (2x2 Grid) -->
                         <div class="grid grid-cols-2 gap-2 flex-grow">
-                            <div class="bg-blue-50 border border-blue-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 0.5s;">
+                            <!-- Content -->
+                            <div class="bg-blue-50 border border-blue-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.5s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-blue-700 tracking-wider">CONTENT</span>
                                     <span class="text-[16px] font-black text-slate-800"><span id="res-personal">0</span>%</span>
@@ -108,7 +104,8 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>I: <span id="res-i-sub">0</span></span>
                                 </div>
                             </div>
-                            <div class="bg-purple-50 border border-purple-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 0.9s;">
+                            <!-- Delivery -->
+                            <div class="bg-purple-50 border border-purple-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.9s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-purple-700 tracking-wider">DELIVERY</span>
                                     <span class="text-[16px] font-black text-slate-800"><span id="res-wpm">0</span> <span class="text-[8px] text-slate-500 font-bold">WPM</span></span>
@@ -118,7 +115,8 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>Pau: <span id="res-pau">0</span>%</span>
                                 </div>
                             </div>
-                            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 1.3s;">
+                            <!-- Simplify -->
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 1.3s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-emerald-700 tracking-wider">SIMPLIFY</span>
                                     <span class="text-[16px] font-black text-slate-800"><span id="res-simp">0</span>%</span>
@@ -128,48 +126,42 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>RDL: <span id="res-rdl">0</span></span>
                                 </div>
                             </div>
-                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 1.7s;">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[10px] font-bold text-amber-700 tracking-wider">TIME</span>
-                                    <span class="text-[16px] font-black text-slate-800"><span id="res-time">0</span>s</span>
-                                </div>
-                                <button data-action="retry" class="w-full bg-slate-800 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center gap-1 hover:bg-slate-700 transition-colors shadow-sm active:scale-95">
-                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> RETRY
-                                </button>
+                            <!-- Time (Clean Display) -->
+                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-2 flex flex-col justify-center items-center animate-slide-up" style="animation-delay: 1.7s;">
+                                <span class="text-[10px] font-bold text-amber-700 tracking-wider mb-1">TIME</span>
+                                <span class="text-[20px] font-black text-slate-800"><span id="res-time">0</span>s</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="px-4 py-3 shrink-0">
-                    <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-3 shadow-sm text-center flex flex-col justify-center min-h-[90px]">
+                <!-- 3. PROMPT AREA (mt-auto forces it downwards) -->
+                <div class="px-4 py-2 shrink-0 mt-auto relative z-20">
+                    <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-3 shadow-sm text-center flex flex-col justify-center min-h-[80px]">
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
                         <p id="studio-adlib" class="text-[13px] font-medium leading-snug text-slate-600">Loading...</p>
                     </div>
                 </div>
 
+                <!-- 4. CREATOR SEQUENCE ACTION BAR -->
                 <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible">
                     <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
                         
                         <div id="action-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out z-0"></div>
 
-                        <div id="action-markers" class="absolute inset-0 flex z-10 pointer-events-none opacity-100 transition-opacity">
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;">
-                                <span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">-no score-</span>
-                            </div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;">
-                                <span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">1/4pts</span>
-                            </div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;">
-                                <span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">3/4pts</span>
-                            </div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;">
-                                <span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">Perfect!</span>
-                            </div>
+                        <div id="action-markers" class="absolute inset-0 flex z-10 pointer-events-none opacity-0 transition-opacity">
+                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">-no score-</span></div>
+                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">1/4pts</span></div>
+                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">3/4pts</span></div>
+                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">Perfect!</span></div>
                             <div class="flex flex-col items-center justify-end pb-1.5" style="width: 11.111%;"></div>
                         </div>
 
-                        <div id="btn-state-start" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                        <!-- Sequence States -->
+                        <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                            <i data-lucide="video" class="w-4 h-4"></i> TURN ON CAMERA & RECORD
+                        </div>
+                        <div id="btn-state-start" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
                             <i data-lucide="play" class="w-4 h-4"></i> TAP TO START GAME
                         </div>
                         <div id="btn-state-recording" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
@@ -178,10 +170,14 @@ class ThpsGameboardAnimated extends HTMLElement {
                         <div id="btn-state-processing" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
                             <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> CHECKING SCORES...
                         </div>
+                        <div id="btn-state-save" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                            <i data-lucide="download" class="w-4 h-4"></i> SAVE & DOWNLOAD VIDEO
+                        </div>
                     </button>
                 </div>
 
-                <div class="px-4 pb-4 pt-3 flex-grow flex flex-col min-h-0">
+                <!-- 5. CAMERA FEED -->
+                <div class="px-4 pb-4 pt-3 flex-grow flex flex-col min-h-[140px]">
                     <div class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
                         
@@ -206,14 +202,17 @@ class ThpsGameboardAnimated extends HTMLElement {
             const btn = e.target.closest('[data-action]');
             if (!btn) return;
             
+            // Step-by-step state machine delegator
             if (btn.dataset.action === 'toggle') {
                 if (this.gameState === 'IDLE') {
-                    this.dispatchEvent(new CustomEvent('thps-studio-start', { bubbles: true, composed: true }));
+                    this.dispatchEvent(new CustomEvent('thps-studio-start-camera', { bubbles: true, composed: true }));
+                } else if (this.gameState === 'CAMERA_ON') {
+                    this.dispatchEvent(new CustomEvent('thps-studio-start-game', { bubbles: true, composed: true }));
                 } else if (this.gameState === 'PLAYING') {
-                    this.dispatchEvent(new CustomEvent('thps-studio-stop', { bubbles: true, composed: true }));
+                    this.dispatchEvent(new CustomEvent('thps-studio-stop-game', { bubbles: true, composed: true }));
+                } else if (this.gameState === 'SCORED') {
+                    this.dispatchEvent(new CustomEvent('thps-studio-save-video', { bubbles: true, composed: true }));
                 }
-            } else if (btn.dataset.action === 'retry') {
-                this.dispatchEvent(new CustomEvent('thps-studio-retry', { bubbles: true, composed: true }));
             }
         });
 
@@ -224,7 +223,6 @@ class ThpsGameboardAnimated extends HTMLElement {
         });
     }
 
-    // Number Counter Animation
     animateValue(id, start, end, duration, decimals) {
         const obj = this.querySelector(`#${id}`);
         if (!obj) return;
@@ -245,16 +243,49 @@ class ThpsGameboardAnimated extends HTMLElement {
         
         const btnMain = this.querySelector('#main-action-btn');
         const prog = this.querySelector('#action-progress');
-        const stStart = this.querySelector('#btn-state-start');
-        const stRec = this.querySelector('#btn-state-recording');
-        const stProc = this.querySelector('#btn-state-processing');
-        const setupCards = this.querySelectorAll('.setup-card');
+        const markers = this.querySelector('#action-markers');
+        
+        // Grab all states
+        const states = {
+            idle: this.querySelector('#btn-state-idle'),
+            start: this.querySelector('#btn-state-start'),
+            recording: this.querySelector('#btn-state-recording'),
+            processing: this.querySelector('#btn-state-processing'),
+            save: this.querySelector('#btn-state-save')
+        };
 
-        if (state === 'PLAYING') {
-            btnMain.classList.replace('bg-slate-800', 'bg-rose-600');
-            btnMain.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
-            stStart.classList.add('hidden');
-            stRec.classList.remove('hidden');
+        // Helper to show just one state text
+        const showState = (activeKey) => {
+            Object.keys(states).forEach(k => {
+                if (k === activeKey) { states[k].classList.remove('hidden'); states[k].classList.add('flex'); }
+                else { states[k].classList.add('hidden'); states[k].classList.remove('flex'); }
+            });
+        };
+
+        if (state === 'IDLE') {
+            if (this.internalTimer) clearInterval(this.internalTimer);
+            btnMain.style.pointerEvents = 'auto';
+            btnMain.className = 'w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn';
+            
+            showState('idle');
+            prog.style.width = '0%';
+            markers.classList.add('opacity-0');
+            
+            this.querySelector('#setup-cards').classList.remove('hidden');
+            this.querySelector('#stats-container').classList.replace('h-[220px]', 'h-[110px]');
+            
+            const resultsCards = this.querySelector('#results-cards');
+            resultsCards.classList.add('hidden');
+            resultsCards.classList.remove('flex');
+        }
+        else if (state === 'CAMERA_ON') {
+            btnMain.className = 'w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-blue-600 hover:bg-blue-500 active:scale-95 group/btn';
+            showState('start');
+            markers.classList.remove('opacity-0');
+        }
+        else if (state === 'PLAYING') {
+            btnMain.className = 'w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-rose-600 hover:bg-rose-500 active:scale-95 group/btn';
+            showState('recording');
             
             this.timerSeconds = 0;
             this.querySelector('#timer-display').innerText = "00:00";
@@ -269,62 +300,28 @@ class ThpsGameboardAnimated extends HTMLElement {
                 this.querySelector('#timer-display').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 
                 if (elapsed <= 90) prog.style.width = `${(elapsed / 90) * 100}%`;
-                else this.dispatchEvent(new CustomEvent('thps-studio-stop', { bubbles: true, composed: true }));
+                else this.dispatchEvent(new CustomEvent('thps-studio-stop-game', { bubbles: true, composed: true }));
             }, 50);
         } 
         else if (state === 'ANALYZING') {
             if (this.internalTimer) clearInterval(this.internalTimer);
-            btnMain.classList.replace('bg-rose-600', 'bg-slate-800');
-            btnMain.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-            btnMain.style.pointerEvents = 'none';
-            
-            stRec.classList.add('hidden');
-            stProc.classList.remove('hidden');
+            btnMain.className = 'w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 group/btn pointer-events-none';
+            showState('processing');
             prog.style.width = '0%';
-            this.querySelector('#action-markers').classList.add('opacity-0');
-
-            setupCards.forEach(card => {
-                card.classList.add('animate-pulse-dark');
-                card.classList.remove('bg-blue-600', 'bg-purple-600', 'bg-emerald-700', 'bg-gradient-to-b');
-            });
+            markers.classList.add('opacity-0');
         }
         else if (state === 'SCORED') {
-            // Smoothly collapse action bar and reveal results
-            this.querySelector('#action-bar-container').classList.add('hide-smooth');
+            btnMain.style.pointerEvents = 'auto';
+            btnMain.className = 'w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 group/btn';
+            showState('save');
+            prog.style.width = '100%';
+            
             this.querySelector('#setup-cards').classList.add('hidden');
             this.querySelector('#stats-container').classList.replace('h-[110px]', 'h-[220px]');
             
             const resultsCards = this.querySelector('#results-cards');
             resultsCards.classList.remove('hidden');
             resultsCards.classList.add('flex');
-        }
-        else if (state === 'IDLE') {
-            if (this.internalTimer) clearInterval(this.internalTimer);
-            btnMain.style.pointerEvents = 'auto';
-            btnMain.classList.replace('bg-rose-600', 'bg-slate-800');
-            btnMain.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-            
-            stStart.classList.remove('hidden');
-            stRec.classList.add('hidden');
-            stProc.classList.add('hidden');
-            prog.style.width = '0%';
-            this.querySelector('#action-markers').classList.remove('opacity-0');
-            
-            this.querySelector('#action-bar-container').classList.remove('hide-smooth');
-            this.querySelector('#setup-cards').classList.remove('hidden');
-            this.querySelector('#stats-container').classList.replace('h-[220px]', 'h-[110px]');
-            
-            const resultsCards = this.querySelector('#results-cards');
-            resultsCards.classList.add('hidden');
-            resultsCards.classList.remove('flex');
-
-            setupCards.forEach((card, idx) => {
-                card.classList.remove('animate-pulse-dark');
-                if (idx === 0) card.classList.add('bg-blue-600');
-                if (idx === 1) card.classList.add('bg-purple-600');
-                if (idx === 2) card.classList.add('bg-emerald-700');
-                if (idx === 3) card.classList.add('bg-gradient-to-b');
-            });
         }
     }
 
@@ -340,14 +337,12 @@ class ThpsGameboardAnimated extends HTMLElement {
         
         this.querySelector('#res-msg').innerText = msg;
         
-        // Stars
-        let diffStars = 1; // Default
+        let diffStars = 1;
         let starsHtml = '';
         for(let i=0; i<diffStars; i++) starsHtml += `<i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500"></i>`;
         this.querySelector('#res-stars').innerHTML = starsHtml;
         if (window.lucide) window.lucide.createIcons();
 
-        // Staggered Animation Logic
         if (total > 0) setTimeout(() => this.animateValue("res-score-hero", 0, total, 1800, 1), 100);
         else this.querySelector('#res-score-hero').innerText = "-";
 
