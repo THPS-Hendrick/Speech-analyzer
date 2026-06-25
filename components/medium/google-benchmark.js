@@ -33,6 +33,12 @@ class ThpsGoogleBenchmark extends HTMLElement {
         });
 
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
+        
+        // NEW: THE "WAKE-UP" CATCH-UP CHECK
+        if (window.thps_lastPayload) {
+            setTimeout(() => this.update(window.thps_lastPayload), 50);
+        }
+
     }
 
     update(data) {
