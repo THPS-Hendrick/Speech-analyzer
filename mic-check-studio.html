@@ -15,7 +15,7 @@
     <!-- THPS NLP Scorer Engine -->
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
 
-    <!-- The New Animated Gameboard Widget (Githack Absolute Path) -->
+    <!-- The Animated Gameboard Widget (Githack Absolute Path) -->
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/gameboard-animated.js?v=3"></script>
 
     <style>
@@ -41,6 +41,7 @@
 
         // --- 1. HARDWARE STATE ---
         let stream = null;
+        let displayStream = null; // NEW: Holds the Screen Share video track
         let mediaRecorder = null;
         let recordedVideoChunks = [];
         let fileExt = 'webm';
@@ -84,7 +85,7 @@
             const recDot = widget.querySelector('#studio-rec-dot');
 
             try {
-                // Request Hardware
+                // 1. Request Webcam & Mic
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
                     audio: { channelCount: 1 } 
@@ -94,14 +95,37 @@
                 videoEl.srcObject = stream;
                 videoEl.classList.remove('hidden');
                 camOff.classList.add('hidden');
+
+                // 2. Request Screen Share (Video ONLY to prevent echo)
+                try {
+                    displayStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { preferCurrentTab: true },
+                        audio: false
+                    });
+                } catch (displayErr) {
+                    // User cancelled the screen share prompt. Abort gracefully.
+                    stream.getTracks().forEach(t => t.stop());
+                    stream = null;
+                    videoEl.srcObject = null;
+                    videoEl.classList.add('hidden');
+                    camOff.classList.remove('hidden');
+                    return; 
+                }
+
                 recDot.classList.remove('hidden');
 
-                // Setup and Start Video Recorder INSTANTLY
+                // 3. STITCH THEM TOGETHER (Screen Video + Mic Audio)
+                const combinedStream = new MediaStream([
+                    ...displayStream.getVideoTracks(),
+                    ...stream.getAudioTracks()
+                ]);
+
+                // 4. Setup and Start Video Recorder INSTANTLY
                 let mimeType = 'video/webm;codecs=vp8,opus';
                 if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
                 else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
                 
-                mediaRecorder = new MediaRecorder(stream, { mimeType });
+                mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
                 recordedVideoChunks = [];
                 mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedVideoChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
@@ -113,14 +137,24 @@
                     a.click();
                     URL.revokeObjectURL(url);
                 };
+
+                // Failsafe: If user clicks the browser's native "Stop Sharing" button early
+                displayStream.getVideoTracks()[0].onended = () => {
+                    if (window.thps_isRecording) {
+                        window.dispatchEvent(new CustomEvent('thps-studio-stop-game', { bubbles: true, composed: true }));
+                    } else if (mediaRecorder.state === "recording") {
+                        window.dispatchEvent(new CustomEvent('thps-studio-save-video', { bubbles: true, composed: true }));
+                    }
+                };
+
                 mediaRecorder.start();
 
                 // Move UI to Phase 2
                 widget.setGameState('CAMERA_ON');
 
             } catch (err) {
-                console.error("Camera Error:", err);
-                alert("Camera and Microphone access is required to use Studio Mode.");
+                console.error("Hardware Error:", err);
+                alert("Camera, Microphone, and Screen Share access are strictly required for Studio Mode.");
             }
         });
 
@@ -134,7 +168,7 @@
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContextClass({ sampleRate: 16000 });
-            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing stream
+            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing raw mic stream
             processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
             
             processorNode.onaudioprocess = function(e) {
@@ -161,7 +195,7 @@
             
             const elapsedSecs = (Date.now() - recordStartTime) / 1000;
 
-            // Stop Google AI, but leave MediaRecorder (Video) running!
+            // Stop Google AI, but leave MediaRecorder (Screen & Mic) running!
             if (processorNode) processorNode.disconnect();
             if (sourceNode) sourceNode.disconnect();
             if (audioCtx) audioCtx.close();
@@ -319,7 +353,10 @@
             
             // Stop Video Recorder (triggers auto-download)
             if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            
+            // Completely terminate the active hardware connections
             if (stream) stream.getTracks().forEach(t => t.stop());
+            if (displayStream) displayStream.getTracks().forEach(t => t.stop());
             
             // Reset UI
             videoEl.classList.add('hidden');
