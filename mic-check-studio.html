@@ -133,9 +133,17 @@
                 ]);
 
                 // 5. Setup and Start Video Recorder
+                fileExt = 'webm';
                 let mimeType = 'video/webm;codecs=vp8,opus';
-                if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
-                else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
+
+// Fallback to a generic webm container if vp8/opus specifically isn't supported
+if (!MediaRecorder.isTypeSupported(mimeType)) {
+    if (MediaRecorder.isTypeSupported('video/webm')) {
+        mimeType = 'video/webm'; 
+    } else {
+        mimeType = ''; // Let the browser dictate its own default
+    }
+}
                 
                 mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
                 recordedVideoChunks = [];
