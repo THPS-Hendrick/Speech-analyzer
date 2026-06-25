@@ -5,6 +5,11 @@
 class ThpsTangibleText extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
+            <style>
+                .personal-word { color: #00B700; font-weight: 700; }
+                .visual-word { color: #ef4444; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+                .overlap-word { color: #00B700; font-weight: 700; text-decoration: underline; text-decoration-color: #ef4444; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+            </style>
             <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move">
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
