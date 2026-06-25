@@ -244,6 +244,16 @@ class ThpsGameboardAnimated extends HTMLElement {
         const btnMain = this.querySelector('#main-action-btn');
         const prog = this.querySelector('#action-progress');
         const markers = this.querySelector('#action-markers');
+        const actionBarContainer = this.querySelector('#action-bar-container');
+        
+        // Dynamic Height Scaling for the Action Bar
+        if (state === 'SCORED') {
+            actionBarContainer.classList.remove('h-[64px]');
+            actionBarContainer.classList.add('h-[44px]');
+        } else {
+            actionBarContainer.classList.remove('h-[44px]');
+            actionBarContainer.classList.add('h-[64px]');
+        }
         
         // Grab all states
         const states = {
