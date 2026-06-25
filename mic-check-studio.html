@@ -41,12 +41,16 @@
 
         // --- 1. HARDWARE STATE ---
         let stream = null;
-        let displayStream = null; // NEW: Holds the Screen Share video track
+        let displayStream = null; 
         let mediaRecorder = null;
         let recordedVideoChunks = [];
         let fileExt = 'webm';
         
-        let audioCtx, sourceNode, processorNode;
+        let audioCtx = null;
+        let sourceNode = null;
+        let processorNode = null;
+        let virtualDestNode = null; // NEW: The AudioContext Bridge Sink
+        
         let audioBuffers = [];
         let totalSamplesRecorded = 0;
         let recordStartTime = 0;
@@ -88,7 +92,7 @@
                 // 1. Request Webcam & Mic
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
-                    audio: { channelCount: 1 } 
+                    audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } 
                 });
 
                 // Wire UI
@@ -103,7 +107,6 @@
                         audio: false
                     });
                 } catch (displayErr) {
-                    // User cancelled the screen share prompt. Abort gracefully.
                     stream.getTracks().forEach(t => t.stop());
                     stream = null;
                     videoEl.srcObject = null;
@@ -114,13 +117,22 @@
 
                 recDot.classList.remove('hidden');
 
-                // 3. STITCH THEM TOGETHER (Screen Video + Mic Audio)
+                // 3. THE AUDIOCONTEXT BRIDGE (Fixes the Muted Export Bug)
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass({ sampleRate: 16000 });
+                
+                // Route raw mic -> Virtual Destination (strips hardware clock desyncs)
+                sourceNode = audioCtx.createMediaStreamSource(stream);
+                virtualDestNode = audioCtx.createMediaStreamDestination();
+                sourceNode.connect(virtualDestNode);
+
+                // 4. STITCH THEM TOGETHER (Screen Video + Virtual Synced Audio)
                 const combinedStream = new MediaStream([
                     ...displayStream.getVideoTracks(),
-                    ...stream.getAudioTracks()
+                    ...virtualDestNode.stream.getAudioTracks()
                 ]);
 
-                // 4. Setup and Start Video Recorder INSTANTLY
+                // 5. Setup and Start Video Recorder
                 let mimeType = 'video/webm;codecs=vp8,opus';
                 if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
                 else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
@@ -166,9 +178,8 @@
             totalSamplesRecorded = 0;
             recordStartTime = Date.now();
             
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContextClass({ sampleRate: 16000 });
-            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing raw mic stream
+            // The AudioContext and sourceNode are already running from Phase 1!
+            // We just plug the ScriptProcessor into the existing chain to capture chunks.
             processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
             
             processorNode.onaudioprocess = function(e) {
@@ -195,10 +206,12 @@
             
             const elapsedSecs = (Date.now() - recordStartTime) / 1000;
 
-            // Stop Google AI, but leave MediaRecorder (Screen & Mic) running!
-            if (processorNode) processorNode.disconnect();
-            if (sourceNode) sourceNode.disconnect();
-            if (audioCtx) audioCtx.close();
+            // DISCONNECT VERCEL PROCESSOR ONLY!
+            // Do NOT disconnect sourceNode or audioCtx, otherwise the video export goes silent!
+            if (processorNode) {
+                processorNode.disconnect();
+                processorNode = null;
+            }
 
             let masterArray = new Float32Array(totalSamplesRecorded);
             let offset = 0;
@@ -354,7 +367,11 @@
             // Stop Video Recorder (triggers auto-download)
             if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
             
-            // Completely terminate the active hardware connections
+            // NOW we completely terminate the active hardware connections
+            if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+            if (virtualDestNode) { virtualDestNode = null; }
+            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); audioCtx = null; }
+
             if (stream) stream.getTracks().forEach(t => t.stop());
             if (displayStream) displayStream.getTracks().forEach(t => t.stop());
             
