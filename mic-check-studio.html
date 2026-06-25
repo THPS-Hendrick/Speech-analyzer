@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mic-Check Studio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    
+    <script src="components/large/gameboard-animated.js"></script>
+
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-[368px] mx-auto relative">
+        <thps-gameboard-animated></thps-gameboard-animated>
+    </div>
+
+    <script>
+        // --- 1. HARDWARE STATE ---
+        let stream = null;
+        let mediaRecorder = null;
+        let recordedVideoChunks = [];
+        let fileExt = 'webm';
+        
+        let audioCtx, sourceNode, processorNode;
+        let audioBuffers = [];
+        let totalSamplesRecorded = 0;
+        let recordStartTime = 0;
+        let globalWordTimestamps = [];
+
+        window.thps_isRecording = false;
+
+        // --- 2. THE HARDWARE PIPELINE (WAV Encoding) ---
+        function floatTo16BitPCM(output, offset, input) {
+            for (let i = 0; i < input.length; i++, offset += 2) {
+                let s = Math.max(-1, Math.min(1, input[i]));
+                output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            }
+        }
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+        }
+        function encodeWAV(samples, sampleRate) {
+            let buffer = new ArrayBuffer(44 + samples.length * 2);
+            let view = new DataView(buffer);
+            writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + samples.length * 2, true);
+            writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt '); view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+            writeString(view, 36, 'data'); view.setUint32(40, samples.length * 2, true);
+            floatTo16BitPCM(view, 44, samples);
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        // --- 3. STUDIO EVENT LISTENERS ---
+        window.addEventListener('thps-studio-start', async () => {
+            const widget = document.querySelector('thps-gameboard-animated');
+            const videoEl = widget.querySelector('#studio-video');
+            const camOff = widget.querySelector('#studio-cam-off');
+            const recDot = widget.querySelector('#studio-rec-dot');
+
+            try {
+                // Request A/V Hardware
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
+                    audio: { channelCount: 1 } 
+                });
+
+                // Wire UI
+                videoEl.srcObject = stream;
+                videoEl.classList.remove('hidden');
+                camOff.classList.add('hidden');
+                recDot.classList.remove('hidden');
+
+                // Setup Video Recorder
+                let mimeType = 'video/webm;codecs=vp8,opus';
+                if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
+                else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
+                
+                mediaRecorder = new MediaRecorder(stream, { mimeType });
+                recordedVideoChunks = [];
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedVideoChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    // Auto-Download Video upon stopping
+                    const blob = new Blob(recordedVideoChunks, { type: mediaRecorder.mimeType });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `MicCheck_Studio_${new Date().toISOString().split('T')[0]}.${fileExt}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+                mediaRecorder.start();
+
+                // Setup Audio AI Pipeline
+                audioBuffers = [];
+                totalSamplesRecorded = 0;
+                globalWordTimestamps = [];
+                recordStartTime = Date.now();
+                
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass({ sampleRate: 16000 });
+                sourceNode = audioCtx.createMediaStreamSource(stream);
+                processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+                
+                processorNode.onaudioprocess = function(e) {
+                    if (!window.thps_isRecording) return;
+                    const channelData = e.inputBuffer.getChannelData(0);
+                    audioBuffers.push(new Float32Array(channelData));
+                    totalSamplesRecorded += channelData.length;
+                };
+
+                sourceNode.connect(processorNode);
+                processorNode.connect(audioCtx.destination);
+
+                window.thps_isRecording = true;
+                widget.setGameState('PLAYING');
+
+            } catch (err) {
+                console.error("Camera/Mic Error:", err);
+                alert("Camera and Microphone access is strictly required for Studio Mode.");
+            }
+        });
+
+        window.addEventListener('thps-studio-stop', async () => {
+            if (!window.thps_isRecording) return;
+            window.thps_isRecording = false;
+            
+            const widget = document.querySelector('thps-gameboard-animated');
+            widget.querySelector('#studio-rec-dot').classList.add('hidden');
+            widget.setGameState('ANALYZING');
+            
+            const elapsedSecs = (Date.now() - recordStartTime) / 1000;
+
+            // Stop Video
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+
+            // Stop Audio
+            if (processorNode) processorNode.disconnect();
+            if (sourceNode) sourceNode.disconnect();
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            if (audioCtx) audioCtx.close();
+
+            // Package Audio for Vercel
+            let masterArray = new Float32Array(totalSamplesRecorded);
+            let offset = 0;
+            for(let i=0; i<audioBuffers.length; i++) {
+                masterArray.set(audioBuffers[i], offset);
+                offset += audioBuffers[i].length;
+            }
+
+            const wavBlob = encodeWAV(masterArray, 16000);
+            const reader = new FileReader();
+            reader.readAsDataURL(wavBlob);
+            reader.onloadend = async () => {
+                const b64 = reader.result.split(',')[1];
+                try {
+                    const res = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ audioContent: b64, mimeType: 'audio/wav' })
+                    });
+                    
+                    let transcript = "";
+                    if (res.ok) {
+                        const data = await res.json();
+                        transcript = data.transcript || "";
+                    }
+                    
+                    // Simple Mock Analyzer (Replace with your full NLP logic if needed)
+                    // For the studio demo, we calculate a rough score based on transcript length & time.
+                    const words = transcript.split(/\s+/).filter(w => w.trim().length > 0);
+                    const wpm = Math.round((words.length / elapsedSecs) * 60) || 0;
+                    
+                    let totalPts = 0;
+                    if (elapsedSecs > 20) totalPts += 2;
+                    if (wpm > 100 && wpm < 150) totalPts += 3;
+                    if (words.length > 30) totalPts += 3.5;
+
+                    // Send payload back to the widget!
+                    window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
+                        detail: { 
+                            overrideGrade: elapsedSecs < 10,
+                            totalPoints: totalPts,
+                            wpm: wpm,
+                            personal: 45,
+                            visual: 25,
+                            time: elapsedSecs,
+                            simple: 85,
+                            grade: 6.5,
+                            pause: 15,
+                            sps: 3.2,
+                            wps: 12
+                        } 
+                    }));
+
+                } catch (e) {
+                    console.error("API Error", e);
+                    window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { overrideGrade: true } }));
+                }
+            };
+        });
+
+        window.addEventListener('thps-studio-retry', () => {
+            const widget = document.querySelector('thps-gameboard-animated');
+            const videoEl = widget.querySelector('#studio-video');
+            const camOff = widget.querySelector('#studio-cam-off');
+            
+            videoEl.classList.add('hidden');
+            videoEl.srcObject = null;
+            camOff.classList.remove('hidden');
+            
+            widget.setGameState('IDLE');
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+    </script>
+</body>
+</html>
