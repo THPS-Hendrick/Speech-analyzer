@@ -222,6 +222,22 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                 } catch(e) {}
             }
             simpleCounts[sTier || 'outside']++;
+            
+            // NEW: TAGGING THE TIMESTAMPS
+            // We find the next matching word in the timestamps array that hasn't been tagged yet
+            let tsObj = wordTimestamps.find(t => t.word.toLowerCase().replace(/[^a-z']/g, '') === cleanWord && !t.tagged);
+            if (tsObj) {
+                tsObj.tagged = true;
+                
+                let root = cleanWord.replace(/(?:s|es|ed|ing)$/, '');
+                let isP = window.THPS.NLP.personalPronouns.has(cleanWord);
+                let isV = (!isP && (window.THPS.NLP.visualDictPronouns.has(cleanWord) || window.THPS.NLP.visualDictWords.has(cleanWord) || window.THPS.NLP.visualDictWords.has(root)));
+                
+                if (isP && isV) { tsObj.colorType = 'overlap'; }
+                else if (isP) { tsObj.colorType = 'personal'; }
+                else if (isV) { tsObj.colorType = 'visual'; }
+                else { tsObj.colorType = 'default'; }
+            }
         }
     });
 
