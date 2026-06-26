@@ -47,16 +47,14 @@ class ThpsGameboardAnimated extends HTMLElement {
                 .animate-pulse-dark * { opacity: 0.5; color: white !important; fill: white !important; }
             </style>
 
-            <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800">
-                
-                <!-- 1. HEADER (Tightened Padding) -->
-                <div class="pt-4 pb-1 text-center shrink-0">
-                    <h1 class="text-4xl text-[#1a2332] tracking-wide leading-none" style="font-family: 'Permanent Marker', cursive;">DAILY MIC-CHECK</h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Date: <span id="studio-date">${this.currentDate}</span></p>
-                </div>
+            <!-- NEW WRAPPER -->
+            <div class="relative w-full max-w-[368px] mx-auto flex flex-col items-center">
+            
+                <!-- THE ORIGINAL WIDGET (Removed mx-auto, added to wrapper) -->
+                <div class="relative w-full aspect-[9/16] max-h-[850px] bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800 z-10">
 
                 <!-- 2. STATS & SETUP AREA -->
-                <div id="stats-container" class="px-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[110px]">
+                <div id="stats-container" class="px-4 pt-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[110px]">
                     
                     <!-- Phase 1-3: Setup Cards -->
                     <div id="setup-cards" class="grid grid-cols-4 gap-2 h-full transition-all duration-300">
@@ -159,10 +157,10 @@ class ThpsGameboardAnimated extends HTMLElement {
 
                         <!-- Sequence States -->
                         <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="video" class="w-4 h-4"></i> TURN ON CAMERA & RECORD
+                            <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
                         </div>
                         <div id="btn-state-start" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="play" class="w-4 h-4"></i> TAP TO START GAME
+                            <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
                         </div>
                         <div id="btn-state-recording" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
                             <i data-lucide="square" class="w-4 h-4"></i> TAP TO STOP (<span id="timer-display">00:00</span>)
@@ -171,14 +169,14 @@ class ThpsGameboardAnimated extends HTMLElement {
                             <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> CHECKING SCORES...
                         </div>
                         <div id="btn-state-save" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="download" class="w-4 h-4"></i> SAVE & DOWNLOAD VIDEO
+                            <i data-lucide="check" class="w-4 h-4"></i> SCORES READY
                         </div>
                     </button>
                 </div>
 
                 <!-- 5. CAMERA FEED -->
                 <div class="px-4 pb-4 pt-3 flex-grow flex flex-col min-h-[140px]">
-                    <div class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner">
+                    <div data-action="toggle-camera" class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
                         
                         <div id="studio-rec-dot" class="hidden absolute top-3 right-3 flex items-center gap-1.5 bg-slate-900/80 px-2 py-1 rounded backdrop-blur-sm z-10">
@@ -186,13 +184,23 @@ class ThpsGameboardAnimated extends HTMLElement {
                             <span class="text-[8px] font-bold text-rose-400 uppercase tracking-widest">REC</span>
                         </div>
 
-                        <div id="studio-cam-off" class="text-slate-600 flex flex-col items-center">
+                        <div id="studio-cam-off" class="text-slate-600 flex flex-col items-center pointer-events-none">
                             <i data-lucide="camera-off" class="w-8 h-8 mb-2 opacity-50"></i>
-                            <span class="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70">CAMERA OFF</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70">TAP TO TURN ON</span>
                         </div>
                     </div>
                 </div>
-            </div>
+                
+                </div> <!-- END ORIGINAL WIDGET -->
+
+                <!-- 6. THE SLIDE-OUT TRAY (Reset Only) -->
+                <div id="slide-out-tray" class="w-[50%] flex transition-all duration-500 ease-in-out h-0 opacity-0 overflow-hidden mt-0 z-0 mx-auto">
+                    <button data-action="reset" class="w-full bg-rose-600 hover:bg-rose-500 text-white rounded-xl flex justify-center items-center shadow-lg active:scale-95 transition-transform">
+                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+            </div> <!-- END NEW WRAPPER -->
         `;
         if (window.lucide) window.lucide.createIcons();
     }
@@ -249,14 +257,27 @@ class ThpsGameboardAnimated extends HTMLElement {
         const prog = this.querySelector('#action-progress');
         const markers = this.querySelector('#action-markers');
         const actionBarContainer = this.querySelector('#action-bar-container');
+        const tray = this.querySelector('#slide-out-tray');
         
-        // Dynamic Height Scaling for the Action Bar
+        // The Two-Element Swap Animation
         if (state === 'SCORED') {
-            actionBarContainer.classList.remove('h-[64px]');
-            actionBarContainer.classList.add('h-[44px]');
+            // 1. Hide internal action bar completely
+            actionBarContainer.classList.replace('h-[64px]', 'h-0');
+            actionBarContainer.classList.add('opacity-0', 'pointer-events-none', 'py-0');
+            
+            // 2. Slide out the external tray
+            tray.classList.replace('h-0', 'h-[52px]');
+            tray.classList.replace('mt-0', 'mt-4');
+            tray.classList.replace('opacity-0', 'opacity-100');
         } else {
-            actionBarContainer.classList.remove('h-[44px]');
-            actionBarContainer.classList.add('h-[64px]');
+            // 1. Restore internal action bar
+            actionBarContainer.classList.replace('h-0', 'h-[64px]');
+            actionBarContainer.classList.remove('opacity-0', 'pointer-events-none', 'py-0');
+            
+            // 2. Hide external tray
+            tray.classList.replace('h-[52px]', 'h-0');
+            tray.classList.replace('mt-4', 'mt-0');
+            tray.classList.replace('opacity-100', 'opacity-0');
         }
         
         // Grab all states
