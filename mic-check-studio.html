@@ -49,7 +49,6 @@
         let audioCtx = null;
         let sourceNode = null;
         let processorNode = null;
-        let virtualDestNode = null; // NEW: The AudioContext Bridge Sink
         
         let audioBuffers = [];
         let totalSamplesRecorded = 0;
@@ -117,17 +116,17 @@
 
                 recDot.classList.remove('hidden');
 
-                // 3. THE AUDIOCONTEXT BRIDGE (Fixes the Muted Export Bug)
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContextClass({ sampleRate: 16000 });
-                
-                // Route raw mic -> Virtual Destination (strips hardware clock desyncs)
-                sourceNode = audioCtx.createMediaStreamSource(stream);
-                virtualDestNode = audioCtx.createMediaStreamDestination();
-                sourceNode.connect(virtualDestNode);
-
-                // 4. STITCH THEM TOGETHER (Screen Video + Virtual Synced Audio)
+                // 3. STITCH THEM TOGETHER (Screen Video + Raw Mic Audio)
                 const combinedStream = new MediaStream([
+                    ...displayStream.getVideoTracks(),
+                    ...stream.getAudioTracks()
+                ]);
+
+                // 4. Setup and Start Video Recorder
+                fileExt = 'webm';
+                let mimeType = 'video/webm;codecs=vp8,opus';
+
+                // Fallback to a generic webm container if vp8/opus specifically isn't supported
                     ...displayStream.getVideoTracks(),
                     ...virtualDestNode.stream.getAudioTracks()
                 ]);
@@ -178,8 +177,9 @@
             totalSamplesRecorded = 0;
             recordStartTime = Date.now();
             
-            // The AudioContext and sourceNode are already running from Phase 1!
-            // We just plug the ScriptProcessor into the existing chain to capture chunks.
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass({ sampleRate: 16000 });
+            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing raw mic stream
             processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
             
             processorNode.onaudioprocess = function(e) {
@@ -208,11 +208,13 @@
             
             const elapsedSecs = (Date.now() - recordStartTime) / 1000;
 
-            // DISCONNECT VERCEL PROCESSOR ONLY!
-            // Do NOT disconnect sourceNode or audioCtx, otherwise the video export goes silent!
-            if (processorNode) {
-                processorNode.disconnect();
-                processorNode = null;
+            // Completely terminate the Vercel connection to save resources
+            // Since the Video is using the raw stream, closing audioCtx is safe again!
+            if (processorNode) processorNode.disconnect();
+            if (sourceNode) sourceNode.disconnect();
+            if (audioCtx) {
+                audioCtx.close();
+                audioCtx = null;
             }
 
             let masterArray = new Float32Array(totalSamplesRecorded);
@@ -359,53 +361,19 @@
             };
         });
 
-        // STEP 5: Save, Download, and Reset
-        window.addEventListener('thps-studio-save-video', () => {
-            const widget = document.querySelector('thps-gameboard-animated');
-            const videoEl = widget.querySelector('#studio-video');
-            const camOff = widget.querySelector('#studio-cam-off');
-            const recDot = widget.querySelector('#studio-rec-dot');
-            
-            // Stop Video Recorder (triggers auto-download)
-            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-            
-            // NOW we completely terminate the active hardware connections
-            if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-            if (virtualDestNode) { virtualDestNode = null; }
-            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); audioCtx = null; }
-
-            if (stream) stream.getTracks().forEach(t => t.stop());
-            if (displayStream) displayStream.getTracks().forEach(t => t.stop());
-            
-// Reset UI
-            videoEl.classList.add('hidden');
-            videoEl.srcObject = null;
-            camOff.classList.remove('hidden');
-            recDot.classList.add('hidden');
-            
-            widget.setGameState('IDLE');
-        });
-
-        // STEP 6: Reset Game (WITHOUT Downloading)
+        // STEP 5: Reset Game (The Clean Teardown without downloading)
         window.addEventListener('thps-studio-reset-game', () => {
             const widget = document.querySelector('thps-gameboard-animated');
             const videoEl = widget.querySelector('#studio-video');
             const camOff = widget.querySelector('#studio-cam-off');
             const recDot = widget.querySelector('#studio-rec-dot');
             
-            // Prevent download by stripping the onstop handler before stopping
-            if (mediaRecorder) {
-                mediaRecorder.onstop = null;
-                if (mediaRecorder.state === "recording") mediaRecorder.stop();
-            }
-            
-            // Completely terminate the active hardware connections
+            if (processorNode) { processorNode.disconnect(); processorNode = null; }
             if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-            if (virtualDestNode) { virtualDestNode = null; }
             if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); audioCtx = null; }
 
             if (stream) stream.getTracks().forEach(t => t.stop());
-            if (displayStream) displayStream.getTracks().forEach(t => t.stop());
+            stream = null;
             
             // Reset UI
             videoEl.classList.add('hidden');
