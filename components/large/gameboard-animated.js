@@ -47,12 +47,16 @@ class ThpsGameboardAnimated extends HTMLElement {
                 .animate-pulse-dark * { opacity: 0.5; color: white !important; fill: white !important; }
             </style>
 
+            <!-- NEW WRAPPER -->
             <div class="relative w-full max-w-[368px] mx-auto flex flex-col items-center">
             
+                <!-- THE ORIGINAL WIDGET (Removed mx-auto, added to wrapper) -->
                 <div class="relative w-full aspect-[9/16] max-h-[850px] bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800 z-10">
 
-                <div id="stats-container" class="px-4 pt-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[110px]">
+                <!-- 2. STATS & SETUP AREA -->
+                <div id="stats-container" class="px-4 pt-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[150px]">
                     
+                    <!-- Phase 1-3: Setup Cards -->
                     <div id="setup-cards" class="grid grid-cols-4 gap-2 h-full transition-all duration-300">
                         <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-blue-600 shadow-md setup-card">
                             <span class="text-[9px] font-bold tracking-wider mb-1">CHALLENGE</span>
@@ -75,14 +79,18 @@ class ThpsGameboardAnimated extends HTMLElement {
                         </div>
                     </div>
 
+                    <!-- Phase 4: Final Results (Hidden) -->
                     <div id="results-cards" class="hidden h-full flex-col w-full">
+                        <!-- Hero Score -->
                         <div class="flex flex-col items-center justify-center mb-3 animate-slide-up" style="animation-delay: 0.1s;">
                             <div class="flex items-center gap-2 mb-1" id="res-stars"></div>
                             <h2 class="text-[42px] font-black text-slate-800 leading-none tracking-tighter" id="res-score-hero">0.0</h2>
                             <p class="text-[11px] font-bold tracking-widest text-blue-600 uppercase" id="res-msg">Checking...</p>
                         </div>
 
+                        <!-- Granular Stats (2x2 Grid) -->
                         <div class="grid grid-cols-2 gap-2 flex-grow">
+                            <!-- Content -->
                             <div class="bg-blue-50 border border-blue-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.5s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-blue-700 tracking-wider">CONTENT</span>
@@ -94,6 +102,7 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>I: <span id="res-i-sub">0</span></span>
                                 </div>
                             </div>
+                            <!-- Delivery -->
                             <div class="bg-purple-50 border border-purple-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.9s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-purple-700 tracking-wider">DELIVERY</span>
@@ -104,6 +113,7 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>Pau: <span id="res-pau">0</span>%</span>
                                 </div>
                             </div>
+                            <!-- Simplify -->
                             <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 1.3s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-emerald-700 tracking-wider">SIMPLIFY</span>
@@ -114,6 +124,7 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>RDL: <span id="res-rdl">0</span></span>
                                 </div>
                             </div>
+                            <!-- Time (Clean Display) -->
                             <div class="bg-amber-50 border border-amber-100 rounded-xl p-2 flex flex-col justify-center items-center animate-slide-up" style="animation-delay: 1.7s;">
                                 <span class="text-[10px] font-bold text-amber-700 tracking-wider mb-1">TIME</span>
                                 <span class="text-[20px] font-black text-slate-800"><span id="res-time">0</span>s</span>
@@ -122,14 +133,16 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </div>
                 </div>
 
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] z-30 pointer-events-none">
+                <!-- 3. PROMPT AREA (Centered Floating HUD) -->
+                <div id="madlib-panel" class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] z-30 pointer-events-none transition-all duration-500 ease-in-out">
                     <div class="w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4 shadow-2xl text-center flex flex-col justify-center min-h-[90px]">
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
                         <p id="studio-adlib" class="text-[14px] font-medium leading-snug text-slate-800 pointer-events-auto">Loading...</p>
                     </div>
                 </div>
 
-                <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible">
+                <!-- 4. CREATOR SEQUENCE ACTION BAR -->
+                <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible mt-auto">
                     <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
                         
                         <div id="action-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out z-0"></div>
@@ -142,6 +155,7 @@ class ThpsGameboardAnimated extends HTMLElement {
                             <div class="flex flex-col items-center justify-end pb-1.5" style="width: 11.111%;"></div>
                         </div>
 
+                        <!-- Sequence States -->
                         <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
                             <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
                         </div>
@@ -160,7 +174,8 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </button>
                 </div>
 
-                <div class="px-4 pb-4 mt-auto h-[33%] flex flex-col shrink-0">
+                <!-- 5. CAMERA FEED -->
+                <div class="px-4 pb-4 h-[30%] flex flex-col shrink-0">
                     <div data-action="toggle-camera" class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
 
@@ -171,13 +186,17 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </div>
                 </div>
                 
-                </div> <div id="slide-out-tray" class="w-[50%] flex transition-all duration-500 ease-in-out h-0 opacity-0 overflow-hidden mt-0 z-0 mx-auto">
+                </div> <!-- END ORIGINAL WIDGET -->
+
+                <!-- 6. THE SLIDE-OUT TRAY (Reset Only) -->
+                <div id="slide-out-tray" class="w-[50%] flex transition-all duration-500 ease-in-out h-0 opacity-0 overflow-hidden mt-0 z-0 mx-auto">
                     <button data-action="reset" class="w-full bg-rose-600 hover:bg-rose-500 text-white rounded-xl flex justify-center items-center shadow-lg active:scale-95 transition-transform">
                         <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
                     </button>
                 </div>
                 
-            </div> `;
+            </div> <!-- END NEW WRAPPER -->
+        `;
         if (window.lucide) window.lucide.createIcons();
     }
 
@@ -234,6 +253,7 @@ class ThpsGameboardAnimated extends HTMLElement {
         const markers = this.querySelector('#action-markers');
         const actionBarContainer = this.querySelector('#action-bar-container');
         const tray = this.querySelector('#slide-out-tray');
+        const madlibPanel = this.querySelector('#madlib-panel'); 
         
         // The Two-Element Swap Animation
         if (state === 'SCORED') {
@@ -245,6 +265,9 @@ class ThpsGameboardAnimated extends HTMLElement {
             tray.classList.replace('h-0', 'h-[52px]');
             tray.classList.replace('mt-0', 'mt-4');
             tray.classList.replace('opacity-0', 'opacity-100');
+
+            // 3. Drop the Mad-Lib panel to the 70% line
+            if (madlibPanel) madlibPanel.classList.replace('top-[60%]', 'top-[70%]');
         } else {
             // 1. Restore internal action bar
             actionBarContainer.classList.replace('h-0', 'h-[64px]');
@@ -254,6 +277,11 @@ class ThpsGameboardAnimated extends HTMLElement {
             tray.classList.replace('h-[52px]', 'h-0');
             tray.classList.replace('mt-4', 'mt-0');
             tray.classList.replace('opacity-100', 'opacity-0');
+
+            // 3. Restore the Mad-Lib panel
+            if (madlibPanel && madlibPanel.classList.contains('top-[70%]')) {
+                madlibPanel.classList.replace('top-[70%]', 'top-[60%]');
+            }
         }
         
         // Grab all states
@@ -283,7 +311,7 @@ class ThpsGameboardAnimated extends HTMLElement {
             markers.classList.add('opacity-0');
             
             this.querySelector('#setup-cards').classList.remove('hidden');
-            this.querySelector('#stats-container').classList.replace('h-[220px]', 'h-[110px]');
+            this.querySelector('#stats-container').classList.replace('h-[320px]', 'h-[150px]');
             
             const resultsCards = this.querySelector('#results-cards');
             resultsCards.classList.add('hidden');
@@ -328,7 +356,7 @@ class ThpsGameboardAnimated extends HTMLElement {
             prog.style.width = '100%';
             
             this.querySelector('#setup-cards').classList.add('hidden');
-            this.querySelector('#stats-container').classList.replace('h-[110px]', 'h-[220px]');
+            this.querySelector('#stats-container').classList.replace('h-[150px]', 'h-[320px]');
             
             const resultsCards = this.querySelector('#results-cards');
             resultsCards.classList.remove('hidden');
