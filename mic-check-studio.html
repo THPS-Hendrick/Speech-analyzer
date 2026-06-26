@@ -41,11 +41,6 @@
 
         // --- 1. HARDWARE STATE ---
         let stream = null;
-        let displayStream = null; 
-        let mediaRecorder = null;
-        let recordedVideoChunks = [];
-        let fileExt = 'webm';
-        
         let audioCtx = null;
         let sourceNode = null;
         let processorNode = null;
@@ -78,108 +73,70 @@
             return new Blob([view], { type: 'audio/wav' });
         }
 
-        // --- 3. STUDIO EVENT LISTENERS (The 5-Step Creator Sequence) ---
+        // --- 3. STUDIO EVENT LISTENERS (The Silent Creator Sequence) ---
         
-        // STEP 1: Turn on Camera & Start Video Recording
+        // STEP 1: Turn on Camera (Viewport Click)
         window.addEventListener('thps-studio-start-camera', async () => {
             const widget = document.querySelector('thps-gameboard-animated');
             const videoEl = widget.querySelector('#studio-video');
             const camOff = widget.querySelector('#studio-cam-off');
-            const recDot = widget.querySelector('#studio-rec-dot');
 
             try {
-                // 1. Request Webcam & Mic
+                // Request Webcam & Mic (No Screen Share/Recorder needed anymore!)
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
                     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } 
                 });
 
-                // Wire UI
                 videoEl.srcObject = stream;
                 videoEl.classList.remove('hidden');
                 camOff.classList.add('hidden');
-
-                // 2. Request Screen Share (Video ONLY to prevent echo)
-                try {
-                    displayStream = await navigator.mediaDevices.getDisplayMedia({
-                        video: { preferCurrentTab: true },
-                        audio: false
-                    });
-                } catch (displayErr) {
-                    stream.getTracks().forEach(t => t.stop());
-                    stream = null;
-                    videoEl.srcObject = null;
-                    videoEl.classList.add('hidden');
-                    camOff.classList.remove('hidden');
-                    return; 
-                }
-
-                recDot.classList.remove('hidden');
-
-                // 3. STITCH THEM TOGETHER (Screen Video + Raw Mic Audio)
-                const combinedStream = new MediaStream([
-                    ...displayStream.getVideoTracks(),
-                    ...stream.getAudioTracks()
-                ]);
-
-                // 4. Setup and Start Video Recorder
-                fileExt = 'webm';
-                let mimeType = 'video/webm;codecs=vp8,opus';
-
-                // Fallback to a generic webm container if vp8/opus specifically isn't supported
-                    ...displayStream.getVideoTracks(),
-                    ...virtualDestNode.stream.getAudioTracks()
-                ]);
-
-                // 5. Setup and Start Video Recorder
-                let mimeType = 'video/webm;codecs=vp8,opus';
-                if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
-                else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
-                
-                mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
-                recordedVideoChunks = [];
-                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedVideoChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedVideoChunks, { type: mediaRecorder.mimeType });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `MicCheck_Studio_${new Date().toISOString().split('T')[0]}.${fileExt}`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                };
-
-                // Failsafe: If user clicks the browser's native "Stop Sharing" button early
-                displayStream.getVideoTracks()[0].onended = () => {
-                    if (window.thps_isRecording) {
-                        window.dispatchEvent(new CustomEvent('thps-studio-stop-game', { bubbles: true, composed: true }));
-                    } else if (mediaRecorder.state === "recording") {
-                        window.dispatchEvent(new CustomEvent('thps-studio-save-video', { bubbles: true, composed: true }));
-                    }
-                };
-
-                mediaRecorder.start();
-
-                // Move UI to Phase 2
                 widget.setGameState('CAMERA_ON');
-
             } catch (err) {
                 console.error("Hardware Error:", err);
-                alert("Camera, Microphone, and Screen Share access are strictly required for Studio Mode.");
+                alert("Camera and Microphone access are required to play.");
             }
         });
 
-        // STEP 2: Start Game (Connect Google AI to existing stream)
-        window.addEventListener('thps-studio-start-game', () => {
+        // STEP 1.5: Turn off Camera (Viewport Click)
+        window.addEventListener('thps-studio-stop-camera', () => {
+            const widget = document.querySelector('thps-gameboard-animated');
+            const videoEl = widget.querySelector('#studio-video');
+            const camOff = widget.querySelector('#studio-cam-off');
+
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
+            videoEl.srcObject = null;
+            videoEl.classList.add('hidden');
+            camOff.classList.remove('hidden');
+            widget.setGameState('IDLE');
+        });
+
+        // STEP 2: Start Game (The Silent Mic Chunking)
+        window.addEventListener('thps-studio-start-game', async () => {
             const widget = document.querySelector('thps-gameboard-animated');
             
+            // Failsafe: If camera isn't on yet, quietly ask for the Mic so the game still works
+            if (!stream) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+                } catch(e) {
+                    alert("Microphone required to play."); return;
+                }
+            }
+
+            const recDot = widget.querySelector('#studio-rec-dot');
+            if (recDot) recDot.classList.remove('hidden');
+
             audioBuffers = [];
             totalSamplesRecorded = 0;
             recordStartTime = Date.now();
             
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContextClass({ sampleRate: 16000 });
-            sourceNode = audioCtx.createMediaStreamSource(stream); // Use existing raw mic stream
+            sourceNode = audioCtx.createMediaStreamSource(stream);
             processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
             
             processorNode.onaudioprocess = function(e) {
@@ -209,13 +166,19 @@
             const elapsedSecs = (Date.now() - recordStartTime) / 1000;
 
             // Completely terminate the Vercel connection to save resources
-            // Since the Video is using the raw stream, closing audioCtx is safe again!
-            if (processorNode) processorNode.disconnect();
-            if (sourceNode) sourceNode.disconnect();
+            if (processorNode) {
+                processorNode.disconnect();
+                processorNode = null;
+            }
+            if (sourceNode) {
+                sourceNode.disconnect();
+                sourceNode = null;
+            }
             if (audioCtx) {
                 audioCtx.close();
                 audioCtx = null;
             }
+            // IMPORTANT: We leave `stream` running here so the camera feed stays active!
 
             let masterArray = new Float32Array(totalSamplesRecorded);
             let offset = 0;
@@ -372,8 +335,10 @@
             if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
             if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); audioCtx = null; }
 
-            if (stream) stream.getTracks().forEach(t => t.stop());
-            stream = null;
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
             
             // Reset UI
             videoEl.classList.add('hidden');
