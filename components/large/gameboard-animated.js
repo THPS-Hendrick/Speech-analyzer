@@ -381,10 +381,10 @@ class ThpsGameboardAnimated extends HTMLElement {
 
         let total = data.overrideGrade ? -1 : (data.totalPoints || 0);
         let msg = "Check Scores";
-        if (total === -1) msg = "Too long / short";
-        else if (total < 5) msg = "Keep Practicing";
-        else if (total < 8.5) msg = "Check your scores!";
-        else if (total < 9.9) msg = "Check you out!";
+        if (total === -1) msg = "No score";
+        else if (total < 5) msg = "Good try";
+        else if (total < 8.5) msg = "Well done";
+        else if (total < 9.9) msg = "Great";
         else msg = "Mic-Check!";
         
         this.querySelector('#res-msg').innerText = msg;
