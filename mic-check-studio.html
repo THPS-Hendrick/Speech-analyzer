@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Mic-Check Studio</title>
     
-    <!-- Tailwind & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- NLP Engine (Compromise) -->
     <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
     
-    <!-- THPS NLP Scorer Engine -->
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
 
-    <!-- The Animated Gameboard Widget (Githack Absolute Path) -->
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/gameboard-animated.js?v=3"></script>
 
     <style>
@@ -24,12 +20,10 @@
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
 
-    <!-- The Studio Canvas -->
     <div class="w-full max-w-[368px] mx-auto relative">
         <thps-gameboard-animated></thps-gameboard-animated>
     </div>
 
-    <!-- The Engine (Vanilla JS) -->
     <script>
         // --- 0. INITIALIZATION ---
         window.onload = () => {
@@ -126,9 +120,6 @@
                     alert("Microphone required to play."); return;
                 }
             }
-
-            const recDot = widget.querySelector('#studio-rec-dot');
-            if (recDot) recDot.classList.remove('hidden');
 
             audioBuffers = [];
             totalSamplesRecorded = 0;
@@ -329,7 +320,6 @@
             const widget = document.querySelector('thps-gameboard-animated');
             const videoEl = widget.querySelector('#studio-video');
             const camOff = widget.querySelector('#studio-cam-off');
-            const recDot = widget.querySelector('#studio-rec-dot');
             
             if (processorNode) { processorNode.disconnect(); processorNode = null; }
             if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
@@ -344,7 +334,6 @@
             videoEl.classList.add('hidden');
             videoEl.srcObject = null;
             camOff.classList.remove('hidden');
-            recDot.classList.add('hidden');
             
             widget.setGameState('IDLE');
         });
