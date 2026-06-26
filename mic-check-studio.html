@@ -133,17 +133,9 @@
                 ]);
 
                 // 5. Setup and Start Video Recorder
-                fileExt = 'webm';
                 let mimeType = 'video/webm;codecs=vp8,opus';
-
-                // Fallback to a generic webm container if vp8/opus specifically isn't supported
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                    if (MediaRecorder.isTypeSupported('video/webm')) {
-                     mimeType = 'video/webm'; 
-                } else {
-                   mimeType = ''; // Let the browser dictate its own default
-                   }
-                }
+                if (MediaRecorder.isTypeSupported('video/mp4')) { mimeType = 'video/mp4'; fileExt = 'mp4'; }
+                else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) { mimeType = 'video/webm;codecs=h264'; fileExt = 'mp4'; }
                 
                 mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
                 recordedVideoChunks = [];
@@ -197,8 +189,10 @@
                 totalSamplesRecorded += channelData.length;
             };
 
+            // Create a dummy black hole for the audio
+            let silentSink = audioCtx.createMediaStreamDestination();
             sourceNode.connect(processorNode);
-            processorNode.connect(audioCtx.destination);
+            processorNode.connect(silentSink); // Safely dumps the audio into the void!
 
             window.thps_isRecording = true;
             widget.setGameState('PLAYING');
