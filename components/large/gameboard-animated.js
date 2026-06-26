@@ -13,6 +13,7 @@ class ThpsGameboardAnimated extends HTMLElement {
         this.currentDate = this.getAdelaideDateString();
         this.timerSeconds = 0;
         this.timerInterval = null;
+        this.currentStars = 5; // Default difficulty for studio board
 
         this.render();
         this.setupListeners();
@@ -81,11 +82,18 @@ class ThpsGameboardAnimated extends HTMLElement {
 
                     <!-- Phase 4: Final Results (Hidden) -->
                     <div id="results-cards" class="hidden h-full flex-col w-full">
-                        <!-- Hero Score -->
-                        <div class="flex flex-col items-center justify-center mb-3 animate-slide-up" style="animation-delay: 0.1s;">
-                            <div class="flex items-center gap-2 mb-1" id="res-stars"></div>
-                            <h2 class="text-[42px] font-black text-slate-800 leading-none tracking-tighter" id="res-score-hero">0.0</h2>
-                            <p class="text-[11px] font-bold tracking-widest text-blue-600 uppercase" id="res-msg">Checking...</p>
+                        <!-- Hero Score (Split Layout) -->
+                        <div class="relative w-full h-16 sm:h-20 mb-3 animate-slide-up" style="animation-delay: 0.1s;">
+                            <!-- Stars (30% from left) -->
+                            <div class="absolute top-1/2 -translate-y-1/2 left-[30%] -translate-x-1/2 flex flex-col items-center gap-0.5 w-24">
+                                <div class="flex justify-center gap-1 w-full" id="res-stars-top"></div>
+                                <div class="flex justify-center gap-1 w-full" id="res-stars-bottom"></div>
+                            </div>
+                            <!-- Grade (60% from left, nudged up) -->
+                            <div class="absolute top-1/2 -translate-y-1/2 left-[60%] -translate-x-1/2 flex flex-col items-center justify-center -mt-2">
+                                <h2 class="text-[48px] sm:text-[56px] font-black text-slate-800 leading-none tracking-tighter drop-shadow-sm" id="res-score-hero">0.0</h2>
+                                <p class="text-[10px] font-bold tracking-widest text-blue-600 uppercase mt-1 leading-none" id="res-msg">Checking...</p>
+                            </div>
                         </div>
 
                         <!-- Granular Stats (2x2 Grid) -->
@@ -138,14 +146,13 @@ class ThpsGameboardAnimated extends HTMLElement {
                     
                     <!-- 3. PROMPT AREA (Anchored to 1/3 of the gap) -->
                     <div id="madlib-panel" class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] z-30 pointer-events-none transition-all duration-500 ease-in-out">
-                        <div class="w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4 shadow-2xl text-center flex flex-col justify-center min-h-[90px]">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
+                        <div class="w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4 shadow-2xl text-center flex flex-col justify-center min-h-[70px]">
                             <p id="studio-adlib" class="text-[14px] font-medium leading-snug text-slate-800 pointer-events-auto">Loading...</p>
                         </div>
                     </div>
 
-                    <!-- 4. CREATOR SEQUENCE ACTION BAR (Anchored to 2/3 of the gap) -->
-                    <div id="action-bar-container" class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible pointer-events-auto">
+                    <!-- 4. CREATOR SEQUENCE ACTION BAR (Top-center anchored to 2/3 of the gap) -->
+                    <div id="action-bar-container" class="absolute top-2/3 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible pointer-events-auto">
                         <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
                             
                             <div id="action-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out z-0"></div>
@@ -381,10 +388,19 @@ class ThpsGameboardAnimated extends HTMLElement {
         
         this.querySelector('#res-msg').innerText = msg;
         
-        let diffStars = 1;
-        let starsHtml = '';
-        for(let i=0; i<diffStars; i++) starsHtml += `<i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500"></i>`;
-        this.querySelector('#res-stars').innerHTML = starsHtml;
+        // Dynamic Star Layout (Top row: max 3, Bottom row: remainder)
+        let actualStars = window.thps_currentGameStars || 5; 
+        let topRowHtml = '';
+        let bottomRowHtml = '';
+        
+        for(let i = 0; i < actualStars; i++) {
+            let starIcon = `<i data-lucide="star" class="w-5 h-5 text-amber-500 fill-amber-500 drop-shadow-sm"></i>`;
+            if (i < 3) topRowHtml += starIcon;
+            else bottomRowHtml += starIcon;
+        }
+        
+        this.querySelector('#res-stars-top').innerHTML = topRowHtml;
+        this.querySelector('#res-stars-bottom').innerHTML = bottomRowHtml;
         if (window.lucide) window.lucide.createIcons();
 
         if (total > 0) setTimeout(() => this.animateValue("res-score-hero", 0, total, 1800, 1), 100);
