@@ -47,18 +47,17 @@ class ThpsGameboardAnimated extends HTMLElement {
                 .animate-pulse-dark * { opacity: 0.5; color: white !important; fill: white !important; }
             </style>
 
-            <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800">
+            <div class="relative w-full max-w-[368px] mx-auto flex flex-col items-center">
+            
+                <div class="relative w-full aspect-[9/16] max-h-[850px] bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800 z-10">
                 
-                <!-- 1. HEADER (Tightened Padding) -->
                 <div class="pt-4 pb-1 text-center shrink-0">
                     <h1 class="text-4xl text-[#1a2332] tracking-wide leading-none" style="font-family: 'Permanent Marker', cursive;">DAILY MIC-CHECK</h1>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Date: <span id="studio-date">${this.currentDate}</span></p>
                 </div>
 
-                <!-- 2. STATS & SETUP AREA -->
                 <div id="stats-container" class="px-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center shrink-0 h-[110px]">
                     
-                    <!-- Phase 1-3: Setup Cards -->
                     <div id="setup-cards" class="grid grid-cols-4 gap-2 h-full transition-all duration-300">
                         <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-blue-600 shadow-md setup-card">
                             <span class="text-[9px] font-bold tracking-wider mb-1">CHALLENGE</span>
@@ -81,18 +80,14 @@ class ThpsGameboardAnimated extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- Phase 4: Final Results (Hidden) -->
                     <div id="results-cards" class="hidden h-full flex-col w-full">
-                        <!-- Hero Score -->
                         <div class="flex flex-col items-center justify-center mb-3 animate-slide-up" style="animation-delay: 0.1s;">
                             <div class="flex items-center gap-2 mb-1" id="res-stars"></div>
                             <h2 class="text-[42px] font-black text-slate-800 leading-none tracking-tighter" id="res-score-hero">0.0</h2>
                             <p class="text-[11px] font-bold tracking-widest text-blue-600 uppercase" id="res-msg">Checking...</p>
                         </div>
 
-                        <!-- Granular Stats (2x2 Grid) -->
                         <div class="grid grid-cols-2 gap-2 flex-grow">
-                            <!-- Content -->
                             <div class="bg-blue-50 border border-blue-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.5s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-blue-700 tracking-wider">CONTENT</span>
@@ -104,7 +99,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>I: <span id="res-i-sub">0</span></span>
                                 </div>
                             </div>
-                            <!-- Delivery -->
                             <div class="bg-purple-50 border border-purple-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 0.9s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-purple-700 tracking-wider">DELIVERY</span>
@@ -115,7 +109,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>Pau: <span id="res-pau">0</span>%</span>
                                 </div>
                             </div>
-                            <!-- Simplify -->
                             <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-2 flex flex-col justify-center gap-1 animate-slide-up" style="animation-delay: 1.3s;">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-emerald-700 tracking-wider">SIMPLIFY</span>
@@ -126,7 +119,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                                     <span>RDL: <span id="res-rdl">0</span></span>
                                 </div>
                             </div>
-                            <!-- Time (Clean Display) -->
                             <div class="bg-amber-50 border border-amber-100 rounded-xl p-2 flex flex-col justify-center items-center animate-slide-up" style="animation-delay: 1.7s;">
                                 <span class="text-[10px] font-bold text-amber-700 tracking-wider mb-1">TIME</span>
                                 <span class="text-[20px] font-black text-slate-800"><span id="res-time">0</span>s</span>
@@ -135,7 +127,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- 3. PROMPT AREA (mt-auto forces it downwards) -->
                 <div class="px-4 py-2 shrink-0 mt-auto relative z-20">
                     <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-3 shadow-sm text-center flex flex-col justify-center min-h-[80px]">
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
@@ -143,7 +134,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- 4. CREATOR SEQUENCE ACTION BAR -->
                 <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible">
                     <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
                         
@@ -157,7 +147,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                             <div class="flex flex-col items-center justify-end pb-1.5" style="width: 11.111%;"></div>
                         </div>
 
-                        <!-- Sequence States -->
                         <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
                             <i data-lucide="video" class="w-4 h-4"></i> TURN ON CAMERA & RECORD
                         </div>
@@ -176,7 +165,6 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </button>
                 </div>
 
-                <!-- 5. CAMERA FEED -->
                 <div class="px-4 pb-4 pt-3 flex-grow flex flex-col min-h-[140px]">
                     <div class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
@@ -192,8 +180,17 @@ class ThpsGameboardAnimated extends HTMLElement {
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
+                
+                </div> <div id="slide-out-tray" class="w-[90%] flex gap-3 transition-all duration-500 ease-in-out h-0 opacity-0 overflow-hidden mt-0 z-0">
+                    <button data-action="download" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex justify-center items-center shadow-lg active:scale-95 transition-transform">
+                        <i data-lucide="download" class="w-6 h-6"></i>
+                    </button>
+                    <button data-action="reset" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white rounded-xl flex justify-center items-center shadow-lg active:scale-95 transition-transform">
+                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+            </div> `;
         if (window.lucide) window.lucide.createIcons();
     }
 
@@ -210,9 +207,11 @@ class ThpsGameboardAnimated extends HTMLElement {
                     this.dispatchEvent(new CustomEvent('thps-studio-start-game', { bubbles: true, composed: true }));
                 } else if (this.gameState === 'PLAYING') {
                     this.dispatchEvent(new CustomEvent('thps-studio-stop-game', { bubbles: true, composed: true }));
-                } else if (this.gameState === 'SCORED') {
-                    this.dispatchEvent(new CustomEvent('thps-studio-save-video', { bubbles: true, composed: true }));
-                }
+                } 
+            } else if (btn.dataset.action === 'download') {
+                this.dispatchEvent(new CustomEvent('thps-studio-save-video', { bubbles: true, composed: true }));
+            } else if (btn.dataset.action === 'reset') {
+                this.dispatchEvent(new CustomEvent('thps-studio-reset-game', { bubbles: true, composed: true }));
             }
         });
 
@@ -245,14 +244,27 @@ class ThpsGameboardAnimated extends HTMLElement {
         const prog = this.querySelector('#action-progress');
         const markers = this.querySelector('#action-markers');
         const actionBarContainer = this.querySelector('#action-bar-container');
+        const tray = this.querySelector('#slide-out-tray');
         
-        // Dynamic Height Scaling for the Action Bar
+        // The Two-Element Swap Animation
         if (state === 'SCORED') {
-            actionBarContainer.classList.remove('h-[64px]');
-            actionBarContainer.classList.add('h-[44px]');
+            // 1. Hide internal action bar completely
+            actionBarContainer.classList.replace('h-[64px]', 'h-0');
+            actionBarContainer.classList.add('opacity-0', 'pointer-events-none', 'py-0');
+            
+            // 2. Slide out the external tray
+            tray.classList.replace('h-0', 'h-[52px]');
+            tray.classList.replace('mt-0', 'mt-4');
+            tray.classList.replace('opacity-0', 'opacity-100');
         } else {
-            actionBarContainer.classList.remove('h-[44px]');
-            actionBarContainer.classList.add('h-[64px]');
+            // 1. Restore internal action bar
+            actionBarContainer.classList.replace('h-0', 'h-[64px]');
+            actionBarContainer.classList.remove('opacity-0', 'pointer-events-none', 'py-0');
+            
+            // 2. Hide external tray
+            tray.classList.replace('h-[52px]', 'h-0');
+            tray.classList.replace('mt-4', 'mt-0');
+            tray.classList.replace('opacity-100', 'opacity-0');
         }
         
         // Grab all states
