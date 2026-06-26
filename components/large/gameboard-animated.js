@@ -133,49 +133,54 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- 3. PROMPT AREA (Centered Floating HUD) -->
-                <div id="madlib-panel" class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] z-30 pointer-events-none transition-all duration-500 ease-in-out">
-                    <div class="w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4 shadow-2xl text-center flex flex-col justify-center min-h-[90px]">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
-                        <p id="studio-adlib" class="text-[14px] font-medium leading-snug text-slate-800 pointer-events-auto">Loading...</p>
+                <!-- NEW: THE FLEX GAP CONTAINER -->
+                <div class="relative flex-1 w-full pointer-events-none">
+                    
+                    <!-- 3. PROMPT AREA (Anchored to 1/3 of the gap) -->
+                    <div id="madlib-panel" class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] z-30 pointer-events-none transition-all duration-500 ease-in-out">
+                        <div class="w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4 shadow-2xl text-center flex flex-col justify-center min-h-[90px]">
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Beginner)</p>
+                            <p id="studio-adlib" class="text-[14px] font-medium leading-snug text-slate-800 pointer-events-auto">Loading...</p>
+                        </div>
                     </div>
+
+                    <!-- 4. CREATOR SEQUENCE ACTION BAR (Anchored to 2/3 of the gap) -->
+                    <div id="action-bar-container" class="absolute top-2/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible pointer-events-auto">
+                        <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
+                            
+                            <div id="action-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out z-0"></div>
+
+                            <div id="action-markers" class="absolute inset-0 flex z-10 pointer-events-none opacity-0 transition-opacity">
+                                <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">-no score-</span></div>
+                                <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">1/4pts</span></div>
+                                <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">3/4pts</span></div>
+                                <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">Perfect!</span></div>
+                                <div class="flex flex-col items-center justify-end pb-1.5" style="width: 11.111%;"></div>
+                            </div>
+
+                            <!-- Sequence States -->
+                            <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                                <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
+                            </div>
+                            <div id="btn-state-start" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                                <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
+                            </div>
+                            <div id="btn-state-recording" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                                <i data-lucide="square" class="w-4 h-4"></i> TAP TO STOP (<span id="timer-display">00:00</span>)
+                            </div>
+                            <div id="btn-state-processing" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> CHECKING SCORES...
+                            </div>
+                            <div id="btn-state-save" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
+                                <i data-lucide="check" class="w-4 h-4"></i> SCORES READY
+                            </div>
+                        </button>
+                    </div>
+
                 </div>
 
-                <!-- 4. CREATOR SEQUENCE ACTION BAR -->
-                <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[64px] overflow-visible mt-auto">
-                    <button data-action="toggle" id="main-action-btn" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden shadow-lg bg-slate-800 hover:bg-slate-700 active:scale-95 group/btn">
-                        
-                        <div id="action-progress" class="absolute left-0 top-0 h-full w-0 bg-indigo-600 transition-all duration-100 ease-out z-0"></div>
-
-                        <div id="action-markers" class="absolute inset-0 flex z-10 pointer-events-none opacity-0 transition-opacity">
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">-no score-</span></div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">1/4pts</span></div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">3/4pts</span></div>
-                            <div class="flex flex-col items-center justify-end pb-1.5 border-r-[1.5px] border-white/20" style="width: 22.222%;"><span class="text-[7px] text-white/50 font-bold tracking-widest leading-none">Perfect!</span></div>
-                            <div class="flex flex-col items-center justify-end pb-1.5" style="width: 11.111%;"></div>
-                        </div>
-
-                        <!-- Sequence States -->
-                        <div id="btn-state-idle" class="flex items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
-                        </div>
-                        <div id="btn-state-start" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="play" class="w-4 h-4"></i> TAP TO START
-                        </div>
-                        <div id="btn-state-recording" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="square" class="w-4 h-4"></i> TAP TO STOP (<span id="timer-display">00:00</span>)
-                        </div>
-                        <div id="btn-state-processing" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> CHECKING SCORES...
-                        </div>
-                        <div id="btn-state-save" class="hidden items-center gap-2 z-20 font-black tracking-widest text-[11px] uppercase">
-                            <i data-lucide="check" class="w-4 h-4"></i> SCORES READY
-                        </div>
-                    </button>
-                </div>
-
-                <!-- 5. CAMERA FEED -->
-                <div class="px-4 pb-4 h-[30%] flex flex-col shrink-0">
+                <!-- 5. CAMERA FEED (Increased to 40%) -->
+                <div class="px-4 pb-4 h-[40%] w-full flex flex-col shrink-0 pointer-events-auto z-10">
                     <div data-action="toggle-camera" class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
 
@@ -259,28 +264,28 @@ class ThpsGameboardAnimated extends HTMLElement {
         if (state === 'SCORED') {
             // 1. Hide internal action bar completely
             actionBarContainer.classList.replace('h-[64px]', 'h-0');
-            actionBarContainer.classList.add('opacity-0', 'pointer-events-none', 'py-0');
+            actionBarContainer.classList.add('opacity-0', 'pointer-events-none');
             
             // 2. Slide out the external tray
             tray.classList.replace('h-0', 'h-[52px]');
             tray.classList.replace('mt-0', 'mt-4');
             tray.classList.replace('opacity-0', 'opacity-100');
 
-            // 3. Drop the Mad-Lib panel to the 70% line
-            if (madlibPanel) madlibPanel.classList.replace('top-[60%]', 'top-[70%]');
+            // 3. Drop the Mad-Lib panel to the exact mathematical center
+            if (madlibPanel) madlibPanel.classList.replace('top-1/3', 'top-1/2');
         } else {
             // 1. Restore internal action bar
             actionBarContainer.classList.replace('h-0', 'h-[64px]');
-            actionBarContainer.classList.remove('opacity-0', 'pointer-events-none', 'py-0');
+            actionBarContainer.classList.remove('opacity-0', 'pointer-events-none');
             
             // 2. Hide external tray
             tray.classList.replace('h-[52px]', 'h-0');
             tray.classList.replace('mt-4', 'mt-0');
             tray.classList.replace('opacity-100', 'opacity-0');
 
-            // 3. Restore the Mad-Lib panel
-            if (madlibPanel && madlibPanel.classList.contains('top-[70%]')) {
-                madlibPanel.classList.replace('top-[70%]', 'top-[60%]');
+            // 3. Restore the Mad-Lib panel to the top third
+            if (madlibPanel && madlibPanel.classList.contains('top-1/2')) {
+                madlibPanel.classList.replace('top-1/2', 'top-1/3');
             }
         }
         
