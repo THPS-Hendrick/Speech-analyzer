@@ -84,13 +84,13 @@ class ThpsGameboardAnimated extends HTMLElement {
                     <div id="results-cards" class="hidden h-full flex-col w-full">
                         <!-- Hero Score (Split Layout) -->
                         <div class="relative w-full h-16 sm:h-20 mb-3 animate-slide-up" style="animation-delay: 0.1s;">
-                            <!-- Stars (30% from left) -->
-                            <div class="absolute top-1/2 -translate-y-1/2 left-[30%] -translate-x-1/2 flex flex-col items-center gap-0.5 w-24">
+                            <!-- Stars (25% from left) -->
+                            <div class="absolute top-1/2 -translate-y-1/2 left-[25%] -translate-x-1/2 flex flex-col items-center gap-0.5 w-24">
                                 <div class="flex justify-center gap-1 w-full" id="res-stars-top"></div>
                                 <div class="flex justify-center gap-1 w-full" id="res-stars-bottom"></div>
                             </div>
-                            <!-- Grade (60% from left, nudged up) -->
-                            <div class="absolute top-1/2 -translate-y-1/2 left-[60%] -translate-x-1/2 flex flex-col items-center justify-center -mt-2">
+                            <!-- Grade (75% from left, nudged up) -->
+                            <div class="absolute top-1/2 -translate-y-1/2 left-[75%] -translate-x-1/2 flex flex-col items-center justify-center -mt-2">
                                 <h2 class="text-[48px] sm:text-[56px] font-black text-slate-800 leading-none tracking-tighter drop-shadow-sm" id="res-score-hero">0.0</h2>
                                 <p class="text-[10px] font-bold tracking-widest text-blue-600 uppercase mt-1 leading-none" id="res-msg">Checking...</p>
                             </div>
