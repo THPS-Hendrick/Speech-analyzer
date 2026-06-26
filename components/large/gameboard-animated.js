@@ -160,7 +160,7 @@ class ThpsGameboardAnimated extends HTMLElement {
                     </button>
                 </div>
 
-                <div class="px-4 pb-4 mt-auto h-[50%] flex flex-col shrink-0">
+                <div class="px-4 pb-4 mt-auto h-[33%] flex flex-col shrink-0">
                     <div data-action="toggle-camera" class="w-full h-full bg-slate-900 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-slate-700 shadow-inner cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
                         <video id="studio-video" class="w-full h-full object-cover transform -scale-x-100 hidden" autoplay muted playsinline></video>
 
