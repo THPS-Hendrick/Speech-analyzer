@@ -377,6 +377,36 @@
             if (stream) stream.getTracks().forEach(t => t.stop());
             if (displayStream) displayStream.getTracks().forEach(t => t.stop());
             
+// Reset UI
+            videoEl.classList.add('hidden');
+            videoEl.srcObject = null;
+            camOff.classList.remove('hidden');
+            recDot.classList.add('hidden');
+            
+            widget.setGameState('IDLE');
+        });
+
+        // STEP 6: Reset Game (WITHOUT Downloading)
+        window.addEventListener('thps-studio-reset-game', () => {
+            const widget = document.querySelector('thps-gameboard-animated');
+            const videoEl = widget.querySelector('#studio-video');
+            const camOff = widget.querySelector('#studio-cam-off');
+            const recDot = widget.querySelector('#studio-rec-dot');
+            
+            // Prevent download by stripping the onstop handler before stopping
+            if (mediaRecorder) {
+                mediaRecorder.onstop = null;
+                if (mediaRecorder.state === "recording") mediaRecorder.stop();
+            }
+            
+            // Completely terminate the active hardware connections
+            if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+            if (virtualDestNode) { virtualDestNode = null; }
+            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); audioCtx = null; }
+
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            if (displayStream) displayStream.getTracks().forEach(t => t.stop());
+            
             // Reset UI
             videoEl.classList.add('hidden');
             videoEl.srcObject = null;
