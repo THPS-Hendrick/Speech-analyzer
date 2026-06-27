@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V14)</title>
+    <title>Daily Mic-Check: Logic Engine (V15)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -109,8 +109,8 @@
         // B-Side Drill-Down State Tracking
         let sideBLevel = 0; 
         let p5SoloFlipped = false;
-        let currentCategory = ''; // 'Content', 'Delivery', or 'Clarity'
-        let currentSubNum = 0; // Tracks which sub-metric (2, 3, or 4) was clicked
+        let currentCategory = ''; 
+        let currentSubNum = 0; 
 
         // --- SVGs ---
         function createStar(type, size = 20, extraClass = "") {
@@ -189,7 +189,6 @@
                 </div>`;
 
             if (sideBLevel === 0) {
-                // When level is 0, P5's back face acts as the prompt revealer. P1-P4 back faces don't matter because they won't be seen.
                 p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-600';
                 p5.innerHTML = `
                     <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
@@ -237,7 +236,6 @@
             }
         }
 
-
         // --- UI RENDERER (SIDE A & INITIAL SETUP) ---
         function renderPhase() {
             for (let i = 1; i <= 5; i++) {
@@ -246,6 +244,10 @@
 
             if (phase === 'START') {
                 for (let i = 1; i <= 4; i++) {
+                    // FIX: Explicitly reset standard classes so leftover colors (blue/purple) are removed on reset
+                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200 text-slate-700';
+                    document.getElementById(`p${i}-back`).className = 'face face-back bg-slate-50 border-slate-200 text-slate-700';
+
                     document.getElementById(`p${i}-front`).innerHTML = `
                         <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
                             <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
@@ -269,6 +271,7 @@
                         </div>
                         <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
                     </div>`;
+                document.getElementById('p5-back').className = 'face face-back';
                 document.getElementById('p5-back').innerHTML = ''; 
             } 
             
@@ -307,7 +310,6 @@
             }
 
             else if (phase === 'RESULTS') {
-                // Initialize Side A
                 for (let i = 1; i <= 4; i++) {
                     document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors';
                     document.getElementById(`p${i}-front`).innerHTML = `
@@ -327,7 +329,7 @@
                     <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevRight}</span>`;
                 
                 sideBLevel = 0;
-                renderSideB(); // Prime P5's back face with the sentence
+                renderSideB(); 
             }
         }
 
@@ -363,7 +365,7 @@
                 else if (sideBLevel === 1) {
                     if (panelNum === 1 || panelNum === 5) {
                         sideBLevel = 0;
-                        renderSideB(); // Re-prime P5's back face
+                        renderSideB(); 
                         flipAll(false);
                     } else {
                         sideBLevel = 2;
@@ -425,6 +427,7 @@
                 phase = 'PROCESSING';
                 clearInterval(timerInterval);
                 renderPhase(); 
+                
                 document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
 
                 setTimeout(() => {
