@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V13)</title>
+    <title>Daily Mic-Check: Logic Engine (V14)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -101,12 +101,18 @@
         let phase = 'START';
         let timerSeconds = 0;
         let timerInterval = null;
-        let achievedStarStatus = 'empty'; // Tracks the dynamic star for Panel 5 Final Phase
+        let achievedStarStatus = 'empty'; 
         const maxDurationSeconds = 30; 
         
         let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+        
+        // B-Side Drill-Down State Tracking
+        let sideBLevel = 0; 
+        let p5SoloFlipped = false;
+        let currentCategory = ''; // 'Content', 'Delivery', or 'Clarity'
+        let currentSubNum = 0; // Tracks which sub-metric (2, 3, or 4) was clicked
 
-        // --- DYNAMIC SVG GENERATOR ---
+        // --- SVGs ---
         function createStar(type, size = 20, extraClass = "") {
             if (type === 'empty') {
                 return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
@@ -116,12 +122,12 @@
                 return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
             }
         }
-
         const playSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
-        const chevronSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        const chevRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        const chevLeft = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
 
-        // The Data Matrix (Now includes explicit star generation per side)
+        // --- DATA DICTIONARIES ---
         const matrix = {
             1: { A: "Talk About", B: "Bore us about", colorA: "text-blue-600", colorB: "text-blue-600", finalA: "Final Grade", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') },
             2: { A: "Cardboard boxes, with", B: "anything, with", colorA: "text-purple-600", colorB: "text-purple-600", finalA: "Content", starA: createStar('filled', 18, 'text-amber-400'), starB: createStar('empty', 18, 'text-slate-300') },
@@ -129,15 +135,111 @@
             4: { A: "Have fun!", B: "Close eyes for 5 sec!", colorA: "text-red-600", colorB: "text-red-600", finalA: "Clarity", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') }
         };
 
+        const drillData = {
+            Content: {
+                score: "2/3",
+                2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" },
+                3: { name: "Visual", val: "10%", you: "didn't use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" },
+                4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" }
+            },
+            Delivery: {
+                score: "1/3",
+                2: { name: "Pace", val: "103 WPM", you: "spoke a bit slowly", try: "speeding up to 130-150 WPM", why: "keeps audience attention" },
+                3: { name: "Pauses", val: "2.9s", you: "had some long gaps", try: "using shorter, deliberate pauses", why: "creates emphasis without losing flow" },
+                4: { name: "Filler", val: "12 words", you: "used 'um' and 'ah' frequently", try: "taking a breath instead of vocalizing", why: "sounds more confident and prepared" }
+            },
+            Clarity: {
+                score: "3/3",
+                2: { name: "Reading Lvl", val: "Grade 8", you: "hit the sweet spot for general audiences", try: "maintaining this consistency", why: "Grade 7-9 is globally accessible" },
+                3: { name: "WPI", val: "7.8", you: "kept ideas punchy", try: "using short sentences for big impacts", why: "Words-Per-Idea under 10 is very clear" },
+                4: { name: "Jargon", val: "Low", you: "avoided confusing industry terms", try: "always explaining acronyms if used", why: "prevents alienating listeners" }
+            }
+        };
+
         function getTodayDate() {
-            const date = new Date();
             const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return date.toLocaleDateString('en-GB', options);
+            return new Date().toLocaleDateString('en-GB', options);
         }
 
-        // --- UI RENDERER ---
+        function buildPromptSentence() {
+            const s1 = selections[1] === 'A' ? matrix[1].A : matrix[1].B;
+            const s2 = selections[2] === 'A' ? matrix[2].A : matrix[2].B;
+            const s3 = selections[3] === 'A' ? matrix[3].A : matrix[3].B;
+            const s4 = selections[4] === 'A' ? matrix[4].A : matrix[4].B;
+            return `${s1} ${s2} ${s3} ${s4}`;
+        }
+
+        // --- DRILL DOWN RENDERER (SIDE B ONLY) ---
+        function renderSideB() {
+            const p1 = document.getElementById('p1-back');
+            const p2 = document.getElementById('p2-back');
+            const p3 = document.getElementById('p3-back');
+            const p4 = document.getElementById('p4-back');
+            const p5 = document.getElementById('p5-back');
+
+            const item = (text, icon) => `
+                <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                    <span class="text-[13px] font-bold uppercase tracking-widest">${text}</span>
+                </div>
+                <span class="absolute right-3 pointer-events-none">${icon}</span>`;
+            
+            const feedbackItem = (label, text) => `
+                <div class="w-full h-full flex items-center justify-start pl-5 pr-8">
+                    <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="text-blue-600 uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
+                </div>`;
+
+            if (sideBLevel === 0) {
+                // When level is 0, P5's back face acts as the prompt revealer. P1-P4 back faces don't matter because they won't be seen.
+                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-600';
+                p5.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
+                        <span class="text-[10px] font-medium leading-tight">${buildPromptSentence()}</span>
+                    </div>
+                    <span class="absolute right-3 text-slate-300">${chevLeft}</span>`;
+            } 
+            else if (sideBLevel === 1) {
+                p1.className = 'face face-back bg-purple-600 border-purple-700 text-white';
+                p1.innerHTML = item("Final Grade = 8.8", chevLeft);
+                
+                [p2, p3, p4].forEach((el, i) => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700 group-hover:bg-slate-100 transition-colors');
+                p2.innerHTML = item(`Content = ${drillData.Content.score}`, chevRight);
+                p3.innerHTML = item(`Delivery = ${drillData.Delivery.score}`, chevRight);
+                p4.innerHTML = item(`Clarity = ${drillData.Clarity.score}`, chevRight);
+                
+                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
+                p5.innerHTML = item(`Time = 41s`, chevLeft);
+            } 
+            else if (sideBLevel === 2) {
+                const data = drillData[currentCategory];
+                p1.className = 'face face-back bg-blue-600 border-blue-700 text-white';
+                p1.innerHTML = item(`${currentCategory} = ${data.score}`, chevLeft);
+
+                [p2, p3, p4].forEach((el, i) => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700 group-hover:bg-slate-100 transition-colors');
+                p2.innerHTML = item(`${data[2].name} = ${data[2].val}`, chevRight);
+                p3.innerHTML = item(`${data[3].name} = ${data[3].val}`, chevRight);
+                p4.innerHTML = item(`${data[4].name} = ${data[4].val}`, chevRight);
+
+                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
+                p5.innerHTML = item(`Go back`, chevLeft);
+            } 
+            else if (sideBLevel === 3) {
+                const data = drillData[currentCategory][currentSubNum];
+                p1.className = 'face face-back bg-blue-600 border-blue-700 text-white';
+                p1.innerHTML = item(`${data.name} = ${data.val}`, chevLeft);
+
+                [p2, p3, p4].forEach(el => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700');
+                p2.innerHTML = feedbackItem('You', data.you);
+                p3.innerHTML = feedbackItem('Try', data.try);
+                p4.innerHTML = feedbackItem('Why', data.why);
+
+                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
+                p5.innerHTML = item(`Go back`, chevLeft);
+            }
+        }
+
+
+        // --- UI RENDERER (SIDE A & INITIAL SETUP) ---
         function renderPhase() {
-            // Revert all flips visually
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`bar-${i}`).classList.remove('flip-active');
             }
@@ -157,7 +259,6 @@
                         <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starB}</span>`;
                 }
 
-                // Panel 5: Timer Bar with Half and Filled stars mapped to 25% and 75%
                 document.getElementById('p5-front').className = 'face face-front bg-[#1e293b] border-[#0f172a] text-white';
                 document.getElementById('p5-front').innerHTML = `
                     <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
@@ -206,76 +307,86 @@
             }
 
             else if (phase === 'RESULTS') {
+                // Initialize Side A
                 for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors';
                     document.getElementById(`p${i}-front`).innerHTML = `
                         <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold text-slate-700 uppercase tracking-widest">${matrix[i].finalA}</span>
+                            <span class="text-[13px] font-bold uppercase tracking-widest">${matrix[i].finalA}</span>
                             <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar('filled', 20)}</div>
                         </div>
-                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
-                    
-                    document.getElementById(`p${i}-back`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[20px] font-black text-slate-400">${i}</span>
-                        </div>
-                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevRight}</span>`;
                 }
 
-                const s1 = selections[1] === 'A' ? matrix[1].A : matrix[1].B;
-                const s2 = selections[2] === 'A' ? matrix[2].A : matrix[2].B;
-                const s3 = selections[3] === 'A' ? matrix[3].A : matrix[3].B;
-                const s4 = selections[4] === 'A' ? matrix[4].A : matrix[4].B;
-                const finalSentence = `${s1} ${s2} ${s3} ${s4}`;
-
-                // Panel 5 utilizes achievedStarStatus from the recording phase!
-                document.getElementById('p5-front').className = 'face face-front bg-white border-slate-200';
+                document.getElementById('p5-front').className = 'face face-front bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors';
                 document.getElementById('p5-front').innerHTML = `
                     <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                        <span class="text-[13px] font-bold text-slate-700 uppercase tracking-widest">${getTodayDate()}</span>
+                        <span class="text-[13px] font-bold uppercase tracking-widest">${getTodayDate()}</span>
                         <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar(achievedStarStatus, 20)}</div>
                     </div>
-                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevRight}</span>`;
                 
-                document.getElementById('p5-back').innerHTML = `
-                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
-                        <span class="text-[10px] font-medium leading-tight text-slate-600">${finalSentence}</span>
-                    </div>
-                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                sideBLevel = 0;
+                renderSideB(); // Prime P5's back face with the sentence
             }
         }
 
         // --- INTERACTION LOGIC ---
+        function flipAll(toBack) {
+            for (let i = 1; i <= 5; i++) {
+                if (toBack) document.getElementById(`bar-${i}`).classList.add('flip-active');
+                else document.getElementById(`bar-${i}`).classList.remove('flip-active');
+            }
+        }
+
         function toggleFlip(panelNum) {
             if (phase === 'RECORDING' || phase === 'PROCESSING') return;
-            if (phase === 'START' && panelNum === 5) return; 
 
-            const bar = document.getElementById(`bar-${panelNum}`);
+            if (phase === 'START') {
+                if (panelNum === 5) return; 
+                document.getElementById(`bar-${panelNum}`).classList.toggle('flip-active');
+                selections[panelNum] = document.getElementById(`bar-${panelNum}`).classList.contains('flip-active') ? 'B' : 'A';
+            } 
             
-            if (phase === 'RESULTS') {
-                if (panelNum >= 1 && panelNum <= 4) {
-                    const isFlipped = bar.classList.contains('flip-active');
-                    if (isFlipped) {
-                        for (let i = 1; i <= 5; i++) {
-                            document.getElementById(`bar-${i}`).classList.remove('flip-active');
-                        }
-                    } else {
-                        for (let i = 1; i <= 4; i++) {
-                            document.getElementById(`p${i}-back`).innerHTML = `
-                                <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                                    <span class="text-[20px] font-black text-slate-400">Panel ${panelNum}</span>
-                                </div>
-                                <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
-                        }
-                        for (let i = 1; i <= 5; i++) {
-                            document.getElementById(`bar-${i}`).classList.add('flip-active');
-                        }
+            else if (phase === 'RESULTS') {
+                if (sideBLevel === 0) {
+                    if (panelNum >= 1 && panelNum <= 4) {
+                        sideBLevel = 1;
+                        renderSideB();
+                        flipAll(true);
+                        p5SoloFlipped = false;
+                    } else if (panelNum === 5) {
+                        p5SoloFlipped = !p5SoloFlipped;
+                        document.getElementById('bar-5').classList.toggle('flip-active');
                     }
-                } else if (panelNum === 5) {
-                    bar.classList.toggle('flip-active');
+                } 
+                else if (sideBLevel === 1) {
+                    if (panelNum === 1 || panelNum === 5) {
+                        sideBLevel = 0;
+                        renderSideB(); // Re-prime P5's back face
+                        flipAll(false);
+                    } else {
+                        sideBLevel = 2;
+                        currentCategory = panelNum === 2 ? 'Content' : (panelNum === 3 ? 'Delivery' : 'Clarity');
+                        renderSideB();
+                    }
+                } 
+                else if (sideBLevel === 2) {
+                    if (panelNum === 1 || panelNum === 5) {
+                        sideBLevel = 1;
+                        renderSideB();
+                    } else {
+                        sideBLevel = 3;
+                        currentSubNum = panelNum;
+                        renderSideB();
+                    }
+                } 
+                else if (sideBLevel === 3) {
+                    if (panelNum === 1 || panelNum === 5) {
+                        sideBLevel = 2;
+                        renderSideB();
+                    }
                 }
-            } else if (phase === 'START') {
-                bar.classList.toggle('flip-active');
-                selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
             }
         }
 
@@ -284,7 +395,7 @@
 
             if (phase === 'START') {
                 phase = 'RECORDING';
-                achievedStarStatus = 'empty'; // Reset dynamic star tracking
+                achievedStarStatus = 'empty'; 
                 renderPhase(); 
                 timerSeconds = 0;
                 
@@ -300,7 +411,6 @@
                     
                     if (tProg) tProg.style.width = progressPercent + '%';
                     
-                    // Track status and dynamically light up stars
                     if (progressPercent >= 25) {
                         if (s1) s1.classList.replace('text-slate-600', 'text-amber-400');
                         achievedStarStatus = 'half';
@@ -315,7 +425,6 @@
                 phase = 'PROCESSING';
                 clearInterval(timerInterval);
                 renderPhase(); 
-                
                 document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
 
                 setTimeout(() => {
@@ -330,6 +439,8 @@
             clearInterval(timerInterval);
             selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
             achievedStarStatus = 'empty';
+            sideBLevel = 0;
+            p5SoloFlipped = false;
             renderPhase(); 
             document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
         }
