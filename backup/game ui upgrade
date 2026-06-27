@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V15)</title>
+    <title>Daily Mic-Check: Logic Engine (V20)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -76,7 +76,7 @@
 
             <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
                 <div id="bar-5" class="flipper">
-                    <div id="p5-front" class="face face-front bg-[#1e293b] border-[#0f172a] text-white"></div>
+                    <div id="p5-front" class="face face-front overflow-hidden"></div>
                     <div id="p5-back" class="face face-back"></div>
                 </div>
             </div>
@@ -97,16 +97,25 @@
     </button>
 
     <script>
-        // --- STATE ENGINE ---
+        // --- STATE ENGINE & COLORS ---
+        const col = {
+            p1: 'bg-[#8F1C1C]', textP1: 'text-[#8F1C1C]', borderP1: 'border-[#8F1C1C]',
+            p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
+            p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
+            p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
+            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200',
+            b: 'bg-slate-900', textB: 'text-slate-800'
+        };
+
         let phase = 'START';
         let timerSeconds = 0;
         let timerInterval = null;
         let achievedStarStatus = 'empty'; 
-        const maxDurationSeconds = 30; 
+        const maxDurationSeconds = 80; 
         
         let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
         
-        // B-Side Drill-Down State Tracking
         let sideBLevel = 0; 
         let p5SoloFlipped = false;
         let currentCategory = ''; 
@@ -114,62 +123,86 @@
 
         // --- SVGs ---
         function createStar(type, size = 20, extraClass = "") {
-            if (type === 'empty') {
-                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-            } else if (type === 'half') {
-                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-            } else {
-                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-            }
+            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
         }
-        const playSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        const playSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
         const chevRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
         const chevLeft = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+        const plusSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+        const caretUpSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
 
         // --- DATA DICTIONARIES ---
         const matrix = {
-            1: { A: "Talk About", B: "Bore us about", colorA: "text-blue-600", colorB: "text-blue-600", finalA: "Final Grade", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') },
-            2: { A: "Cardboard boxes, with", B: "anything, with", colorA: "text-purple-600", colorB: "text-purple-600", finalA: "Content", starA: createStar('filled', 18, 'text-amber-400'), starB: createStar('empty', 18, 'text-slate-300') },
-            3: { A: "any examples.", B: "Private + Public examples.", colorA: "text-emerald-600", colorB: "text-emerald-600", finalA: "Delivery", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') },
-            4: { A: "Have fun!", B: "Close eyes for 5 sec!", colorA: "text-red-600", colorB: "text-red-600", finalA: "Clarity", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') }
+            1: { A: "Today's Mic-Check is...", B: "Yell at some point!", colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", B: "Bore us about", colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", B: "Cardboard boxes, with", colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            4: { A: "any examples.", B: "Private + Public examples.", colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
         };
 
         const drillData = {
-            Content: {
-                score: "2/3",
-                2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" },
-                3: { name: "Visual", val: "10%", you: "didn't use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" },
-                4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" }
-            },
-            Delivery: {
-                score: "1/3",
-                2: { name: "Pace", val: "103 WPM", you: "spoke a bit slowly", try: "speeding up to 130-150 WPM", why: "keeps audience attention" },
-                3: { name: "Pauses", val: "2.9s", you: "had some long gaps", try: "using shorter, deliberate pauses", why: "creates emphasis without losing flow" },
-                4: { name: "Filler", val: "12 words", you: "used 'um' and 'ah' frequently", try: "taking a breath instead of vocalizing", why: "sounds more confident and prepared" }
-            },
-            Clarity: {
-                score: "3/3",
-                2: { name: "Reading Lvl", val: "Grade 8", you: "hit the sweet spot for general audiences", try: "maintaining this consistency", why: "Grade 7-9 is globally accessible" },
-                3: { name: "WPI", val: "7.8", you: "kept ideas punchy", try: "using short sentences for big impacts", why: "Words-Per-Idea under 10 is very clear" },
-                4: { name: "Jargon", val: "Low", you: "avoided confusing industry terms", try: "always explaining acronyms if used", why: "prevents alienating listeners" }
-            }
+            Delivery: { score: "1/3", 2: { name: "Pace", val: "103 WPM", you: "spoke a bit slowly", try: "speeding up to 130-150 WPM", why: "keeps audience attention" }, 3: { name: "Pauses", val: "2.9s", you: "had some long gaps", try: "using shorter, deliberate pauses", why: "creates emphasis without losing flow" }, 4: { name: "Filler", val: "12 words", you: "used 'um' and 'ah' frequently", try: "taking a breath instead of vocalizing", why: "sounds more confident and prepared" } },
+            Content: { score: "2/3", 2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" }, 3: { name: "Visual", val: "10%", you: "didn't use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" }, 4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" } },
+            Clarity: { score: "3/3", 2: { name: "Reading Lvl", val: "Grade 8", you: "hit the sweet spot for general audiences", try: "maintaining this consistency", why: "Grade 7-9 is globally accessible" }, 3: { name: "WPI", val: "7.8", you: "kept ideas punchy", try: "using short sentences for big impacts", why: "Words-Per-Idea under 10 is very clear" }, 4: { name: "Jargon", val: "Low", you: "avoided confusing industry terms", try: "always explaining acronyms if used", why: "prevents alienating listeners" } }
         };
 
-        function getTodayDate() {
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return new Date().toLocaleDateString('en-GB', options);
+        // --- CALCULATION LOGIC ---
+        function getTodayDate() { 
+            return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); 
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function getTimeGradeAndStar(sec) {
+            if (sec >= 60 && sec <= 80) return { grade: "1/1", star: "filled", count: 5 };
+            if (sec >= 20 && sec < 60) return { grade: "0.5/1", star: "half", count: 3 };
+            return { grade: "0/1", star: "empty", count: 1 };
+        }
+
+        function getLevelCount() {
+            let count = 0;
+            if (selections[1] === 'B') count++;
+            if (selections[2] === 'B') count++;
+            if (selections[3] === 'B') count++;
+            if (selections[4] === 'B') count++;
+            return count;
+        }
+
+        function updateLevelDisplay() {
+            const count = getLevelCount();
+            const fillPercent = (count / 4) * 100;
+            const levelSpan = document.getElementById('level-text');
+            const fillDiv = document.getElementById('p5-fill');
+            
+            if (levelSpan) levelSpan.innerText = `Level ${count + 1}: Speak for 1min`;
+            if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
         }
 
         function buildPromptSentence() {
-            const s1 = selections[1] === 'A' ? matrix[1].A : matrix[1].B;
-            const s2 = selections[2] === 'A' ? matrix[2].A : matrix[2].B;
-            const s3 = selections[3] === 'A' ? matrix[3].A : matrix[3].B;
-            const s4 = selections[4] === 'A' ? matrix[4].A : matrix[4].B;
+            const s1 = selections[1] === 'A' ? `<strong class="${matrix[1].colorA}">${matrix[1].A}</strong>` : `<strong class="${matrix[1].colorB}">${matrix[1].B}</strong>`;
+            const s2 = selections[2] === 'A' ? `<strong class="${matrix[2].colorA}">${matrix[2].A}</strong>` : `<strong class="${matrix[2].colorB}">${matrix[2].B}</strong>`;
+            const s3 = selections[3] === 'A' ? `<strong class="${matrix[3].colorA}">${matrix[3].A}</strong>` : `<strong class="${matrix[3].colorB}">${matrix[3].B}</strong>`;
+            const s4 = selections[4] === 'A' ? `<strong class="${matrix[4].colorA}">${matrix[4].A}</strong>` : `<strong class="${matrix[4].colorB}">${matrix[4].B}</strong>`;
             return `${s1} ${s2} ${s3} ${s4}`;
         }
 
-        // --- DRILL DOWN RENDERER (SIDE B ONLY) ---
+        function generateFiveStars() {
+            const activeStars = getTimeGradeAndStar(timerSeconds).count;
+            let html = '<div class="flex gap-1">';
+            for(let i = 1; i <= 5; i++) {
+                html += createStar(i <= activeStars ? 'filled' : 'empty', 16, col.textP5);
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // --- UI RENDERER (SIDE B DRILL-DOWNS) ---
         function renderSideB() {
             const p1 = document.getElementById('p1-back');
             const p2 = document.getElementById('p2-back');
@@ -177,66 +210,73 @@
             const p4 = document.getElementById('p4-back');
             const p5 = document.getElementById('p5-back');
 
-            const item = (text, icon) => `
+            const item = (text, icon, textColor = col.textB) => `
                 <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                    <span class="text-[13px] font-bold uppercase tracking-widest">${text}</span>
+                    <span class="text-[13px] font-bold uppercase tracking-widest ${textColor}">${text}</span>
                 </div>
-                <span class="absolute right-3 pointer-events-none">${icon}</span>`;
+                <span class="absolute right-3 pointer-events-none ${textColor}">${icon}</span>`;
             
             const feedbackItem = (label, text) => `
                 <div class="w-full h-full flex items-center justify-start pl-5 pr-8">
-                    <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="text-blue-600 uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
+                    <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="${col.textP3} uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
                 </div>`;
 
             if (sideBLevel === 0) {
-                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-600';
-                p5.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
-                        <span class="text-[10px] font-medium leading-tight">${buildPromptSentence()}</span>
-                    </div>
-                    <span class="absolute right-3 text-slate-300">${chevLeft}</span>`;
+                // Safety catch for Final 0 Side B, though strictly accessed via Final 1 logic
             } 
             else if (sideBLevel === 1) {
-                p1.className = 'face face-back bg-purple-600 border-purple-700 text-white';
-                p1.innerHTML = item("Final Grade = 8.8", chevLeft);
+                p1.className = `face face-back ${col.p1}`;
+                p1.innerHTML = item("Final Grade = 8.8", chevLeft, col.textP5);
                 
-                [p2, p3, p4].forEach((el, i) => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700 group-hover:bg-slate-100 transition-colors');
-                p2.innerHTML = item(`Content = ${drillData.Content.score}`, chevRight);
-                p3.innerHTML = item(`Delivery = ${drillData.Delivery.score}`, chevRight);
-                p4.innerHTML = item(`Clarity = ${drillData.Clarity.score}`, chevRight);
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
+                p2.innerHTML = item(`Delivery = ${drillData.Delivery.score}`, chevRight, col.textB);
+                p3.innerHTML = item(`Content = ${drillData.Content.score}`, chevRight, col.textB);
+                p4.innerHTML = item(`Clarity = ${drillData.Clarity.score}`, chevRight, col.textB);
                 
-                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
-                p5.innerHTML = item(`Time = 41s`, chevLeft);
+                const p5a = document.getElementById('p5-front');
+                p5a.className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                p5a.innerHTML = item(`Time = ${getTimeGradeAndStar(timerSeconds).grade}`, plusSVG, col.textB);
+
+                p5.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                p5.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
+                        <span class="text-[10px] font-medium leading-tight text-slate-600">${buildPromptSentence()}</span>
+                    </div>
+                    <span class="absolute right-3 text-slate-300 pointer-events-none">${caretUpSVG}</span>`;
             } 
             else if (sideBLevel === 2) {
                 const data = drillData[currentCategory];
-                p1.className = 'face face-back bg-blue-600 border-blue-700 text-white';
-                p1.innerHTML = item(`${currentCategory} = ${data.score}`, chevLeft);
+                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
+                
+                p1.className = `face face-back ${activeBg}`;
+                p1.innerHTML = item(`${currentCategory} = ${data.score}`, chevLeft, col.textW);
 
-                [p2, p3, p4].forEach((el, i) => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700 group-hover:bg-slate-100 transition-colors');
-                p2.innerHTML = item(`${data[2].name} = ${data[2].val}`, chevRight);
-                p3.innerHTML = item(`${data[3].name} = ${data[3].val}`, chevRight);
-                p4.innerHTML = item(`${data[4].name} = ${data[4].val}`, chevRight);
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
+                p2.innerHTML = item(`${data[2].name} = ${data[2].val}`, chevRight, col.textB);
+                p3.innerHTML = item(`${data[3].name} = ${data[3].val}`, chevRight, col.textB);
+                p4.innerHTML = item(`${data[4].name} = ${data[4].val}`, chevRight, col.textB);
 
-                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
-                p5.innerHTML = item(`Go back`, chevLeft);
+                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
+                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
             } 
             else if (sideBLevel === 3) {
                 const data = drillData[currentCategory][currentSubNum];
-                p1.className = 'face face-back bg-blue-600 border-blue-700 text-white';
-                p1.innerHTML = item(`${data.name} = ${data.val}`, chevLeft);
+                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
 
-                [p2, p3, p4].forEach(el => el.className = 'face face-back bg-slate-50 border-slate-200 text-slate-700');
+                p1.className = `face face-back ${activeBg}`;
+                p1.innerHTML = item(`${data.name} = ${data.val}`, chevLeft, col.textW);
+
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW}`);
                 p2.innerHTML = feedbackItem('You', data.you);
                 p3.innerHTML = feedbackItem('Try', data.try);
                 p4.innerHTML = feedbackItem('Why', data.why);
 
-                p5.className = 'face face-back bg-slate-50 border-slate-200 text-slate-500 group-hover:bg-slate-100 transition-colors';
-                p5.innerHTML = item(`Go back`, chevLeft);
+                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
+                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
             }
         }
 
-        // --- UI RENDERER (SIDE A & INITIAL SETUP) ---
+        // --- UI RENDERER (SIDE A & PRIMARY FLOWS) ---
         function renderPhase() {
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`bar-${i}`).classList.remove('flip-active');
@@ -244,32 +284,36 @@
 
             if (phase === 'START') {
                 for (let i = 1; i <= 4; i++) {
-                    // FIX: Explicitly reset standard classes so leftover colors (blue/purple) are removed on reset
-                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200 text-slate-700';
-                    document.getElementById(`p${i}-back`).className = 'face face-back bg-slate-50 border-slate-200 text-slate-700';
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrix[i].bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrix[i].bgB}`;
 
                     document.getElementById(`p${i}-front`).innerHTML = `
                         <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
                         </div>
                         <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starA}</span>`;
                     
                     document.getElementById(`p${i}-back`).innerHTML = `
                         <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${matrix[i].colorB}">${matrix[i].B}</strong></span>
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorB}">${matrix[i].B}</strong></span>
                         </div>
                         <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starB}</span>`;
                 }
 
-                document.getElementById('p5-front').className = 'face face-front bg-[#1e293b] border-[#0f172a] text-white';
+                if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
+                if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
+                if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
+                if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
+
+                const fillP = (getLevelCount() / 4) * 100;
+                document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
                 document.getElementById('p5-front').innerHTML = `
-                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
-                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
-                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
-                            ${playSVG}
-                        </div>
-                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
+                    <div class="relative w-full h-full z-10 flex items-center justify-start pl-5 pr-14">
+                        <span id="level-text" class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">Level ${getLevelCount() + 1}: Speak for 1min</span>
+                    </div>
+                    <div class="absolute right-2 z-20 pointer-events-auto cursor-pointer p-2 bg-slate-900/10 text-slate-800 hover:bg-slate-900/20 rounded-full transition-all shadow-sm" onclick="handleActionClick(event)">
+                        ${playSVG}
                     </div>`;
                 document.getElementById('p5-back').className = 'face face-back';
                 document.getElementById('p5-back').innerHTML = ''; 
@@ -280,14 +324,17 @@
                     const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
                     const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
                     const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
+                    const chosenBg = selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB;
                     
+                    document.getElementById(`p${i}-front`).className = `face face-front ${chosenBg}`;
                     document.getElementById(`p${i}-front`).innerHTML = `
                         <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
                         </div>
                         <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
                 }
 
+                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
                 document.getElementById('p5-front').innerHTML = `
                     <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
                     <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
@@ -300,33 +347,50 @@
             }
 
             else if (phase === 'PROCESSING') {
+                const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5];
+                const txt = [col.textP5, col.textW, col.textW, col.textW, col.textW];
+                
                 for (let i = 1; i <= 5; i++) {
-                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200';
+                    document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
                     document.getElementById(`p${i}-front`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse text-slate-500 font-bold uppercase tracking-widest text-[13px]">
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse font-bold uppercase tracking-widest text-[13px] ${txt[i-1]}">
                             Checking Scores
                         </div>`;
                 }
             }
 
             else if (phase === 'RESULTS') {
-                for (let i = 1; i <= 4; i++) {
-                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors';
+                // Final 0 (A) logic
+                document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
+                document.getElementById('p1-front').innerHTML = `
+                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                        ${generateFiveStars()}
+                        <div class="absolute" style="left: 75%; transform: translateX(-50%);">
+                            <span class="text-[13px] font-bold uppercase tracking-widest ${col.textW}">See Scores</span>
+                        </div>
+                    </div>
+                    <span class="absolute right-3 ${col.textW} pointer-events-none">${chevRight}</span>`;
+
+                for (let i = 2; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    
+                    document.getElementById(`p${i}-front`).className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
                     document.getElementById(`p${i}-front`).innerHTML = `
                         <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold uppercase tracking-widest">${matrix[i].finalA}</span>
-                            <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar('filled', 20)}</div>
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                            <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar('filled', 20, col.textP5)}</div>
                         </div>
-                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevRight}</span>`;
+                        <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
                 }
 
-                document.getElementById('p5-front').className = 'face face-front bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors';
+                document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
                 document.getElementById('p5-front').innerHTML = `
                     <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                        <span class="text-[13px] font-bold uppercase tracking-widest">${getTodayDate()}</span>
-                        <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar(achievedStarStatus, 20)}</div>
+                        <span class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">${getTodayDate()} Time: ${formatTime(timerSeconds)}</span>
+                        <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar(getTimeGradeAndStar(timerSeconds).star, 20, col.textP5)}</div>
                     </div>
-                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevRight}</span>`;
+                    <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
                 
                 sideBLevel = 0;
                 renderSideB(); 
@@ -348,35 +412,36 @@
                 if (panelNum === 5) return; 
                 document.getElementById(`bar-${panelNum}`).classList.toggle('flip-active');
                 selections[panelNum] = document.getElementById(`bar-${panelNum}`).classList.contains('flip-active') ? 'B' : 'A';
+                updateLevelDisplay(); 
             } 
             
             else if (phase === 'RESULTS') {
                 if (sideBLevel === 0) {
-                    if (panelNum >= 1 && panelNum <= 4) {
-                        sideBLevel = 1;
-                        renderSideB();
-                        flipAll(true);
-                        p5SoloFlipped = false;
-                    } else if (panelNum === 5) {
-                        p5SoloFlipped = !p5SoloFlipped;
-                        document.getElementById('bar-5').classList.toggle('flip-active');
-                    }
+                    // Any click in Final 0 dives into Final 1 Menu
+                    sideBLevel = 1;
+                    renderSideB();
+                    for (let i = 1; i <= 4; i++) document.getElementById(`bar-${i}`).classList.add('flip-active');
+                    document.getElementById('bar-5').classList.remove('flip-active');
+                    p5SoloFlipped = false;
                 } 
                 else if (sideBLevel === 1) {
-                    if (panelNum === 1 || panelNum === 5) {
+                    if (panelNum === 1) {
                         sideBLevel = 0;
-                        renderSideB(); 
-                        flipAll(false);
-                    } else {
+                        renderPhase(); 
+                    } else if (panelNum >= 2 && panelNum <= 4) {
                         sideBLevel = 2;
-                        currentCategory = panelNum === 2 ? 'Content' : (panelNum === 3 ? 'Delivery' : 'Clarity');
+                        currentCategory = panelNum === 2 ? 'Delivery' : (panelNum === 3 ? 'Content' : 'Clarity');
                         renderSideB();
+                        document.getElementById('bar-5').classList.add('flip-active'); // Force P5 to back for "Go back"
+                    } else if (panelNum === 5) {
+                        document.getElementById('bar-5').classList.toggle('flip-active');
                     }
                 } 
                 else if (sideBLevel === 2) {
                     if (panelNum === 1 || panelNum === 5) {
                         sideBLevel = 1;
                         renderSideB();
+                        document.getElementById('bar-5').classList.remove('flip-active');
                     } else {
                         sideBLevel = 3;
                         currentSubNum = panelNum;
@@ -413,13 +478,11 @@
                     
                     if (tProg) tProg.style.width = progressPercent + '%';
                     
-                    if (progressPercent >= 25) {
-                        if (s1) s1.classList.replace('text-slate-600', 'text-amber-400');
-                        achievedStarStatus = 'half';
-                    }
-                    if (progressPercent >= 75) {
-                        if (s2) s2.classList.replace('text-slate-600', 'text-amber-400');
-                        achievedStarStatus = 'filled';
+                    if (progressPercent >= 25 && s1) s1.classList.replace('text-slate-600', 'text-amber-400');
+                    if (progressPercent >= 75 && s2) s2.classList.replace('text-slate-600', 'text-amber-400');
+
+                    if (timerSeconds >= maxDurationSeconds) {
+                        handleActionClick(null);
                     }
                 }, 1000);
             } 
@@ -440,8 +503,7 @@
         function resetGame() {
             phase = 'START';
             clearInterval(timerInterval);
-            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
-            achievedStarStatus = 'empty';
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; // Resets to Level 1 default
             sideBLevel = 0;
             p5SoloFlipped = false;
             renderPhase(); 
