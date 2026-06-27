@@ -1,397 +1,268 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check Redesign</title>
-    <!-- Tailwind CSS (Native Browser Script) -->
+    <title>Daily Mic-Check: Flipboard Concept V6 (Height Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for the Logo -->
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: #e2e8f0; 
         }
-        .logo-font { font-family: 'Caveat', cursive; }
-        
-        /* Custom Animations */
-        @keyframes slideUpFade {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up { 
-            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-            opacity: 0; 
-        }
-        
-        @keyframes pulseDark {
-            0%, 100% { opacity: 1; background-color: #1e293b; border-color: transparent;}
-            50% { opacity: 0.7; background-color: #0f172a; border-color: transparent;}
-        }
-        .animate-pulse-dark { animation: pulseDark 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .animate-pulse-dark * { opacity: 0.5; color: white !important; }
 
-        /* Hiding elements smoothly */
-        .hide-smooth {
-            height: 0 !important;
-            opacity: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
-            pointer-events: none !important;
+        /* 3D Flipboard CSS */
+        .perspective { perspective: 1200px; }
+        
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
+
+        .flip-active {
+            transform: rotateX(180deg);
+        }
+
+        .face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .face-front {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .face-back {
+            transform: rotateX(180deg);
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Pulse animation for the timer processing state */
+        @keyframes pulse-dark {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-dark { animation: pulse-dark 1.5s infinite; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <!-- App Container (9:16 Ratio approx, 368px width constraint) -->
-    <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col ring-8 ring-slate-800">
+    <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
         
-        <!-- 1. HEADER (Static) -->
-        <div class="pt-6 pb-2 text-center shrink-0">
-            <h1 class="text-4xl text-[#1a2332] tracking-tight logo-font leading-none">DAILY MIC-CHECK</h1>
-            <p class="text-[12px] text-gray-500 font-bold uppercase tracking-wider mt-1">Date: 2026-06-25</p>
-        </div>
-
-        <!-- 2. STATS & SETUP AREA (Dynamic Height) -->
-        <!-- Starts at ~110px, expands to ~220px when results are shown -->
-        <div id="stats-container" class="px-4 w-full transition-all duration-500 ease-in-out flex flex-col justify-center h-[110px]">
+        <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
             
-            <!-- Phases 1-3: Setup Cards (Grid of 4) -->
-            <div id="setup-cards" class="grid grid-cols-4 gap-2 h-full transition-all duration-300">
-                <!-- Challenge -->
-                <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-blue-600 shadow-md transition-all duration-300 setup-card">
-                    <span class="text-[10px] font-bold tracking-wider mb-1">CHALLENGE</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <!-- Sponsor -->
-                <div class="rounded-xl flex flex-col items-center justify-center p-2 border-2 bg-white border-gray-100 shadow-md text-[#1a2332] transition-all duration-300 setup-card">
-                    <span class="text-[10px] font-bold tracking-wider text-purple-600 mb-1">SPONSOR</span>
-                    <span class="text-[12px] font-serif font-bold leading-tight text-center label-text">Cardboard<br/>Boxes</span>
-                </div>
-                <!-- Script -->
-                <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-emerald-600 shadow-md transition-all duration-300 setup-card">
-                    <span class="text-[10px] font-bold tracking-wider mb-1">SCRIPT</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                </div>
-                <!-- Mic-Check -->
-                <div class="rounded-xl flex flex-col items-center justify-center p-2 text-white bg-gradient-to-b from-red-700 to-red-900 shadow-md transition-all duration-300 setup-card">
-                    <span class="text-[10px] font-bold tracking-wider mb-1 text-center leading-tight">MIC-CHECK</span>
-                    <div class="flex gap-0.5">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <div class="w-full h-full min-h-[3rem]">
+                <div id="bar-1" class="flipper">
+                    <div class="face face-front">
+                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-blue-600">Bore us</strong> about</span>
+                    </div>
+                    <div class="face face-back bg-blue-50 border-blue-200 px-4 justify-between">
+                        <span class="text-[12px] font-bold text-blue-700 tracking-wider">FINAL GRADE</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-[20px] font-black text-gray-800">8.8</span>
+                            <span class="text-[12px] font-bold text-slate-500">/ 41s</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Phase 4: Final Results (Hidden initially) -->
-            <div id="results-cards" class="hidden h-full flex-col w-full">
-                <!-- Primary Hero Score -->
-                <div class="flex flex-col items-center justify-center mb-3 animate-slide-up" style="animation-delay: 0.1s;">
-                    <div class="flex gap-1 text-yellow-500 mb-1">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <div class="w-full h-full min-h-[3rem]">
+                <div id="bar-2" class="flipper">
+                    <div class="face face-front">
+                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-purple-600">Cardboard Boxes</strong>, with</span>
                     </div>
-                    <div class="flex items-baseline gap-2">
-                        <h2 class="text-[48px] font-black text-gray-800 leading-none tracking-tighter" id="score-hero">0.0</h2>
-                    </div>
-                    <p class="text-[12px] font-bold tracking-widest text-orange-500 uppercase">So Close!</p>
-                </div>
-
-                <!-- Detailed Granular Stats (2x2 Grid) -->
-                <div class="grid grid-cols-2 gap-2 flex-grow">
-                    <!-- Content -->
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 0.6s;">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[12px] font-bold text-blue-700 tracking-wider">CONTENT</span>
-                            <span class="text-[16px] font-black text-gray-800"><span id="score-content">0</span>%</span>
+                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
+                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">CONTENT</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-[16px] font-black text-gray-800">37%</span>
+                            <span class="text-[10px] font-bold text-slate-500">PER:9 VIS:37</span>
                         </div>
-                        <div class="text-[12px] text-gray-500 flex justify-between">
-                            <span>Per: 9</span> <span>Vis: 37</span> <span>Int: 54</span>
-                        </div>
-                    </div>
-
-                    <!-- Delivery -->
-                    <div class="bg-purple-50/50 border border-purple-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 1.0s;">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[12px] font-bold text-purple-700 tracking-wider">DELIVERY</span>
-                            <span class="text-[16px] font-black text-gray-800"><span id="score-delivery">0</span> <span class="text-[10px] text-gray-500 font-bold">WPM</span></span>
-                        </div>
-                        <div class="text-[12px] text-gray-500 flex justify-between">
-                            <span>Mum: 2.9</span> <span>Pau: 0.0</span>
-                        </div>
-                    </div>
-
-                    <!-- Simplicity -->
-                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 1.4s;">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[12px] font-bold text-emerald-700 tracking-wider">SIMPLIFY</span>
-                            <span class="text-[16px] font-black text-gray-800"><span id="score-simplify">0.0</span> <span class="text-[10px] text-gray-500 font-bold">WPI</span></span>
-                        </div>
-                        <div class="text-[12px] text-gray-500 flex justify-between">
-                            <span>RDL: 3.3</span> <span>Voc: 0.0</span>
-                        </div>
-                    </div>
-
-                    <!-- Time & Reset -->
-                    <div class="bg-yellow-50/50 border border-yellow-100 rounded-xl p-2 flex flex-col justify-between animate-slide-up" style="animation-delay: 1.8s;">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[12px] font-bold text-yellow-700 tracking-wider">TIME</span>
-                            <span class="text-[16px] font-black text-gray-800"><span id="score-time">0</span>s</span>
-                        </div>
-                        <button onclick="resetGame()" class="mt-1 w-full bg-gray-900 text-white text-[12px] font-bold py-1 rounded flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg> RETRY
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 3. PROMPT AREA (Static placement) -->
-        <div class="px-4 py-3 shrink-0">
-            <div class="w-full bg-gray-50 border border-gray-100 rounded-2xl p-3 shadow-sm text-center flex flex-col justify-center min-h-[90px]">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1.5">Today's Mic-Check (Brilliant!)</p>
-                <p class="text-[14px] font-medium leading-snug text-gray-600">
-                    <strong class="text-blue-600">Bore us</strong> about <strong class="text-purple-600">Cardboard Boxes</strong>, with <strong class="text-emerald-600">Cheap + Expensive</strong> examples, and <strong class="text-red-600">Close your eyes for 5 seconds!</strong>
-                </p>
+            <div class="w-full h-full min-h-[3rem]">
+                <div id="bar-3" class="flipper">
+                    <div class="face face-front">
+                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-emerald-600">Cheap + Expensive</strong> examples,</span>
+                    </div>
+                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
+                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">DELIVERY</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-[16px] font-black text-gray-800">103 <span class="text-[10px] font-bold text-slate-500">WPM</span></span>
+                            <span class="text-[10px] font-bold text-slate-500">MUM:2.9</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <div class="w-full h-full min-h-[3rem]">
+                <div id="bar-4" class="flipper">
+                    <div class="face face-front">
+                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest">and <strong class="text-red-600">Close your eyes!</strong></span>
+                    </div>
+                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
+                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">SIMPLICITY</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-[16px] font-black text-gray-800">7.8 <span class="text-[10px] font-bold text-slate-500">WPI</span></span>
+                            <span class="text-[10px] font-bold text-slate-500">RDL:3.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="handleActionClick()">
+                <div id="bar-5" class="flipper">
+                    
+                    <div id="action-btn-front" class="face face-front bg-[#1e293b] border-[#0f172a] text-white transition-colors duration-300 relative overflow-hidden">
+                        
+                        <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                        
+                        <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center py-2">
+                            
+                            <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 33.33%; transform: translate(-50%, -50%);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </div>
+
+                            <div class="text-white z-20">
+                                <svg id="icon-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <svg id="icon-stop" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+                                <svg id="icon-loader" class="hidden animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                            </div>
+
+                            <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 66.66%; transform: translate(-50%, -50%);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="face face-back bg-white border-slate-200 px-2 text-center flex flex-col justify-center">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Today's Prompt</span>
+                        <span class="text-[11px] font-medium leading-tight text-slate-600">
+                            Bore us about Cardboard Boxes, with Cheap + Expensive examples, and Close your eyes!
+                        </span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- 4. ACTION BAR (The Timer) -->
-        <div id="action-bar-container" class="px-4 shrink-0 transition-all duration-500 ease-in-out h-[60px] overflow-visible">
-            <button id="main-action-btn" onclick="handleActionClick()" class="w-full h-full rounded-2xl flex flex-col items-center justify-center text-white transition-all duration-300 relative overflow-hidden font-bold tracking-widest text-[12px] shadow-lg bg-[#1e293b] active:scale-95">
-                
-                <!-- Grid lines styling -->
-                <div class="absolute inset-0 flex justify-between px-[20%] opacity-20 pointer-events-none">
-                    <div class="w-px h-full bg-white"></div>
-                    <div class="w-px h-full bg-white"></div>
-                    <div class="w-px h-full bg-white"></div>
-                </div>
-
-                <!-- Button States (Toggled via JS) -->
-                <div id="btn-state-start" class="flex items-center gap-2 z-10 w-full justify-center">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    TAP TO START GAME
-                </div>
-
-                <div id="btn-state-recording" class="hidden items-center gap-2 z-10 w-full justify-center">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-                    TAP TO STOP (<span id="timer-display">00:00</span>)
-                </div>
-
-                <div id="btn-state-processing" class="hidden items-center gap-2 z-10 w-full justify-center">
-                    <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
-                    CHECKING SCORES...
-                </div>
-                
-                <!-- Subtext for points -->
-                <div id="btn-subtext" class="absolute bottom-1 w-full px-4 flex justify-between text-[8px] text-gray-300 z-10 font-normal">
-                    <span>-no score-</span><span>1/4pts</span><span>3/4pts</span><span>Perfect!</span>
-                </div>
-            </button>
-        </div>
-
-        <!-- 5. CAMERA FEED (Flex grows) -->
-        <div class="px-4 pb-4 pt-2 flex-grow flex flex-col min-h-0">
-            <div class="w-full h-full bg-[#111827] rounded-2xl relative overflow-hidden flex flex-col items-center justify-center border border-gray-800 shadow-inner">
-                <div class="text-gray-600 flex flex-col items-center">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                    <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">
-                        CAMERA OFF
-                    </span>
-                </div>
+        <div class="w-full flex-grow bg-[#111827] rounded-[1.25rem] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800 shadow-inner">
+            <div class="text-gray-600 flex flex-col items-center">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
             </div>
         </div>
 
     </div>
 
-    <!-- Application Logic (Vanilla JS) -->
+    <button onclick="resetGame()" class="mt-8 px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow transition-all active:scale-95">
+        Reset Flipboard
+    </button>
+
     <script>
-        // State Variables
-        let phase = 'START'; // START, RECORDING, PROCESSING, RESULTS
+        let phase = 'START';
         let timerSeconds = 0;
         let timerInterval = null;
+        
+        // 30s max duration for testing
+        const maxDurationSeconds = 30; 
 
-        // DOM Elements
-        const btnMain = document.getElementById('main-action-btn');
-        const actionBarContainer = document.getElementById('action-bar-container');
-        
-        const btnStart = document.getElementById('btn-state-start');
-        const btnRecording = document.getElementById('btn-state-recording');
-        const btnProcessing = document.getElementById('btn-state-processing');
-        const btnSubtext = document.getElementById('btn-subtext');
-        
-        const timerDisplay = document.getElementById('timer-display');
+        const btnFront = document.getElementById('action-btn-front');
+        const timerProgress = document.getElementById('timer-progress');
+        const star1 = document.getElementById('star-1');
+        const star2 = document.getElementById('star-2');
+        const iconPlay = document.getElementById('icon-play');
+        const iconStop = document.getElementById('icon-stop');
+        const iconLoader = document.getElementById('icon-loader');
         const cameraStatus = document.getElementById('camera-status');
-        
-        const statsContainer = document.getElementById('stats-container');
-        const setupCards = document.getElementById('setup-cards');
-        const setupCardElements = document.querySelectorAll('.setup-card');
-        const labelText = document.querySelector('.label-text');
-        const resultsCards = document.getElementById('results-cards');
-
-        // Number Animation Function
-        function animateValue(elementId, start, end, duration, decimals = 0) {
-            const obj = document.getElementById(elementId);
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // Ease out exponential
-                const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-                const current = (easeOut * end).toFixed(decimals);
-                obj.innerHTML = current;
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    obj.innerHTML = end.toFixed(decimals);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
 
         function handleActionClick() {
             if (phase === 'START') {
-                startRecording();
-            } else if (phase === 'RECORDING') {
-                stopRecording();
+                phase = 'RECORDING';
+                timerSeconds = 0;
+                
+                iconPlay.classList.add('hidden');
+                iconStop.classList.remove('hidden');
+                
+                cameraStatus.innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
+
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    
+                    let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
+                    timerProgress.style.width = progressPercent + '%';
+
+                    if (progressPercent >= 33.33) {
+                        star1.classList.replace('text-slate-600', 'text-amber-400');
+                    }
+                    if (progressPercent >= 66.66) {
+                        star2.classList.replace('text-slate-600', 'text-amber-400');
+                    }
+
+                }, 1000);
+            } 
+            else if (phase === 'RECORDING') {
+                phase = 'PROCESSING';
+                clearInterval(timerInterval);
+                
+                btnFront.classList.add('animate-pulse-dark');
+                iconStop.classList.add('hidden');
+                iconLoader.classList.remove('hidden');
+                
+                cameraStatus.innerHTML = 'CAMERA OFF';
+
+                setTimeout(revealFlipboard, 2000);
             }
         }
 
-        function startRecording() {
-            phase = 'RECORDING';
-            timerSeconds = 0;
-            timerDisplay.innerText = "00:00";
-            
-            // UI Updates
-            btnMain.classList.remove('bg-[#1e293b]');
-            btnMain.classList.add('bg-red-500');
-            
-            btnStart.classList.add('hidden');
-            btnStart.classList.remove('flex');
-            
-            btnRecording.classList.remove('hidden');
-            btnRecording.classList.add('flex');
-            
-            btnSubtext.classList.add('hidden');
-            btnSubtext.classList.remove('flex');
-
-            cameraStatus.innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
-
-            // Start Timer
-            timerInterval = setInterval(() => {
-                timerSeconds++;
-                timerDisplay.innerText = formatTime(timerSeconds);
-            }, 1000);
-        }
-
-        function stopRecording() {
-            phase = 'PROCESSING';
-            clearInterval(timerInterval);
-            
-            // UI Updates
-            btnMain.classList.remove('bg-red-500');
-            btnMain.classList.add('bg-[#1e293b]', 'cursor-not-allowed');
-            btnMain.disabled = true;
-
-            btnRecording.classList.add('hidden');
-            btnRecording.classList.remove('flex');
-            
-            btnProcessing.classList.remove('hidden');
-            btnProcessing.classList.add('flex');
-
-            cameraStatus.innerHTML = 'CAMERA OFF';
-
-            // Add dark pulse to setup cards
-            setupCardElements.forEach(card => {
-                card.classList.add('animate-pulse-dark');
-                card.classList.remove('bg-blue-600', 'bg-white', 'bg-emerald-600', 'bg-gradient-to-b');
-            });
-            labelText.classList.add('opacity-0');
-
-            // Simulate server processing time, then show results
-            setTimeout(showResults, 2500);
-        }
-
-        function showResults() {
+        function revealFlipboard() {
             phase = 'RESULTS';
-            
-            // Hide Action Bar (reclaims space)
-            actionBarContainer.classList.add('hide-smooth');
-            
-            // Swap setup cards for results cards
-            setupCards.classList.add('hidden');
-            
-            // Expand the stats container height
-            statsContainer.classList.remove('h-[110px]');
-            statsContainer.classList.add('h-[220px]'); // Expands to fit the 2x2 grid
+            btnFront.classList.remove('animate-pulse-dark');
 
-            // Show results
-            resultsCards.classList.remove('hidden');
-            resultsCards.classList.add('flex');
-
-            // Trigger Number Animations
-            // delay matches the CSS animation delays
-            setTimeout(() => animateValue("score-hero", 0, 8.8, 1800, 1), 100);
-            setTimeout(() => animateValue("score-content", 0, 37, 1200, 0), 600);
-            setTimeout(() => animateValue("score-delivery", 0, 103, 1200, 0), 1000);
-            setTimeout(() => animateValue("score-simplify", 0, 7.8, 1200, 1), 1400);
-            setTimeout(() => animateValue("score-time", 0, timerSeconds || 41, 1200, 0), 1800); // Use actual recorded time or fallback
+            for (let i = 1; i <= 5; i++) {
+                setTimeout(() => {
+                    document.getElementById(`bar-${i}`).classList.add('flip-active');
+                }, i * 150); 
+            }
         }
 
         function resetGame() {
             phase = 'START';
+            clearInterval(timerInterval);
             
-            // Reset UI
-            actionBarContainer.classList.remove('hide-smooth');
-            
-            btnMain.classList.remove('cursor-not-allowed');
-            btnMain.disabled = false;
-            
-            btnProcessing.classList.add('hidden');
-            btnProcessing.classList.remove('flex');
-            
-            btnStart.classList.remove('hidden');
-            btnStart.classList.add('flex');
-            
-            btnSubtext.classList.remove('hidden');
-            btnSubtext.classList.add('flex');
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`bar-${i}`).classList.remove('flip-active');
+            }
 
-            // Reset Cards Area
-            statsContainer.classList.remove('h-[220px]');
-            statsContainer.classList.add('h-[110px]');
-            
-            resultsCards.classList.add('hidden');
-            resultsCards.classList.remove('flex');
-            
-            setupCards.classList.remove('hidden');
-            
-            // Restore Original Colors
-            setupCardElements.forEach(card => card.classList.remove('animate-pulse-dark'));
-            setupCardElements[0].classList.add('bg-blue-600');
-            setupCardElements[1].classList.add('bg-white');
-            setupCardElements[2].classList.add('bg-emerald-600');
-            setupCardElements[3].classList.add('bg-gradient-to-b');
-            labelText.classList.remove('opacity-0');
-
-            // Reset scores text just in case
-            document.getElementById('score-hero').innerText = "0.0";
-            document.getElementById('score-content').innerText = "0";
-            document.getElementById('score-delivery').innerText = "0";
-            document.getElementById('score-simplify').innerText = "0.0";
-            document.getElementById('score-time').innerText = "0";
+            setTimeout(() => {
+                btnFront.classList.remove('animate-pulse-dark');
+                timerProgress.style.width = '0%';
+                
+                star1.classList.replace('text-amber-400', 'text-slate-600');
+                star2.classList.replace('text-amber-400', 'text-slate-600');
+                
+                iconLoader.classList.add('hidden');
+                iconStop.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+                
+                cameraStatus.innerHTML = 'CAMERA OFF';
+            }, 300); 
         }
     </script>
 </body>
 </html>
-
-
-```
