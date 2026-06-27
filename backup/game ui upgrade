@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Flipboard Concept V6 (Height Fix)</title>
+    <title>Daily Mic-Check: Logic Engine (V13)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -11,7 +11,6 @@
             background-color: #e2e8f0; 
         }
 
-        /* 3D Flipboard CSS */
         .perspective { perspective: 1200px; }
         
         .flipper {
@@ -19,12 +18,10 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
 
-        .flip-active {
-            transform: rotateX(180deg);
-        }
+        .flip-active { transform: rotateX(180deg); }
 
         .face {
             position: absolute;
@@ -39,23 +36,8 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .face-front {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-        }
-
-        .face-back {
-            transform: rotateX(180deg);
-            background-color: #ffffff;
-            border: 1px solid #cbd5e1;
-        }
-
-        /* Pulse animation for the timer processing state */
-        @keyframes pulse-dark {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        .animate-pulse-dark { animation: pulse-dark 1.5s infinite; }
+        .face-front { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .face-back { transform: rotateX(180deg); background-color: #f8fafc; border: 1px solid #cbd5e1; }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
@@ -64,98 +46,38 @@
         
         <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
             
-            <div class="w-full h-full min-h-[3rem]">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
                 <div id="bar-1" class="flipper">
-                    <div class="face face-front">
-                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-blue-600">Bore us</strong> about</span>
-                    </div>
-                    <div class="face face-back bg-blue-50 border-blue-200 px-4 justify-between">
-                        <span class="text-[12px] font-bold text-blue-700 tracking-wider">FINAL GRADE</span>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-[20px] font-black text-gray-800">8.8</span>
-                            <span class="text-[12px] font-bold text-slate-500">/ 41s</span>
-                        </div>
-                    </div>
+                    <div id="p1-front" class="face face-front"></div>
+                    <div id="p1-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem]">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)">
                 <div id="bar-2" class="flipper">
-                    <div class="face face-front">
-                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-purple-600">Cardboard Boxes</strong>, with</span>
-                    </div>
-                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
-                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">CONTENT</span>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-[16px] font-black text-gray-800">37%</span>
-                            <span class="text-[10px] font-bold text-slate-500">PER:9 VIS:37</span>
-                        </div>
-                    </div>
+                    <div id="p2-front" class="face face-front"></div>
+                    <div id="p2-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem]">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)">
                 <div id="bar-3" class="flipper">
-                    <div class="face face-front">
-                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="text-emerald-600">Cheap + Expensive</strong> examples,</span>
-                    </div>
-                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
-                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">DELIVERY</span>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-[16px] font-black text-gray-800">103 <span class="text-[10px] font-bold text-slate-500">WPM</span></span>
-                            <span class="text-[10px] font-bold text-slate-500">MUM:2.9</span>
-                        </div>
-                    </div>
+                    <div id="p3-front" class="face face-front"></div>
+                    <div id="p3-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem]">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)">
                 <div id="bar-4" class="flipper">
-                    <div class="face face-front">
-                        <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest">and <strong class="text-red-600">Close your eyes!</strong></span>
-                    </div>
-                    <div class="face face-back bg-slate-50 border-slate-200 px-4 justify-between">
-                        <span class="text-[12px] font-bold text-slate-700 tracking-wider">SIMPLICITY</span>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-[16px] font-black text-gray-800">7.8 <span class="text-[10px] font-bold text-slate-500">WPI</span></span>
-                            <span class="text-[10px] font-bold text-slate-500">RDL:3.3</span>
-                        </div>
-                    </div>
+                    <div id="p4-front" class="face face-front"></div>
+                    <div id="p4-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="handleActionClick()">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
                 <div id="bar-5" class="flipper">
-                    
-                    <div id="action-btn-front" class="face face-front bg-[#1e293b] border-[#0f172a] text-white transition-colors duration-300 relative overflow-hidden">
-                        
-                        <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
-                        
-                        <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center py-2">
-                            
-                            <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 33.33%; transform: translate(-50%, -50%);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                            </div>
-
-                            <div class="text-white z-20">
-                                <svg id="icon-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                <svg id="icon-stop" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-                                <svg id="icon-loader" class="hidden animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
-                            </div>
-
-                            <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 66.66%; transform: translate(-50%, -50%);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="face face-back bg-white border-slate-200 px-2 text-center flex flex-col justify-center">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Today's Prompt</span>
-                        <span class="text-[11px] font-medium leading-tight text-slate-600">
-                            Bore us about Cardboard Boxes, with Cheap + Expensive examples, and Close your eyes!
-                        </span>
-                    </div>
+                    <div id="p5-front" class="face face-front bg-[#1e293b] border-[#0f172a] text-white"></div>
+                    <div id="p5-back" class="face face-back"></div>
                 </div>
             </div>
 
@@ -171,98 +93,249 @@
     </div>
 
     <button onclick="resetGame()" class="mt-8 px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow transition-all active:scale-95">
-        Reset Flipboard
+        Reset Flow
     </button>
 
     <script>
+        // --- STATE ENGINE ---
         let phase = 'START';
         let timerSeconds = 0;
         let timerInterval = null;
-        
-        // 30s max duration for testing
+        let achievedStarStatus = 'empty'; // Tracks the dynamic star for Panel 5 Final Phase
         const maxDurationSeconds = 30; 
+        
+        let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
 
-        const btnFront = document.getElementById('action-btn-front');
-        const timerProgress = document.getElementById('timer-progress');
-        const star1 = document.getElementById('star-1');
-        const star2 = document.getElementById('star-2');
-        const iconPlay = document.getElementById('icon-play');
-        const iconStop = document.getElementById('icon-stop');
-        const iconLoader = document.getElementById('icon-loader');
-        const cameraStatus = document.getElementById('camera-status');
+        // --- DYNAMIC SVG GENERATOR ---
+        function createStar(type, size = 20, extraClass = "") {
+            if (type === 'empty') {
+                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            } else if (type === 'half') {
+                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            } else {
+                return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            }
+        }
 
-        function handleActionClick() {
+        const playSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
+        const chevronSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+
+        // The Data Matrix (Now includes explicit star generation per side)
+        const matrix = {
+            1: { A: "Talk About", B: "Bore us about", colorA: "text-blue-600", colorB: "text-blue-600", finalA: "Final Grade", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') },
+            2: { A: "Cardboard boxes, with", B: "anything, with", colorA: "text-purple-600", colorB: "text-purple-600", finalA: "Content", starA: createStar('filled', 18, 'text-amber-400'), starB: createStar('empty', 18, 'text-slate-300') },
+            3: { A: "any examples.", B: "Private + Public examples.", colorA: "text-emerald-600", colorB: "text-emerald-600", finalA: "Delivery", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') },
+            4: { A: "Have fun!", B: "Close eyes for 5 sec!", colorA: "text-red-600", colorB: "text-red-600", finalA: "Clarity", starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, 'text-amber-400') }
+        };
+
+        function getTodayDate() {
+            const date = new Date();
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('en-GB', options);
+        }
+
+        // --- UI RENDERER ---
+        function renderPhase() {
+            // Revert all flips visually
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`bar-${i}`).classList.remove('flip-active');
+            }
+
+            if (phase === 'START') {
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starA}</span>`;
+                    
+                    document.getElementById(`p${i}-back`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${matrix[i].colorB}">${matrix[i].B}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starB}</span>`;
+                }
+
+                // Panel 5: Timer Bar with Half and Filled stars mapped to 25% and 75%
+                document.getElementById('p5-front').className = 'face face-front bg-[#1e293b] border-[#0f172a] text-white';
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
+                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
+                            ${playSVG}
+                        </div>
+                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    </div>`;
+                document.getElementById('p5-back').innerHTML = ''; 
+            } 
+            
+            else if (phase === 'RECORDING') {
+                for (let i = 1; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
+                    
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold text-slate-600 uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                }
+
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
+                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
+                            ${stopSVG}
+                        </div>
+                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    </div>`;
+            }
+
+            else if (phase === 'PROCESSING') {
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`p${i}-front`).className = 'face face-front bg-white border-slate-200';
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse text-slate-500 font-bold uppercase tracking-widest text-[13px]">
+                            Checking Scores
+                        </div>`;
+                }
+            }
+
+            else if (phase === 'RESULTS') {
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold text-slate-700 uppercase tracking-widest">${matrix[i].finalA}</span>
+                            <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar('filled', 20)}</div>
+                        </div>
+                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                    
+                    document.getElementById(`p${i}-back`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[20px] font-black text-slate-400">${i}</span>
+                        </div>
+                        <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                }
+
+                const s1 = selections[1] === 'A' ? matrix[1].A : matrix[1].B;
+                const s2 = selections[2] === 'A' ? matrix[2].A : matrix[2].B;
+                const s3 = selections[3] === 'A' ? matrix[3].A : matrix[3].B;
+                const s4 = selections[4] === 'A' ? matrix[4].A : matrix[4].B;
+                const finalSentence = `${s1} ${s2} ${s3} ${s4}`;
+
+                // Panel 5 utilizes achievedStarStatus from the recording phase!
+                document.getElementById('p5-front').className = 'face face-front bg-white border-slate-200';
+                document.getElementById('p5-front').innerHTML = `
+                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                        <span class="text-[13px] font-bold text-slate-700 uppercase tracking-widest">${getTodayDate()}</span>
+                        <div class="absolute text-amber-400" style="left: 75%; transform: translateX(-50%);">${createStar(achievedStarStatus, 20)}</div>
+                    </div>
+                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                
+                document.getElementById('p5-back').innerHTML = `
+                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
+                        <span class="text-[10px] font-medium leading-tight text-slate-600">${finalSentence}</span>
+                    </div>
+                    <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+            }
+        }
+
+        // --- INTERACTION LOGIC ---
+        function toggleFlip(panelNum) {
+            if (phase === 'RECORDING' || phase === 'PROCESSING') return;
+            if (phase === 'START' && panelNum === 5) return; 
+
+            const bar = document.getElementById(`bar-${panelNum}`);
+            
+            if (phase === 'RESULTS') {
+                if (panelNum >= 1 && panelNum <= 4) {
+                    const isFlipped = bar.classList.contains('flip-active');
+                    if (isFlipped) {
+                        for (let i = 1; i <= 5; i++) {
+                            document.getElementById(`bar-${i}`).classList.remove('flip-active');
+                        }
+                    } else {
+                        for (let i = 1; i <= 4; i++) {
+                            document.getElementById(`p${i}-back`).innerHTML = `
+                                <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                                    <span class="text-[20px] font-black text-slate-400">Panel ${panelNum}</span>
+                                </div>
+                                <span class="absolute right-3 text-slate-300 group-hover:text-slate-500 transition-colors pointer-events-none">${chevronSVG}</span>`;
+                        }
+                        for (let i = 1; i <= 5; i++) {
+                            document.getElementById(`bar-${i}`).classList.add('flip-active');
+                        }
+                    }
+                } else if (panelNum === 5) {
+                    bar.classList.toggle('flip-active');
+                }
+            } else if (phase === 'START') {
+                bar.classList.toggle('flip-active');
+                selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
+            }
+        }
+
+        function handleActionClick(event) {
+            if (event) event.stopPropagation();
+
             if (phase === 'START') {
                 phase = 'RECORDING';
+                achievedStarStatus = 'empty'; // Reset dynamic star tracking
+                renderPhase(); 
                 timerSeconds = 0;
                 
-                iconPlay.classList.add('hidden');
-                iconStop.classList.remove('hidden');
-                
-                cameraStatus.innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
+                document.getElementById('camera-status').innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
 
                 timerInterval = setInterval(() => {
                     timerSeconds++;
-                    
                     let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
-                    timerProgress.style.width = progressPercent + '%';
-
-                    if (progressPercent >= 33.33) {
-                        star1.classList.replace('text-slate-600', 'text-amber-400');
+                    
+                    const tProg = document.getElementById('timer-progress');
+                    const s1 = document.getElementById('star-1');
+                    const s2 = document.getElementById('star-2');
+                    
+                    if (tProg) tProg.style.width = progressPercent + '%';
+                    
+                    // Track status and dynamically light up stars
+                    if (progressPercent >= 25) {
+                        if (s1) s1.classList.replace('text-slate-600', 'text-amber-400');
+                        achievedStarStatus = 'half';
                     }
-                    if (progressPercent >= 66.66) {
-                        star2.classList.replace('text-slate-600', 'text-amber-400');
+                    if (progressPercent >= 75) {
+                        if (s2) s2.classList.replace('text-slate-600', 'text-amber-400');
+                        achievedStarStatus = 'filled';
                     }
-
                 }, 1000);
             } 
             else if (phase === 'RECORDING') {
                 phase = 'PROCESSING';
                 clearInterval(timerInterval);
+                renderPhase(); 
                 
-                btnFront.classList.add('animate-pulse-dark');
-                iconStop.classList.add('hidden');
-                iconLoader.classList.remove('hidden');
-                
-                cameraStatus.innerHTML = 'CAMERA OFF';
+                document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
 
-                setTimeout(revealFlipboard, 2000);
-            }
-        }
-
-        function revealFlipboard() {
-            phase = 'RESULTS';
-            btnFront.classList.remove('animate-pulse-dark');
-
-            for (let i = 1; i <= 5; i++) {
                 setTimeout(() => {
-                    document.getElementById(`bar-${i}`).classList.add('flip-active');
-                }, i * 150); 
+                    phase = 'RESULTS';
+                    renderPhase();
+                }, 2000);
             }
         }
 
         function resetGame() {
             phase = 'START';
             clearInterval(timerInterval);
-            
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById(`bar-${i}`).classList.remove('flip-active');
-            }
-
-            setTimeout(() => {
-                btnFront.classList.remove('animate-pulse-dark');
-                timerProgress.style.width = '0%';
-                
-                star1.classList.replace('text-amber-400', 'text-slate-600');
-                star2.classList.replace('text-amber-400', 'text-slate-600');
-                
-                iconLoader.classList.add('hidden');
-                iconStop.classList.add('hidden');
-                iconPlay.classList.remove('hidden');
-                
-                cameraStatus.innerHTML = 'CAMERA OFF';
-            }, 300); 
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+            achievedStarStatus = 'empty';
+            renderPhase(); 
+            document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
         }
+
+        // Init
+        renderPhase();
     </script>
 </body>
 </html>
