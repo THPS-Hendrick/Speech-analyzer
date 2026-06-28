@@ -1,0 +1,212 @@
+// ==========================================
+// THPS AUDIO PROCESSOR ENGINE (HEADLESS V2)
+// Handles Microphone, WAV Chunking, and Vercel STT Integration
+// ==========================================
+
+window.THPS = window.THPS || {};
+window.THPS.Audio = window.THPS.Audio || {};
+
+window.THPS.Audio.isRecording = false;
+window.THPS.Audio.recordedAudio = false;
+window.THPS.Audio.recordStartTime = 0;
+window.THPS.Audio.lastRecordedDuration = 0;
+window.THPS.Audio.wordTimestamps = []; 
+window.THPS.Audio.volumeData = [];
+
+let audioCtx = null;
+let sourceNode = null;
+let processorNode = null;
+let analyserNode = null; 
+let volumeInterval = null; 
+let audioBuffers = [];
+let totalSamplesRecorded = 0;
+
+function floatTo16BitPCM(output, offset, input) {
+    for (let i = 0; i < input.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+}
+
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+}
+
+function encodeWAV(samples, sampleRate) {
+    let buffer = new ArrayBuffer(44 + samples.length * 2);
+    let view = new DataView(buffer);
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); 
+    view.setUint16(22, 1, true); 
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+    floatTo16BitPCM(view, 44, samples);
+    return new Blob([view], { type: 'audio/wav' });
+}
+
+window.THPS.Audio.startRecordingProcess = async function() {
+    window.THPS.Audio.isRecording = true;
+    window.THPS.Audio.recordedAudio = true; 
+    audioBuffers = [];
+    totalSamplesRecorded = 0;
+    window.THPS.Audio.recordStartTime = Date.now();
+    window.THPS.Audio.wordTimestamps = []; 
+    window.THPS.Audio.volumeData = []; 
+
+    try {
+        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+        
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass({ sampleRate: 16000 });
+        
+        sourceNode = audioCtx.createMediaStreamSource(window.THPS.Audio.audioStream);
+        processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 2048;
+        sourceNode.connect(analyserNode);
+
+        volumeInterval = setInterval(() => {
+            if (!window.THPS.Audio.isRecording) return;
+            const dataArray = new Float32Array(analyserNode.fftSize);
+            analyserNode.getFloatTimeDomainData(dataArray);
+            let sumSquares = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sumSquares += dataArray[i] * dataArray[i];
+            }
+            let rms = Math.sqrt(sumSquares / dataArray.length);
+            let db = 20 * Math.log10(Math.max(rms, 0.0001)); 
+            
+            window.THPS.Audio.volumeData.push({
+                time: (Date.now() - window.THPS.Audio.recordStartTime) / 1000,
+                rms: rms,
+                db: db
+            });
+        }, 100);
+
+        processorNode.onaudioprocess = function(e) {
+            if (!window.THPS.Audio.isRecording) return;
+            const channelData = e.inputBuffer.getChannelData(0);
+            const elapsed = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+            if (elapsed <= 240) { 
+                audioBuffers.push(new Float32Array(channelData));
+                totalSamplesRecorded += channelData.length;
+            }
+        };
+
+        sourceNode.connect(processorNode);
+        processorNode.connect(audioCtx.destination); 
+        return true; // Success
+    } catch (e) {
+        console.warn("Microphone access denied or not supported.", e);
+        window.THPS.Audio.isRecording = false;
+        return false; // Failed
+    }
+};
+
+window.THPS.Audio.stopRecordingProcess = async function() {
+    if (!window.THPS.Audio.isRecording && !window.THPS.Audio.recordedAudio) return { transcript: "", timestamps: [], error: "No recording found" };
+    window.THPS.Audio.isRecording = false;
+
+    if (volumeInterval) {
+        clearInterval(volumeInterval);
+        volumeInterval = null;
+    }
+    
+    const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+    window.THPS.Audio.lastRecordedDuration = elapsedSecs;
+    
+    // Safely tear down all audio nodes
+    if (processorNode) { processorNode.disconnect(); processorNode = null; }
+    if (analyserNode) { analyserNode.disconnect(); analyserNode = null; }
+    if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+    if (window.THPS.Audio.audioStream) { window.THPS.Audio.audioStream.getTracks().forEach(t => t.stop()); }
+    if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
+
+    if (totalSamplesRecorded === 0) {
+        return { transcript: "", timestamps: [], error: "No audio data captured" };
+    }
+
+    let masterFloatArray = new Float32Array(totalSamplesRecorded);
+    let writeOffset = 0;
+    for(let i = 0; i < audioBuffers.length; i++) {
+        masterFloatArray.set(audioBuffers[i], writeOffset);
+        writeOffset += audioBuffers[i].length;
+    }
+
+    const sampleRate = 16000;
+    const chunkSize = sampleRate * 30; // 30-Second Slicer
+    let wavChunks = [];
+    
+    for(let i = 0; i < totalSamplesRecorded; i += chunkSize) {
+        let segment = masterFloatArray.subarray(i, Math.min(i + chunkSize, totalSamplesRecorded));
+        wavChunks.push(encodeWAV(segment, sampleRate));
+    }
+
+    const uploadPromises = wavChunks.map(async (blob, index) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+                const base64data = reader.result.split(',')[1];
+                try {
+                    const response = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ audioContent: base64data, mimeType: 'audio/wav' })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        resolve({ index: index, transcript: data.transcript ? data.transcript.trim() : '', words: data.words || [] });
+                    } else {
+                        resolve({ index: index, transcript: '', words: [], error: `HTTP ${response.status}` });
+                    }
+                } catch (e) {
+                    resolve({ index: index, transcript: '', words: [], error: e.message });
+                }
+            };
+        });
+    });
+
+    try {
+        const resolvedChunks = await Promise.all(uploadPromises);
+        resolvedChunks.sort((a, b) => a.index - b.index); 
+        
+        const finalStitchedTranscript = resolvedChunks.map(r => r.transcript).filter(t => t.length > 0).join(' ');
+            
+        let finalStitchedWords = [];
+        resolvedChunks.forEach(chunk => {
+            if (chunk.words && chunk.words.length > 0) {
+                chunk.words.forEach(w => {
+                    finalStitchedWords.push({
+                        word: w.word,
+                        start: w.start + (chunk.index * 30),
+                        end: w.end + (chunk.index * 30)
+                    });
+                });
+            }
+        });
+        
+        window.THPS.Audio.wordTimestamps = finalStitchedWords;
+        audioBuffers = []; masterFloatArray = null;
+
+        return { 
+            transcript: finalStitchedTranscript, 
+            timestamps: finalStitchedWords,
+            duration: elapsedSecs,
+            error: null
+        };
+
+    } catch (globalError) {
+        console.error("Parallel Framework Error:", globalError);
+        return { transcript: "", timestamps: [], error: globalError.message };
+    }
+};
