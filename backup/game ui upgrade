@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V20)</title>
+    <title>Daily Mic-Check: Logic Engine (V24)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-engine-headless.js"></script>
+    
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -83,11 +86,17 @@
 
         </div>
 
-        <div class="w-full flex-grow bg-[#111827] rounded-[1.25rem] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800 shadow-inner">
-            <div class="text-gray-600 flex flex-col items-center">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
+        <div onclick="toggleCamera()" class="cursor-pointer w-full flex-grow bg-[#111827] rounded-[1.25rem] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800 shadow-inner">
+            
+            <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
+            
+            <div id="countdown-overlay" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 text-white text-5xl font-bold opacity-0 transition-opacity duration-200 drop-shadow-2xl z-10 tracking-widest uppercase text-center leading-tight"></div>
+
+            <div id="camera-status-container" class="absolute top-4 w-full pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>
             </div>
+            
         </div>
 
     </div>
@@ -121,6 +130,55 @@
         let currentCategory = ''; 
         let currentSubNum = 0; 
 
+        let isStarting = false; 
+        let cameraStream = null; 
+        let isCameraOn = false;
+        let isCameraLoading = false; 
+
+        // --- CAMERA ENGINE ---
+        async function toggleCamera() {
+            // LOCKOUT: Prevent toggling during active countdown/recording
+            if (phase === 'RECORDING' || phase === 'PROCESSING' || isStarting || isCameraLoading) return;
+
+            const videoEl = document.getElementById('camera-feed');
+            const statusContainer = document.getElementById('camera-status-container');
+            const statusText = document.getElementById('camera-status');
+
+            isCameraLoading = true;
+
+            if (isCameraOn) {
+                // TURN OFF CAMERA
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                }
+                videoEl.srcObject = null;
+                videoEl.classList.replace('opacity-100', 'opacity-0');
+                
+                statusContainer.classList.remove('opacity-0');
+                statusContainer.innerHTML = `
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                    <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+                
+                isCameraOn = false;
+                cameraStream = null;
+            } else {
+                // TURN ON CAMERA
+                statusText.innerHTML = 'STARTING...';
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    videoEl.srcObject = cameraStream;
+                    videoEl.classList.replace('opacity-0', 'opacity-100');
+                    
+                    statusContainer.classList.add('opacity-0');
+                    isCameraOn = true;
+                } catch (err) {
+                    console.error("Camera access denied or failed.", err);
+                    statusText.innerHTML = '<span class="text-red-500">BLOCKED</span>';
+                }
+            }
+            isCameraLoading = false;
+        }
+
         // --- SVGs ---
         function createStar(type, size = 20, extraClass = "") {
             if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
@@ -135,16 +193,21 @@
         const caretUpSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
 
         // --- DATA DICTIONARIES ---
+        let b1 = "Yell at some point!";
+        let b2 = "Bore us about";
+        let b3 = "Cardboard boxes, with";
+        let b4 = "Private + Public examples.";
+
         const matrix = {
-            1: { A: "Today's Mic-Check is...", B: "Yell at some point!", colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
-            2: { A: "Talk About", B: "Bore us about", colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
-            3: { A: "Anything, with", B: "Cardboard boxes, with", colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
-            4: { A: "any examples.", B: "Private + Public examples.", colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
+            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }, 
+            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
         };
 
         const drillData = {
             Delivery: { score: "1/3", 2: { name: "Pace", val: "103 WPM", you: "spoke a bit slowly", try: "speeding up to 130-150 WPM", why: "keeps audience attention" }, 3: { name: "Pauses", val: "2.9s", you: "had some long gaps", try: "using shorter, deliberate pauses", why: "creates emphasis without losing flow" }, 4: { name: "Filler", val: "12 words", you: "used 'um' and 'ah' frequently", try: "taking a breath instead of vocalizing", why: "sounds more confident and prepared" } },
-            Content: { score: "2/3", 2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" }, 3: { name: "Visual", val: "10%", you: "didn't use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" }, 4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" } },
+            Content: { score: "2/3", 2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" }, 3: { name: "Visual", val: "10%", you: "didnt use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" }, 4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" } },
             Clarity: { score: "3/3", 2: { name: "Reading Lvl", val: "Grade 8", you: "hit the sweet spot for general audiences", try: "maintaining this consistency", why: "Grade 7-9 is globally accessible" }, 3: { name: "WPI", val: "7.8", you: "kept ideas punchy", try: "using short sentences for big impacts", why: "Words-Per-Idea under 10 is very clear" }, 4: { name: "Jargon", val: "Low", you: "avoided confusing industry terms", try: "always explaining acronyms if used", why: "prevents alienating listeners" } }
         };
 
@@ -221,9 +284,7 @@
                     <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="${col.textP3} uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
                 </div>`;
 
-            if (sideBLevel === 0) {
-                // Safety catch for Final 0 Side B, though strictly accessed via Final 1 logic
-            } 
+            if (sideBLevel === 0) {} 
             else if (sideBLevel === 1) {
                 p1.className = `face face-back ${col.p1}`;
                 p1.innerHTML = item("Final Grade = 8.8", chevLeft, col.textP5);
@@ -360,7 +421,6 @@
             }
 
             else if (phase === 'RESULTS') {
-                // Final 0 (A) logic
                 document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
                 document.getElementById('p1-front').innerHTML = `
                     <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
@@ -384,10 +444,13 @@
                         <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
                 }
 
+                // MISSION 3 TEST: Display the raw transcript returned from Vercel
+                const rawText = window.testTranscript ? window.testTranscript.substring(0, 50) + "..." : "No audio.";
+                
                 document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
                 document.getElementById('p5-front').innerHTML = `
                     <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                        <span class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">${getTodayDate()} Time: ${formatTime(timerSeconds)}</span>
+                        <span class="text-[10px] font-medium leading-tight text-slate-600 line-clamp-2">${rawText}</span>
                         <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar(getTimeGradeAndStar(timerSeconds).star, 20, col.textP5)}</div>
                     </div>
                     <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
@@ -417,7 +480,6 @@
             
             else if (phase === 'RESULTS') {
                 if (sideBLevel === 0) {
-                    // Any click in Final 0 dives into Final 1 Menu
                     sideBLevel = 1;
                     renderSideB();
                     for (let i = 1; i <= 4; i++) document.getElementById(`bar-${i}`).classList.add('flip-active');
@@ -432,7 +494,7 @@
                         sideBLevel = 2;
                         currentCategory = panelNum === 2 ? 'Delivery' : (panelNum === 3 ? 'Content' : 'Clarity');
                         renderSideB();
-                        document.getElementById('bar-5').classList.add('flip-active'); // Force P5 to back for "Go back"
+                        document.getElementById('bar-5').classList.add('flip-active'); 
                     } else if (panelNum === 5) {
                         document.getElementById('bar-5').classList.toggle('flip-active');
                     }
@@ -457,16 +519,42 @@
             }
         }
 
-        function handleActionClick(event) {
+        async function handleActionClick(event) {
             if (event) event.stopPropagation();
 
             if (phase === 'START') {
+                if (isStarting) return; 
+                isStarting = true;
+
+                // Start Mic Process immediately (Safeguard for iOS user gesture requirement)
+                if (window.THPS && window.THPS.Audio) {
+                    const micSuccess = await window.THPS.Audio.startRecordingProcess();
+                    if (!micSuccess) {
+                        alert("Microphone access is required to proceed.");
+                        isStarting = false;
+                        resetGame();
+                        return;
+                    }
+                }
+
+                // The Countdown Sequence (runs regardless of camera state)
+                const overlay = document.getElementById('countdown-overlay');
+                overlay.classList.remove('opacity-0');
+                
+                const steps = ["3", "2", "1", "Mic-Check!"];
+                for (let i = 0; i < steps.length; i++) {
+                    overlay.innerText = steps[i];
+                    await new Promise(r => setTimeout(r, 800));
+                }
+                
+                overlay.classList.add('opacity-0'); 
+                isStarting = false; 
+
+                // Officially Start Recording Phase
                 phase = 'RECORDING';
                 achievedStarStatus = 'empty'; 
                 renderPhase(); 
                 timerSeconds = 0;
-                
-                document.getElementById('camera-status').innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
 
                 timerInterval = setInterval(() => {
                     timerSeconds++;
@@ -490,28 +578,84 @@
                 phase = 'PROCESSING';
                 clearInterval(timerInterval);
                 renderPhase(); 
-                
-                document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
 
-                setTimeout(() => {
-                    phase = 'RESULTS';
-                    renderPhase();
-                }, 2000);
+                if (!isCameraOn) {
+                    const statusContainer = document.getElementById('camera-status-container');
+                    statusContainer.innerHTML = `
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                        <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+                } else {
+                    document.getElementById('camera-status-container').classList.add('opacity-0');
+                }
+
+                // Wait for Vercel backend to finish processing audio chunks
+                if (window.THPS && window.THPS.Audio) {
+                    const audioData = await window.THPS.Audio.stopRecordingProcess();
+                    window.testTranscript = audioData.transcript || "No words captured or error occurred.";
+                }
+
+                // Transition to Results once data is received
+                phase = 'RESULTS';
+                renderPhase();
             }
         }
 
         function resetGame() {
             phase = 'START';
             clearInterval(timerInterval);
-            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; // Resets to Level 1 default
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; 
             sideBLevel = 0;
             p5SoloFlipped = false;
-            renderPhase(); 
-            document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
+            
+            initApp(); 
+            
+            // Ensure status container resets properly based on camera state
+            if (!isCameraOn) {
+                const statusContainer = document.getElementById('camera-status-container');
+                statusContainer.classList.remove('opacity-0');
+                statusContainer.innerHTML = `
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                    <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+            }
+        }
+
+        // --- ASYNC INIT & GITHACK FETCH ---
+        async function initApp() {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`p${i}-front`);
+                if(el) {
+                    el.className = `face face-front ${col.w} border-slate-200`;
+                    el.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">
+                            Loading...
+                        </div>`;
+                }
+            }
+
+            try {
+                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
+                const data = await response.json();
+
+                const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' };
+                const todayAdelaide = new Intl.DateTimeFormat('en-CA', options).format(new Date());
+
+                if (data[todayAdelaide]) {
+                    b1 = data[todayAdelaide].p1;
+                    b2 = data[todayAdelaide].p2;
+                    b3 = `${data[todayAdelaide].p3}, with`; 
+                    b4 = `${data[todayAdelaide].p4} examples.`;
+                } else {
+                    console.warn(`No prompts found for ${todayAdelaide}. Using fallbacks.`);
+                }
+            } catch (error) {
+                console.error("Failed to load daily prompts. Using fallbacks.", error);
+            }
+
+            renderPhase();
         }
 
         // Init
-        renderPhase();
+        initApp();
     </script>
 </body>
 </html>
