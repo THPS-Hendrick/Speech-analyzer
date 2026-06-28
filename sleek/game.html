@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mic-Check: Logic Engine (V21)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #e2e8f0; 
+        }
+
+        .perspective { perspective: 1200px; }
+        
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .flip-active { transform: rotateX(180deg); }
+
+        .face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .face-front { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .face-back { transform: rotateX(180deg); background-color: #f8fafc; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
+        
+        <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
+            
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
+                <div id="bar-1" class="flipper">
+                    <div id="p1-front" class="face face-front"></div>
+                    <div id="p1-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)">
+                <div id="bar-2" class="flipper">
+                    <div id="p2-front" class="face face-front"></div>
+                    <div id="p2-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)">
+                <div id="bar-3" class="flipper">
+                    <div id="p3-front" class="face face-front"></div>
+                    <div id="p3-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)">
+                <div id="bar-4" class="flipper">
+                    <div id="p4-front" class="face face-front"></div>
+                    <div id="p4-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
+                <div id="bar-5" class="flipper">
+                    <div id="p5-front" class="face face-front overflow-hidden"></div>
+                    <div id="p5-back" class="face face-back"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-full flex-grow bg-[#111827] rounded-[1.25rem] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800 shadow-inner">
+            <div class="text-gray-600 flex flex-col items-center">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
+            </div>
+        </div>
+
+    </div>
+
+    <button onclick="resetGame()" class="mt-8 px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow transition-all active:scale-95">
+        Reset Flow
+    </button>
+
+    <script>
+        // --- STATE ENGINE & COLORS ---
+        const col = {
+            p1: 'bg-[#8F1C1C]', textP1: 'text-[#8F1C1C]', borderP1: 'border-[#8F1C1C]',
+            p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
+            p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
+            p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
+            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200',
+            b: 'bg-slate-900', textB: 'text-slate-800'
+        };
+
+        let phase = 'START';
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let achievedStarStatus = 'empty'; 
+        const maxDurationSeconds = 80; 
+        
+        let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+        
+        let sideBLevel = 0; 
+        let p5SoloFlipped = false;
+        let currentCategory = ''; 
+        let currentSubNum = 0; 
+
+        // --- SVGs ---
+        function createStar(type, size = 20, extraClass = "") {
+            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
+        const playSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
+        const chevRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        const chevLeft = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+        const plusSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+        const caretUpSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+
+        // --- DATA DICTIONARIES ---
+        // Fallback texts in case GitHack is offline or date is missing
+        let b1 = "Yell at some point!";
+        let b2 = "Bore us about";
+        let b3 = "Cardboard boxes, with";
+        let b4 = "Private + Public examples.";
+
+        const matrix = {
+            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('filled', 18, col.textP5), starB: createStar('empty', 18, 'text-slate-300') },
+            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
+        };
+
+        const drillData = {
+            Delivery: { score: "1/3", 2: { name: "Pace", val: "103 WPM", you: "spoke a bit slowly", try: "speeding up to 130-150 WPM", why: "keeps audience attention" }, 3: { name: "Pauses", val: "2.9s", you: "had some long gaps", try: "using shorter, deliberate pauses", why: "creates emphasis without losing flow" }, 4: { name: "Filler", val: "12 words", you: "used 'um' and 'ah' frequently", try: "taking a breath instead of vocalizing", why: "sounds more confident and prepared" } },
+            Content: { score: "2/3", 2: { name: "Personal", val: "35%", you: "used a good amount of 'I' and 'we'", try: "balancing with more objective facts", why: "connects you to the audience" }, 3: { name: "Visual", val: "10%", you: "didn't use many descriptions", try: "colours, sizes, objects, etc", why: "best speakers use 25%-40% visual words" }, 4: { name: "Abstract", val: "55%", you: "relied heavily on concepts", try: "grounding them in real-world examples", why: "makes ideas easier to grasp" } },
+            Clarity: { score: "3/3", 2: { name: "Reading Lvl", val: "Grade 8", you: "hit the sweet spot for general audiences", try: "maintaining this consistency", why: "Grade 7-9 is globally accessible" }, 3: { name: "WPI", val: "7.8", you: "kept ideas punchy", try: "using short sentences for big impacts", why: "Words-Per-Idea under 10 is very clear" }, 4: { name: "Jargon", val: "Low", you: "avoided confusing industry terms", try: "always explaining acronyms if used", why: "prevents alienating listeners" } }
+        };
+
+        // --- CALCULATION LOGIC ---
+        function getTodayDate() { 
+            return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); 
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function getTimeGradeAndStar(sec) {
+            if (sec >= 60 && sec <= 80) return { grade: "1/1", star: "filled", count: 5 };
+            if (sec >= 20 && sec < 60) return { grade: "0.5/1", star: "half", count: 3 };
+            return { grade: "0/1", star: "empty", count: 1 };
+        }
+
+        function getLevelCount() {
+            let count = 0;
+            if (selections[1] === 'B') count++;
+            if (selections[2] === 'B') count++;
+            if (selections[3] === 'B') count++;
+            if (selections[4] === 'B') count++;
+            return count;
+        }
+
+        function updateLevelDisplay() {
+            const count = getLevelCount();
+            const fillPercent = (count / 4) * 100;
+            const levelSpan = document.getElementById('level-text');
+            const fillDiv = document.getElementById('p5-fill');
+            
+            if (levelSpan) levelSpan.innerText = `Level ${count + 1}: Speak for 1min`;
+            if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
+        }
+
+        function buildPromptSentence() {
+            const s1 = selections[1] === 'A' ? `<strong class="${matrix[1].colorA}">${matrix[1].A}</strong>` : `<strong class="${matrix[1].colorB}">${matrix[1].B}</strong>`;
+            const s2 = selections[2] === 'A' ? `<strong class="${matrix[2].colorA}">${matrix[2].A}</strong>` : `<strong class="${matrix[2].colorB}">${matrix[2].B}</strong>`;
+            const s3 = selections[3] === 'A' ? `<strong class="${matrix[3].colorA}">${matrix[3].A}</strong>` : `<strong class="${matrix[3].colorB}">${matrix[3].B}</strong>`;
+            const s4 = selections[4] === 'A' ? `<strong class="${matrix[4].colorA}">${matrix[4].A}</strong>` : `<strong class="${matrix[4].colorB}">${matrix[4].B}</strong>`;
+            return `${s1} ${s2} ${s3} ${s4}`;
+        }
+
+        function generateFiveStars() {
+            const activeStars = getTimeGradeAndStar(timerSeconds).count;
+            let html = '<div class="flex gap-1">';
+            for(let i = 1; i <= 5; i++) {
+                html += createStar(i <= activeStars ? 'filled' : 'empty', 16, col.textP5);
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // --- UI RENDERER (SIDE B DRILL-DOWNS) ---
+        function renderSideB() {
+            const p1 = document.getElementById('p1-back');
+            const p2 = document.getElementById('p2-back');
+            const p3 = document.getElementById('p3-back');
+            const p4 = document.getElementById('p4-back');
+            const p5 = document.getElementById('p5-back');
+
+            const item = (text, icon, textColor = col.textB) => `
+                <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                    <span class="text-[13px] font-bold uppercase tracking-widest ${textColor}">${text}</span>
+                </div>
+                <span class="absolute right-3 pointer-events-none ${textColor}">${icon}</span>`;
+            
+            const feedbackItem = (label, text) => `
+                <div class="w-full h-full flex items-center justify-start pl-5 pr-8">
+                    <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="${col.textP3} uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
+                </div>`;
+
+            if (sideBLevel === 0) {
+                // Safety catch for Final 0 Side B
+            } 
+            else if (sideBLevel === 1) {
+                p1.className = `face face-back ${col.p1}`;
+                p1.innerHTML = item("Final Grade = 8.8", chevLeft, col.textP5);
+                
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
+                p2.innerHTML = item(`Delivery = ${drillData.Delivery.score}`, chevRight, col.textB);
+                p3.innerHTML = item(`Content = ${drillData.Content.score}`, chevRight, col.textB);
+                p4.innerHTML = item(`Clarity = ${drillData.Clarity.score}`, chevRight, col.textB);
+                
+                const p5a = document.getElementById('p5-front');
+                p5a.className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                p5a.innerHTML = item(`Time = ${getTimeGradeAndStar(timerSeconds).grade}`, plusSVG, col.textB);
+
+                p5.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                p5.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
+                        <span class="text-[10px] font-medium leading-tight text-slate-600">${buildPromptSentence()}</span>
+                    </div>
+                    <span class="absolute right-3 text-slate-300 pointer-events-none">${caretUpSVG}</span>`;
+            } 
+            else if (sideBLevel === 2) {
+                const data = drillData[currentCategory];
+                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
+                
+                p1.className = `face face-back ${activeBg}`;
+                p1.innerHTML = item(`${currentCategory} = ${data.score}`, chevLeft, col.textW);
+
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
+                p2.innerHTML = item(`${data[2].name} = ${data[2].val}`, chevRight, col.textB);
+                p3.innerHTML = item(`${data[3].name} = ${data[3].val}`, chevRight, col.textB);
+                p4.innerHTML = item(`${data[4].name} = ${data[4].val}`, chevRight, col.textB);
+
+                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
+                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
+            } 
+            else if (sideBLevel === 3) {
+                const data = drillData[currentCategory][currentSubNum];
+                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
+
+                p1.className = `face face-back ${activeBg}`;
+                p1.innerHTML = item(`${data.name} = ${data.val}`, chevLeft, col.textW);
+
+                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW}`);
+                p2.innerHTML = feedbackItem('You', data.you);
+                p3.innerHTML = feedbackItem('Try', data.try);
+                p4.innerHTML = feedbackItem('Why', data.why);
+
+                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
+                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
+            }
+        }
+
+        // --- UI RENDERER (SIDE A & PRIMARY FLOWS) ---
+        function renderPhase() {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`bar-${i}`).classList.remove('flip-active');
+            }
+
+            if (phase === 'START') {
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrix[i].bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrix[i].bgB}`;
+
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starA}</span>`;
+                    
+                    document.getElementById(`p${i}-back`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorB}">${matrix[i].B}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starB}</span>`;
+                }
+
+                if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
+                if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
+                if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
+                if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
+
+                const fillP = (getLevelCount() / 4) * 100;
+                document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
+                    <div class="relative w-full h-full z-10 flex items-center justify-start pl-5 pr-14">
+                        <span id="level-text" class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">Level ${getLevelCount() + 1}: Speak for 1min</span>
+                    </div>
+                    <div class="absolute right-2 z-20 pointer-events-auto cursor-pointer p-2 bg-slate-900/10 text-slate-800 hover:bg-slate-900/20 rounded-full transition-all shadow-sm" onclick="handleActionClick(event)">
+                        ${playSVG}
+                    </div>`;
+                document.getElementById('p5-back').className = 'face face-back';
+                document.getElementById('p5-back').innerHTML = ''; 
+            } 
+            
+            else if (phase === 'RECORDING') {
+                for (let i = 1; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
+                    const chosenBg = selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB;
+                    
+                    document.getElementById(`p${i}-front`).className = `face face-front ${chosenBg}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                }
+
+                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
+                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
+                            ${stopSVG}
+                        </div>
+                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    </div>`;
+            }
+
+            else if (phase === 'PROCESSING') {
+                const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5];
+                const txt = [col.textP5, col.textW, col.textW, col.textW, col.textW];
+                
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse font-bold uppercase tracking-widest text-[13px] ${txt[i-1]}">
+                            Checking Scores
+                        </div>`;
+                }
+            }
+
+            else if (phase === 'RESULTS') {
+                // Final 0 (A) logic
+                document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
+                document.getElementById('p1-front').innerHTML = `
+                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                        ${generateFiveStars()}
+                        <div class="absolute" style="left: 75%; transform: translateX(-50%);">
+                            <span class="text-[13px] font-bold uppercase tracking-widest ${col.textW}">See Scores</span>
+                        </div>
+                    </div>
+                    <span class="absolute right-3 ${col.textW} pointer-events-none">${chevRight}</span>`;
+
+                for (let i = 2; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    
+                    document.getElementById(`p${i}-front`).className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                            <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar('filled', 20, col.textP5)}</div>
+                        </div>
+                        <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
+                }
+
+                document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
+                        <span class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">${getTodayDate()} Time: ${formatTime(timerSeconds)}</span>
+                        <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar(getTimeGradeAndStar(timerSeconds).star, 20, col.textP5)}</div>
+                    </div>
+                    <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
+                
+                sideBLevel = 0;
+                renderSideB(); 
+            }
+        }
+
+        // --- INTERACTION LOGIC ---
+        function flipAll(toBack) {
+            for (let i = 1; i <= 5; i++) {
+                if (toBack) document.getElementById(`bar-${i}`).classList.add('flip-active');
+                else document.getElementById(`bar-${i}`).classList.remove('flip-active');
+            }
+        }
+
+        function toggleFlip(panelNum) {
+            if (phase === 'RECORDING' || phase === 'PROCESSING') return;
+
+            if (phase === 'START') {
+                if (panelNum === 5) return; 
+                document.getElementById(`bar-${panelNum}`).classList.toggle('flip-active');
+                selections[panelNum] = document.getElementById(`bar-${panelNum}`).classList.contains('flip-active') ? 'B' : 'A';
+                updateLevelDisplay(); 
+            } 
+            
+            else if (phase === 'RESULTS') {
+                if (sideBLevel === 0) {
+                    sideBLevel = 1;
+                    renderSideB();
+                    for (let i = 1; i <= 4; i++) document.getElementById(`bar-${i}`).classList.add('flip-active');
+                    document.getElementById('bar-5').classList.remove('flip-active');
+                    p5SoloFlipped = false;
+                } 
+                else if (sideBLevel === 1) {
+                    if (panelNum === 1) {
+                        sideBLevel = 0;
+                        renderPhase(); 
+                    } else if (panelNum >= 2 && panelNum <= 4) {
+                        sideBLevel = 2;
+                        currentCategory = panelNum === 2 ? 'Delivery' : (panelNum === 3 ? 'Content' : 'Clarity');
+                        renderSideB();
+                        document.getElementById('bar-5').classList.add('flip-active'); 
+                    } else if (panelNum === 5) {
+                        document.getElementById('bar-5').classList.toggle('flip-active');
+                    }
+                } 
+                else if (sideBLevel === 2) {
+                    if (panelNum === 1 || panelNum === 5) {
+                        sideBLevel = 1;
+                        renderSideB();
+                        document.getElementById('bar-5').classList.remove('flip-active');
+                    } else {
+                        sideBLevel = 3;
+                        currentSubNum = panelNum;
+                        renderSideB();
+                    }
+                } 
+                else if (sideBLevel === 3) {
+                    if (panelNum === 1 || panelNum === 5) {
+                        sideBLevel = 2;
+                        renderSideB();
+                    }
+                }
+            }
+        }
+
+        function handleActionClick(event) {
+            if (event) event.stopPropagation();
+
+            if (phase === 'START') {
+                phase = 'RECORDING';
+                achievedStarStatus = 'empty'; 
+                renderPhase(); 
+                timerSeconds = 0;
+                
+                document.getElementById('camera-status').innerHTML = '<span class="text-red-500 flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC</span>';
+
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
+                    
+                    const tProg = document.getElementById('timer-progress');
+                    const s1 = document.getElementById('star-1');
+                    const s2 = document.getElementById('star-2');
+                    
+                    if (tProg) tProg.style.width = progressPercent + '%';
+                    
+                    if (progressPercent >= 25 && s1) s1.classList.replace('text-slate-600', 'text-amber-400');
+                    if (progressPercent >= 75 && s2) s2.classList.replace('text-slate-600', 'text-amber-400');
+
+                    if (timerSeconds >= maxDurationSeconds) {
+                        handleActionClick(null);
+                    }
+                }, 1000);
+            } 
+            else if (phase === 'RECORDING') {
+                phase = 'PROCESSING';
+                clearInterval(timerInterval);
+                renderPhase(); 
+                
+                document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
+
+                setTimeout(() => {
+                    phase = 'RESULTS';
+                    renderPhase();
+                }, 2000);
+            }
+        }
+
+        function resetGame() {
+            phase = 'START';
+            clearInterval(timerInterval);
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; // Resets to Level 1 default
+            sideBLevel = 0;
+            p5SoloFlipped = false;
+            
+            // Re-run initApp to re-fetch and reset the matrix properly
+            initApp(); 
+            document.getElementById('camera-status').innerHTML = 'CAMERA OFF';
+        }
+
+        // --- ASYNC INIT & GITHACK FETCH ---
+        async function initApp() {
+            // 1. Show Loading State
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`p${i}-front`);
+                if(el) {
+                    el.className = `face face-front ${col.w} border-slate-200`;
+                    el.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">
+                            Loading...
+                        </div>`;
+                }
+            }
+
+            try {
+                // 2. Fetch the JSON
+                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
+                const data = await response.json();
+
+                // 3. Get Adelaide Date (YYYY-MM-DD format)
+                const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' };
+                // 'en-CA' forces the output into YYYY-MM-DD format across all browsers natively
+                const todayAdelaide = new Intl.DateTimeFormat('en-CA', options).format(new Date());
+
+                // 4. Map JSON to Matrix (If today's date exists)
+                if (data[todayAdelaide]) {
+                    b1 = data[todayAdelaide].p1;
+                    b2 = data[todayAdelaide].p2;
+                    b3 = `${data[todayAdelaide].p3}, with`; // Injecting the connector words
+                    b4 = `${data[todayAdelaide].p4} examples.`;
+                } else {
+                    console.warn(`No prompts found for ${todayAdelaide}. Using fallbacks.`);
+                }
+            } catch (error) {
+                console.error("Failed to load daily prompts. Using fallbacks.", error);
+            }
+
+            // 5. Launch the Engine
+            renderPhase();
+        }
+
+        // Init
+        initApp();
+    </script>
+</body>
+</html>
