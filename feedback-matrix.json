@@ -1,0 +1,47 @@
+{
+  "Pace": {
+    "low": { "you": "A bit too slow", "try": "Aim for 110+ WPM", "why": "Keeps attention" },
+    "high": { "you": "A bit too fast", "try": "Drop below 150 WPM", "why": "Improves clarity" },
+    "perfect": { "you": "Nailed the pace", "try": "Keep this rhythm", "why": "Perfect flow" }
+  },
+  "Mumble": {
+    "low": { "you": "Too drawn out", "try": "Aim for 3.5+ SPS", "why": "Sounds energetic" },
+    "high": { "you": "Words blurring", "try": "Drop below 4.5 SPS", "why": "Aids enunciation" },
+    "perfect": { "you": "Crisp delivery", "try": "Maintain this density", "why": "Easy to follow" }
+  },
+  "Pause": {
+    "low": { "you": "Barely breathed", "try": "Pause 15%+ of time", "why": "Lets ideas sink in" },
+    "high": { "you": "Long silences", "try": "Keep pauses under 30%", "why": "Maintains momentum" },
+    "perfect": { "you": "Great breathing", "try": "Keep this cadence", "why": "Powerful emphasis" }
+  },
+  "Personal": {
+    "low": { "you": "Slightly detached", "try": "Use 30%+ 'I' or 'We'", "why": "Builds connection" },
+    "high": { "you": "Very self-focused", "try": "Balance with facts", "why": "Widens perspective" },
+    "perfect": { "you": "Highly relatable", "try": "Keep sharing stories", "why": "Builds trust" }
+  },
+  "Visual": {
+    "low": { "you": "Lacked imagery", "try": "Use colors & sizes", "why": "Paints a picture" },
+    "high": { "you": "Overly descriptive", "try": "Reduce to <50%", "why": "Keeps it moving" },
+    "perfect": { "you": "Vivid language", "try": "Keep painting pictures", "why": "Highly memorable" }
+  },
+  "Abstract": {
+    "low": { "you": "Very literal", "try": "Add big picture ideas", "why": "Connects concepts" },
+    "high": { "you": "Too theoretical", "try": "Ground in reality", "why": "Easier to grasp" },
+    "perfect": { "you": "Great balance", "try": "Keep this ratio", "why": "Deep but clear" }
+  },
+  "Signal": {
+    "low": { "you": "Slightly choppy", "try": "Combine thoughts", "why": "Smooths delivery" },
+    "high": { "you": "Run-on sentences", "try": "Use more periods", "why": "Lets ideas breathe" },
+    "perfect": { "you": "Punchy sentences", "try": "Keep this length", "why": "High impact" }
+  },
+  "Eng10k": {
+    "low": { "you": "Complex vocabulary", "try": "Use simpler words", "why": "Prevents alienating" },
+    "high": { "you": "Overly basic", "try": "Add specific terms", "why": "Shows expertise" },
+    "perfect": { "you": "Plain English", "try": "Maintain this vocab", "why": "Globally accessible" }
+  },
+  "Pop75": {
+    "low": { "you": "Too basic", "try": "Add some depth", "why": "Engages adults" },
+    "high": { "you": "Too academic", "try": "Simplify concepts", "why": "Widens audience" },
+    "perfect": { "you": "The Sweet Spot", "try": "Keep this level", "why": "Maximum reach" }
+  }
+}
