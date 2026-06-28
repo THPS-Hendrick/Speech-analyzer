@@ -44,16 +44,20 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
+    
+    <style>
+        /* DASHBOARD LOCK PROTECTION */
+        #thps-dashboard-grid:not(.edit-mode-active) .thps-close-btn { display: none !important; }
+        #thps-dashboard-grid:not(.edit-mode-active) .cursor-move { cursor: default !important; }
+    </style>
 </head>
 <body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
 
-    <!-- HIDDEN PROXY TEXTAREA: Keeps audio-processor.js connected even if the Text Input Widget is not spawned! -->
     <textarea id="cba-inputText" class="hidden"></textarea>
 
-    <!-- THE NEW WIDGET MANAGER MENU -->
-    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
+    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
 
-    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-slate-200">
+    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -74,9 +78,7 @@
 
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
             
-            <!-- SMALL WIDGETS TAB -->
             <div id="tab-content-small" class="block space-y-8">
-                <!-- Content Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -91,7 +93,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -106,7 +107,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Simplicity Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -123,9 +123,7 @@
                 </div>
             </div>
 
-            <!-- MEDIUM WIDGETS TAB -->
             <div id="tab-content-medium" class="hidden space-y-8">
-                <!-- Content Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -140,7 +138,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -152,8 +149,7 @@
                         </div>
                     </div>
                 </div>
-                 <!-- Simplicity Category -->
-                <div>
+                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-signal-noise', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
@@ -172,10 +168,8 @@
                 </div>
             </div>
 
-            <!-- LARGE WIDGETS TAB -->
             <div id="tab-content-large" class="hidden space-y-8">
-                 <!-- Content Category -->
-                <div>
+                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-live-mic-timer', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
@@ -192,7 +186,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Delivery Category -->
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
@@ -201,8 +194,7 @@
                         </div>
                     </div>
                 </div>
-                 <!-- Simplicity Category -->
-                <div>
+                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
@@ -220,16 +212,10 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MAIN SCREEN UI                             -->
-    <!-- ========================================== -->
-
-    <!-- Error Message Container -->
     <div class="max-w-4xl mx-auto w-full mt-4 md:mt-8 px-2 flex flex-col items-center">
         <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mb-6"></div>
     </div>
 
-    <!-- Celebration Panel (Static UI Placeholder) -->
     <div id="celebration-panel" class="hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500">
         <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400">Waiting for Audio...</h2>
         <div class="flex flex-row justify-center items-center gap-8 md:gap-16">
@@ -249,7 +235,6 @@
         <div class="flex flex-col space-y-6 sm:space-y-8">
             <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
 
-                <!-- PROCESSING PANEL -->
                 <div id="cba-processing-panel" class="hidden score-card glass-panel p-8 rounded-2xl border-t-4 border-blue-500 shadow-md bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center transition-all duration-300">
                     <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner">
                         <i data-lucide="refresh-cw" class="w-8 h-8 text-blue-600 animate-spin"></i>
@@ -259,33 +244,35 @@
                     <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
                 </div>
                 
-                <!-- TRACKMAN DASHBOARD AREA -->
                 <div class="w-full">
-                    <!-- Dashboard Header & Add Widget Button -->
                     <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
                         <div>
                             <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Your Dashboard</h2>
                             <p class="text-xs text-slate-500 mt-1">Configure your metrics to match your speaking goals.</p>
                         </div>
-                        <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
-                            <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
-                            <span class="hidden sm:inline">Add Widget</span>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
+                                <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
+                                <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                            </button>
+                            <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
+                                <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                                <span class="hidden sm:inline">Add Widget</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- THE DROP ZONE (Grid Container) -->
                     <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
-                        
-                        <!-- DEFAULT WIDGETS -->
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-whats-this></thps-whats-this>
-                        </div>
 
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-live-mic-timer></thps-live-mic-timer>
                         </div>
 
-                        <div class="w-full mt-2 cursor-move relative group">
+                      <div class="w-full mt-2 cursor-move relative group">
+                            <thps-whats-this></thps-whats-this>
+                      </div>
+                        
+                      <div class="w-full mt-2 cursor-move relative group">
                             <thps-score-summary></thps-score-summary>
                         </div>
 
@@ -299,15 +286,51 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC                           -->
-    <!-- ========================================== -->
     <script>
         lucide.createIcons();
         
         let gameTimerInterval = null;
         let isActive = false;
         let reportMarkdownText = "";
+
+        // ==========================================
+        // EDIT MODE (LOCK/UNLOCK) LOGIC
+        // ==========================================
+        window.thps_editMode = false; // Locked by default
+
+        window.toggleEditMode = function() {
+            window.thps_editMode = !window.thps_editMode;
+            const grid = document.getElementById('thps-dashboard-grid');
+            const btnIcon = document.getElementById('edit-mode-icon');
+            const btnText = document.getElementById('edit-mode-text');
+            const btnEl = document.getElementById('toggle-edit-mode-btn');
+
+            if (window.thps_editMode) {
+                grid.classList.add('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'unlock');
+                btnText.innerText = 'Edit Mode';
+                btnEl.classList.replace('bg-slate-100', 'bg-rose-100');
+                btnEl.classList.replace('text-slate-500', 'text-rose-600');
+                btnEl.classList.replace('border-slate-200', 'border-rose-200');
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", false);
+            } else {
+                grid.classList.remove('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'lock');
+                btnText.innerText = 'Locked';
+                btnEl.classList.replace('bg-rose-100', 'bg-slate-100');
+                btnEl.classList.replace('text-rose-600', 'text-slate-500');
+                btnEl.classList.replace('border-rose-200', 'border-slate-200');
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Failsafe: Ensure it locks automatically on load
+        setTimeout(() => {
+            if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
+                window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+        }, 1000);
 
         const EXPLANATIONS_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/explanations.json"; 
         let explanationsData = null;
@@ -616,35 +639,36 @@
 
                 updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio ? window.THPS.Audio.recordedAudio : false, text.length);
 
-                // --- THE TRACKMAN BROADCAST ---
-                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { 
-                    detail: { 
-                        sps: mumbleScore,
-                        wpm: avgWpm,
-                        grade: avgGrade,
-                        time: elapsedSecs,
-                        personal: personalPercent,
-                        visual: visualPercent,
-                        text: text,
-                        wordTimestamps: wordTimestamps,
-                        volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
-                        pause: pausePercent,
-                        intangible: intangiblePercent,
-                        wps: avgWpsFloat,
-                        simple: coreSimpleScore,
-                        totalPoints: totalPoints,
-                        overrideGrade: overrideGrade,
-                        recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
-                        highlightedHTML: highlightedHTML,
-                        reportMarkdownText: reportMarkdownText,
-                        numWords: numWords,
-                        numSentences: numSentences,
-                        totalSyllables: totalSyllables,
-                        google10kCount: google10kCount,
-                        simpleCounts: simpleCounts,
-                        readability: readability
-                    } 
-                }));
+                // --- THE TRACKMAN BROADCAST & CACHE ---
+                const payload = { 
+                    sps: mumbleScore,
+                    wpm: avgWpm,
+                    grade: avgGrade,
+                    time: elapsedSecs,
+                    personal: personalPercent,
+                    visual: visualPercent,
+                    text: text,
+                    wordTimestamps: wordTimestamps,
+                    volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
+                    pause: pausePercent,
+                    intangible: intangiblePercent,
+                    wps: avgWpsFloat,
+                    simple: coreSimpleScore,
+                    totalPoints: totalPoints,
+                    overrideGrade: overrideGrade,
+                    recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
+                    highlightedHTML: highlightedHTML,
+                    reportMarkdownText: reportMarkdownText,
+                    numWords: numWords,
+                    numSentences: numSentences,
+                    totalSyllables: totalSyllables,
+                    google10kCount: google10kCount,
+                    simpleCounts: simpleCounts,
+                    readability: readability
+                };
+                
+                window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
         };
@@ -674,6 +698,8 @@
                 window.THPS.Audio.wordTimestamps = []; 
                 window.THPS.Audio.volumeData = [];
             }
+            
+            window.thps_lastPayload = null; // WIPE THE CACHE
             
             window.analyze();
         };
