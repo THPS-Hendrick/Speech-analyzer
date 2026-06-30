@@ -55,15 +55,15 @@ class ThpsVoiceGraph extends HTMLElement {
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                     <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Pause Var.</h4>
+                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pause Var.')">Pause Var.</h4>
                         <div class="thps-bar-container-pause flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                     <div class="flex flex-col h-full">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Voice Var.</h4>
+                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Voice Var.')">Voice Var.</h4>
                         <div class="thps-bar-container-voice flex-1 flex items-end"></div>
                     </div>
                     <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2">Pace Var.</h4>
+                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pace Var.')">Pace Var.</h4>
                         <div class="thps-bar-container-pace flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                 </div>
