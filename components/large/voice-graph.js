@@ -22,7 +22,7 @@ class ThpsVoiceGraph extends HTMLElement {
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Graph</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">3-Second Intensity Windows & Start-to-Start Cadence</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Variance in Pause, Voice, & Pace</p>
                     </div>
                 </div>
                 
