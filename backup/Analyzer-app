@@ -289,9 +289,9 @@
                                 <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
                                 <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
                             </button>
-                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200">
-                                <i data-lucide="history" class="w-4 h-4"></i>
-                                <span>: <span id="history-count">0</span></span>
+                                <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200 whitespace-nowrap">
+                                    <i data-lucide="history" class="w-4 h-4"></i>
+                                    <span>: <span id="history-count">0</span></span>
                             </button>
                             <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
                                 <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
