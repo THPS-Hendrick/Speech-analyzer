@@ -57,7 +57,7 @@
 
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.toggleWidgetMenu()"></div>
 
-    <div id="widget-menu-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-slate-200">
+    <div id="widget-menu-drawer" class="fixed top-[10vh] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -268,16 +268,20 @@
                             <thps-live-mic-timer></thps-live-mic-timer>
                         </div>
 
-                      <div class="w-full mt-2 cursor-move relative group">
+                        <div class="w-full mt-2 cursor-move relative group">
                             <thps-whats-this></thps-whats-this>
-                      </div>
-                        
-                      <div class="w-full mt-2 cursor-move relative group">
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
                             <thps-score-summary></thps-score-summary>
                         </div>
 
                         <div class="w-full mt-2 cursor-move relative group">
-                            <thps-voice-graph></thps-voice-graph>
+                            <thps-voice-graph title="Voice Graph"></thps-voice-graph>
+                        </div>
+                        
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-tangible-text></thps-tangible-text>
                         </div>
                     </div>
                 </div>
@@ -494,7 +498,7 @@
                     panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
                 }
             } else {
-                comment.textContent = "Check your scores and have another go!";
+                comment.textContent = "Cannot Score speeches under 30sec or over 90sec";
                 panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
             }
         }
