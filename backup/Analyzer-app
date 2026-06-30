@@ -81,11 +81,11 @@
             <div id="hist-tab-content-list" class="block space-y-3">
                 <!-- Dynamic List items go here -->
             </div>
-            <div id="hist-tab-content-avg" class="hidden space-y-4 text-center py-10">
-                <p class="text-slate-500 font-medium text-sm">Average metrics calculation coming soon...</p>
+            <div id="hist-tab-content-avg" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">Average metrics calculation coming soon...</p>
             </div>
-            <div id="hist-tab-content-best" class="hidden space-y-4 text-center py-10">
-                <p class="text-slate-500 font-medium text-sm">Best metrics tracking coming soon...</p>
+            <div id="hist-tab-content-best" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">Best metrics tracking coming soon...</p>
             </div>
         </div>
     </div>
@@ -285,13 +285,13 @@
                             <p class="text-xs text-slate-500 mt-1">Configure your metrics to match your speaking goals.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200">
-                                <i data-lucide="history" class="w-4 h-4"></i>
-                                <span>History: <span id="history-count">0</span></span>
-                            </button>
                             <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
                                 <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
                                 <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                            </button>
+                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                                <span>: <span id="history-count">0</span></span>
                             </button>
                             <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
                                 <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
@@ -384,7 +384,7 @@
         let explanationsData = null;
         const FALLBACK_EXPLANATIONS = {
             "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
+            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 30-60 is 0.75p, and going under 30s or over 90s cancels your Grade entirely.",
             "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
             "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions.",
             "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
@@ -586,7 +586,7 @@
                     panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
                 }
             } else {
-                comment.textContent = "Cannot Score speeches under 20sec or over 90sec";
+                comment.textContent = "Cannot Score speeches under 30sec or over 90sec";
                 panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
             }
         }
@@ -685,7 +685,7 @@
                 let overrideGrade = false;
 
                 if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    if (elapsedSecs < 20) overrideGrade = true; 
+                    if (elapsedSecs < 30) overrideGrade = true; 
                     else if (elapsedSecs < 60) totalPoints += 0.75; 
                     else if (elapsedSecs <= 90) totalPoints += 1.0; 
                     else overrideGrade = true;
@@ -778,10 +778,53 @@
             } catch(e) { console.error("Summary Dashboard Error:", e); }
         };
 
+        window.getMetricPoints = function(key, val) {
+            if (key === 'totalPoints') return val; 
+            if (key === 'time') {
+                if (val >= 60 && val <= 90) return 1;
+                if (val >= 20 && val < 60) return 0.75;
+                return 0;
+            }
+            if (key === 'wpm') return (val >= 100 && val <= 150) ? 1 : (val < 100 ? 0.75 : 0.25);
+            if (key === 'sps') return (val >= 3 && val <= 5) ? 1 : (val < 3 ? 0.75 : 0.25);
+            if (key === 'pause') return (val >= 10 && val <= 30) ? 1 : (val > 30 ? 0.75 : 0.25);
+            if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
+            if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
+            if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
+            if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'simple') return (val >= 85 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
+            return 0;
+        };
+
+        window.formatMetric = function(key, val) {
+            if (val === null || val === undefined) return '-';
+            if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
+            if (['totalPoints', 'sps', 'wps', 'grade'].includes(key)) return val.toFixed(1);
+            if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
+            return Math.round(val);
+        };
+
+        window.deleteHistoryAttempt = function(id) {
+            window.thps_sessionHistory = window.thps_sessionHistory.filter(h => h.id !== id);
+            window.updateHistoryUI();
+            
+            // If deleting currently viewed attempt, try viewing latest or clear screen
+            if (window.thps_lastPayload && window.thps_lastPayload.id === id) {
+                if (window.thps_sessionHistory.length > 0) {
+                    window.loadHistoryAttempt(window.thps_sessionHistory[0].id);
+                } else {
+                    window.clearAnalyzer();
+                }
+            }
+        };
+
         window.updateHistoryUI = function() {
             const countEl = document.getElementById('history-count');
             const btnEl = document.getElementById('toggle-history-btn');
             const listEl = document.getElementById('hist-tab-content-list');
+            const avgEl = document.getElementById('hist-tab-content-avg');
+            const bestEl = document.getElementById('hist-tab-content-best');
             
             // Always show the count, never hide the button
             if (countEl) {
@@ -791,6 +834,13 @@
             if (!listEl) return;
             
             listEl.innerHTML = '';
+            
+            if (window.thps_sessionHistory.length === 0) {
+                if (avgEl) avgEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                if (bestEl) bestEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                return;
+            }
+
             window.thps_sessionHistory.forEach((attempt) => {
                 const isActive = (window.thps_lastPayload && window.thps_lastPayload.id === attempt.id);
                 const gradeText = attempt.overrideGrade ? '-' : (attempt.totalPoints % 1 === 0 ? attempt.totalPoints : attempt.totalPoints.toFixed(2));
@@ -804,13 +854,62 @@
                         <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
                         <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/10</span>
                     </div>
-                    <div class="flex justify-between items-center text-xs text-slate-400 font-medium">
+                    <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
                         <span>Time: ${Math.floor(attempt.time / 60)}:${Math.floor(attempt.time % 60).toString().padStart(2, '0')}</span>
-                        <span>WPM: ${attempt.wpm || 0}</span>
+                        <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-3 h-3"></i></button>
                     </div>
                 `;
                 listEl.appendChild(item);
             });
+
+            // Map UI text labels to their payload keys
+            const metricsMap = [
+                { label: 'Score', key: 'totalPoints' },
+                { label: 'Time', key: 'time' },
+                { label: 'Pers', key: 'personal' },
+                { label: 'Vis', key: 'visual' },
+                { label: 'Intg', key: 'intangible' },
+                { label: 'WPM', key: 'wpm' },
+                { label: 'SPS', key: 'sps' },
+                { label: 'Pause', key: 'pause' },
+                { label: 'W/Sen', key: 'wps' },
+                { label: 'Comp', key: 'grade' },
+                { label: 'Sim%', key: 'simple' }
+            ];
+
+            let avgHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Average</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            let bestHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Best</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+
+            metricsMap.forEach(m => {
+                let sum = 0, count = 0;
+                let bestVal = null, bestPts = -1;
+
+                window.thps_sessionHistory.forEach(h => {
+                    let val = h[m.key];
+                    if (val !== undefined && val !== null && !isNaN(val)) {
+                        sum += val;
+                        count++;
+                        
+                        let pts = window.getMetricPoints(m.key, val);
+                        if (pts > bestPts) {
+                            bestPts = pts;
+                            bestVal = val;
+                        }
+                    }
+                });
+
+                let avgVal = count > 0 ? sum / count : null;
+                avgHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, avgVal)}</td></tr>`;
+                bestHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, bestVal)}</td></tr>`;
+            });
+
+            avgHtml += `</tbody></table></div>`;
+            bestHtml += `</tbody></table></div>`;
+
+            if (avgEl) avgEl.innerHTML = avgHtml;
+            if (bestEl) bestEl.innerHTML = bestHtml;
+            
+            if (window.lucide) window.lucide.createIcons();
         };
 
         window.loadHistoryAttempt = function(id) {
