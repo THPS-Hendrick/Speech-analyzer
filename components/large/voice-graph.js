@@ -178,7 +178,7 @@ class ThpsVoiceGraph extends HTMLElement {
             });
 
             let activeTime = 3 - pauseInChunk;
-            if (activeTime >= 1) { 
+            if (activeTime >= 0.2) { 
                 let dbSum = 0; let dbCount = 0;
                 if (data.volumeData && data.volumeData.length > 0) {
                     data.volumeData.forEach(v => {
