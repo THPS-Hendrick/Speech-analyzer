@@ -282,7 +282,7 @@
                     <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
                         <div>
                             <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">THPS Analyzer</h2>
-                            <p class="text-xs text-slate-500 mt-1">Widgets to measure your speech.</p>
+                            <p class="text-xs text-slate-500 mt-1">Measure your speech.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
