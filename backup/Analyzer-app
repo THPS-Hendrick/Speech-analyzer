@@ -384,7 +384,7 @@
         let explanationsData = null;
         const FALLBACK_EXPLANATIONS = {
             "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 30-60 is 0.75p, and going under 30s or over 90s cancels your Grade entirely.",
+            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
             "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
             "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions.",
             "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
@@ -586,7 +586,7 @@
                     panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
                 }
             } else {
-                comment.textContent = "Cannot Score speeches under 30sec or over 90sec";
+                comment.textContent = "Cannot Score speeches under 20sec or over 90sec";
                 panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
             }
         }
@@ -685,7 +685,7 @@
                 let overrideGrade = false;
 
                 if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    if (elapsedSecs < 30) overrideGrade = true; 
+                    if (elapsedSecs < 20) overrideGrade = true; 
                     else if (elapsedSecs < 60) totalPoints += 0.75; 
                     else if (elapsedSecs <= 90) totalPoints += 1.0; 
                     else overrideGrade = true;
