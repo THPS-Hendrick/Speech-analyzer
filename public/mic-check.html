@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V24.1 - P6 Edition)</title>
+    <title>Daily Mic-Check: Logic Engine (V24.1 - UX Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -90,24 +90,40 @@
 
         </div>
 
-        <div class="w-full flex-grow perspective cursor-pointer group mb-1" onclick="toggleFlip(6)">
-            <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner">
+        <div class="w-full flex-grow perspective group mb-1">
+            <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
                 
-                <div id="p6-front" class="face face-front bg-[#111827] border-gray-800 rounded-[1.25rem]">
-                    <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
-                    <div id="countdown-overlay" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 text-white text-5xl font-bold opacity-0 transition-opacity duration-200 drop-shadow-2xl z-10 tracking-widest uppercase text-center leading-tight"></div>
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start">
+                    <h3 class="text-xs font-black uppercase text-slate-800 tracking-widest mb-2">How to Play:</h3>
+                    <ol class="text-[10px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight">
+                        <li>Select stars to increase speech difficulty.</li>
+                        <li>Flip this panel to use Camera.</li>
+                        <li>Press play to start.</li>
+                        <li>Press stop to see scores & stats.</li>
+                    </ol>
                     
-                    <div id="camera-status-container" onclick="toggleCamera(); event.stopPropagation();" class="absolute top-4 w-full pointer-events-auto cursor-pointer text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500 hover:text-gray-400">
+                    <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-blue-600 transition-colors z-20 p-1 cursor-pointer">
+                        <i data-lucide="video" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>
+                </div>
+
+                <div id="p6-back" class="face face-back bg-[#111827] border-gray-800 rounded-[1.25rem]">
+                    <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
+                    
+                    <div id="camera-trigger-area" onclick="toggleCamera();" class="absolute inset-0 z-10 cursor-pointer"></div>
+                    
+                    <div id="camera-status-container" class="absolute top-4 w-full pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
                         <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>
                     </div>
-                </div>
 
-                <div id="p6-back" class="face face-back bg-slate-50 rounded-[1.25rem] border border-slate-200">
-                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs font-bold uppercase tracking-widest opacity-50">
-                        <i data-lucide="layout-grid" class="w-6 h-6 mb-2"></i>
-                        Widget Space
-                    </div>
+                    <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors z-30 p-1 cursor-pointer">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                    </button>
+
+                    <div id="countdown-overlay-back" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white text-5xl font-black opacity-0 transition-opacity duration-200 drop-shadow-2xl z-40 tracking-widest uppercase text-center leading-tight"></div>
                 </div>
 
             </div>
@@ -167,11 +183,9 @@
         }
 
         function buildDynamicDrillData(nlpData, elapsedSecs) {
-            // Safety first: Division by zero protection
             const words = Math.max(1, nlpData.numWords);
             const activeSecs = Math.max(1, elapsedSecs);
             
-            // 1. CALCULATE RAW VALUES
             const wpm = Math.round((words / activeSecs) * 60);
             
             const periods = (nlpData.reportMarkdownText.match(/[.!?]/g) || []).length;
@@ -197,7 +211,6 @@
             else popVal = Math.max(1, 15 - ((grade - 15) * 2.8));
             popVal = Math.round(Math.min(99, popVal));
 
-            // 2. SCORE THEM
             let scPace = scoreMetric(wpm, [110, 150], [89, 109], [151, 171]);
             let scMumb = scoreMetric(parseFloat(sps), [3.5, 4.5], [2.9, 3.4], [4.6, 5.2]);
             let scPaus = scoreMetric(pausePct, [15, 30], [9, 14], [31, 36]);
@@ -210,7 +223,6 @@
             let scEng = scoreMetric(engPct, [85, 95], [80, 84], [96, 100]);
             let scPop = scoreMetric(grade, [5, 10], [3, 4.99], [10.01, 12]);
 
-            // 3. BUILD THE OBJECT
             const sumDel = scPace.points + scMumb.points + scPaus.points;
             const sumCon = scPers.points + scVis.points + scAbs.points;
             const sumCla = scSig.points + scEng.points + scPop.points;
@@ -583,10 +595,20 @@
             if (phase === 'RECORDING' || phase === 'PROCESSING') return;
 
             if (phase === 'START') {
-                if (panelNum === 5 || panelNum === 6) return; // Protect structural panels
-                document.getElementById(`bar-${panelNum}`).classList.toggle('flip-active');
-                selections[panelNum] = document.getElementById(`bar-${panelNum}`).classList.contains('flip-active') ? 'B' : 'A';
-                updateLevelDisplay(); 
+                if (panelNum === 5) return; // Only lock the Play button
+                
+                const bar = document.getElementById(`bar-${panelNum}`);
+                if (bar) bar.classList.toggle('flip-active');
+                
+                if (panelNum !== 6) {
+                    selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
+                    updateLevelDisplay(); 
+                } else {
+                    // SAFETY KILL: If flipping back to the Text Side (removing flip-active) and camera is ON, turn it off.
+                    if (!bar.classList.contains('flip-active') && isCameraOn) {
+                        toggleCamera();
+                    }
+                }
             } 
             
             else if (phase === 'RESULTS') {
@@ -651,16 +673,23 @@
                     }
                 }
 
-                const overlay = document.getElementById('countdown-overlay');
-                overlay.classList.remove('opacity-0');
+                // Dual Layer Countdown Sequence
+                const overlayFront = document.getElementById('countdown-overlay-front');
+                const overlayBack = document.getElementById('countdown-overlay-back');
+                
+                if (overlayFront) overlayFront.classList.remove('opacity-0');
+                if (overlayBack) overlayBack.classList.remove('opacity-0');
                 
                 const steps = ["3", "2", "1", "Mic-Check!"];
                 for (let i = 0; i < steps.length; i++) {
-                    overlay.innerText = steps[i];
+                    if (overlayFront) overlayFront.innerText = steps[i];
+                    if (overlayBack) overlayBack.innerText = steps[i];
                     await new Promise(r => setTimeout(r, 800));
                 }
                 
-                overlay.classList.add('opacity-0'); 
+                if (overlayFront) overlayFront.classList.add('opacity-0');
+                if (overlayBack) overlayBack.classList.add('opacity-0'); 
+                
                 isStarting = false; 
 
                 phase = 'RECORDING';
