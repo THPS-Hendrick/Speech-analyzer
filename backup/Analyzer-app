@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1030,6 +1031,23 @@
                 }, 100);
             }
         };
+        
+                window.spawnCompareWidget = function() {
+            window.closeAllMenus();
+            if (window.THPS && window.THPS.Dashboard) {
+                // Create a silent dummy element to satisfy the dashboard manager's button animation
+                const dummyBtn = document.createElement('div');
+                dummyBtn.innerHTML = 'VS';
+                
+                // Pass the dummyBtn as the 3rd argument
+                window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', dummyBtn);
+                
+                setTimeout(() => {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+        };
+
     </script>
 </body>
 </html>
