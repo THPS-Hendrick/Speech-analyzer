@@ -1,6 +1,6 @@
 // ==========================================
 // THPS WIDGET: LARGE UPLOAD SPEECH
-// Handles File Drop, Audio Decoding, Snipping, and 30s Vercel Chunking
+// Handles File Drop, Audio Decoding, Snipping, 30s Vercel Chunking, and Session Import/Export
 // ==========================================
 
 class ThpsUploadSpeech extends HTMLElement {
@@ -8,30 +8,32 @@ class ThpsUploadSpeech extends HTMLElement {
         this.innerHTML = `
             <div class="glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-emerald-500 shadow-sm flex flex-col bg-white relative w-full transition-transform hover:-translate-y-1 hover:shadow-md group">
                 
-                <!-- SELF DESTRUCT BUTTON -->
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upload Speech (Audio/Video)</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Snip and analyze up to 5 minutes of local media</p>
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upload Speech (Audio/Video/Data)</h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Snip media or restore a saved session</p>
                     </div>
                 </div>
                 
-                <!-- ERROR / STATUS BANNER -->
                 <div id="upload-status-banner" class="hidden w-full text-xs font-bold p-3 rounded-lg mb-4 text-center transition-all"></div>
 
-                <!-- DROP ZONE (Visible Initially) -->
-                <div id="drop-zone" class="w-full h-40 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-emerald-400 transition-all cursor-pointer relative">
-                    <input type="file" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="audio/*,video/mp4,video/webm">
-                    <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2 pointer-events-none"></i>
-                    <span class="text-sm font-bold text-slate-600 pointer-events-none">Drag & Drop Media Here</span>
-                    <span class="text-[10px] font-medium text-slate-400 mt-1 pointer-events-none">Supports MP3, MP4, WAV, WEBM</span>
+                <div id="drop-zone-wrapper" class="w-full flex flex-col gap-2">
+                    <div id="drop-zone" class="w-full h-40 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-emerald-400 transition-all cursor-pointer relative">
+                        <input type="file" id="file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="audio/*,video/mp4,video/webm,application/json,.json">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2 pointer-events-none"></i>
+                        <span class="text-sm font-bold text-slate-600 pointer-events-none">Drag & Drop Media or Data</span>
+                        <span class="text-[10px] font-medium text-slate-400 mt-1 pointer-events-none text-center">Supports MP3, MP4, WAV, WEBM, JSON</span>
+                    </div>
+                    
+                    <button id="btn-export-session" class="w-full mt-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-slate-200 shadow-sm relative z-10 active:scale-95">
+                        <i data-lucide="download" class="w-4 h-4"></i> Export Current Session
+                    </button>
                 </div>
 
-                <!-- EDITING PANEL (Hidden Initially) -->
                 <div id="edit-panel" class="hidden w-full flex-col gap-4">
                     
                     <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
@@ -42,12 +44,10 @@ class ThpsUploadSpeech extends HTMLElement {
                         <button id="btn-reset-file" class="text-[10px] font-bold text-slate-500 hover:text-rose-500 uppercase tracking-widest px-2 py-1 bg-white border border-slate-200 rounded shadow-sm shrink-0">Replace</button>
                     </div>
 
-                    <!-- Native Audio Player -->
                     <div class="w-full bg-slate-800 rounded-xl p-3 shadow-inner">
                         <audio id="audio-player" class="w-full h-8 outline-none" controls></audio>
                     </div>
 
-                    <!-- Snipping Controls -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                             <div class="flex justify-between items-center">
@@ -65,7 +65,6 @@ class ThpsUploadSpeech extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-3 mt-2">
                         <button id="btn-download-snip" class="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2 shadow-sm">
                             <i data-lucide="download" class="w-4 h-4"></i> Download Snip
@@ -82,6 +81,7 @@ class ThpsUploadSpeech extends HTMLElement {
         this.audioPlayer = this.querySelector('#audio-player');
         this.fileInput = this.querySelector('#file-input');
         this.dropZone = this.querySelector('#drop-zone');
+        this.dropZoneWrapper = this.querySelector('#drop-zone-wrapper');
         this.editPanel = this.querySelector('#edit-panel');
         this.statusBanner = this.querySelector('#upload-status-banner');
         
@@ -123,11 +123,14 @@ class ThpsUploadSpeech extends HTMLElement {
             }
         });
 
+        // Session Data Export
+        this.querySelector('#btn-export-session').addEventListener('click', () => this.exportSession());
+
         // Reset File
         this.querySelector('#btn-reset-file').addEventListener('click', () => {
             this.audioBuffer = null;
             this.editPanel.classList.add('hidden');
-            this.dropZone.classList.remove('hidden');
+            this.dropZoneWrapper.classList.remove('hidden');
             this.fileInput.value = '';
             this.audioPlayer.src = '';
             this.hideStatus();
@@ -169,18 +172,95 @@ class ThpsUploadSpeech extends HTMLElement {
         this.statusBanner.classList.add('hidden');
     }
 
+    exportSession() {
+        if (!window.thps_lastPayload || Object.keys(window.thps_lastPayload).length === 0) {
+            this.showStatus('No active session data found to export. Analyze a speech first!', 'warn');
+            setTimeout(() => this.hideStatus(), 3000);
+            return;
+        }
+
+        const dataStr = JSON.stringify(window.thps_lastPayload, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `speech-session-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async importJSONSession(file) {
+        this.showStatus('<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block align-middle mr-2"></i> Restoring Session...', 'info');
+        if (window.lucide) window.lucide.createIcons();
+
+        try {
+            const text = await file.text();
+            const payload = JSON.parse(text);
+
+            window.thps_lastPayload = payload;
+
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl && payload.text) hiddenEl.value = payload.text;
+
+            if (window.THPS && window.THPS.Audio) {
+                window.THPS.Audio.recordedAudio = payload.recordedAudio || false;
+                window.THPS.Audio.lastRecordedDuration = payload.time || 0;
+                window.THPS.Audio.wordTimestamps = payload.wordTimestamps || [];
+                window.THPS.Audio.volumeData = payload.volumeData || [];
+            }
+
+            if (typeof window.updateCelebrationPanel === 'function') {
+                window.updateCelebrationPanel(payload.totalPoints, payload.time, payload.overrideGrade, payload.recordedAudio, (payload.text || '').length);
+            }
+
+            // Immediately clear the status since visual feedback comes from widgets populating
+            this.hideStatus();
+            
+            // Trigger the UI update
+            window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
+            
+            // Inject into History tracking
+            if (window.thps_sessionHistory && typeof window.updateHistoryUI === 'function') {
+                let historyPayload = { 
+                    ...payload, 
+                    id: window.thps_currentAttemptId, 
+                    title: 'Imported Attempt ' + window.thps_currentAttemptId, 
+                    date: new Date() 
+                };
+                
+                window.thps_sessionHistory.unshift(historyPayload);
+                window.thps_currentAttemptId++;
+                window.updateHistoryUI();
+            }
+
+            // Reset file input so the same file can be uploaded again if needed
+            this.fileInput.value = '';
+
+        } catch (error) {
+            console.error("JSON Parse Error:", error);
+            this.showStatus('Invalid session file. Could not restore data.', 'error');
+        }
+    }
+
     async handleFile(file) {
+        // ROUTER: Intercept JSON Files
+        if (file.type === 'application/json' || file.name.endsWith('.json')) {
+            return this.importJSONSession(file);
+        }
+
+        // Default handling for Media
         this.querySelector('#file-name-display').innerText = file.name;
-        this.dropZone.classList.add('hidden');
+        this.dropZoneWrapper.classList.add('hidden');
         this.showStatus('<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block align-middle mr-2"></i> Extracting Audio Track...', 'info');
         if (window.lucide) window.lucide.createIcons();
 
         try {
-            // Setup Native Audio Player
             const objectUrl = URL.createObjectURL(file);
             this.audioPlayer.src = objectUrl;
             
-            // Decode raw PCM data for chunking/analysis
             const arrayBuffer = await file.arrayBuffer();
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: this.sampleRate });
             this.audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
@@ -198,13 +278,13 @@ class ThpsUploadSpeech extends HTMLElement {
         } catch (error) {
             console.error("Audio Decode Error:", error);
             this.showStatus('Failed to decode media file. Ensure it is a valid MP3, MP4, or WEBM.', 'error');
-            this.dropZone.classList.remove('hidden');
+            this.dropZoneWrapper.classList.remove('hidden');
         }
     }
 
     getSlicedFloatArray() {
         if (!this.audioBuffer) return null;
-        const channelData = this.audioBuffer.getChannelData(0); // Mono
+        const channelData = this.audioBuffer.getChannelData(0);
         const startSample = Math.floor(this.inTime * this.sampleRate);
         const endSample = Math.floor(this.outTime * this.sampleRate);
         return channelData.slice(startSample, endSample);
@@ -255,7 +335,6 @@ class ThpsUploadSpeech extends HTMLElement {
     async analyzeSnip() {
         const duration = this.outTime - this.inTime;
         
-        // Safety Constraint: 5 Minute Maximum
         if (duration > 300) {
             this.showStatus('Cannot process snips longer than 5 minutes. Please set the IN and OUT points closer together.', 'error');
             return;
@@ -267,7 +346,6 @@ class ThpsUploadSpeech extends HTMLElement {
         this.showStatus('<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block align-middle mr-2"></i> Chunking and sending to Vercel STT...', 'info');
         if (window.lucide) window.lucide.createIcons();
 
-        // 1. CHUNK AUDIO (30s limits to avoid Vercel timeouts)
         const chunkSizeSamples = this.sampleRate * 30; 
         let wavChunks = [];
         
@@ -276,7 +354,6 @@ class ThpsUploadSpeech extends HTMLElement {
             wavChunks.push(this.encodeWAV(segment));
         }
 
-        // 2. PARALLEL UPLOAD PIPELINE
         const uploadPromises = wavChunks.map(async (blob, index) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -303,9 +380,8 @@ class ThpsUploadSpeech extends HTMLElement {
             });
         });
 
-        // 3. GENERATE VOLUME DATA (For Acoustic Timeline Widget!)
         const volumeData = [];
-        const windowSize = Math.floor(this.sampleRate * 0.1); // 100ms snapshots
+        const windowSize = Math.floor(this.sampleRate * 0.1);
         for(let i = 0; i < slicedData.length; i += windowSize) {
             let sumSquares = 0; let count = 0;
             for(let j = 0; j < windowSize && (i+j) < slicedData.length; j++) {
@@ -317,7 +393,6 @@ class ThpsUploadSpeech extends HTMLElement {
             volumeData.push({ time: (i / this.sampleRate), rms: rms, db: db });
         }
 
-        // 4. RESTITCH & BROADCAST
         try {
             const resolvedChunks = await Promise.all(uploadPromises);
             resolvedChunks.sort((a, b) => a.index - b.index); 
@@ -339,7 +414,6 @@ class ThpsUploadSpeech extends HTMLElement {
 
             this.hideStatus();
 
-            // Inject the data into the global Dashboard architecture
             if (window.THPS && window.THPS.Audio) {
                 window.THPS.Audio.recordedAudio = true;
                 window.THPS.Audio.lastRecordedDuration = duration;
@@ -352,7 +426,6 @@ class ThpsUploadSpeech extends HTMLElement {
                 inputEl.value = finalStitchedTranscript;
             }
 
-            // Trigger the master analyzer!
             if (typeof window.analyze === 'function') window.analyze();
 
         } catch (globalError) {
