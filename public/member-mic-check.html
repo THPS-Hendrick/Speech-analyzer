@@ -54,8 +54,8 @@
                     Members Hub
                 </h1>
                 <p class="text-xs md:text-sm text-slate-500 font-medium max-w-md mt-1">
-                    Welcome back. Play historic challenges and track your progress below.<br>
-                    <strong>(Score 8.5+ to boost your Star Count!)</strong>
+                    Members get every daily challenge, progress tracking & other premium features.<br>
+                    <strong>(Score 8.0+ to boost your Star Count!)</strong>
                 </p>
                 <div id="db-status" class="mt-2 text-[10px] font-bold px-3 py-1 bg-amber-100 text-amber-700 rounded-full animate-pulse">Connecting to Save Data...</div>
             </div>
@@ -242,13 +242,13 @@
                     const data = window.userScores[dateKey];
                     let stars = 0; let score = 0.0; let scoreColor = 'text-slate-400';
                     
-                    if (data) { 
-                        stars = data.stars; score = data.score; 
-                        if (score === 10) { goldenCount++; scoreColor = 'text-yellow-400 drop-shadow-md font-black'; } 
-                        else if (score >= 8.5) { totalStars += stars; scoreColor = 'text-green-500'; } 
-                        else if (score >= 7) { scoreColor = 'text-orange-500'; } 
-                        else { scoreColor = 'text-yellow-500'; }
-                    }
+                   if (data) { 
+                      stars = data.stars; score = data.score; 
+                      if (score === 10) { goldenCount++; scoreColor = 'text-yellow-400 drop-shadow-md font-black'; } 
+                      else if (score >= 8.0) { totalStars += stars; scoreColor = 'text-green-500'; } 
+                      else if (score >= 7) { scoreColor = 'text-orange-500'; } 
+                      else { scoreColor = 'text-yellow-500'; }
+                   }
 
                     let starsHtml = '';
                     for (let s = 1; s <= 5; s++) { starsHtml += s <= stars ? `<i data-lucide="star" class="w-2 h-2 sm:w-3 sm:h-3 text-amber-500 fill-amber-500"></i>` : `<i data-lucide="star" class="w-2 h-2 sm:w-3 sm:h-3 text-slate-300"></i>`; }
