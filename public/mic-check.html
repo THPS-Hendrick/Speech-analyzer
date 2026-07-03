@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V24.1 - Phase Menu Remodel)</title>
+    <title>Daily Mic-Check: Logic Engine (V24.1 - Master Dashboard)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -55,35 +55,35 @@
         
         <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
             
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" id="p1-container" onclick="toggleFlip(1)">
                 <div id="bar-1" class="flipper">
                     <div id="p1-front" class="face face-front"></div>
                     <div id="p1-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" id="p2-container" onclick="toggleFlip(2)">
                 <div id="bar-2" class="flipper">
                     <div id="p2-front" class="face face-front"></div>
                     <div id="p2-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" id="p3-container" onclick="toggleFlip(3)">
                 <div id="bar-3" class="flipper">
                     <div id="p3-front" class="face face-front"></div>
                     <div id="p3-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" id="p4-container" onclick="toggleFlip(4)">
                 <div id="bar-4" class="flipper">
                     <div id="p4-front" class="face face-front"></div>
                     <div id="p4-back" class="face face-back"></div>
                 </div>
             </div>
 
-            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" id="p5-container" onclick="toggleFlip(5)">
                 <div id="bar-5" class="flipper">
                     <div id="p5-front" class="face face-front overflow-hidden"></div>
                     <div id="p5-back" class="face face-back"></div>
@@ -95,8 +95,7 @@
         <div class="w-full flex-grow perspective group mb-1">
             <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
                 
-                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center">
-                    </div>
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center"></div>
 
                 <div id="p6-back" class="face face-back bg-[#111827] border-gray-800 rounded-[1.25rem]">
                     <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
@@ -135,7 +134,7 @@
         
         // --- STATE ENGINE & COLORS ---
         const col = {
-            p1: 'bg-[#8F1C1C]', textP1: 'text-[#8F1C1C]', borderP1: 'border-[#8F1C1C]',
+            p1: 'bg-[#C06060]', textP1: 'text-[#C06060]', borderP1: 'border-[#C06060]',
             p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
             p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
             p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
@@ -144,7 +143,6 @@
             b: 'bg-slate-900', textB: 'text-slate-800'
         };
 
-        // NEW PHASE INIT
         let phase = 'MENU'; 
         let activeMenuTopic = 'LOGO'; 
         let currentMenuPage = 1;
@@ -157,7 +155,6 @@
         let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
         
         let sideBLevel = 0; 
-        let p5SoloFlipped = false;
         let currentCategory = ''; 
         let currentSubNum = 0; 
 
@@ -169,12 +166,12 @@
         let feedbackMatrix = {};
         let drillData = {}; 
 
-        // --- P6 DYNAMIC EXPLAINER CONTENT ---
+        // --- P6 DYNAMIC CONTENT DICTIONARIES ---
         const p3ScoringContent = [
             "<strong>1. Delivery (Pace, Mumble, Pause):</strong><br>Scores your speed, clarity, and pacing. Green is ideal, Yellow needs adjustment, Red means you are speaking too fast, too slow, or not enunciating.",
             "<strong>2. Content (Personal, Visual, Abstract):</strong><br>Scores the balance of your story. A perfect score blends personal anecdotes, visual imagery, and abstract concepts evenly.",
             "<strong>3. Clarity (Word Avg, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Use shorter sentences and common English words to hit Green thresholds.",
-            "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20seconds or over 80seconds is disqualified so don't chicken out or ramble on!",
+            "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20s or over 80s is disqualified so don't chicken out or ramble on!",
             "<strong>5. Stars & Final Grade:</strong><br> All 10 sub-scores combine into a Final Grade out of 10. The Star rating reflects the difficulty level you completed.",
         ];
 
@@ -192,14 +189,52 @@
         ];
 
         function changeMenuPage(direction, event, maxPages) {
-            if (event) event.stopPropagation(); // Stop panel from flipping
+            if (event) event.stopPropagation();
             currentMenuPage += direction;
             if (currentMenuPage < 1) currentMenuPage = maxPages;
             if (currentMenuPage > maxPages) currentMenuPage = 1;
             renderP6Front();
         }
 
-        // --- DYNAMIC P6 RENDERER ---
+        // --- INTERACTION LOGIC (RESULTS Phase) ---
+        function revertP6ToDefault(event) {
+            if (event) event.stopPropagation();
+            const bar6 = document.getElementById('bar-6');
+            if (bar6 && bar6.classList.contains('flip-active')) {
+                // Info shake on camera mode
+                const infoIcon = bar6.querySelector('.face-back button');
+                if (infoIcon) {
+                    infoIcon.classList.add('animate-bounce');
+                    setTimeout(() => infoIcon.classList.remove('animate-bounce'), 1000);
+                }
+            } else {
+                activeMenuTopic = 'RESULTS_DEFAULT';
+                renderP6Front();
+            }
+        }
+
+        function handleMetricClick(category, subNum, event) {
+            if (event) event.stopPropagation();
+            const bar6 = document.getElementById('bar-6');
+            const isCameraShowing = bar6 && bar6.classList.contains('flip-active');
+
+            currentCategory = category;
+            currentSubNum = subNum;
+
+            if (isCameraShowing) {
+                sideBLevel = 3;
+                renderSideB();
+                for (let i = 1; i <= 5; i++) {
+                    const bar = document.getElementById(`bar-${i}`);
+                    if (bar) bar.classList.add('flip-active');
+                }
+            } else {
+                activeMenuTopic = 'FEEDBACK_CARD';
+                renderP6Front(); 
+            }
+        }
+
+        // --- P6 MASTER RENDERER ---
         function renderP6Front() {
             const p6f = document.getElementById('p6-front');
             if (!p6f) return;
@@ -222,9 +257,9 @@
                 p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start`;
                 p6f.innerHTML = `
                     ${cameraIconDark}
-                    <h3 class="text-[11px] font-black uppercase text-[#8F1C1C] tracking-widest mb-2">What is Mic-Check?</h3>
+                    <h3 class="text-[11px] font-black uppercase text-[#C06060] tracking-widest mb-2">What is Mic-Check?</h3>
                     <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">
-                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#8F1C1C]">START</strong> to "check" it out!
+                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#C06060]">START</strong> to "check" it out!
                     </p>
                 `;
             }
@@ -254,7 +289,6 @@
                         <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3>
                         <p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p>
                     </div>
-                    
                     <div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0">
                         <button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                         <span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span>
@@ -262,16 +296,40 @@
                     </div>
                 `;
             }
-
-            // Also ensure the countdown layer exists if in START phase, injected carefully so it doesn't get erased
-            if (!document.getElementById('countdown-overlay-front')) {
-                p6f.insertAdjacentHTML('beforeend', `<div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>`);
+            else if (activeMenuTopic === 'RESULTS_DEFAULT') {
+                p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center`;
+                p6f.innerHTML = `
+                    ${cameraIcon}
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none">
+                        ${window.lastAchievedGrade}<span class="text-xl text-white/50"> / Level ${window.lastAchievedLevel}</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
+                        <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
+                        <span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
+                `;
             }
-            
+            else if (activeMenuTopic === 'FEEDBACK_CARD') {
+                const data = drillData[currentCategory][currentSubNum];
+                const activeColor = currentCategory === 'Delivery' ? 'text-[#9333EA]' : (currentCategory === 'Content' ? 'text-[#2563EB]' : 'text-[#047857]');
+                
+                p6f.className = `face face-front bg-white border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-start items-start`;
+                p6f.innerHTML = `
+                    <button onclick="revertP6ToDefault(event)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-800 transition-colors p-1 cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <h3 class="text-[11px] font-black uppercase ${activeColor} tracking-widest mb-3">${data.name}</h3>
+                    <div class="space-y-3 w-full pr-1 overflow-y-auto max-h-[170px]">
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">You:</strong> ${data.you}</p>
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Try:</strong> ${data.try}</p>
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Why:</strong> ${data.why}</p>
+                    </div>
+                `;
+            }
+
             if (window.lucide) window.lucide.createIcons();
         }
 
-        // --- DYNAMIC MATH & NLP BRIDGE ---
+        // --- MATH & NLP BRIDGE ---
         function scoreMetric(raw, bounds1, bounds05_low, bounds05_high) {
             if (raw >= bounds1[0] && raw <= bounds1[1]) return { points: 1, state: 'perfect' };
             if (bounds05_low && raw >= bounds05_low[0] && raw <= bounds05_low[1]) return { points: 0.5, state: 'low' };
@@ -279,35 +337,18 @@
             return { points: 0, state: raw < bounds1[0] ? 'low' : 'high' };
         }
 
-        function getStarFromScore(score) {
-            if (score >= 2.5) return 'filled';
-            if (score >= 1.5) return 'half';
-            return 'empty';
-        }
-
         function buildDynamicDrillData(nlpData, elapsedSecs) {
             const words = Math.max(1, nlpData.numWords);
             const activeSecs = Math.max(1, elapsedSecs);
             const wpm = Math.round((words / activeSecs) * 60);
-            const periods = (nlpData.reportMarkdownText.match(/[.!?]/g) || []).length;
-            const commas = (nlpData.reportMarkdownText.match(/[,;:-]/g) || []).length;
-            let estPauseSecs = (periods * 1.3) + (commas * 0.5);
-            estPauseSecs = Math.max(activeSecs * 0.05, Math.min(activeSecs * 0.45, estPauseSecs)); 
-            const pausePct = Math.round((estPauseSecs / activeSecs) * 100);
-            const sps = (nlpData.totalSyllables / Math.max(1, activeSecs - estPauseSecs)).toFixed(1);
+            const pausePct = Math.round(((nlpData.reportMarkdownText.match(/[.!?]/g)?.length || 0) * 1.3 / activeSecs) * 100);
+            const sps = (nlpData.totalSyllables / activeSecs).toFixed(1);
             const perPct = Math.round((nlpData.personalCount / words) * 100);
             const visPct = Math.round((nlpData.visualCount / words) * 100);
             const absPct = Math.max(0, 100 - perPct - visPct);
             const wps = Math.round(words / Math.max(1, nlpData.numSentences));
             const engPct = Math.round((nlpData.google10kCount / words) * 100);
             const grade = window.THPS.NLP.calculateReadabilityMetrics(words, nlpData.numSentences, nlpData.totalSyllables, nlpData.letterCount, nlpData.complexWordCount).avgGrade;
-            
-            let popVal = 0;
-            if (grade <= 5) popVal = 95 + (5 - grade)*1; 
-            else if (grade <= 10) popVal = 95 - ((grade - 5) * 7.8);
-            else if (grade <= 15) popVal = 56 - ((grade - 10) * 8.2);
-            else popVal = Math.max(1, 15 - ((grade - 15) * 2.8));
-            popVal = Math.round(Math.min(99, popVal));
 
             let scPace = scoreMetric(wpm, [110, 150], [89, 109], [151, 171]);
             let scMumb = scoreMetric(parseFloat(sps), [3.5, 4.5], [2.9, 3.4], [4.6, 5.2]);
@@ -319,229 +360,30 @@
             let scEng = scoreMetric(engPct, [85, 95], [80, 84], [96, 100]);
             let scPop = scoreMetric(grade, [5, 10], [3, 4.99], [10.01, 12]);
 
-            const sumDel = scPace.points + scMumb.points + scPaus.points;
-            const sumCon = scPers.points + scVis.points + scAbs.points;
-            const sumCla = scSig.points + scEng.points + scPop.points;
-
             const safeFb = (cat, state) => feedbackMatrix[cat] ? feedbackMatrix[cat][state] : { you: "-", try: "-", why: "-" };
             const getCol = (pts) => pts === 1 ? 'text-emerald-500' : (pts === 0.5 ? 'text-amber-500' : 'text-rose-500');
 
             drillData = {
-                Delivery: { 
-                    score: sumDel, star: getStarFromScore(sumDel),
-                    2: { name: "Pace", val: `${wpm}`, color: getCol(scPace.points), ...safeFb('Pace', scPace.state) }, 
-                    3: { name: "Mumble", val: `${sps}`, color: getCol(scMumb.points), ...safeFb('Mumble', scMumb.state) }, 
-                    4: { name: "Pause", val: `${pausePct}%`, color: getCol(scPaus.points), ...safeFb('Pause', scPaus.state) } 
-                },
-                Content: { 
-                    score: sumCon, star: getStarFromScore(sumCon),
-                    2: { name: "Personal", val: `${perPct}%`, color: getCol(scPers.points), ...safeFb('Personal', scPers.state) }, 
-                    3: { name: "Visual", val: `${visPct}%`, color: getCol(scVis.points), ...safeFb('Visual', scVis.state) }, 
-                    4: { name: "Abstract", val: `${absPct}%`, color: getCol(scAbs.points), ...safeFb('Abstract', scAbs.state) } 
-                },
-                Clarity: { 
-                    score: sumCla, star: getStarFromScore(sumCla),
-                    2: { name: "Word Avg", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 
-                    3: { name: "Eng 10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 
-                    4: { name: "Pop", val: `~${popVal}%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } 
-                },
-                FinalGrade: sumDel + sumCon + sumCla 
+                Delivery: { 2: { name: "Pace", val: `${wpm}`, color: getCol(scPace.points), ...safeFb('Pace', scPace.state) }, 3: { name: "Mumble", val: `${sps}`, color: getCol(scMumb.points), ...safeFb('Mumble', scMumb.state) }, 4: { name: "Pause", val: `${pausePct}%`, color: getCol(scPaus.points), ...safeFb('Pause', scPaus.state) } },
+                Content: { 2: { name: "Personal", val: `${perPct}%`, color: getCol(scPers.points), ...safeFb('Personal', scPers.state) }, 3: { name: "Visual", val: `${visPct}%`, color: getCol(scVis.points), ...safeFb('Visual', scVis.state) }, 4: { name: "Abstract", val: `${absPct}%`, color: getCol(scAbs.points), ...safeFb('Abstract', scAbs.state) } },
+                Clarity: { 2: { name: "Word Avg", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 3: { name: "Eng 10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 4: { name: "Pop", val: `~95%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } },
+                FinalGrade: (scPace.points + scMumb.points + scPaus.points + scPers.points + scVis.points + scAbs.points + scSig.points + scEng.points + scPop.points)
+            };
+
+            // Dynamic Extras Category
+            let timeYou = elapsedSecs < 20 ? "Less than 20 sec" : (elapsedSecs < 60 ? "20 to 59s" : (elapsedSecs <= 80 ? "60 to 80s" : "More than 80s"));
+            let timeWhy = elapsedSecs < 20 ? "Score invalid" : (elapsedSecs < 60 ? "Score of 0.5 / 1" : (elapsedSecs <= 80 ? "Score of +1" : "Score invalid"));
+            let timeTry = (elapsedSecs >= 60 && elapsedSecs <= 80) ? "You nailed it!" : "Speaking for 60-80s";
+
+            drillData.Extras = {
+                1: { name: "Time", val: formatTime(elapsedSecs), you: timeYou, why: timeWhy, try: timeTry },
+                2: { name: "Date", val: globalShortDate, you: "Should play Daily Mic-Check again tomorrow!", why: "Because every day is a new challenge!", try: "Become a member for courses & tools!" }
             };
         }
 
-        // --- CAMERA ENGINE ---
-        async function toggleCamera() {
-            if (phase === 'RECORDING' || phase === 'PROCESSING' || isStarting || isCameraLoading) return;
-
-            const videoEl = document.getElementById('camera-feed');
-            const statusContainer = document.getElementById('camera-status-container');
-            const statusText = document.getElementById('camera-status');
-
-            isCameraLoading = true;
-
-            if (isCameraOn) {
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                }
-                videoEl.srcObject = null;
-                videoEl.classList.replace('opacity-100', 'opacity-0');
-                
-                statusContainer.classList.remove('opacity-0');
-                statusContainer.innerHTML = `
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                    <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
-                
-                isCameraOn = false;
-                cameraStream = null;
-            } else {
-                statusText.innerHTML = 'STARTING...';
-                try {
-                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    videoEl.srcObject = cameraStream;
-                    videoEl.classList.replace('opacity-0', 'opacity-100');
-                    
-                    statusContainer.classList.add('opacity-0');
-                    isCameraOn = true;
-                } catch (err) {
-                    console.error("Camera access denied or failed.", err);
-                    statusText.innerHTML = '<span class="text-red-500">BLOCKED</span>';
-                }
-            }
-            isCameraLoading = false;
-        }
-
-        // --- SVGs ---
-        function createStar(type, size = 20, extraClass = "") {
-            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
-        }
-        const playSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-        const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
-        const chevRight = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
-        const chevLeft = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
-        const plusSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-        const caretUpSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
-
-        // --- DATA DICTIONARIES ---
-        let b1 = "Yell at some point!";
-        let b2 = "Bore us about";
-        let b3 = "Cardboard boxes, with";
-        let b4 = "Private + Public examples.";
-
-        const matrix = {
-            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
-            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
-            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }, 
-            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
-        };
-
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-
-        function getTimeGradeAndStar(sec) {
-            if (sec >= 60 && sec <= 80) return { grade: "1/1", num: 1, star: "filled", count: 5 };
-            if (sec >= 20 && sec < 60) return { grade: "0.5/1", num: 0.5, star: "half", count: 3 };
-            return { grade: "0/1", num: 0, star: "empty", count: 1 };
-        }
-
-        function getLevelCount() {
-            let count = 0;
-            if (selections[1] === 'B') count++;
-            if (selections[2] === 'B') count++;
-            if (selections[3] === 'B') count++;
-            if (selections[4] === 'B') count++;
-            return count;
-        }
-
-        function updateLevelDisplay() {
-            const count = getLevelCount();
-            const fillPercent = (count / 4) * 100;
-            
-            const fillDiv = document.getElementById('p5-fill');
-            if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
-            
-            const levelText = document.getElementById('p5-level-num');
-            if (levelText) levelText.innerText = `PLAY LEVEL ${count + 1}`;
-        }
-
-        function buildPromptSentence() {
-            const s1 = selections[1] === 'A' ? `<strong class="${matrix[1].colorA}">${matrix[1].A}</strong>` : `<strong class="${matrix[1].colorB}">${matrix[1].B}</strong>`;
-            const s2 = selections[2] === 'A' ? `<strong class="${matrix[2].colorA}">${matrix[2].A}</strong>` : `<strong class="${matrix[2].colorB}">${matrix[2].B}</strong>`;
-            const s3 = selections[3] === 'A' ? `<strong class="${matrix[3].colorA}">${matrix[3].A}</strong>` : `<strong class="${matrix[3].colorB}">${matrix[3].B}</strong>`;
-            const s4 = selections[4] === 'A' ? `<strong class="${matrix[4].colorA}">${matrix[4].A}</strong>` : `<strong class="${matrix[4].colorB}">${matrix[4].B}</strong>`;
-            return `${s1} ${s2} ${s3} ${s4}`;
-        }
-
-        // --- UI RENDERER (SIDE B DRILL-DOWNS) ---
-        function renderSideB() {
-            const p1 = document.getElementById('p1-back');
-            const p2 = document.getElementById('p2-back');
-            const p3 = document.getElementById('p3-back');
-            const p4 = document.getElementById('p4-back');
-            const p5 = document.getElementById('p5-back');
-
-            const item = (text, icon, textColor = col.textB) => `
-                <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                    <span class="text-[13px] font-bold uppercase tracking-widest ${textColor}">${text}</span>
-                </div>
-                <span class="absolute right-3 pointer-events-none ${textColor}">${icon}</span>`;
-            
-            const feedbackItem = (label, text) => `
-                <div class="w-full h-full flex items-center justify-start pl-5 pr-8">
-                    <span class="text-[11px] font-medium leading-tight text-slate-600"><strong class="${col.textP3} uppercase text-[10px] tracking-widest">${label}:</strong> ${text}</span>
-                </div>`;
-
-            if (sideBLevel === 0) {} 
-            else if (sideBLevel === 1) {
-                const timePts = getTimeGradeAndStar(timerSeconds).num;
-                const totalScore = ((drillData.FinalGrade || 0) + timePts).toFixed(1);
-
-                p1.className = `face face-back ${col.p1}`;
-                p1.innerHTML = item(`Final Grade = ${totalScore}`, chevLeft, col.textP5);
-                
-                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
-                p2.innerHTML = item(`Delivery = ${drillData.Delivery ? drillData.Delivery.score : 0}/3`, chevRight, col.textB);
-                p3.innerHTML = item(`Content = ${drillData.Content ? drillData.Content.score : 0}/3`, chevRight, col.textB);
-                p4.innerHTML = item(`Clarity = ${drillData.Clarity ? drillData.Clarity.score : 0}/3`, chevRight, col.textB);
-                
-                const p5a = document.getElementById('p5-front');
-                p5a.className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                p5a.innerHTML = item(`Time = ${getTimeGradeAndStar(timerSeconds).grade}`, plusSVG, col.textB);
-
-                p5.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                p5.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-start pl-5 pr-10 text-left">
-                        <span class="text-[10px] font-medium leading-tight text-slate-600">${buildPromptSentence()}</span>
-                    </div>
-                    <span class="absolute right-3 text-slate-300 pointer-events-none">${caretUpSVG}</span>`;
-            } 
-            else if (sideBLevel === 2) {
-                const data = drillData[currentCategory];
-                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
-                
-                p1.className = `face face-back ${activeBg}`;
-                p1.innerHTML = item(`${currentCategory} = ${data.score}/3`, chevLeft, col.textW);
-
-                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors`);
-                p2.innerHTML = item(`${data[2].name} = ${data[2].val}`, chevRight, col.textB);
-                p3.innerHTML = item(`${data[3].name} = ${data[3].val}`, chevRight, col.textB);
-                p4.innerHTML = item(`${data[4].name} = ${data[4].val}`, chevRight, col.textB);
-
-                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
-                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
-            } 
-            else if (sideBLevel === 3) {
-                const data = drillData[currentCategory][currentSubNum];
-                const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
-
-                p1.className = `face face-back ${activeBg}`;
-                p1.innerHTML = item(`${data.name} = ${data.val}`, chevLeft, col.textW);
-
-                [p2, p3, p4].forEach(el => el.className = `face face-back ${col.w} ${col.borderW}`);
-                p2.innerHTML = feedbackItem('You', data.you);
-                p3.innerHTML = feedbackItem('Try', data.try);
-                p4.innerHTML = feedbackItem('Why', data.why);
-
-                p5.className = `face face-back ${col.p5} hover:brightness-95 transition-all cursor-pointer`;
-                p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
-            }
-        }
-
-        // --- UI RENDERER (SIDE A & PRIMARY FLOWS) ---
+        // --- UI GENERATOR (Side A) ---
         function renderPhase() {
-            if (phase === 'MENU' || phase === 'START') {
-                if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
-                if (document.getElementById('p6-grade-back')) document.getElementById('p6-grade-back').remove();
-            }
-
-            for (let i = 1; i <= 5; i++) {
-                const el = document.getElementById(`bar-${i}`);
-                if (el) el.classList.remove('flip-active');
-            }
+            for (let i = 1; i <= 5; i++) document.getElementById(`bar-${i}`).classList.remove('flip-active');
 
             if (phase === 'MENU') {
                 const menuData = {
@@ -550,406 +392,188 @@
                     3: { title: "Scoring", bg: col.p3, text: col.textW },
                     4: { title: "Tips", bg: col.p4, text: col.textW }
                 };
-
                 for (let i = 1; i <= 4; i++) {
                     document.getElementById(`p${i}-front`).className = `face face-front ${menuData[i].bg}`;
-                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="text-[13px] font-black uppercase tracking-widest ${menuData[i].text}">${menuData[i].title}</span></div>`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-center text-center"><span class="text-[12px] font-black uppercase tracking-widest ${menuData[i].text}">${menuData[i].title}</span></div>`;
                 }
-
-                // Phase 0 Start Button
                 document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
                 document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] ${col.textP1}">START</span></div>`;
-                
                 renderP6Front();
             }
             else if (phase === 'START') {
                 for (let i = 1; i <= 4; i++) {
-                    document.getElementById(`p${i}-front`).className = `face face-front ${matrix[i].bgA}`;
-                    document.getElementById(`p${i}-back`).className = `face face-back ${matrix[i].bgB}`;
-
-                    document.getElementById(`p${i}-front`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorA}">${matrix[i].A}</strong></span>
-                        </div>
-                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starA}</span>`;
-                    
-                    document.getElementById(`p${i}-back`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${matrix[i].colorB}">${matrix[i].B}</strong></span>
-                        </div>
-                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrix[i].starB}</span>`;
+                    const matrixData = matrix[i];
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrixData.bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrixData.bgB}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorA}">${matrixData.A}</strong></span></div><span class="absolute right-3 pointer-events-none">${matrixData.starA}</span>`;
+                    document.getElementById(`p${i}-back`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorB}">${matrixData.B}</strong></span></div><span class="absolute right-3 pointer-events-none">${matrixData.starB}</span>`;
                 }
-
                 if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
                 if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
                 if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
                 if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
 
                 const fillP = (getLevelCount() / 4) * 100;
-                const currentLevel = getLevelCount() + 1;
-                
                 document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
                 document.getElementById('p5-front').innerHTML = `
                     <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
-                    
-                    <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer hover:bg-slate-900/5 transition-colors active:scale-95" onclick="handleActionClick(event)">
-                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-800 drop-shadow-sm">PLAY LEVEL ${currentLevel}</span>
+                    <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)">
+                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-800">PLAY LEVEL ${getLevelCount() + 1}</span>
                     </div>`;
-                document.getElementById('p5-back').className = 'face face-back';
-                document.getElementById('p5-back').innerHTML = ''; 
-                
-                // Set P6 back to LOGO state if not viewing camera
                 activeMenuTopic = 'LOGO';
                 renderP6Front();
             } 
-            
             else if (phase === 'RECORDING') {
                 for (let i = 1; i <= 4; i++) {
-                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
-                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
-                    const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
-                    const chosenBg = selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB;
-                    
-                    document.getElementById(`p${i}-front`).className = `face face-front ${chosenBg}`;
-                    document.getElementById(`p${i}-front`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
-                        </div>
-                        <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                    const txt = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const c = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    const b = selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB;
+                    document.getElementById(`p${i}-front`).className = `face face-front ${b}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${c}">${txt}</strong></span></div>`;
                 }
-
                 document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
-                document.getElementById('p5-front').innerHTML = `
-                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
-                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
-                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
-                            ${stopSVG}
-                        </div>
-                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
-                    </div>`;
+                document.getElementById('p5-front').innerHTML = `<div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div><div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center"><div class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2">${createStar('half', 20, 'text-slate-600')}</div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm" onclick="handleActionClick(event)">${stopSVG}</div><div class="absolute top-1/2 left-[75%] -translate-x-1/2 -translate-y-1/2">${createStar('filled', 20, 'text-slate-600')}</div></div>`;
             }
-
-            else if (phase === 'PROCESSING') {
-                const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5];
-                const txt = [col.textP5, col.textW, col.textW, col.textW, col.textW];
-                
-                for (let i = 1; i <= 5; i++) {
-                    document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
-                    document.getElementById(`p${i}-front`).innerHTML = `
-                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse font-bold uppercase tracking-widest text-[13px] ${txt[i-1]}">
-                            Checking Scores
-                        </div>`;
-                }
-            }
-
             else if (phase === 'RESULTS') {
-                if (sideBLevel === 0) {
-                    const timeData = getTimeGradeAndStar(timerSeconds);
-                    const timePts = timeData.num;
-                    const totalScore = ((drillData.FinalGrade || 0) + timePts).toFixed(1);
-                    
-                    let timeColor = 'text-rose-500';
-                    if (timerSeconds < 20 || timerSeconds > 80) timeColor = 'text-slate-400 line-through';
-                    else if (timerSeconds >= 20 && timerSeconds < 60) timeColor = 'text-amber-500';
-                    else if (timerSeconds >= 60 && timerSeconds <= 80) timeColor = 'text-emerald-500';
+                const totalScore = (drillData.FinalGrade + getTimeGradeAndStar(timerSeconds).num).toFixed(1);
+                const timeColor = (timerSeconds < 20 || timerSeconds > 80) ? 'text-slate-400 line-through' : 'text-emerald-500';
+                
+                let gradeBg = 'bg-blue-500';
+                if (totalScore >= 8.0 && totalScore < 10.0) gradeBg = 'bg-emerald-500';
+                else if (totalScore >= 10.0) gradeBg = 'bg-[#F4B532]';
 
-                    let gradeColor = 'text-blue-500';
-                    if (totalScore >= 8.0 && totalScore < 10.0) gradeColor = 'text-emerald-500';
-                    else if (totalScore >= 10.0) gradeColor = 'text-[#F4B532]';
+                const third = (label, val, colorClass, cat, subNum) => `
+                    <div onclick="handleMetricClick('${cat}', ${subNum}, event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">${label}</span>
+                        <span class="text-sm font-black ${colorClass} leading-none mt-1 pointer-events-none">${val}</span>
+                    </div>`;
 
-                    const levelChosen = getLevelCount() + 1;
+                document.getElementById('p1-front').className = `face face-front ${col.p1}`;
+                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)"><span class="text-2xl uppercase text-[#F4B532] tracking-widest" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span></div>`;
+                document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Pace", drillData.Delivery[2].val, drillData.Delivery[2].color, "Delivery", 2)}${third("Mumble", drillData.Delivery[3].val, drillData.Delivery[3].color, "Delivery", 3)}${third("Pause", drillData.Delivery[4].val, drillData.Delivery[4].color, "Delivery", 4)}</div>`;
+                document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
+                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Word Avg", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Time", drillData.Extras[1].val, timeColor, "Extras", 1)}${third("Date", globalShortDate, "text-slate-600", "Extras", 2)}<div onclick="revertP6ToDefault(event)" class="flex items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors"><span class="text-sm font-black text-slate-800 leading-none mt-1">${totalScore}/10</span></div></div>`;
 
-                    const third = (label, val, colorClass) => `
-                        <div class="flex flex-col items-center justify-center w-full h-full">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">${label}</span>
-                            <span class="text-sm font-black ${colorClass} leading-none mt-1">${val}</span>
-                        </div>`;
-
-                    document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
-                    document.getElementById('p1-front').innerHTML = `
-                        <div class="w-full h-full flex items-center justify-center">
-                            <span class="text-2xl uppercase text-[#F4B532] tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
-                        </div>`;
-
-                    document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                    document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Delivery[2].name, drillData.Delivery[2].val, drillData.Delivery[2].color)}${third(drillData.Delivery[3].name, drillData.Delivery[3].val, drillData.Delivery[3].color)}${third(drillData.Delivery[4].name, drillData.Delivery[4].val, drillData.Delivery[4].color)}</div>`;
-
-                    document.getElementById('p3-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                    document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Content[2].name, drillData.Content[2].val, drillData.Content[2].color)}${third(drillData.Content[3].name, drillData.Content[3].val, drillData.Content[3].color)}${third(drillData.Content[4].name, drillData.Content[4].val, drillData.Content[4].color)}</div>`;
-
-                    document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                    document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Clarity[2].name, drillData.Clarity[2].val, drillData.Clarity[2].color)}${third(drillData.Clarity[3].name, drillData.Clarity[3].val, drillData.Clarity[3].color)}${third(drillData.Clarity[4].name, drillData.Clarity[4].val, drillData.Clarity[4].color)}</div>`;
-
-                    document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                    document.getElementById('p5-front').innerHTML = `
-                        <div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">
-                            ${third("Time", formatTime(timerSeconds), timeColor)}
-                            <div class="flex flex-col items-center justify-center w-full h-full">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Date</span>
-                                <span class="text-xs font-black text-slate-600 leading-none mt-1">${globalShortDate}</span>
-                            </div>
-                            <div class="flex items-center justify-center gap-1 text-slate-300">
-                                <div class="flex items-center justify-center relative">
-                                    <i data-lucide="star" class="w-7 h-7 text-[#F4B532] fill-[#F4B532]"></i>
-                                    <span class="absolute text-[11px] font-black text-slate-900 mt-px">${levelChosen}</span>
-                                </div>
-                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                            </div>
-                        </div>`;
-
-                    const gradeHTML = `<div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter ${gradeColor} drop-shadow-md pointer-events-none">${totalScore}<span class="text-xl text-slate-400/50">/10</span></div>`;
-                    
-                    if(!document.getElementById('p6-grade-front')) {
-                        document.getElementById('p6-front').insertAdjacentHTML('beforeend', `<div id="p6-grade-front" class="pointer-events-none">${gradeHTML}</div>`);
-                        document.getElementById('p6-back').insertAdjacentHTML('beforeend', `<div id="p6-grade-back" class="pointer-events-none">${gradeHTML}</div>`);
-                    } else {
-                        document.getElementById('p6-grade-front').innerHTML = gradeHTML;
-                        document.getElementById('p6-grade-back').innerHTML = gradeHTML;
-                    }
-
-                    if (window.lucide) window.lucide.createIcons();
-                    renderSideB(); 
-                }
+                window.lastAchievedGrade = totalScore;
+                window.lastAchievedLevel = getLevelCount() + 1;
+                window.lastAchievedBg = gradeBg;
+                activeMenuTopic = 'RESULTS_DEFAULT';
+                renderP6Front();
             }
         }
 
-        // --- INTERACTION LOGIC ---
+        // --- UI GENERATOR (Side B - Feedback Cards) ---
+        function renderSideB() {
+            const p5 = document.getElementById('p5-back');
+            const data = drillData[currentCategory][currentSubNum];
+            const activeColor = currentCategory === 'Delivery' ? col.textP2 : (currentCategory === 'Content' ? col.textP3 : col.textP4);
+
+            document.getElementById('p1-back').innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="text-[13px] font-black uppercase tracking-widest ${activeColor}">${data.name}</span></div>`;
+            document.getElementById('p2-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">You:</strong> ${data.you}</span></div>`;
+            document.getElementById('p3-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Try:</strong> ${data.try}</span></div>`;
+            document.getElementById('p4-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Why:</strong> ${data.why}</span></div>`;
+            
+            p5.className = `face face-back ${col.p5} cursor-pointer active:scale-95`;
+            p5.innerHTML = `<div class="w-full h-full flex items-center justify-center gap-2"><i data-lucide="chevron-left" class="w-4 h-4 text-[#C06060]"></i><span class="text-[11px] font-black uppercase text-[#C06060]">Back to Grid</span></div>`;
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- CORE NAVIGATION ---
         function toggleFlip(panelNum) {
             if (phase === 'RECORDING' || phase === 'PROCESSING') return;
-
             if (panelNum === 6) {
                 const bar6 = document.getElementById('bar-6');
-                if (bar6) bar6.classList.toggle('flip-active');
-                
-                if (bar6 && !bar6.classList.contains('flip-active') && isCameraOn) {
-                    toggleCamera();
-                }
-                return; 
-            }
-
-            if (phase === 'MENU') {
-                if (panelNum >= 1 && panelNum <= 4) {
-                    activeMenuTopic = 'P' + panelNum;
-                    currentMenuPage = 1;
-                    renderP6Front();
-                } else if (panelNum === 5) {
-                    phase = 'START';
-                    activeMenuTopic = 'LOGO';
-                    renderPhase();
-                }
+                bar6.classList.toggle('flip-active');
+                if (!bar6.classList.contains('flip-active') && isCameraOn) toggleCamera();
                 return;
             }
-
+            if (phase === 'MENU') {
+                if (panelNum >= 1 && panelNum <= 4) { activeMenuTopic = 'P' + panelNum; currentMenuPage = 1; renderP6Front(); }
+                else if (panelNum === 5) { phase = 'START'; renderPhase(); }
+                return;
+            }
             if (phase === 'START') {
-                if (panelNum === 5) return; 
-                
+                if (panelNum === 5) return;
                 const bar = document.getElementById(`bar-${panelNum}`);
-                if (bar) bar.classList.toggle('flip-active');
+                bar.classList.toggle('flip-active');
                 selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
-                updateLevelDisplay(); 
-            } 
-            
+                updateLevelDisplay();
+            }
             else if (phase === 'RESULTS') {
-                if (sideBLevel === 0) { 
-                    sideBLevel = 1;
-                    renderSideB();
-                    for (let i = 1; i <= 4; i++) document.getElementById(`bar-${i}`).classList.add('flip-active');
-                    document.getElementById('bar-5').classList.remove('flip-active');
-                    p5SoloFlipped = false;
-                } 
-                else if (sideBLevel === 1) { 
-                    if (panelNum === 1) {
-                        sideBLevel = 0;
-                        renderPhase(); 
-                    } else if (panelNum >= 2 && panelNum <= 4) {
-                        sideBLevel = 2;
-                        currentCategory = panelNum === 2 ? 'Delivery' : (panelNum === 3 ? 'Content' : 'Clarity');
-                        renderSideB();
-                        document.getElementById('bar-5').classList.add('flip-active'); 
-                    } else if (panelNum === 5) {
-                        document.getElementById('bar-5').classList.toggle('flip-active');
-                    }
-                } 
-                else if (sideBLevel === 2) { 
-                    if (panelNum === 1 || panelNum === 5) {
-                        sideBLevel = 1;
-                        renderSideB();
-                        document.getElementById('bar-5').classList.remove('flip-active');
-                    } else {
-                        sideBLevel = 3;
-                        currentSubNum = panelNum;
-                        renderSideB();
-                    }
-                } 
-                else if (sideBLevel === 3) { 
-                    if (panelNum === 1 || panelNum === 5) {
-                        sideBLevel = 2;
-                        renderSideB();
-                    }
+                // If top panels are flipped (Feedback cards), P5 acts as "Back to Dashboard"
+                if (sideBLevel === 3 && panelNum === 5) {
+                    sideBLevel = 0;
+                    renderPhase();
                 }
             }
         }
 
         async function handleActionClick(event) {
             if (event) event.stopPropagation();
-
             if (phase === 'START') {
-                if (isStarting) return; 
-                isStarting = true;
-
-                if (window.THPS && window.THPS.Audio) {
-                    const micSuccess = await window.THPS.Audio.startRecordingProcess();
-                    if (!micSuccess) {
-                        alert("Microphone access is required to proceed.");
-                        isStarting = false;
-                        resetGame();
-                        return;
-                    }
-                }
-
-                const overlayFront = document.getElementById('countdown-overlay-front');
-                const overlayBack = document.getElementById('countdown-overlay-back');
-                
-                if (overlayFront) overlayFront.classList.remove('opacity-0');
-                if (overlayBack) overlayBack.classList.remove('opacity-0');
-                
+                if (isStarting) return; isStarting = true;
+                if (window.THPS?.Audio) { if (!(await window.THPS.Audio.startRecordingProcess())) { alert("Mic required."); isStarting = false; resetGame(); return; } }
                 const steps = ["3", "2", "1", "Mic-Check!"];
-                for (let i = 0; i < steps.length; i++) {
-                    if (overlayFront) overlayFront.innerText = steps[i];
-                    if (overlayBack) overlayBack.innerText = steps[i];
+                for (let s of steps) {
+                    document.getElementById('countdown-overlay-front').innerText = s;
+                    document.getElementById('countdown-overlay-back').innerText = s;
+                    document.getElementById('countdown-overlay-front').classList.remove('opacity-0');
+                    document.getElementById('countdown-overlay-back').classList.remove('opacity-0');
                     await new Promise(r => setTimeout(r, 800));
                 }
-                
-                if (overlayFront) overlayFront.classList.add('opacity-0');
-                if (overlayBack) overlayBack.classList.add('opacity-0'); 
-                
-                isStarting = false; 
-
-                phase = 'RECORDING';
-                achievedStarStatus = 'empty'; 
-                renderPhase(); 
-                timerSeconds = 0;
-
+                document.getElementById('countdown-overlay-front').classList.add('opacity-0');
+                document.getElementById('countdown-overlay-back').classList.add('opacity-0');
+                isStarting = false; phase = 'RECORDING'; renderPhase(); timerSeconds = 0;
                 timerInterval = setInterval(() => {
-                    timerSeconds++;
-                    let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
-                    
-                    const tProg = document.getElementById('timer-progress');
-                    const s1 = document.getElementById('star-1');
-                    const s2 = document.getElementById('star-2');
-                    
-                    if (tProg) tProg.style.width = progressPercent + '%';
-                    
-                    if (progressPercent >= 25 && s1) s1.classList.replace('text-slate-600', 'text-amber-400');
-                    if (progressPercent >= 75 && s2) s2.classList.replace('text-slate-600', 'text-amber-400');
-
-                    if (timerSeconds >= maxDurationSeconds) {
-                        handleActionClick(null);
-                    }
+                    timerSeconds++; let p = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
+                    document.getElementById('timer-progress').style.width = p + '%';
+                    if (timerSeconds >= maxDurationSeconds) handleActionClick(null);
                 }, 1000);
             } 
             else if (phase === 'RECORDING') {
-                phase = 'PROCESSING';
-                clearInterval(timerInterval);
-                renderPhase(); 
-
-                if (!isCameraOn) {
-                    const statusContainer = document.getElementById('camera-status-container');
-                    if (statusContainer) {
-                        statusContainer.innerHTML = `
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                            <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
-                    }
-                }
-
-                if (window.THPS && window.THPS.Audio) {
+                phase = 'PROCESSING'; clearInterval(timerInterval); renderPhase();
+                if (window.THPS?.Audio) {
                     const audioData = await window.THPS.Audio.stopRecordingProcess();
-                    
-                    if (window.THPS.NLP && audioData.transcript) {
-                        const nlpData = window.THPS.NLP.analyzeTranscript(audioData.transcript, audioData.timestamps || []);
-                        buildDynamicDrillData(nlpData, audioData.duration);
-                    } else {
-                        buildDynamicDrillData({numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, google10kCount: 0, numSentences: 0, reportMarkdownText: ""}, audioData.duration || 0);
-                    }
-                    
-                    window.testTranscript = audioData.transcript || "No words captured.";
+                    buildDynamicDrillData(window.THPS.NLP.analyzeTranscript(audioData.transcript || "", audioData.timestamps || []), audioData.duration || 0);
                 }
-
-                phase = 'RESULTS';
-                sideBLevel = 0;
-                renderPhase();
+                phase = 'RESULTS'; sideBLevel = 0; renderPhase();
             }
         }
 
         function resetGame() {
-            phase = 'MENU';
-            activeMenuTopic = 'LOGO';
-            currentMenuPage = 1;
-            clearInterval(timerInterval);
-            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; 
-            sideBLevel = 0;
-            p5SoloFlipped = false;
-            
-            initApp(); 
-            
-            if (!isCameraOn) {
-                const statusContainer = document.getElementById('camera-status-container');
-                if (statusContainer) {
-                    statusContainer.classList.remove('opacity-0');
-                    statusContainer.innerHTML = `
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                        <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
-                }
-            }
+            phase = 'MENU'; activeMenuTopic = 'LOGO'; currentMenuPage = 1;
+            clearInterval(timerInterval); selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+            initApp();
         }
 
-        // --- ASYNC INIT & GITHACK FETCH ---
-        async function initApp() {
-            const d = new Date();
-            globalShortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+        async function toggleCamera() {
+            if (phase === 'RECORDING' || isCameraLoading) return;
+            isCameraLoading = true;
+            const videoEl = document.getElementById('camera-feed');
+            if (isCameraOn) { cameraStream?.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; videoEl.classList.replace('opacity-100', 'opacity-0'); isCameraOn = false; }
+            else {
+                try { cameraStream = await navigator.mediaDevices.getUserMedia({ video: true }); videoEl.srcObject = cameraStream; videoEl.classList.replace('opacity-0', 'opacity-100'); isCameraOn = true; }
+                catch (e) { console.error(e); }
+            }
+            isCameraLoading = false;
+        }
 
+        async function initApp() {
+            const d = new Date(); globalShortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
             for (let i = 1; i <= 5; i++) {
                 const el = document.getElementById(`p${i}-front`);
-                if(el) {
-                    el.className = `face face-front ${col.w} border-slate-200`;
-                    el.innerHTML = `
-                        <div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">
-                            Loading...
-                        </div>`;
-                }
+                if(el) { el.className = `face face-front bg-white border-slate-200`; el.innerHTML = `<div class="animate-pulse text-[11px] text-slate-400 font-bold uppercase tracking-widest">Loading...</div>`; }
             }
-
             try {
-                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
-                const data = await response.json();
-
-                const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' };
-                const todayAdelaide = new Intl.DateTimeFormat('en-CA', options).format(new Date());
-
-                if (data[todayAdelaide]) {
-                    b1 = data[todayAdelaide].p1;
-                    b2 = `${data[todayAdelaide].p2} about`; 
-                    b3 = `${data[todayAdelaide].p3}, with`; 
-                    b4 = `${data[todayAdelaide].p4} examples.`;
-                }
-                
-                const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json');
-                feedbackMatrix = await fbRes.json();
-                
-                if (window.THPS && window.THPS.NLP) {
-                    await window.THPS.NLP.loadDictionaries();
-                }
-
-            } catch (error) {
-                console.warn("Failed to load some dependencies. Using fallbacks.", error);
-            }
-
+                const data = await (await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json')).json();
+                const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+                if (data[today]) { b1 = data[today].p1; b2 = `${data[today].p2} about`; b3 = `${data[today].p3}, with`; b4 = `${data[today].p4} examples.`; }
+                feedbackMatrix = await (await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json')).json();
+                if (window.THPS?.NLP) await window.THPS.NLP.loadDictionaries();
+            } catch (e) { console.warn(e); }
             renderPhase();
-            if (window.lucide) window.lucide.createIcons();
         }
-
-        // Init
         initApp();
     </script>
 </body>
