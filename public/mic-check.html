@@ -316,7 +316,11 @@
                 p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
                 p6f.innerHTML = `
                     ${cameraIcon}
-                    <div class="flex flex-col items-center justify-center text-center leading-none mt-4" style="font-family: 'Permanent Marker', cursive;">
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">
+                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${window.lastAchievedLevel}</span>
+                    </div>
+                    
+                    <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
                         <span class="text-[1.75rem] uppercase text-white tracking-widest drop-shadow-sm mb-2">${p6ResultHeader}</span>
                         <span class="text-[2.2rem] uppercase text-white tracking-widest drop-shadow-sm mb-6">${p6ResultSub}</span>
                     </div>
@@ -373,8 +377,9 @@
 
         // --- MATH & NLP BRIDGE ---
         function formatTime(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
+            const rnd = Math.round(seconds);
+            const m = Math.floor(rnd / 60);
+            const s = rnd % 60;
             return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
@@ -731,6 +736,7 @@
             } 
             
             else if (phase === 'RESULTS') {
+                // Return from Feedback Cards
                 if (sideBLevel === 3 && panelNum === 5) {
                     sideBLevel = 0;
                     for (let i = 1; i <= 5; i++) {
