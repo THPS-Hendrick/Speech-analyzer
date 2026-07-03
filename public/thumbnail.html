@@ -280,7 +280,7 @@
                       </div>
                     )}
                   </div>
-                  <div className="bg-slate-100 rounded-xl overflow-hidden aspect-[9/16] w-64 mx-auto relative flex items-center justify-center border border-slate-200 shadow-inner">
+                  <div className="bg-slate-100 rounded-none overflow-hidden aspect-[9/16] w-64 mx-auto relative flex items-center justify-center border border-slate-200 shadow-inner">
                     {isProcessing ? <p className="text-slate-400 text-sm font-medium animate-pulse">Processing...</p> 
                     : shortsThumb ? <img src={shortsThumb} alt="Shorts Thumbnail" className="w-full h-full object-contain" /> 
                     : <p className="text-slate-400 text-sm font-medium">Preview area</p>}
@@ -300,15 +300,15 @@
               {sourceImage && (
                 <img 
                   src={sourceImage.src} 
-                  style={{ position: 'absolute', width: '1080px', height: '720px', right: 0, bottom: 0, objectFit: 'cover', objectPosition: 'bottom right', zIndex: 10 }} 
+                  style={{ position: 'absolute', width: '1080px', height: '740px', right: 0, bottom: 0, objectFit: 'cover', objectPosition: 'bottom right', zIndex: 10 }} 
                   alt="Background"
                 />
               )}
 
               {/* PANEL 3: Logo & Date (TOP LEFT, Flush to Top) */}
               <div 
-                className="bg-[#AA0000] flex flex-col justify-center items-center border-b-4 border-[#8A0000] absolute z-20 rounded-b-[1.5rem]" 
-                style={{ top: '0px', left: '50px', width: '650px', height: '210px', boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}
+                className="bg-[#AA0000] flex flex-col justify-center items-center border-b-4 border-[#8A0000] absolute z-20 rounded-t-[1.5rem]" 
+                style={{ top: '0px', left: '50px', width: '660px', height: '225px', boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}
               >
                 <span className="text-[3.5rem] uppercase text-white tracking-widest leading-none text-center pt-4" style={{ fontFamily: "'Permanent Marker', cursive", textShadow: "2px 3px 4px rgba(0,0,0,0.3)" }}>
                   Daily<br/>Mic-Check
@@ -318,8 +318,8 @@
 
               {/* PANEL 2: Prompts (BOTTOM LEFT, Flush to Bottom) */}
               <div 
-                className="bg-slate-100 px-6 pt-5 pb-6 flex flex-col justify-between absolute z-30 border border-slate-300 rounded-t-[1.5rem]" 
-                style={{ bottom: '0px', left: '50px', width: '650px', height: '480px', boxShadow: "0 -10px 30px rgba(0,0,0,0.25)" }}
+                className="bg-slate-100 px-6 pt-5 pb-6 flex flex-col justify-between absolute z-30 border border-slate-300 rounded-b-[1.5rem]" 
+                style={{ bottom: '0px', left: '50px', width: '660px', height: '495px', boxShadow: "0 -10px 30px rgba(0,0,0,0.25)" }}
               >
                 <PromptRow textColor="text-[#AA0000]" bgColor="bg-white" text={p1} />
                 <PromptRow textColor="text-[#9333EA]" bgColor="bg-white" text={p2} />
