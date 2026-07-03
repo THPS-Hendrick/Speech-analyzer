@@ -26,11 +26,9 @@ class ThpsCompareSpeech extends HTMLElement {
 
                 <div class="flex gap-4 mb-6">
                     <div class="flex-1">
-                        <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2 block text-center">Attempt A</label>
                         <select id="compare-select-a" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-indigo-400 cursor-pointer shadow-sm transition-all text-center appearance-none"></select>
                     </div>
                     <div class="flex-1">
-                        <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2 block text-center">Attempt B</label>
                         <select id="compare-select-b" class="w-full p-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-indigo-400 cursor-pointer shadow-sm transition-all text-center appearance-none"></select>
                     </div>
                 </div>
@@ -81,9 +79,8 @@ class ThpsCompareSpeech extends HTMLElement {
         this.selectA.innerHTML = '';
         this.selectB.innerHTML = '';
 
-        history.forEach((attempt, index) => {
-            const grade = attempt.overrideGrade ? '-' : (attempt.totalPoints % 1 === 0 ? attempt.totalPoints : attempt.totalPoints.toFixed(1));
-            const label = `${attempt.title} (Score: ${grade})`;
+        history.forEach((attempt) => {
+            const label = attempt.title; // Removed the (Score: X) text
             
             this.selectA.add(new Option(label, attempt.id));
             this.selectB.add(new Option(label, attempt.id));
