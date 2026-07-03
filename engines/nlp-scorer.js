@@ -11,7 +11,7 @@ window.THPS.NLP.DICT_URLS = {
     visual: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json"
 };
 
-window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say"]);
+window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "mine", "him", "himself", "her", "herself"]);
 window.THPS.NLP.visualDictPronouns = new Set();
 window.THPS.NLP.visualDictWords = new Set();
 window.THPS.NLP.simpleMap = new Map();
