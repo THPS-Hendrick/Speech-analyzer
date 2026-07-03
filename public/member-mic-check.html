@@ -88,16 +88,45 @@
 
     <div id="view-game" class="hidden w-full max-w-6xl mx-auto flex-col items-center animate-in fade-in duration-500 pb-16">
         
-        <div class="w-full max-w-[368px] flex justify-between items-center mb-4">
-            <button onclick="window.closeGameView()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold uppercase tracking-widest text-xs transition-colors bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm active:scale-95">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Hub
+        <div class="w-full max-w-[368px] grid grid-cols-3 gap-3 mb-4">
+            <button onclick="window.closeGameView()" class="flex items-center justify-center gap-1.5 text-slate-500 hover:text-blue-600 font-bold uppercase tracking-widest text-[10px] transition-colors bg-white py-2 rounded-full border border-slate-200 shadow-sm active:scale-95">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Hub
             </button>
-            <button onclick="resetGame(window.thps_currentPlayDate)" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            <button onclick="toggleLegalOverlay()" id="legal-btn" class="text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 font-bold uppercase tracking-widest text-[10px] py-2 rounded-full shadow-sm transition-all active:scale-95">
+                Legal
+            </button>
+            <button onclick="resetGame(window.thps_currentPlayDate)" class="text-slate-700 bg-slate-300 hover:bg-slate-400 font-bold uppercase tracking-widest text-[10px] py-2 rounded-full shadow-sm transition-all active:scale-95 border border-transparent">
                 Reset
             </button>
         </div>
 
         <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
+            
+            <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+                <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                    <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-[#AA0000]">Mic-Check Copyright <span id="copyright-year"></span></span>
+                    </div>
+                    <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-[#9333EA]">is owned & exclusively licensed by:</span>
+                    </div>
+                    <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-[#2563EB]">Talent Academy Pty Ltd & Tom Hendrick</span>
+                    </div>
+                    <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-[#047857]">All rights reserved</span>
+                    </div>
+                    <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Card game available now!</span>
+                    </div>
+                </div>
+                
+                <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-6 mb-1 p-6">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5bQi-Ani7eWjmKDT44EshxHMyolXHeiklREPCJkC3sQ&s=10" alt="Talent Academy" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
+                    <div class="w-1/2 h-[1px] bg-slate-200"></div>
+                    <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
+                </div>
+            </div>
             <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
                 <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)"><div id="bar-1" class="flipper"><div id="p1-front" class="face face-front"></div><div id="p1-back" class="face face-back"></div></div></div>
                 <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)"><div id="bar-2" class="flipper"><div id="p2-front" class="face face-front"></div><div id="p2-back" class="face face-back"></div></div></div>
@@ -280,7 +309,35 @@
             resetGame(dateStr); 
         };
 
+        // --- LEGAL OVERLAY LOGIC ---
+        let isLegalOpen = false;
+
+        window.toggleLegalOverlay = function() {
+            isLegalOpen = !isLegalOpen;
+            const overlay = document.getElementById('legal-overlay');
+            const btn = document.getElementById('legal-btn');
+            
+            // Dynamically insert current year
+            const yearSpan = document.getElementById('copyright-year');
+            if (yearSpan) yearSpan.innerText = new Date().getFullYear();
+
+            if (isLegalOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-100', 'bg-slate-800');
+                btn.classList.replace('text-slate-600', 'text-white');
+                btn.innerText = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-slate-100');
+                btn.classList.replace('text-white', 'text-slate-600');
+                btn.innerText = "LEGAL";
+            }
+        };
+
         window.closeGameView = function() {
+            if (isLegalOpen) toggleLegalOverlay();
             window.thps_currentPlayDate = null;
             document.getElementById('view-game').classList.add('hidden');
             document.getElementById('view-game').classList.remove('flex');
@@ -705,6 +762,7 @@
         }
 
         function resetGame(targetDateStr) {
+            if (isLegalOpen) toggleLegalOverlay();
             phase = 'MENU'; activeMenuTopic = 'LOGO'; currentMenuPage = 1; clearInterval(timerInterval);
             selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; sideBLevel = 0;
             initApp(targetDateStr); 
