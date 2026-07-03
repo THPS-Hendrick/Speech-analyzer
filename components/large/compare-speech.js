@@ -91,10 +91,13 @@ class ThpsCompareSpeech extends HTMLElement {
             return;
         }
 
-        // 3. Populate options with just the Attempt Title
+        // 3. Populate options with just the Attempt Title, stripping out "Imported "
         history.forEach((attempt) => {
-            this.selectA.add(new Option(attempt.title, attempt.id));
-            this.selectB.add(new Option(attempt.title, attempt.id));
+            let label = attempt.title;
+            label = label.replace('Imported ', '');
+            
+            this.selectA.add(new Option(label, attempt.id));
+            this.selectB.add(new Option(label, attempt.id));
         });
 
         // 4. Restore previous selection if it still exists, otherwise set logical defaults
@@ -165,6 +168,10 @@ class ThpsCompareSpeech extends HTMLElement {
             const displayA = window.formatMetric ? window.formatMetric(m.key, valA) : valA;
             const displayB = window.formatMetric ? window.formatMetric(m.key, valB) : valB;
 
+            // Safe display check to catch 'undefined', null, or NaN
+            const finalDisplayA = (displayA === undefined || String(displayA) === 'undefined') ? '-' : displayA;
+            const finalDisplayB = (displayB === undefined || String(displayB) === 'undefined') ? '-' : displayB;
+
             const styleA = this.getColorStyle(m.key, valA);
             const styleB = this.getColorStyle(m.key, valB);
             
@@ -177,7 +184,7 @@ class ThpsCompareSpeech extends HTMLElement {
                 <div class="flex flex-row items-center w-full ${rowPadding}">
                     <div class="w-1/3 flex justify-end pr-2 sm:pr-4">
                         <div class="w-full max-w-[100px] text-center font-black ${textSize} p-1.5 rounded-lg border-2 ${styleA}">
-                            ${displayA}
+                            ${finalDisplayA}
                         </div>
                     </div>
                     
@@ -187,7 +194,7 @@ class ThpsCompareSpeech extends HTMLElement {
                     
                     <div class="w-1/3 flex justify-start pl-2 sm:pl-4">
                         <div class="w-full max-w-[100px] text-center font-black ${textSize} p-1.5 rounded-lg border-2 ${styleB}">
-                            ${displayB}
+                            ${finalDisplayB}
                         </div>
                     </div>
                 </div>
