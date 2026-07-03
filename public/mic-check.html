@@ -108,8 +108,10 @@
                     </div>
 
                     <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors z-30 p-1 cursor-pointer">
-                        <i data-lucide="camera" class="w-4 h-4"></i>
+                        <i data-lucide="info" class="w-4 h-4"></i>
                     </button>
+
+                    <div id="p6-camera-grade-overlay" class="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none opacity-0 transition-opacity duration-300"></div>
 
                     <div id="countdown-overlay-back" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white text-5xl font-black opacity-0 transition-opacity duration-200 drop-shadow-2xl z-40 tracking-widest uppercase text-center leading-tight"></div>
                 </div>
@@ -134,7 +136,7 @@
         
         // --- STATE ENGINE & COLORS ---
         const col = {
-            p1: 'bg-[#C06060]', textP1: 'text-[#C06060]', borderP1: 'border-[#C06060]',
+            p1: 'bg-[#AA0000]', textP1: 'text-[#AA0000]', borderP1: 'border-[#AA0000]',
             p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
             p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
             p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
@@ -261,9 +263,9 @@
                 p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
                 p6f.innerHTML = `
                     ${cameraIconDark}
-                    <h3 class="text-[11px] font-black uppercase text-[#C06060] tracking-widest mb-2">What is Mic-Check?</h3>
+                    <h3 class="text-[11px] font-black uppercase text-[#AA0000] tracking-widest mb-2">What is Mic-Check?</h3>
                     <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">
-                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#C06060]">START</strong> to "check" it out!
+                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#AA0000]">START</strong> to "check" it out!
                     </p>
                 `;
             }
@@ -305,8 +307,8 @@
                 p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
                 p6f.innerHTML = `
                     ${cameraIcon}
-                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap">
-                        ${window.lastAchievedGrade}<span class="text-xl text-white/50 ml-1">/ Level ${window.lastAchievedLevel}</span>
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">
+                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none">/ Level ${window.lastAchievedLevel}</span>
                     </div>
                     <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
                         <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
@@ -488,7 +490,13 @@
         function renderPhase() {
             if (phase === 'MENU' || phase === 'START') {
                 if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
-                if (document.getElementById('p6-grade-back')) document.getElementById('p6-grade-back').remove();
+                
+                // Clear the camera overlay cleanly upon entering menu/start
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) {
+                    camOverlay.classList.add('opacity-0');
+                    camOverlay.innerHTML = '';
+                }
             }
 
             for (let i = 1; i <= 5; i++) {
@@ -639,6 +647,18 @@
                             <span class="text-sm font-black text-slate-800 leading-none mt-1 pointer-events-none">${totalScore}/10</span>
                         </div>
                     </div>`;
+
+                // Set up the Camera-Side Grade Overlay
+                let transBg = gradeBg === 'bg-[#F4B532]' ? 'bg-[#F4B532]/80' : gradeBg + '/80';
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) {
+                    camOverlay.innerHTML = `
+                        <div class="${transBg} px-5 py-1.5 rounded-2xl backdrop-blur-sm shadow-xl flex items-baseline justify-center border border-white/20">
+                            <span class="text-[2.5rem] font-black tracking-tighter text-white leading-none">${totalScore}</span>
+                            <span class="text-xl font-bold text-white ml-2 leading-none">/ Level ${levelChosen}</span>
+                        </div>`;
+                    camOverlay.classList.remove('opacity-0');
+                }
 
                 // Update Globals for P6 Shape-Shifter
                 window.lastAchievedGrade = totalScore;
