@@ -132,7 +132,7 @@
     </div>
 
     <button onclick="resetGame()" class="mt-8 px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow transition-all active:scale-95">
-        Reset Flow
+        Reset
     </button>
 
     <script>
@@ -798,7 +798,7 @@
 
                 if (data[todayAdelaide]) {
                     b1 = data[todayAdelaide].p1;
-                    b2 = data[todayAdelaide].p2;
+                    b2 = `${data[todayAdelaide].p2} about`;
                     b3 = `${data[todayAdelaide].p3}, with`; 
                     b4 = `${data[todayAdelaide].p4} examples.`;
                 }
