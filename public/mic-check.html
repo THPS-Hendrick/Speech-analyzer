@@ -134,7 +134,7 @@
         
         // --- STATE ENGINE & COLORS ---
         const col = {
-            p1: 'bg-[#C06060]', textP1: 'text-[#C06060]', borderP1: 'border-[#C06060]',
+            p1: 'bg-[#AA0000]', textP1: 'text-[#AA0000]', borderP1: 'border-[#AA0000]',
             p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
             p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
             p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
@@ -257,9 +257,9 @@
                 p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start`;
                 p6f.innerHTML = `
                     ${cameraIconDark}
-                    <h3 class="text-[11px] font-black uppercase text-[#C06060] tracking-widest mb-2">What is Mic-Check?</h3>
+                    <h3 class="text-[11px] font-black uppercase text-[#AA0000] tracking-widest mb-2">What is Mic-Check?</h3>
                     <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">
-                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#C06060]">START</strong> to "check" it out!
+                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#AA0000]">START</strong> to "check" it out!
                     </p>
                 `;
             }
@@ -475,7 +475,7 @@
             document.getElementById('p4-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Why:</strong> ${data.why}</span></div>`;
             
             p5.className = `face face-back ${col.p5} cursor-pointer active:scale-95`;
-            p5.innerHTML = `<div class="w-full h-full flex items-center justify-center gap-2"><i data-lucide="chevron-left" class="w-4 h-4 text-[#C06060]"></i><span class="text-[11px] font-black uppercase text-[#C06060]">Back to Grid</span></div>`;
+            p5.innerHTML = `<div class="w-full h-full flex items-center justify-center gap-2"><i data-lucide="chevron-left" class="w-4 h-4 text-[#AA0000]"></i><span class="text-[11px] font-black uppercase text-[#AA0000]">Back to Grid</span></div>`;
             if (window.lucide) window.lucide.createIcons();
         }
 
