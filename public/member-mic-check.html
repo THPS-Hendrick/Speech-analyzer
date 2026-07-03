@@ -293,6 +293,19 @@
             document.getElementById('star-count').innerText = totalStars;
             document.getElementById('golden-count').innerText = goldenCount;
             if (window.lucide) window.lucide.createIcons();
+
+// --- NEW CODE: SCROLL TO TODAY ---
+            setTimeout(() => {
+                const container = document.getElementById('grid-scroll-container');
+                const todayBtn = document.getElementById('btn-today');
+                if (container && todayBtn) {
+                    // Centers today's button in the view
+                    container.scrollTo({
+                        top: todayBtn.offsetTop - (container.clientHeight / 2) + (todayBtn.clientHeight / 2),
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100); // 100ms delay ensures the DOM has finished painting the grid
         };
 
         window.openGameView = function(dateStr) {
