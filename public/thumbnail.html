@@ -45,27 +45,19 @@
     const RefreshIcon = ({ className }) => (
       <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
     );
-    
-    // Explicit xmlns, Width/Height added for html2canvas compatibility
-    const StarIcon = ({ className }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="#F4B532" stroke="#F4B532" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-    );
 
-    // --- Component for individual prompts ---
-    const PromptRow = ({ textColor, bgColor, text, showStar = true, justify = "justify-start" }) => (
+    // --- Component for massive individual prompts ---
+    const PromptRow = ({ textColor, bgColor, text, justify = "justify-start" }) => (
       <div 
-        className={`w-full h-16 ${bgColor} rounded-[0.85rem] flex items-center px-6 relative z-30 ${justify}`}
-        style={{ border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
+        className={`w-full ${bgColor} rounded-[1.25rem] flex items-center px-8 relative z-30 ${justify}`}
+        style={{ height: '85px', border: '2px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
       >
-        {/* Optically center uppercase text using leading-none and a 1px translateY nudge */}
         <span 
-          className={`text-[16px] font-black uppercase tracking-widest leading-none ${textColor} ${showStar ? 'pr-10' : ''}`} 
+          className={`text-[26px] font-black uppercase tracking-widest leading-none ${textColor}`} 
           style={{ fontFamily: "'Inter', sans-serif", transform: "translateY(-1px)" }}
         >
           {text}
         </span>
-        {/* Force explicit absolute centering coordinates for the canvas engine */}
-        {showStar && <StarIcon className="absolute right-5 top-1/2 -translate-y-1/2" />}
       </div>
     );
 
@@ -77,7 +69,6 @@
       const [shortsSize, setShortsSize] = useState(0);
       const [standardSize, setStandardSize] = useState(0);
 
-      // --- Data Integrations ---
       const [promptsData, setPromptsData] = useState({});
       const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
 
@@ -91,11 +82,9 @@
           .catch(err => console.error("Failed to load prompts DB:", err));
       }, []);
 
-      // Calculate localized short date
       const [y, m, d] = selectedDate.split('-');
       const shortDate = `${d}/${m}/${y.substring(2)}`;
 
-      // Resolve actual daily prompts or fallbacks
       let p1 = "Speak out loud!";
       let p2 = "Teach us about";
       let p3 = "Daily habits, with";
@@ -141,10 +130,9 @@
         setIsProcessing(true);
 
         try {
-          // Force wait for Google Fonts to be fully loaded
           await document.fonts.ready;
 
-          // 1. SHORTS THUMBNAIL (Native 9:16 Center Crop)
+          // 1. SHORTS THUMBNAIL 
           const shortsCanvas = document.createElement('canvas');
           shortsCanvas.width = 1080; shortsCanvas.height = 1920;
           const sCtx = shortsCanvas.getContext('2d');
@@ -159,18 +147,15 @@
           setShortsThumb(URL.createObjectURL(shortsBlob));
           setShortsSize(shortsBlob.size);
 
-          // 2. STANDARD THUMBNAIL (Prep-Board DOM Capture)
+          // 2. STANDARD THUMBNAIL 
           const board = document.getElementById('prep-board-hidden');
           
-          // Increased scale slightly for sharper text rendering
           const canvas = await html2canvas(board, {
             width: 1280, height: 720, scale: 2, useCORS: true, backgroundColor: '#f1f5f9'
           });
 
-          // Scale back down to 1280x720 for final output
           const downscaledCanvas = document.createElement('canvas');
-          downscaledCanvas.width = 1280;
-          downscaledCanvas.height = 720;
+          downscaledCanvas.width = 1280; downscaledCanvas.height = 720;
           const dsCtx = downscaledCanvas.getContext('2d');
           dsCtx.drawImage(canvas, 0, 0, 1280, 720);
 
@@ -186,7 +171,6 @@
         }
       }, [sourceImage]);
 
-      // Auto-trigger generation if image or date changes, adding 300ms delay to let DOM repaint
       useEffect(() => {
         if (!sourceImage) return;
         const timer = setTimeout(() => { generateThumbnails(); }, 300);
@@ -208,14 +192,10 @@
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
-              {/* LEFT CONTROLS */}
               <div className="space-y-6">
-                
-                {/* Upload Card */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                    <UploadIcon className="w-5 h-5 text-indigo-500" />
-                    Upload Image
+                    <UploadIcon className="w-5 h-5 text-indigo-500" /> Upload Image
                   </h2>
                   <div 
                     className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 transition-colors"
@@ -243,14 +223,12 @@
                   )}
                 </div>
 
-                {/* Database Settings Card */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                    <CalendarIcon className="w-5 h-5 text-slate-500" />
-                    Challenge Settings
+                    <CalendarIcon className="w-5 h-5 text-slate-500" /> Challenge Settings
                   </h2>
                   <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    Select the broadcast date. The thumbnail engine will automatically fetch the correct prompts and date card to render in Panel 2 and 3.
+                    Select the broadcast date. The thumbnail engine will automatically fetch the correct prompts and date card to render.
                   </p>
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2">Broadcast Date</label>
@@ -262,13 +240,9 @@
                     />
                   </div>
                 </div>
-
               </div>
 
-              {/* RIGHT PREVIEWS */}
               <div className="lg:col-span-2 space-y-6">
-                
-                {/* 16:9 STANDARD */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <div className="flex justify-between items-end mb-4">
                     <div>
@@ -284,19 +258,13 @@
                       </div>
                     )}
                   </div>
-                  
                   <div className="bg-slate-100 rounded-xl overflow-hidden aspect-video relative flex items-center justify-center border border-slate-200 shadow-inner">
-                    {isProcessing ? (
-                      <p className="text-slate-400 text-sm font-medium animate-pulse">Rendering prep-board...</p>
-                    ) : standardThumb ? (
-                      <img src={standardThumb} alt="Standard Thumbnail" className="w-full h-full object-contain" />
-                    ) : (
-                      <p className="text-slate-400 text-sm font-medium">Upload an image to generate</p>
-                    )}
+                    {isProcessing ? <p className="text-slate-400 text-sm font-medium animate-pulse">Rendering prep-board...</p> 
+                    : standardThumb ? <img src={standardThumb} alt="Standard Thumbnail" className="w-full h-full object-contain" /> 
+                    : <p className="text-slate-400 text-sm font-medium">Upload an image to generate</p>}
                   </div>
                 </div>
 
-                {/* 9:16 SHORTS */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <div className="flex justify-between items-end mb-4">
                     <div>
@@ -312,18 +280,12 @@
                       </div>
                     )}
                   </div>
-                  
                   <div className="bg-slate-100 rounded-xl overflow-hidden aspect-[9/16] w-64 mx-auto relative flex items-center justify-center border border-slate-200 shadow-inner">
-                    {isProcessing ? (
-                      <p className="text-slate-400 text-sm font-medium animate-pulse">Processing...</p>
-                    ) : shortsThumb ? (
-                      <img src={shortsThumb} alt="Shorts Thumbnail" className="w-full h-full object-contain" />
-                    ) : (
-                      <p className="text-slate-400 text-sm font-medium">Preview area</p>
-                    )}
+                    {isProcessing ? <p className="text-slate-400 text-sm font-medium animate-pulse">Processing...</p> 
+                    : shortsThumb ? <img src={shortsThumb} alt="Shorts Thumbnail" className="w-full h-full object-contain" /> 
+                    : <p className="text-slate-400 text-sm font-medium">Preview area</p>}
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -338,42 +300,34 @@
               {sourceImage && (
                 <img 
                   src={sourceImage.src} 
-                  style={{
-                    position: 'absolute',
-                    width: '1080px', 
-                    height: '720px',
-                    right: 0, 
-                    bottom: 0,
-                    objectFit: 'cover',
-                    objectPosition: 'bottom right',
-                    zIndex: 10
-                  }} 
+                  style={{ position: 'absolute', width: '1080px', height: '720px', right: 0, bottom: 0, objectFit: 'cover', objectPosition: 'bottom right', zIndex: 10 }} 
                   alt="Background"
                 />
               )}
 
-              {/* STACKED CONTAINER: Panels 3 & 2 */}
-              <div style={{ position: 'absolute', left: '50px', bottom: '50px', zIndex: 30, width: '480px', height: '620px', display: 'flex', flexDirection: 'column' }}>
-                
-                {/* PANEL 3: Logo & Date */}
-                <div className="bg-[#AA0000] w-full rounded-t-[1.5rem] flex flex-col justify-center items-center border-b-2 border-[#8A0000] relative z-20 flex-shrink-0" style={{ height: '220px', boxShadow: "0 10px 25px rgba(0,0,0,0.15)" }}>
-                  <span className="text-[3.5rem] uppercase text-white tracking-widest leading-none text-center" style={{ fontFamily: "'Permanent Marker', cursive", textShadow: "1px 2px 3px rgba(0,0,0,0.2)" }}>
-                    Daily<br/>Mic-Check
-                  </span>
-                  <span className="text-2xl font-bold text-white tracking-widest uppercase mt-6" style={{ fontFamily: "'Inter', sans-serif" }}>{shortDate}</span>
-                </div>
-
-                {/* PANEL 2: Prompts */}
-                <div className="w-full bg-slate-100 rounded-b-[1.5rem] p-4 flex flex-col justify-between relative z-30 border-x border-b border-slate-300 flex-grow" style={{ height: '400px', boxShadow: "0 15px 30px rgba(0,0,0,0.2)" }}>
-                  <PromptRow textColor="text-[#AA0000]" bgColor="bg-white" text={p1} />
-                  <PromptRow textColor="text-[#9333EA]" bgColor="bg-white" text={p2} />
-                  <PromptRow textColor="text-[#2563EB]" bgColor="bg-white" text={p3} />
-                  <PromptRow textColor="text-[#047857]" bgColor="bg-white" text={p4} />
-                  
-                  {/* PANEL 5: Play Level 5 */}
-                  <PromptRow textColor="text-slate-900" bgColor="bg-[#F4B532]" text="PLAY LEVEL 5" showStar={false} justify="justify-center" />
-                </div>
+              {/* PANEL 3: Logo & Date (TOP RIGHT) */}
+              <div 
+                className="bg-[#AA0000] flex flex-col justify-center items-center border-b-4 border-[#8A0000] absolute z-20 rounded-[1.5rem]" 
+                style={{ top: '20px', right: '100px', width: '480px', height: '220px', boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}
+              >
+                <span className="text-[3.5rem] uppercase text-white tracking-widest leading-none text-center" style={{ fontFamily: "'Permanent Marker', cursive", textShadow: "2px 3px 4px rgba(0,0,0,0.3)" }}>
+                  Daily<br/>Mic-Check
+                </span>
+                <span className="text-2xl font-bold text-white tracking-widest uppercase mt-6" style={{ fontFamily: "'Inter', sans-serif" }}>{shortDate}</span>
               </div>
+
+              {/* PANEL 2: Prompts (BOTTOM LEFT, 1.5x+ Scaled) */}
+              <div 
+                className="bg-slate-100 p-6 flex flex-col gap-4 absolute z-30 border border-slate-300 rounded-[1.5rem]" 
+                style={{ bottom: '20px', left: '20px', width: '750px', boxShadow: "0 15px 30px rgba(0,0,0,0.25)" }}
+              >
+                <PromptRow textColor="text-[#AA0000]" bgColor="bg-white" text={p1} />
+                <PromptRow textColor="text-[#9333EA]" bgColor="bg-white" text={p2} />
+                <PromptRow textColor="text-[#2563EB]" bgColor="bg-white" text={p3} />
+                <PromptRow textColor="text-[#047857]" bgColor="bg-white" text={p4} />
+                <PromptRow textColor="text-slate-900" bgColor="bg-[#F4B532]" text="PLAY LEVEL 5" justify="justify-center" />
+              </div>
+
             </div>
           </div>
 
