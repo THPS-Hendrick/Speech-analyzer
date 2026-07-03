@@ -102,9 +102,9 @@
                     
                     <div id="camera-trigger-area" onclick="toggleCamera();" class="absolute inset-0 z-10 cursor-pointer"></div>
                     
-                    <div id="camera-status-container" class="absolute top-4 w-full pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                        <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>
+                    <div id="camera-status-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                        <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
                     </div>
 
                     <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors z-30 p-1 cursor-pointer">
@@ -204,7 +204,6 @@
             
             const bar6 = document.getElementById('bar-6');
             if (bar6 && bar6.classList.contains('flip-active')) {
-                // If Camera is active, do the "info shake" warning
                 const infoIcon = bar6.querySelector('.face-back button');
                 if (infoIcon) {
                     infoIcon.classList.add('animate-bounce');
@@ -226,7 +225,6 @@
             currentSubNum = subNum;
 
             if (isCameraShowing) {
-                // Top panels flip to reveal F3 feedback
                 sideBLevel = 3;
                 renderSideB();
                 for (let i = 1; i <= 5; i++) {
@@ -234,7 +232,6 @@
                     if (bar) bar.classList.add('flip-active');
                 }
             } else {
-                // P6 text side becomes a dynamic feedback card
                 activeMenuTopic = 'FEEDBACK_CARD';
                 renderP6Front(); 
             }
@@ -295,7 +292,6 @@
                         <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3>
                         <p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p>
                     </div>
-                    
                     <div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0">
                         <button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                         <span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span>
@@ -308,7 +304,7 @@
                 p6f.innerHTML = `
                     ${cameraIcon}
                     <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">
-                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none">/ Level ${window.lastAchievedLevel}</span>
+                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${window.lastAchievedLevel}</span>
                     </div>
                     <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
                         <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
@@ -336,7 +332,6 @@
                 `;
             }
 
-            // Ensure countdown overlay survives replacements
             if (!document.getElementById('countdown-overlay-front')) {
                 p6f.insertAdjacentHTML('beforeend', `<div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>`);
             }
@@ -475,7 +470,6 @@
                 FinalGrade: sumDel + sumCon + sumCla 
             };
 
-            // Dynamic Extras Engine (Time & Date feedback)
             let timeYou = elapsedSecs < 20 ? "Less than 20 sec" : (elapsedSecs < 60 ? "20 to 59s" : (elapsedSecs <= 80 ? "60 to 80s" : "More than 80s"));
             let timeWhy = elapsedSecs < 20 ? "Score invalid" : (elapsedSecs < 60 ? "Score of 0.5 / 1" : (elapsedSecs <= 80 ? "Score of +1" : "Score invalid"));
             let timeTry = (elapsedSecs >= 60 && elapsedSecs <= 80) ? "You nailed it!" : "Speaking for 60-80s";
@@ -491,7 +485,6 @@
             if (phase === 'MENU' || phase === 'START') {
                 if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
                 
-                // Clear the camera overlay cleanly upon entering menu/start
                 const camOverlay = document.getElementById('p6-camera-grade-overlay');
                 if (camOverlay) {
                     camOverlay.classList.add('opacity-0');
@@ -653,14 +646,13 @@
                 const camOverlay = document.getElementById('p6-camera-grade-overlay');
                 if (camOverlay) {
                     camOverlay.innerHTML = `
-                        <div class="${transBg} px-5 py-1.5 rounded-2xl backdrop-blur-sm shadow-xl flex items-baseline justify-center border border-white/20">
+                        <div class="${transBg} px-5 py-1.5 rounded-2xl backdrop-blur-sm shadow-xl flex items-baseline justify-center border border-white/20 whitespace-nowrap">
                             <span class="text-[2.5rem] font-black tracking-tighter text-white leading-none">${totalScore}</span>
-                            <span class="text-xl font-bold text-white ml-2 leading-none">/ Level ${levelChosen}</span>
+                            <span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${levelChosen}</span>
                         </div>`;
                     camOverlay.classList.remove('opacity-0');
                 }
 
-                // Update Globals for P6 Shape-Shifter
                 window.lastAchievedGrade = totalScore;
                 window.lastAchievedLevel = levelChosen;
                 window.lastAchievedBg = gradeBg;
@@ -726,7 +718,6 @@
             } 
             
             else if (phase === 'RESULTS') {
-                // Return from Feedback Cards
                 if (sideBLevel === 3 && panelNum === 5) {
                     sideBLevel = 0;
                     for (let i = 1; i <= 5; i++) {
@@ -804,8 +795,8 @@
                     const statusContainer = document.getElementById('camera-status-container');
                     if (statusContainer) {
                         statusContainer.innerHTML = `
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                            <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                            <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
                     }
                 }
 
@@ -843,8 +834,8 @@
                 if (statusContainer) {
                     statusContainer.classList.remove('opacity-0');
                     statusContainer.innerHTML = `
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                        <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                        <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
                 }
             }
         }
@@ -868,8 +859,8 @@
                 
                 statusContainer.classList.remove('opacity-0');
                 statusContainer.innerHTML = `
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-                    <span id="camera-status" class="text-[10px] font-bold uppercase tracking-widest mt-1">CAMERA OFF</span>`;
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                    <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
                 
                 isCameraOn = false;
                 cameraStream = null;
