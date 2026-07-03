@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V24.1 - F0 Polished)</title>
+    <title>Daily Mic-Check: Logic Engine (V24.1 - Start Phase Remodel)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -95,14 +95,22 @@
         <div class="w-full flex-grow perspective group mb-1">
             <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
                 
-                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start">
-                    <h3 class="text-xs font-black uppercase text-slate-800 tracking-widest mb-2">How to Play:</h3>
-                    <ol class="text-[10px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight">
-                        <li>Select stars to increase speech difficulty.</li>
-                        <li>Flip this panel to use Camera.</li>
-                        <li>Press play to start.</li>
-                        <li>Press stop to see scores & stats.</li>
-                    </ol>
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center">
+                    
+                    <div class="flex flex-col items-center justify-center mb-4 w-full">
+                        <span class="text-2xl uppercase text-black tracking-widest drop-shadow-sm leading-none" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
+                        <span id="p6-date-display" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest"></span>
+                    </div>
+
+                    <div class="w-full flex flex-col items-start pl-2">
+                        <h3 class="text-[10px] font-black uppercase text-slate-800 tracking-widest mb-1.5">How to Play:</h3>
+                        <ol class="text-[9px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight">
+                            <li>Select stars to increase speech difficulty.</li>
+                            <li>Flip this panel to use Camera.</li>
+                            <li>Press play to start.</li>
+                            <li>Press stop to see scores & stats.</li>
+                        </ol>
+                    </div>
                     
                     <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-blue-600 transition-colors z-20 p-1 cursor-pointer">
                         <i data-lucide="video" class="w-4 h-4"></i>
@@ -143,6 +151,9 @@
     </div>
 
     <script>
+        // --- GLOBAL VARIABLES ---
+        let globalShortDate = "";
+        
         // --- STATE ENGINE & COLORS ---
         const col = {
             p1: 'bg-[#8F1C1C]', textP1: 'text-[#8F1C1C]', borderP1: 'border-[#8F1C1C]',
@@ -354,10 +365,10 @@
         function updateLevelDisplay() {
             const count = getLevelCount();
             const fillPercent = (count / 4) * 100;
-            const levelSpan = document.getElementById('level-text');
             const fillDiv = document.getElementById('p5-fill');
+            const levelNum = document.getElementById('p5-level-num');
             
-            if (levelSpan) levelSpan.innerText = `Level ${count + 1}: Speak for 1min`;
+            if (levelNum) levelNum.innerText = count + 1;
             if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
         }
 
@@ -450,7 +461,6 @@
 
         // --- UI RENDERER (SIDE A & PRIMARY FLOWS) ---
         function renderPhase() {
-            // Remove P6 grade injections cleanly if returning to START
             if (phase === 'START') {
                 if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
                 if (document.getElementById('p6-grade-back')) document.getElementById('p6-grade-back').remove();
@@ -485,14 +495,22 @@
                 if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
 
                 const fillP = (getLevelCount() / 4) * 100;
+                const currentLevel = getLevelCount() + 1;
+                
                 document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
                 document.getElementById('p5-front').innerHTML = `
                     <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
-                    <div class="relative w-full h-full z-10 flex items-center justify-start pl-5 pr-14">
-                        <span id="level-text" class="text-[13px] font-bold uppercase tracking-widest ${col.textB}">Level ${getLevelCount() + 1}: Speak for 1min</span>
-                    </div>
-                    <div class="absolute right-2 z-20 pointer-events-auto cursor-pointer p-2 bg-slate-900/10 text-slate-800 hover:bg-slate-900/20 rounded-full transition-all shadow-sm" onclick="handleActionClick(event)">
-                        ${playSVG}
+                    
+                    <div class="relative w-full h-full z-10 flex items-center justify-center gap-5">
+                        <div class="relative flex items-center justify-center">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="transparent" stroke="#1e293b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            <span id="p5-level-num" class="absolute text-[13px] font-black text-slate-900 mt-px">${currentLevel}</span>
+                        </div>
+                        <div class="pointer-events-auto cursor-pointer p-2.5 bg-slate-900/10 text-slate-800 hover:bg-slate-900/20 rounded-full transition-all shadow-sm active:scale-95" onclick="handleActionClick(event)">
+                            ${playSVG}
+                        </div>
                     </div>`;
                 document.getElementById('p5-back').className = 'face face-back';
                 document.getElementById('p5-back').innerHTML = ''; 
@@ -540,7 +558,6 @@
 
             else if (phase === 'RESULTS') {
                 if (sideBLevel === 0) {
-                    // F0: High Density Data Dashboard
                     const timeData = getTimeGradeAndStar(timerSeconds);
                     const timePts = timeData.num;
                     const totalScore = ((drillData.FinalGrade || 0) + timePts).toFixed(1);
@@ -555,9 +572,6 @@
                     else if (totalScore >= 10.0) gradeColor = 'text-[#F4B532]';
 
                     const levelChosen = getLevelCount() + 1;
-                    
-                    const d = new Date();
-                    const shortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
 
                     const third = (label, val, colorClass) => `
                         <div class="flex flex-col items-center justify-center w-full h-full">
@@ -586,12 +600,12 @@
                             ${third("Time", formatTime(timerSeconds), timeColor)}
                             <div class="flex flex-col items-center justify-center w-full h-full">
                                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Date</span>
-                                <span class="text-xs font-black text-slate-600 leading-none mt-1">${shortDate}</span>
+                                <span class="text-xs font-black text-slate-600 leading-none mt-1">${globalShortDate}</span>
                             </div>
                             <div class="flex items-center justify-center gap-1 text-slate-300">
                                 <div class="flex items-center justify-center relative">
-                                    <i data-lucide="star" class="w-6 h-6 text-slate-200 fill-slate-100"></i>
-                                    <span class="absolute text-[10px] font-black text-slate-500 mt-px">${levelChosen}</span>
+                                    <i data-lucide="star" class="w-7 h-7 text-[#F4B532] fill-[#F4B532]"></i>
+                                    <span class="absolute text-[11px] font-black text-slate-900 mt-px">${levelChosen}</span>
                                 </div>
                                 <i data-lucide="chevron-right" class="w-5 h-5"></i>
                             </div>
@@ -617,7 +631,6 @@
         function toggleFlip(panelNum) {
             if (phase === 'RECORDING' || phase === 'PROCESSING') return;
 
-            // --- P6 VIP LANE (Independent Manual Mirror) ---
             if (panelNum === 6) {
                 const bar6 = document.getElementById('bar-6');
                 if (bar6) bar6.classList.toggle('flip-active');
@@ -628,7 +641,6 @@
                 return; 
             }
 
-            // --- STANDARD GAME LOGIC (P1 - P5) ---
             if (phase === 'START') {
                 if (panelNum === 5) return; 
                 
@@ -639,14 +651,14 @@
             } 
             
             else if (phase === 'RESULTS') {
-                if (sideBLevel === 0) { // F0 to F1
+                if (sideBLevel === 0) { 
                     sideBLevel = 1;
                     renderSideB();
                     for (let i = 1; i <= 4; i++) document.getElementById(`bar-${i}`).classList.add('flip-active');
                     document.getElementById('bar-5').classList.remove('flip-active');
                     p5SoloFlipped = false;
                 } 
-                else if (sideBLevel === 1) { // F1 to F0 or F2
+                else if (sideBLevel === 1) { 
                     if (panelNum === 1) {
                         sideBLevel = 0;
                         renderPhase(); 
@@ -659,7 +671,7 @@
                         document.getElementById('bar-5').classList.toggle('flip-active');
                     }
                 } 
-                else if (sideBLevel === 2) { // F2 to F1 or F3
+                else if (sideBLevel === 2) { 
                     if (panelNum === 1 || panelNum === 5) {
                         sideBLevel = 1;
                         renderSideB();
@@ -670,7 +682,7 @@
                         renderSideB();
                     }
                 } 
-                else if (sideBLevel === 3) { // F3 to F2
+                else if (sideBLevel === 3) { 
                     if (panelNum === 1 || panelNum === 5) {
                         sideBLevel = 2;
                         renderSideB();
@@ -792,6 +804,11 @@
 
         // --- ASYNC INIT & GITHACK FETCH ---
         async function initApp() {
+            const d = new Date();
+            globalShortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+            const dateDisplay = document.getElementById('p6-date-display');
+            if (dateDisplay) dateDisplay.innerText = globalShortDate;
+
             for (let i = 1; i <= 5; i++) {
                 const el = document.getElementById(`p${i}-front`);
                 if(el) {
