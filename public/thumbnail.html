@@ -17,10 +17,14 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Permanent+Marker&display=swap');
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    
+    /* Pre-load fonts so they are ready for the canvas */
+    .preload-font-1 { font-family: 'Inter', sans-serif; }
+    .preload-font-2 { font-family: 'Permanent Marker', cursive; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root" class="preload-font-1 preload-font-2"></div>
 
   <script type="text/babel">
     const { useState, useRef, useEffect, useCallback } = React;
@@ -41,17 +45,22 @@
     const RefreshIcon = ({ className }) => (
       <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
     );
+    
+    // Explicit Width/Height added for html2canvas compatibility
     const StarIcon = ({ className }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="#F4B532" stroke="#F4B532" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
     );
 
     // --- Component for individual prompts ---
     const PromptRow = ({ textColor, bgColor, text, showStar = true, justify = "justify-start" }) => (
-      <div className={`w-full h-16 ${bgColor} rounded-[0.85rem] shadow-sm border border-slate-200 flex items-center px-6 relative z-30 ${justify}`}>
-        <span className={`text-[16px] font-black uppercase tracking-widest leading-tight ${textColor} ${showStar ? 'pr-10' : ''}`}>
+      <div 
+        className={`w-full h-16 ${bgColor} rounded-[0.85rem] flex items-center px-6 relative z-30 ${justify}`}
+        style={{ border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
+      >
+        <span className={`text-[16px] font-black uppercase tracking-widest leading-tight ${textColor} ${showStar ? 'pr-10' : ''}`} style={{ fontFamily: "'Inter', sans-serif" }}>
           {text}
         </span>
-        {showStar && <StarIcon className="absolute right-5 w-6 h-6 text-[#F4B532] drop-shadow-sm" />}
+        {showStar && <StarIcon className="absolute right-5" />}
       </div>
     );
 
@@ -127,6 +136,9 @@
         setIsProcessing(true);
 
         try {
+          // Force wait for Google Fonts to be fully loaded
+          await document.fonts.ready;
+
           // 1. SHORTS THUMBNAIL (Native 9:16 Center Crop)
           const shortsCanvas = document.createElement('canvas');
           shortsCanvas.width = 1080; shortsCanvas.height = 1920;
@@ -144,11 +156,20 @@
 
           // 2. STANDARD THUMBNAIL (Prep-Board DOM Capture)
           const board = document.getElementById('prep-board-hidden');
+          
+          // Increased scale slightly for sharper text rendering
           const canvas = await html2canvas(board, {
-            width: 1280, height: 720, scale: 1, useCORS: true, backgroundColor: '#f1f5f9'
+            width: 1280, height: 720, scale: 2, useCORS: true, backgroundColor: '#f1f5f9'
           });
 
-          const stdBlob = await optimizeImage(canvas);
+          // Scale back down to 1280x720 for final output
+          const downscaledCanvas = document.createElement('canvas');
+          downscaledCanvas.width = 1280;
+          downscaledCanvas.height = 720;
+          const dsCtx = downscaledCanvas.getContext('2d');
+          dsCtx.drawImage(canvas, 0, 0, 1280, 720);
+
+          const stdBlob = await optimizeImage(downscaledCanvas);
           setStandardThumb(URL.createObjectURL(stdBlob));
           setStandardSize(stdBlob.size);
 
@@ -160,10 +181,10 @@
         }
       }, [sourceImage]);
 
-      // Auto-trigger generation if image or date changes, adding 150ms delay to let DOM repaint
+      // Auto-trigger generation if image or date changes, adding 300ms delay to let DOM repaint
       useEffect(() => {
         if (!sourceImage) return;
-        const timer = setTimeout(() => { generateThumbnails(); }, 150);
+        const timer = setTimeout(() => { generateThumbnails(); }, 300);
         return () => clearTimeout(timer);
       }, [sourceImage, selectedDate, promptsData, generateThumbnails]);
 
@@ -308,7 +329,7 @@
           <div className="absolute top-[-9999px] left-[-9999px]">
             <div id="prep-board-hidden" style={{ width: '1280px', height: '720px', position: 'relative', overflow: 'hidden', background: '#f1f5f9' }}>
               
-              {/* PANEL 1: Uploaded Background Image (Spills top/left natively when anchored to bottom/right) */}
+              {/* PANEL 1: Uploaded Background Image */}
               {sourceImage && (
                 <img 
                   src={sourceImage.src} 
@@ -329,16 +350,16 @@
               {/* STACKED CONTAINER: Panels 3 & 2 */}
               <div style={{ position: 'absolute', left: '50px', bottom: '50px', zIndex: 30, width: '480px', height: '620px', display: 'flex', flexDirection: 'column' }}>
                 
-                {/* PANEL 3: Logo & Date (Total Height constraint: ~220px) */}
-                <div className="bg-[#AA0000] w-full rounded-t-[1.5rem] flex flex-col justify-center items-center shadow-lg border-b-2 border-[#8A0000] relative z-20 flex-shrink-0" style={{ height: '220px' }}>
-                  <span className="text-[3.5rem] uppercase text-white tracking-widest drop-shadow-md leading-none text-center" style={{ fontFamily: "'Permanent Marker', cursive" }}>
+                {/* PANEL 3: Logo & Date (Clean inline styles for text-shadow) */}
+                <div className="bg-[#AA0000] w-full rounded-t-[1.5rem] flex flex-col justify-center items-center border-b-2 border-[#8A0000] relative z-20 flex-shrink-0" style={{ height: '220px', boxShadow: "0 10px 25px rgba(0,0,0,0.15)" }}>
+                  <span className="text-[3.5rem] uppercase text-white tracking-widest leading-none text-center" style={{ fontFamily: "'Permanent Marker', cursive", textShadow: "1px 2px 3px rgba(0,0,0,0.2)" }}>
                     Daily<br/>Mic-Check
                   </span>
-                  <span className="text-2xl font-bold text-white tracking-widest uppercase mt-6">{shortDate}</span>
+                  <span className="text-2xl font-bold text-white tracking-widest uppercase mt-6" style={{ fontFamily: "'Inter', sans-serif" }}>{shortDate}</span>
                 </div>
 
-                {/* PANEL 2: Prompts (Total Height constraint: 400px) */}
-                <div className="w-full bg-slate-100 rounded-b-[1.5rem] p-4 shadow-2xl flex flex-col justify-between relative z-30 border-x border-b border-slate-300 flex-grow" style={{ height: '400px' }}>
+                {/* PANEL 2: Prompts */}
+                <div className="w-full bg-slate-100 rounded-b-[1.5rem] p-4 flex flex-col justify-between relative z-30 border-x border-b border-slate-300 flex-grow" style={{ height: '400px', boxShadow: "0 15px 30px rgba(0,0,0,0.2)" }}>
                   <PromptRow textColor="text-[#AA0000]" bgColor="bg-white" text={p1} />
                   <PromptRow textColor="text-[#9333EA]" bgColor="bg-white" text={p2} />
                   <PromptRow textColor="text-[#2563EB]" bgColor="bg-white" text={p3} />
