@@ -250,8 +250,8 @@
                 p6f.innerHTML = `
                     ${cameraIcon}
                     <div class="flex flex-col items-center justify-center text-center leading-none" style="font-family: 'Permanent Marker', cursive;">
-                        <span class="text-4xl uppercase text-[#F4B532] tracking-widest drop-shadow-sm mb-1">Daily</span>
-                        <span class="text-[2.1rem] uppercase text-[#F4B532] tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
+                        <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
+                        <span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
                     </div>
                     <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
                 `;
@@ -292,6 +292,7 @@
                         <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3>
                         <p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p>
                     </div>
+                    
                     <div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0">
                         <button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                         <span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span>
@@ -300,17 +301,26 @@
                 `;
             }
             else if (activeMenuTopic === 'RESULTS_DEFAULT') {
+                let p6ResultHeader = "";
+                let p6ResultSub = "";
+                if (!window.lastAchievedTimeValid) {
+                    p6ResultHeader = "Check your"; p6ResultSub = "Time";
+                } else if (window.lastAchievedGradeFloat < 8.0) {
+                    p6ResultHeader = "Check your"; p6ResultSub = "Scores";
+                } else if (window.lastAchievedGradeFloat < 10.0) {
+                    p6ResultHeader = "Check"; p6ResultSub = "You Out!";
+                } else {
+                    p6ResultHeader = "Perfect"; p6ResultSub = "Mic-Check";
+                }
+
                 p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
                 p6f.innerHTML = `
                     ${cameraIcon}
-                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">
-                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${window.lastAchievedLevel}</span>
+                    <div class="flex flex-col items-center justify-center text-center leading-none mt-4" style="font-family: 'Permanent Marker', cursive;">
+                        <span class="text-[1.75rem] uppercase text-white tracking-widest drop-shadow-sm mb-2">${p6ResultHeader}</span>
+                        <span class="text-[2.2rem] uppercase text-white tracking-widest drop-shadow-sm mb-6">${p6ResultSub}</span>
                     </div>
-                    <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
-                        <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
-                        <span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
-                    </div>
-                    <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
+                    <span class="text-[10px] font-bold text-white/80 uppercase tracking-widest">Reset & Try Again</span>
                 `;
             }
             else if (activeMenuTopic === 'FEEDBACK_CARD') {
@@ -499,7 +509,7 @@
 
             if (phase === 'MENU') {
                 const menuData = {
-                    1: { title: "What is Mic-Check?", bg: col.p1, text: col.textP5 },
+                    1: { title: "What is Mic-Check?", bg: col.p1, text: col.textW },
                     2: { title: "How to Play", bg: col.p2, text: col.textW },
                     3: { title: "Scoring", bg: col.p3, text: col.textW },
                     4: { title: "Tips", bg: col.p4, text: col.textW }
@@ -511,7 +521,7 @@
                 }
 
                 document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
-                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] ${col.textP1}">START</span></div>`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900">START</span></div>`;
                 
                 renderP6Front();
             }
@@ -545,7 +555,7 @@
                 document.getElementById('p5-front').innerHTML = `
                     <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
                     <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)">
-                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-800 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span>
+                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span>
                     </div>`;
                 document.getElementById('p5-back').className = 'face face-back';
                 document.getElementById('p5-back').innerHTML = ''; 
@@ -583,7 +593,7 @@
 
             else if (phase === 'PROCESSING') {
                 const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5];
-                const txt = [col.textP5, col.textW, col.textW, col.textW, col.textW];
+                const txt = [col.textW, col.textW, col.textW, col.textW, col.textW];
                 
                 for (let i = 1; i <= 5; i++) {
                     document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
@@ -618,7 +628,7 @@
                 document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
                 document.getElementById('p1-front').innerHTML = `
                     <div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)">
-                        <span class="text-2xl uppercase text-[#F4B532] tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
+                        <span class="text-2xl uppercase text-white tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
                     </div>`;
 
                 document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
@@ -653,7 +663,10 @@
                     camOverlay.classList.remove('opacity-0');
                 }
 
+                // Update Globals for P6 Shape-Shifter
                 window.lastAchievedGrade = totalScore;
+                window.lastAchievedGradeFloat = parseFloat(totalScore);
+                window.lastAchievedTimeValid = (timerSeconds >= 20 && timerSeconds <= 80);
                 window.lastAchievedLevel = levelChosen;
                 window.lastAchievedBg = gradeBg;
                 
