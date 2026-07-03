@@ -138,7 +138,7 @@
             p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
             p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
             p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
-            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            p5: 'bg-[#FFEE00]', textP5: 'text-[#FFEE00]', borderP5: 'border-[#FFEE00]',
             w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200',
             b: 'bg-slate-900', textB: 'text-slate-800'
         };
@@ -247,8 +247,8 @@
                 p6f.innerHTML = `
                     ${cameraIcon}
                     <div class="flex flex-col items-center justify-center text-center leading-none" style="font-family: 'Permanent Marker', cursive;">
-                        <span class="text-4xl uppercase text-[#F4B532] tracking-widest drop-shadow-sm mb-1">Daily</span>
-                        <span class="text-[2.1rem] uppercase text-[#F4B532] tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
+                        <span class="text-4xl uppercase text-[#FFEE00] tracking-widest drop-shadow-sm mb-1">Daily</span>
+                        <span class="text-[2.1rem] uppercase text-[#FFEE00] tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
                     </div>
                     <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
                 `;
@@ -440,7 +440,7 @@
                 
                 let gradeBg = 'bg-blue-500';
                 if (totalScore >= 8.0 && totalScore < 10.0) gradeBg = 'bg-emerald-500';
-                else if (totalScore >= 10.0) gradeBg = 'bg-[#F4B532]';
+                else if (totalScore >= 10.0) gradeBg = 'bg-[#FFEE00]';
 
                 const third = (label, val, colorClass, cat, subNum) => `
                     <div onclick="handleMetricClick('${cat}', ${subNum}, event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors">
@@ -449,7 +449,7 @@
                     </div>`;
 
                 document.getElementById('p1-front').className = `face face-front ${col.p1}`;
-                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)"><span class="text-2xl uppercase text-[#F4B532] tracking-widest" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span></div>`;
+                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)"><span class="text-2xl uppercase text-[#FFEE00] tracking-widest" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span></div>`;
                 document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Pace", drillData.Delivery[2].val, drillData.Delivery[2].color, "Delivery", 2)}${third("Mumble", drillData.Delivery[3].val, drillData.Delivery[3].color, "Delivery", 3)}${third("Pause", drillData.Delivery[4].val, drillData.Delivery[4].color, "Delivery", 4)}</div>`;
                 document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
                 document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Word Avg", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
