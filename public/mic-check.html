@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Mic-Check: Logic Engine (V24.1 - Panel 6 Integrated)</title>
+    <title>Daily Mic-Check: Logic Engine (V24.1 - F0 Remodel)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -13,6 +13,8 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+        
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: transparent; 
@@ -131,9 +133,14 @@
 
     </div>
 
-    <button onclick="resetGame()" class="mt-8 px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow transition-all active:scale-95">
-        Reset
-    </button>
+    <div class="mt-8 flex gap-4">
+        <button class="px-6 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95 flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Back
+        </button>
+        <button onclick="resetGame()" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            Reset Flow
+        </button>
+    </div>
 
     <script>
         // --- STATE ENGINE & COLORS ---
@@ -228,25 +235,28 @@
             const sumCla = scSig.points + scEng.points + scPop.points;
 
             const safeFb = (cat, state) => feedbackMatrix[cat] ? feedbackMatrix[cat][state] : { you: "-", try: "-", why: "-" };
+            
+            // F0 Specific Color logic
+            const getCol = (pts) => pts === 1 ? 'text-emerald-500' : (pts === 0.5 ? 'text-amber-500' : 'text-rose-500');
 
             drillData = {
                 Delivery: { 
                     score: sumDel, star: getStarFromScore(sumDel),
-                    2: { name: "Pace", val: `${wpm} WPM`, ...safeFb('Pace', scPace.state) }, 
-                    3: { name: "Mumble", val: `${sps} SPS`, ...safeFb('Mumble', scMumb.state) }, 
-                    4: { name: "Pause %", val: `${pausePct}%`, ...safeFb('Pause', scPaus.state) } 
+                    2: { name: "Pace", val: `${wpm}`, color: getCol(scPace.points), ...safeFb('Pace', scPace.state) }, 
+                    3: { name: "Mumb", val: `${sps}`, color: getCol(scMumb.points), ...safeFb('Mumble', scMumb.state) }, 
+                    4: { name: "Paus", val: `${pausePct}%`, color: getCol(scPaus.points), ...safeFb('Pause', scPaus.state) } 
                 },
                 Content: { 
                     score: sumCon, star: getStarFromScore(sumCon),
-                    2: { name: "Personal", val: `${perPct}%`, ...safeFb('Personal', scPers.state) }, 
-                    3: { name: "Visual", val: `${visPct}%`, ...safeFb('Visual', scVis.state) }, 
-                    4: { name: "Abstract", val: `${absPct}%`, ...safeFb('Abstract', scAbs.state) } 
+                    2: { name: "Pers", val: `${perPct}%`, color: getCol(scPers.points), ...safeFb('Personal', scPers.state) }, 
+                    3: { name: "Vis", val: `${visPct}%`, color: getCol(scVis.points), ...safeFb('Visual', scVis.state) }, 
+                    4: { name: "Abs", val: `${absPct}%`, color: getCol(scAbs.points), ...safeFb('Abstract', scAbs.state) } 
                 },
                 Clarity: { 
                     score: sumCla, star: getStarFromScore(sumCla),
-                    2: { name: "Signal", val: `${wps} WPS`, ...safeFb('Signal', scSig.state) }, 
-                    3: { name: "Eng 10k", val: `${engPct}%`, ...safeFb('Eng10k', scEng.state) }, 
-                    4: { name: "Pop 75%", val: `~${popVal}%`, ...safeFb('Pop75', scPop.state) } 
+                    2: { name: "WPS", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 
+                    3: { name: "10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 
+                    4: { name: "Pop", val: `~${popVal}%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } 
                 },
                 FinalGrade: sumDel + sumCon + sumCla 
             };
@@ -320,10 +330,6 @@
         };
 
         // --- CALCULATION LOGIC ---
-        function getTodayDate() { 
-            return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); 
-        }
-
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60);
             const s = seconds % 60;
@@ -363,16 +369,6 @@
             return `${s1} ${s2} ${s3} ${s4}`;
         }
 
-        function generateFiveStars() {
-            const activeStars = getTimeGradeAndStar(timerSeconds).count;
-            let html = '<div class="flex gap-1">';
-            for(let i = 1; i <= 5; i++) {
-                html += createStar(i <= activeStars ? 'filled' : 'empty', 16, col.textP5);
-            }
-            html += '</div>';
-            return html;
-        }
-
         // --- UI RENDERER (SIDE B DRILL-DOWNS) ---
         function renderSideB() {
             const p1 = document.getElementById('p1-back');
@@ -394,7 +390,7 @@
 
             if (sideBLevel === 0) {} 
             else if (sideBLevel === 1) {
-                // Calculate accurate final grade out of 10
+                // F1: Basic Scores Overview
                 const timePts = getTimeGradeAndStar(timerSeconds).num;
                 const totalScore = ((drillData.FinalGrade || 0) + timePts).toFixed(1);
 
@@ -419,6 +415,7 @@
                     <span class="absolute right-3 text-slate-300 pointer-events-none">${caretUpSVG}</span>`;
             } 
             else if (sideBLevel === 2) {
+                // F2: Deep Dive Categories
                 const data = drillData[currentCategory];
                 const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
                 
@@ -434,6 +431,7 @@
                 p5.innerHTML = item(`Go back`, chevLeft, col.textP1);
             } 
             else if (sideBLevel === 3) {
+                // F3: Feedback Cards
                 const data = drillData[currentCategory][currentSubNum];
                 const activeBg = currentCategory === 'Delivery' ? col.p2 : (currentCategory === 'Content' ? col.p3 : col.p4);
 
@@ -452,7 +450,12 @@
 
         // --- UI RENDERER (SIDE A & PRIMARY FLOWS) ---
         function renderPhase() {
-            // Only reset P1-P5 during phase changes. P6 is manually controlled.
+            // Remove P6 grade injections cleanly if returning to START
+            if (phase === 'START') {
+                if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
+                if (document.getElementById('p6-grade-back')) document.getElementById('p6-grade-back').remove();
+            }
+
             for (let i = 1; i <= 5; i++) {
                 const el = document.getElementById(`bar-${i}`);
                 if (el) el.classList.remove('flip-active');
@@ -536,62 +539,74 @@
             }
 
             else if (phase === 'RESULTS') {
-                const timePts = getTimeGradeAndStar(timerSeconds).num;
-                const totalScore = (drillData.FinalGrade || 0) + timePts;
-                const mainStar = totalScore >= 8.5 ? 'filled' : 'empty';
-
-                document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
-                document.getElementById('p1-front').innerHTML = `
-                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                        ${generateFiveStars()}
-                        <div class="absolute" style="left: 75%; transform: translateX(-50%);">
-                            <span class="text-[13px] font-bold uppercase tracking-widest ${col.textW}">See Scores</span>
-                        </div>
-                    </div>
-                    <span class="absolute right-3 ${col.textW} pointer-events-none">${chevRight}</span>`;
-
-                for (let i = 2; i <= 4; i++) {
-                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
-                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                if (sideBLevel === 0) {
+                    // F0: High Density Data Dashboard
+                    const timeData = getTimeGradeAndStar(timerSeconds);
+                    const timePts = timeData.num;
+                    const totalScore = ((drillData.FinalGrade || 0) + timePts).toFixed(1);
                     
-                    const catName = i === 2 ? 'Delivery' : (i === 3 ? 'Content' : 'Clarity');
-                    const earnedStar = drillData[catName] ? drillData[catName].star : 'empty';
+                    const timeColor = (timerSeconds < 20 || timerSeconds > 80) ? 'text-slate-400 line-through' : 'text-emerald-500';
+                    let gradeColor = 'text-blue-500';
+                    if (totalScore >= 8.0 && totalScore < 10.0) gradeColor = 'text-emerald-500';
+                    else if (totalScore >= 10.0) gradeColor = 'text-[#F4B532]';
+
+                    const levelChosen = getLevelCount() + 1;
                     
-                    document.getElementById(`p${i}-front`).className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                    document.getElementById(`p${i}-front`).innerHTML = `
-                        <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
-                            <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar(earnedStar, 20, col.textP5)}</div>
-                        </div>
-                        <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
+                    const d = new Date();
+                    const shortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+
+                    const third = (label, val, colorClass) => `
+                        <div class="flex flex-col items-center justify-center w-full h-full">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">${label}</span>
+                            <span class="text-sm font-black ${colorClass} leading-none">${val}</span>
+                        </div>`;
+
+                    document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
+                    document.getElementById('p1-front').innerHTML = `
+                        <div class="absolute top-2 right-3 text-[9px] text-white/70 font-medium tracking-wide">${shortDate}</div>
+                        <div class="w-full h-full flex items-center justify-center">
+                            <span class="text-2xl uppercase text-[#F4B532] tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
+                        </div>`;
+
+                    document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                    document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Delivery[2].name, drillData.Delivery[2].val, drillData.Delivery[2].color)}${third(drillData.Delivery[3].name, drillData.Delivery[3].val, drillData.Delivery[3].color)}${third(drillData.Delivery[4].name, drillData.Delivery[4].val, drillData.Delivery[4].color)}</div>`;
+
+                    document.getElementById('p3-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                    document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Content[2].name, drillData.Content[2].val, drillData.Content[2].color)}${third(drillData.Content[3].name, drillData.Content[3].val, drillData.Content[3].color)}${third(drillData.Content[4].name, drillData.Content[4].val, drillData.Content[4].color)}</div>`;
+
+                    document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                    document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third(drillData.Clarity[2].name, drillData.Clarity[2].val, drillData.Clarity[2].color)}${third(drillData.Clarity[3].name, drillData.Clarity[3].val, drillData.Clarity[3].color)}${third(drillData.Clarity[4].name, drillData.Clarity[4].val, drillData.Clarity[4].color)}</div>`;
+
+                    document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
+                    document.getElementById('p5-front').innerHTML = `
+                        <div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">
+                            ${third("Time", formatTime(timerSeconds), timeColor)}
+                            <div class="flex items-center justify-center relative">
+                                <i data-lucide="star" class="w-7 h-7 text-slate-200 fill-slate-100"></i>
+                                <span class="absolute text-[10px] font-black text-slate-500 mt-px">${levelChosen}</span>
+                            </div>
+                            <div class="flex items-center justify-center text-slate-300">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </div>`;
+
+                    const gradeHTML = `<div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter ${gradeColor} drop-shadow-md pointer-events-none">${totalScore}<span class="text-xl text-slate-400/50">/10</span></div>`;
+                    
+                    if(!document.getElementById('p6-grade-front')) {
+                        document.getElementById('p6-front').insertAdjacentHTML('beforeend', `<div id="p6-grade-front" class="pointer-events-none">${gradeHTML}</div>`);
+                        document.getElementById('p6-back').insertAdjacentHTML('beforeend', `<div id="p6-grade-back" class="pointer-events-none">${gradeHTML}</div>`);
+                    } else {
+                        document.getElementById('p6-grade-front').innerHTML = gradeHTML;
+                        document.getElementById('p6-grade-back').innerHTML = gradeHTML;
+                    }
+
+                    if (window.lucide) window.lucide.createIcons();
+                    renderSideB(); 
                 }
-
-                const rawText = window.testTranscript ? window.testTranscript.substring(0, 50) + "..." : "No audio.";
-                
-                document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} hover:bg-slate-50 transition-colors cursor-pointer`;
-                document.getElementById('p5-front').innerHTML = `
-                    <div class="relative w-full h-full flex items-center justify-start pl-5 pr-10">
-                        <span class="text-[10px] font-medium leading-tight text-slate-600 line-clamp-2">${rawText}</span>
-                        <div class="absolute text-amber-400" style="left: 85%; transform: translateX(-50%);">${createStar(getTimeGradeAndStar(timerSeconds).star, 20, col.textP5)}</div>
-                    </div>
-                    <span class="absolute right-3 text-slate-300 pointer-events-none">${chevRight}</span>`;
-                
-                sideBLevel = 0;
-                renderSideB(); 
             }
         }
 
         // --- INTERACTION LOGIC ---
-        function flipAll(toBack) {
-            for (let i = 1; i <= 6; i++) {
-                const el = document.getElementById(`bar-${i}`);
-                if (el) {
-                    if (toBack) el.classList.add('flip-active');
-                    else el.classList.remove('flip-active');
-                }
-            }
-        }
-
         function toggleFlip(panelNum) {
             if (phase === 'RECORDING' || phase === 'PROCESSING') return;
 
@@ -600,11 +615,10 @@
                 const bar6 = document.getElementById('bar-6');
                 if (bar6) bar6.classList.toggle('flip-active');
                 
-                // GLOBAL SAFETY KILL: If flipping back to Text Side (removing flip-active) and camera is ON, kill it.
                 if (bar6 && !bar6.classList.contains('flip-active') && isCameraOn) {
                     toggleCamera();
                 }
-                return; // Exit function immediately. P6 does not affect F0-F3 game states.
+                return; 
             }
 
             // --- STANDARD GAME LOGIC (P1 - P5) ---
@@ -665,7 +679,6 @@
                 if (isStarting) return; 
                 isStarting = true;
 
-                // Start Mic Process immediately
                 if (window.THPS && window.THPS.Audio) {
                     const micSuccess = await window.THPS.Audio.startRecordingProcess();
                     if (!micSuccess) {
@@ -676,7 +689,6 @@
                     }
                 }
 
-                // Dual Layer Countdown Sequence
                 const overlayFront = document.getElementById('countdown-overlay-front');
                 const overlayBack = document.getElementById('countdown-overlay-back');
                 
@@ -723,8 +735,6 @@
                 clearInterval(timerInterval);
                 renderPhase(); 
 
-                // The camera stream is left completely alone here so screen recordings aren't interrupted.
-                
                 if (!isCameraOn) {
                     const statusContainer = document.getElementById('camera-status-container');
                     if (statusContainer) {
@@ -734,7 +744,6 @@
                     }
                 }
 
-                // Wait for Vercel & Process NLP
                 if (window.THPS && window.THPS.Audio) {
                     const audioData = await window.THPS.Audio.stopRecordingProcess();
                     
@@ -742,7 +751,6 @@
                         const nlpData = window.THPS.NLP.analyzeTranscript(audioData.transcript, audioData.timestamps || []);
                         buildDynamicDrillData(nlpData, audioData.duration);
                     } else {
-                        // Failsafe empty data if audio failed
                         buildDynamicDrillData({numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, google10kCount: 0, numSentences: 0, reportMarkdownText: ""}, audioData.duration || 0);
                     }
                     
@@ -750,6 +758,7 @@
                 }
 
                 phase = 'RESULTS';
+                sideBLevel = 0;
                 renderPhase();
             }
         }
@@ -763,7 +772,6 @@
             
             initApp(); 
             
-            // Respecting manual user control: We do NOT flip Panel 6 or kill the camera here.
             if (!isCameraOn) {
                 const statusContainer = document.getElementById('camera-status-container');
                 if (statusContainer) {
@@ -789,7 +797,6 @@
             }
 
             try {
-                // Fetch daily prompts
                 const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
                 const data = await response.json();
 
@@ -798,16 +805,14 @@
 
                 if (data[todayAdelaide]) {
                     b1 = data[todayAdelaide].p1;
-                    b2 = `${data[todayAdelaide].p2} about`;
+                    b2 = data[todayAdelaide].p2;
                     b3 = `${data[todayAdelaide].p3}, with`; 
                     b4 = `${data[todayAdelaide].p4} examples.`;
                 }
                 
-                // Fetch Feedback Matrix
                 const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json');
                 feedbackMatrix = await fbRes.json();
                 
-                // Load NLP Dictionaries securely before rendering
                 if (window.THPS && window.THPS.NLP) {
                     await window.THPS.NLP.loadDictionaries();
                 }
@@ -817,8 +822,6 @@
             }
 
             renderPhase();
-            
-            // Boot external icons if available
             if (window.lucide) window.lucide.createIcons();
         }
 
