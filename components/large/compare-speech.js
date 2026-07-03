@@ -36,21 +36,22 @@ class ThpsCompareSpeech extends HTMLElement {
                 <div id="compare-grid" class="flex flex-col gap-2">
                     </div>
 
-                <div id="compare-empty-state" class="hidden text-center py-10">
-                    <i data-lucide="history" class="w-8 h-8 text-slate-300 mx-auto mb-3"></i>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Need at least 2 attempts<br>in history to compare.</p>
-                </div>
-
             </div>
         `;
 
         this.selectA = this.querySelector('#compare-select-a');
         this.selectB = this.querySelector('#compare-select-b');
         this.grid = this.querySelector('#compare-grid');
-        this.emptyState = this.querySelector('#compare-empty-state');
         
         this.setupListeners();
         this.populateDropdowns();
+    }
+
+    disconnectedCallback() {
+        // Clean up the global event listener to prevent memory leaks when the widget is deleted
+        if (this.boundUpdate) {
+            window.removeEventListener('thps-dashboard-update', this.boundUpdate);
+        }
     }
 
     setupListeners() {
@@ -64,31 +65,49 @@ class ThpsCompareSpeech extends HTMLElement {
         // Dropdown changes trigger re-render
         this.selectA.addEventListener('change', () => this.renderComparison());
         this.selectB.addEventListener('change', () => this.renderComparison());
+
+        // Listen for new speeches being analyzed to dynamically update dropdowns
+        this.boundUpdate = () => this.populateDropdowns();
+        window.addEventListener('thps-dashboard-update', this.boundUpdate);
     }
 
     populateDropdowns() {
         const history = window.thps_sessionHistory || [];
         
-        if (history.length < 1) {
-            this.selectA.parentElement.parentElement.classList.add('hidden');
-            this.emptyState.classList.remove('hidden');
+        // 1. Cache the current selection so it doesn't jarringly reset when a new attempt is recorded
+        const currentA = this.selectA.value;
+        const currentB = this.selectB.value;
+
+        // Clear current options
+        this.selectA.innerHTML = '';
+        this.selectB.innerHTML = '';
+
+        // 2. Handle Zero Attempts gracefully
+        if (history.length === 0) {
+            this.selectA.add(new Option("No attempts yet", ""));
+            this.selectB.add(new Option("No attempts yet", ""));
+            this.renderComparison();
             if (window.lucide) window.lucide.createIcons();
             return;
         }
 
-        this.selectA.innerHTML = '';
-        this.selectB.innerHTML = '';
-
+        // 3. Populate options with just the Attempt Title
         history.forEach((attempt) => {
-            const label = attempt.title; // Removed the (Score: X) text
-            
-            this.selectA.add(new Option(label, attempt.id));
-            this.selectB.add(new Option(label, attempt.id));
+            this.selectA.add(new Option(attempt.title, attempt.id));
+            this.selectB.add(new Option(attempt.title, attempt.id));
         });
 
-        // Default: Compare the most recent (index 0) with the second most recent (index 1), if it exists
-        if (history.length > 1) {
-            this.selectB.selectedIndex = 1;
+        // 4. Restore previous selection if it still exists, otherwise set logical defaults
+        if (currentA && Array.from(this.selectA.options).some(o => o.value === currentA)) {
+            this.selectA.value = currentA;
+        } else {
+            this.selectA.selectedIndex = 0; // Top of history
+        }
+
+        if (currentB && Array.from(this.selectB.options).some(o => o.value === currentB)) {
+            this.selectB.value = currentB;
+        } else {
+            this.selectB.selectedIndex = history.length > 1 ? 1 : 0; // Second in history if possible
         }
         
         this.renderComparison();
