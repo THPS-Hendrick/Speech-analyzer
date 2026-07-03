@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mic-Check: Premium Members Hub</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-engine-headless.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Permanent+Marker&display=swap');
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: transparent; 
+            overflow-x: hidden;
+        }
+
+        /* Hub Styles */
+        .styled-scrollbar::-webkit-scrollbar { width: 6px; }
+        .styled-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .styled-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+
+        /* Game 3D Styles */
+        .perspective { perspective: 1200px; }
+        .flipper {
+            position: relative; width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flip-active { transform: rotateX(180deg); }
+        .face {
+            position: absolute; inset: 0;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 0.85rem; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .face-front { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .face-back { transform: rotateX(180deg); background-color: #f8fafc; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body class="w-full mx-auto bg-slate-50 min-h-screen flex flex-col items-center justify-start p-2 md:p-8">
+
+    <div id="view-menu" class="w-full max-w-6xl mx-auto flex flex-col items-center animate-in fade-in duration-500">
+        
+        <div class="w-full flex flex-col items-center mb-8 px-2 mt-4">
+            <div class="flex flex-col items-center gap-1 text-center mb-6">
+                <h1 class="text-4xl md:text-5xl uppercase tracking-wider text-slate-900 drop-shadow-sm" style="font-family: 'Permanent Marker', cursive;">
+                    Members Hub
+                </h1>
+                <p class="text-xs md:text-sm text-slate-500 font-medium max-w-md mt-1">
+                    Welcome back. Play historic challenges and track your progress below.<br>
+                    <strong>(Score 8.5+ to boost your Star Count!)</strong>
+                </p>
+                <div id="db-status" class="mt-2 text-[10px] font-bold px-3 py-1 bg-amber-100 text-amber-700 rounded-full animate-pulse">Connecting to Save Data...</div>
+            </div>
+
+            <div class="flex justify-center gap-4 md:gap-12 w-full">
+                <div class="flex flex-col items-center bg-gradient-to-b from-yellow-50 to-amber-100 border border-amber-200 rounded-2xl p-3 shadow-sm w-36 md:w-44 transition-all hover:scale-105">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-amber-700 text-center mb-1 leading-tight">Golden<br>Mic-Checks</span>
+                    <span id="golden-count" class="text-3xl md:text-4xl font-black text-amber-600 drop-shadow-sm">0</span>
+                </div>
+                <div class="flex flex-col items-center bg-gradient-to-b from-slate-50 to-blue-50 border border-blue-200 rounded-2xl p-3 shadow-sm w-36 md:w-44 transition-all hover:scale-105">
+                    <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-700 text-center mb-1 leading-tight">Total<br>Star Count</span>
+                    <div class="flex items-center gap-1">
+                        <i data-lucide="star" class="w-5 h-5 md:w-6 md:h-6 text-amber-500 fill-amber-500 drop-shadow-sm"></i>
+                        <span id="star-count" class="text-3xl md:text-4xl font-black text-blue-800 drop-shadow-sm">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full relative">
+            <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-slate-50 to-transparent z-10 pointer-events-none"></div>
+            <div id="grid-scroll-container" class="w-full max-h-[60vh] overflow-y-auto pb-16 pt-2 px-2 styled-scrollbar">
+                <div id="menu-grid" class="w-full grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 md:gap-4">
+                    </div>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none"></div>
+        </div>
+    </div>
+
+
+    <div id="view-game" class="hidden w-full max-w-6xl mx-auto flex-col items-center animate-in fade-in duration-500 pb-16">
+        
+        <div class="w-full max-w-[368px] flex justify-between items-center mb-4">
+            <button onclick="window.closeGameView()" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold uppercase tracking-widest text-xs transition-colors bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm active:scale-95">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Hub
+            </button>
+            <button onclick="resetGame(window.thps_currentPlayDate)" class="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+                Reset
+            </button>
+        </div>
+
+        <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)"><div id="bar-1" class="flipper"><div id="p1-front" class="face face-front"></div><div id="p1-back" class="face face-back"></div></div></div>
+                <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)"><div id="bar-2" class="flipper"><div id="p2-front" class="face face-front"></div><div id="p2-back" class="face face-back"></div></div></div>
+                <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)"><div id="bar-3" class="flipper"><div id="p3-front" class="face face-front"></div><div id="p3-back" class="face face-back"></div></div></div>
+                <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)"><div id="bar-4" class="flipper"><div id="p4-front" class="face face-front"></div><div id="p4-back" class="face face-back"></div></div></div>
+                <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)"><div id="bar-5" class="flipper"><div id="p5-front" class="face face-front overflow-hidden"></div><div id="p5-back" class="face face-back"></div></div></div>
+            </div>
+
+            <div class="w-full flex-grow perspective group mb-1">
+                <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
+                    <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300"></div>
+                    <div id="p6-back" class="face face-back bg-[#111827] border-gray-800 rounded-[1.25rem]">
+                        <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
+                        <div id="camera-trigger-area" onclick="toggleCamera();" class="absolute inset-0 z-10 cursor-pointer"></div>
+                        
+                        <div id="camera-status-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                            <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
+                        </div>
+
+                        <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors z-30 p-1 cursor-pointer">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                        </button>
+                        <div id="p6-camera-grade-overlay" class="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none opacity-0 transition-opacity duration-300"></div>
+                        <div id="countdown-overlay-back" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white text-5xl font-black opacity-0 transition-opacity duration-200 drop-shadow-2xl z-40 tracking-widest uppercase text-center leading-tight"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let db, auth, currentUser;
+        window.userScores = {}; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOZBkKXHQvmyhpGPBj_Ca1kaaOcS4CFm0",
+            authDomain: "member-mic-check.firebaseapp.com",
+            projectId: "member-mic-check",
+            storageBucket: "member-mic-check.firebasestorage.app",
+            messagingSenderId: "553738270562",
+            appId: "1:553738270562:web:d80b87898cc836ffcdde3b",
+            measurementId: "G-55L6EV735D"
+        };
+
+        async function initFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                await signInAnonymously(auth);
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        listenToScores();
+                        const stat = document.getElementById('db-status');
+                        stat.innerText = "Progress Synchronized";
+                        stat.classList.replace('text-amber-700', 'text-green-700');
+                        stat.classList.replace('bg-amber-100', 'bg-green-100');
+                        stat.classList.remove('animate-pulse');
+                        setTimeout(() => stat.classList.add('hidden'), 3000);
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase init error:", error);
+                document.getElementById('db-status').innerText = "Database Connection Failed";
+                window.renderMenuGrid();
+            }
+        }
+
+        function listenToScores() {
+            if (!currentUser) return;
+            const scoresRef = collection(db, 'users', currentUser.uid, 'micCheckScores');
+            onSnapshot(scoresRef, (snapshot) => {
+                window.userScores = {};
+                snapshot.forEach(doc => { window.userScores[doc.id] = doc.data(); });
+                window.renderMenuGrid(); 
+            });
+        }
+
+        window.dbSaveScore = async function(dateStr, stars, score) {
+            if (!currentUser || !db) return; 
+            const existing = window.userScores[dateStr];
+            let shouldSave = true;
+            
+            if (existing) {
+                if (existing.stars > stars) shouldSave = false;
+                if (existing.stars === stars && existing.score >= score) shouldSave = false;
+            }
+
+            if (shouldSave) {
+                const docRef = doc(db, 'users', currentUser.uid, 'micCheckScores', dateStr);
+                await setDoc(docRef, { stars: stars, score: score, timestamp: Date.now() });
+            }
+        };
+
+        initFirebase();
+    </script>
+
+    <script>
+        // --- HUB NAVIGATION GLOBALS ---
+        window.thps_currentPlayDate = null; 
+        
+        function getAdelaideDateObj() {
+            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' });
+            const parts = formatter.formatToParts(new Date());
+            const year = parseInt(parts.find(p => p.type === 'year').value);
+            const month = parseInt(parts.find(p => p.type === 'month').value) - 1; 
+            const day = parseInt(parts.find(p => p.type === 'day').value);
+            return new Date(year, month, day);
+        }
+
+        window.renderMenuGrid = function() {
+            const gridEl = document.getElementById('menu-grid');
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const startDate = new Date(2026, 0, 1);
+            const todayObj = getAdelaideDateObj();
+            const tomorrowObj = new Date(todayObj);
+            tomorrowObj.setDate(tomorrowObj.getDate() + 1);
+            
+            let totalStars = 0; let goldenCount = 0; let htmlContent = '';
+            let currentDate = new Date(startDate);
+            
+            while (currentDate <= tomorrowObj) {
+                const yyyy = currentDate.getFullYear();
+                const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(currentDate.getDate()).padStart(2, '0');
+                const dateKey = `${yyyy}-${mm}-${dd}`;
+                
+                const isTomorrow = currentDate.getTime() === tomorrowObj.getTime();
+                const isToday = currentDate.getTime() === todayObj.getTime();
+                const displayStr = `${currentDate.getDate()} ${monthNames[currentDate.getMonth()]} '${String(yyyy).substring(2)}`;
+                
+                if (isTomorrow) {
+                    htmlContent += `<div class="flex flex-col items-center justify-center p-3 sm:p-4 bg-slate-100 rounded-xl shadow-inner border border-slate-200 opacity-60"><span class="text-xs sm:text-sm font-bold text-slate-400 mb-3">${displayStr}</span><i data-lucide="lock" class="w-5 h-5 text-slate-400 mb-2"></i><span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest text-center leading-tight">Check-in<br>Tomorrow</span></div>`;
+                } else {
+                    const data = window.userScores[dateKey];
+                    let stars = 0; let score = 0.0; let scoreColor = 'text-slate-400';
+                    
+                    if (data) { 
+                        stars = data.stars; score = data.score; 
+                        if (score === 10) { goldenCount++; scoreColor = 'text-yellow-400 drop-shadow-md font-black'; } 
+                        else if (score >= 8.5) { totalStars += stars; scoreColor = 'text-green-500'; } 
+                        else if (score >= 7) { scoreColor = 'text-orange-500'; } 
+                        else { scoreColor = 'text-yellow-500'; }
+                    }
+
+                    let starsHtml = '';
+                    for (let s = 1; s <= 5; s++) { starsHtml += s <= stars ? `<i data-lucide="star" class="w-2 h-2 sm:w-3 sm:h-3 text-amber-500 fill-amber-500"></i>` : `<i data-lucide="star" class="w-2 h-2 sm:w-3 sm:h-3 text-slate-300"></i>`; }
+                    
+                    const todayId = isToday ? 'id="btn-today"' : '';
+                    const todayRing = isToday ? 'ring-2 ring-blue-400 ring-offset-2' : '';
+
+                    htmlContent += `<div ${todayId} onclick="window.openGameView('${dateKey}')" class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group ${todayRing}"><span class="text-xs sm:text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors mb-2">${displayStr}</span><div class="flex gap-0.5 mb-1">${starsHtml}</div><span class="${scoreColor} text-lg sm:text-xl font-black">${score.toFixed(1)}</span></div>`;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            gridEl.innerHTML = htmlContent;
+            document.getElementById('star-count').innerText = totalStars;
+            document.getElementById('golden-count').innerText = goldenCount;
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        window.openGameView = function(dateStr) {
+            window.thps_currentPlayDate = dateStr;
+            document.getElementById('view-menu').classList.add('hidden');
+            document.getElementById('view-game').classList.remove('hidden');
+            document.getElementById('view-game').classList.add('flex');
+            window.scrollTo(0, 0);
+            
+            // Format the target date for the game UI
+            const [yyyy, mm, dd] = dateStr.split('-');
+            globalShortDate = `${dd}/${mm}/${yyyy.substring(2)}`;
+            
+            resetGame(dateStr); 
+        };
+
+        window.closeGameView = function() {
+            window.thps_currentPlayDate = null;
+            document.getElementById('view-game').classList.add('hidden');
+            document.getElementById('view-game').classList.remove('flex');
+            document.getElementById('view-menu').classList.remove('hidden');
+            
+            if (window.renderMenuGrid) window.renderMenuGrid(); 
+            window.scrollTo(0, 0);
+            
+            // Kill camera if active to save battery
+            if (isCameraOn) toggleCamera();
+        };
+
+        // --- GAME ENGINE LOGIC (V24.1) ---
+        let globalShortDate = "";
+        const col = {
+            p1: 'bg-[#AA0000]', textP1: 'text-[#AA0000]', borderP1: 'border-[#AA0000]',
+            p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
+            p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
+            p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
+            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200', b: 'bg-slate-900', textB: 'text-slate-800'
+        };
+
+        let phase = 'MENU', activeMenuTopic = 'LOGO', currentMenuPage = 1, timerSeconds = 0, timerInterval = null;
+        const maxDurationSeconds = 80; 
+        let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+        let sideBLevel = 0, currentCategory = '', currentSubNum = 0; 
+        let isStarting = false, cameraStream = null, isCameraOn = false, isCameraLoading = false; 
+        let feedbackMatrix = {}, drillData = {}; 
+
+        const p3ScoringContent = [
+            "<strong>1. Delivery (Pace, Mumble, Pause):</strong><br>Scores your speed, clarity, and pacing. Green is ideal, Yellow needs adjustment, Red means you are speaking too fast, too slow, or not enunciating.",
+            "<strong>2. Content (Personal, Visual, Abstract):</strong><br>Scores the balance of your story. A perfect score blends personal anecdotes, visual imagery, and abstract concepts evenly.",
+            "<strong>3. Clarity (Word Avg, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Use shorter sentences and common English words to hit Green thresholds.",
+            "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20s or over 80s is disqualified so don't chicken out or ramble on!",
+            "<strong>5. Stars & Final Grade:</strong><br> All 10 sub-scores combine into a Final Grade out of 10. The Star rating reflects the difficulty level you completed.",
+        ];
+        const p4TipsContent = [
+            "<strong>Pace:</strong> Aim for 110-150 words per minute. If you speak faster, you risk overwhelming the listener.",
+            "<strong>Mumble:</strong> Syllables per second (SPS). Keep it between 3.5 and 4.5. Open your mouth wider to hit those hard consonants.",
+            "<strong>Pause:</strong> Aim for 15-30% pause time. Silence is powerful—use it to let your audience digest your points.",
+            "<strong>Personal:</strong> Use 'I', 'Me', 'We' to build a connection. Aim for 30-60% personal pronoun density in your speeches.",
+            "<strong>Visual:</strong> Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.",
+            "<strong>Abstract:</strong> Don't get lost in the clouds. Keep complex, theoretical concepts to a minimum (10-30%).",
+            "<strong>Word Avg:</strong> Short sentences punch harder. Aim for 7 to 14 words per sentence.",
+            "<strong>Eng 10K:</strong> Use simple, recognizable words. Over 85% of your speech should be from the 10,000 most common English words.",
+            "<strong>Pop:</strong> Readability grade level. Aim for a 5th to 10th-grade reading level to maximize mass-market appeal.",
+            "<strong>Time:</strong> Don't ramble! The goal is exactly 60 seconds. Going under 20s or over 80s will penalize your grade."
+        ];
+
+        function changeMenuPage(direction, event, maxPages) {
+            if (event) event.stopPropagation(); 
+            currentMenuPage += direction;
+            if (currentMenuPage < 1) currentMenuPage = maxPages;
+            if (currentMenuPage > maxPages) currentMenuPage = 1;
+            renderP6Front();
+        }
+
+        function revertP6ToDefault(event) {
+            if (event) event.stopPropagation();
+            const bar6 = document.getElementById('bar-6');
+            if (bar6 && bar6.classList.contains('flip-active')) {
+                const infoIcon = bar6.querySelector('.face-back button');
+                if (infoIcon) {
+                    infoIcon.classList.add('animate-bounce');
+                    setTimeout(() => infoIcon.classList.remove('animate-bounce'), 1000);
+                }
+            } else {
+                activeMenuTopic = 'RESULTS_DEFAULT';
+                renderP6Front();
+            }
+        }
+
+        function handleMetricClick(category, subNum, event) {
+            if (event) event.stopPropagation();
+            const bar6 = document.getElementById('bar-6');
+            const isCameraShowing = bar6 && bar6.classList.contains('flip-active');
+            currentCategory = category; currentSubNum = subNum;
+            if (isCameraShowing) {
+                sideBLevel = 3;
+                renderSideB();
+                for (let i = 1; i <= 5; i++) { const bar = document.getElementById(`bar-${i}`); if (bar) bar.classList.add('flip-active'); }
+            } else {
+                activeMenuTopic = 'FEEDBACK_CARD';
+                renderP6Front(); 
+            }
+        }
+
+        function renderP6Front() {
+            const p6f = document.getElementById('p6-front');
+            if (!p6f) return;
+            const cameraIcon = `<button onclick="toggleFlip(6); event.stopPropagation();" class="absolute top-3 right-3 text-white/50 hover:text-white transition-colors z-20 p-1 cursor-pointer"><i data-lucide="video" class="w-4 h-4"></i></button>`;
+            const cameraIconDark = cameraIcon.replace('text-white/50 hover:text-white', 'text-slate-400 hover:text-blue-600');
+
+            if (activeMenuTopic === 'LOGO') {
+                p6f.className = `face face-front ${col.p1} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
+                p6f.innerHTML = `${cameraIcon}<div class="flex flex-col items-center justify-center text-center leading-none" style="font-family: 'Permanent Marker', cursive;"><span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span><span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span></div><span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>`;
+            } else if (activeMenuTopic === 'P1') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `${cameraIconDark}<h3 class="text-[11px] font-black uppercase text-[#AA0000] tracking-widest mb-2">What is Mic-Check?</h3><p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">Mic-check is a public speaking game by pro speakers for... not so pro speakers. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#AA0000]">START</strong> to "check" it out!</p>`;
+            } else if (activeMenuTopic === 'P2') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `${cameraIconDark}<h3 class="text-[11px] font-black uppercase text-[#9333EA] tracking-widest mb-2">How to Play:</h3><ol class="text-[10px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight"><li>Select stars to increase speech difficulty.</li><li>Flip this panel to use Camera.</li><li>Press start to play.</li><li>Press stop to see scores & stats.</li></ol>`;
+            } else if (activeMenuTopic === 'P3' || activeMenuTopic === 'P4') {
+                const maxP = activeMenuTopic === 'P3' ? 5 : 10;
+                const title = activeMenuTopic === 'P3' ? "Scoring" : "Tips";
+                const titleCol = activeMenuTopic === 'P3' ? "text-[#2563EB]" : "text-[#047857]";
+                const contentText = activeMenuTopic === 'P3' ? p3ScoringContent[currentMenuPage - 1] : p4TipsContent[currentMenuPage - 1];
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-between items-start transition-colors duration-300`;
+                p6f.innerHTML = `${cameraIconDark}<div class="w-full flex-1 flex flex-col items-start pr-4"><h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3><p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p></div><div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0"><button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button><span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span><button onclick="changeMenuPage(1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></button></div>`;
+            } else if (activeMenuTopic === 'RESULTS_DEFAULT') {
+                let p6ResultHeader = "", p6ResultSub = "";
+                if (!window.lastAchievedTimeValid) { p6ResultHeader = "Check your"; p6ResultSub = "Time"; } 
+                else if (window.lastAchievedGradeFloat < 8.0) { p6ResultHeader = "Check your"; p6ResultSub = "Scores"; } 
+                else if (window.lastAchievedGradeFloat < 10.0) { p6ResultHeader = "Check"; p6ResultSub = "You Out!"; } 
+                else { p6ResultHeader = "Perfect"; p6ResultSub = "Mic-Check"; }
+                p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
+                p6f.innerHTML = `${cameraIcon}<div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${window.lastAchievedLevel}</span></div><div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;"><span class="text-[1.75rem] uppercase text-white tracking-widest drop-shadow-sm mb-2">${p6ResultHeader}</span><span class="text-[2.2rem] uppercase text-white tracking-widest drop-shadow-sm mb-6">${p6ResultSub}</span></div><span class="text-[10px] font-bold text-white/80 uppercase tracking-widest">Reset & Try Again</span>`;
+            } else if (activeMenuTopic === 'FEEDBACK_CARD') {
+                const data = drillData[currentCategory][currentSubNum];
+                let activeColor = 'text-slate-800';
+                if (currentCategory === 'Delivery') activeColor = col.textP2;
+                else if (currentCategory === 'Content') activeColor = col.textP3;
+                else if (currentCategory === 'Clarity') activeColor = col.textP4;
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-start items-start transition-colors duration-300`;
+                p6f.innerHTML = `<button onclick="revertP6ToDefault(event)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-800 transition-colors p-1 cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button><h3 class="text-[11px] font-black uppercase ${activeColor} tracking-widest mb-3">${data.name}</h3><div class="space-y-3 w-full pr-1 overflow-y-auto max-h-[170px]"><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">You:</strong> ${data.you}</p><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Why:</strong> ${data.why}</p><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Try:</strong> ${data.try}</p></div>`;
+            }
+            if (!document.getElementById('countdown-overlay-front')) { p6f.insertAdjacentHTML('beforeend', `<div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>`); }
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function createStar(type, size = 20, extraClass = "") {
+            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
+        const playSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
+
+        let b1 = "Yell at some point!", b2 = "Bore us about", b3 = "Cardboard boxes, with", b4 = "Private + Public examples.";
+        const matrix = {
+            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textP5, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textP5), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }, 
+            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
+        };
+
+        function formatTime(seconds) { const rnd = Math.round(seconds); const m = Math.floor(rnd / 60); const s = rnd % 60; return `${m}:${s < 10 ? '0' : ''}${s}`; }
+        function getTimeGradeAndStar(sec) {
+            if (sec >= 60 && sec <= 80) return { grade: "1/1", num: 1, star: "filled", count: 5 };
+            if (sec >= 20 && sec < 60) return { grade: "0.5/1", num: 0.5, star: "half", count: 3 };
+            return { grade: "0/1", num: 0, star: "empty", count: 1 };
+        }
+        function getLevelCount() { let count = 0; for(let i=1;i<=4;i++){if(selections[i]==='B')count++;} return count; }
+        function updateLevelDisplay() {
+            const count = getLevelCount();
+            const fillDiv = document.getElementById('p5-fill');
+            if (fillDiv) fillDiv.style.width = `${(count / 4) * 100}%`;
+            const levelNum = document.getElementById('p5-level-num');
+            if (levelNum) levelNum.innerText = `PLAY LEVEL ${count + 1}`;
+        }
+        function scoreMetric(raw, bounds1, bounds05_low, bounds05_high) {
+            if (raw >= bounds1[0] && raw <= bounds1[1]) return { points: 1, state: 'perfect' };
+            if (bounds05_low && raw >= bounds05_low[0] && raw <= bounds05_low[1]) return { points: 0.5, state: 'low' };
+            if (bounds05_high && raw >= bounds05_high[0] && raw <= bounds05_high[1]) return { points: 0.5, state: 'high' };
+            return { points: 0, state: raw < bounds1[0] ? 'low' : 'high' };
+        }
+        function getStarFromScore(score) { if (score >= 2.5) return 'filled'; if (score >= 1.5) return 'half'; return 'empty'; }
+
+        function buildDynamicDrillData(nlpData, elapsedSecs) {
+            const words = Math.max(1, nlpData.numWords);
+            const activeSecs = Math.max(1, elapsedSecs);
+            const wpm = Math.round((words / activeSecs) * 60);
+            const periods = (nlpData.reportMarkdownText.match(/[.!?]/g) || []).length;
+            const commas = (nlpData.reportMarkdownText.match(/[,;:-]/g) || []).length;
+            let estPauseSecs = Math.max(activeSecs * 0.05, Math.min(activeSecs * 0.45, (periods * 1.3) + (commas * 0.5))); 
+            const pausePct = Math.round((estPauseSecs / activeSecs) * 100);
+            const sps = (nlpData.totalSyllables / Math.max(1, activeSecs - estPauseSecs)).toFixed(1);
+            const perPct = Math.round((nlpData.personalCount / words) * 100);
+            const visPct = Math.round((nlpData.visualCount / words) * 100);
+            const absPct = Math.max(0, 100 - perPct - visPct);
+            const wps = Math.round(words / Math.max(1, nlpData.numSentences));
+            const engPct = Math.round((nlpData.google10kCount / words) * 100);
+            const grade = window.THPS.NLP.calculateReadabilityMetrics(words, nlpData.numSentences, nlpData.totalSyllables, nlpData.letterCount, nlpData.complexWordCount).avgGrade;
+            
+            let popVal = grade <= 5 ? 95 + (5 - grade)*1 : (grade <= 10 ? 95 - ((grade - 5) * 7.8) : (grade <= 15 ? 56 - ((grade - 10) * 8.2) : Math.max(1, 15 - ((grade - 15) * 2.8))));
+            popVal = Math.round(Math.min(99, popVal));
+
+            let scPace = scoreMetric(wpm, [110, 150], [89, 109], [151, 171]);
+            let scMumb = scoreMetric(parseFloat(sps), [3.5, 4.5], [2.9, 3.4], [4.6, 5.2]);
+            let scPaus = scoreMetric(pausePct, [15, 30], [9, 14], [31, 36]);
+            let scPers = scoreMetric(perPct, [30, 60], [20, 29], [61, 70]);
+            let scVis = scoreMetric(visPct, [25, 50], [15, 24], [51, 60]);
+            let scAbs = scoreMetric(absPct, [10, 30], [0, 9], [31, 40]);
+            let scSig = scoreMetric(wps, [7, 14], [4, 6], [15, 17]);
+            let scEng = scoreMetric(engPct, [85, 95], [80, 84], [96, 100]);
+            let scPop = scoreMetric(grade, [5, 10], [3, 4.99], [10.01, 12]);
+
+            const sumDel = scPace.points + scMumb.points + scPaus.points;
+            const sumCon = scPers.points + scVis.points + scAbs.points;
+            const sumCla = scSig.points + scEng.points + scPop.points;
+            const safeFb = (cat, state) => feedbackMatrix[cat] ? feedbackMatrix[cat][state] : { you: "-", try: "-", why: "-" };
+            const getCol = (pts) => pts === 1 ? 'text-emerald-500' : (pts === 0.5 ? 'text-amber-500' : 'text-rose-500');
+
+            drillData = {
+                Delivery: { score: sumDel, star: getStarFromScore(sumDel), 2: { name: "Pace", val: `${wpm}`, color: getCol(scPace.points), ...safeFb('Pace', scPace.state) }, 3: { name: "Mumble", val: `${sps}`, color: getCol(scMumb.points), ...safeFb('Mumble', scMumb.state) }, 4: { name: "Pause", val: `${pausePct}%`, color: getCol(scPaus.points), ...safeFb('Pause', scPaus.state) } },
+                Content: { score: sumCon, star: getStarFromScore(sumCon), 2: { name: "Personal", val: `${perPct}%`, color: getCol(scPers.points), ...safeFb('Personal', scPers.state) }, 3: { name: "Visual", val: `${visPct}%`, color: getCol(scVis.points), ...safeFb('Visual', scVis.state) }, 4: { name: "Abstract", val: `${absPct}%`, color: getCol(scAbs.points), ...safeFb('Abstract', scAbs.state) } },
+                Clarity: { score: sumCla, star: getStarFromScore(sumCla), 2: { name: "Word Avg", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 3: { name: "Eng 10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 4: { name: "Pop", val: `~${popVal}%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } },
+                FinalGrade: sumDel + sumCon + sumCla 
+            };
+
+            drillData.Extras = {
+                1: { name: "Time", val: formatTime(elapsedSecs), you: elapsedSecs < 20 ? "Less than 20 sec" : (elapsedSecs < 60 ? "20 to 59s" : (elapsedSecs <= 80 ? "60 to 80s" : "More than 80s")), why: elapsedSecs < 20 ? "Score invalid" : (elapsedSecs < 60 ? "Score of 0.5 / 1" : (elapsedSecs <= 80 ? "Score of +1" : "Score invalid")), try: (elapsedSecs >= 60 && elapsedSecs <= 80) ? "You nailed it!" : "Speaking for 60-80s" },
+                2: { name: "Date", val: globalShortDate, you: "You played Daily Mic-Check!", why: "Because every day is a new challenge!", try: "Check back tomorrow for more!" }
+            };
+        }
+
+        function renderPhase() {
+            if (phase === 'MENU' || phase === 'START') {
+                if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) { camOverlay.classList.add('opacity-0'); camOverlay.innerHTML = ''; }
+            }
+            for (let i = 1; i <= 5; i++) { const el = document.getElementById(`bar-${i}`); if (el) el.classList.remove('flip-active'); }
+
+            if (phase === 'MENU') {
+                const menuData = { 1: { title: "What is Mic-Check?", bg: col.p1, text: col.textW }, 2: { title: "How to Play", bg: col.p2, text: col.textW }, 3: { title: "Scoring", bg: col.p3, text: col.textW }, 4: { title: "Tips", bg: col.p4, text: col.textW } };
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${menuData[i].bg}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-center text-center"><span class="text-[12px] font-black uppercase tracking-widest ${menuData[i].text}">${menuData[i].title}</span></div>`;
+                }
+                document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900">START</span></div>`;
+                renderP6Front();
+            }
+            else if (phase === 'START') {
+                for (let i = 1; i <= 4; i++) {
+                    const matrixData = matrix[i];
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrixData.bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrixData.bgB}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorA}">${matrixData.A}</strong></span></div><span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starA}</span>`;
+                    document.getElementById(`p${i}-back`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorB}">${matrixData.B}</strong></span></div><span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starB}</span>`;
+                }
+                if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
+                if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
+                if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
+                if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
+                
+                const fillP = (getLevelCount() / 4) * 100;
+                document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `<div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div><div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)"><span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span></div>`;
+                document.getElementById('p5-back').className = 'face face-back'; document.getElementById('p5-back').innerHTML = ''; 
+                activeMenuTopic = 'LOGO'; renderP6Front();
+            } 
+            else if (phase === 'RECORDING') {
+                for (let i = 1; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
+                    document.getElementById(`p${i}-front`).className = `face face-front ${selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span></div><span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                }
+                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
+                document.getElementById('p5-front').innerHTML = `<div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div><div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center"><div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${stopSVG}</div><div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div></div>`;
+            }
+            else if (phase === 'PROCESSING') {
+                const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5], txt = [col.textW, col.textW, col.textW, col.textW, col.textW];
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse font-bold uppercase tracking-widest text-[13px] ${txt[i-1]}">Checking Scores</div>`;
+                }
+            }
+            else if (phase === 'RESULTS') {
+                const timeData = getTimeGradeAndStar(timerSeconds);
+                const totalScore = ((drillData.FinalGrade || 0) + timeData.num).toFixed(1);
+                
+                let timeColor = 'text-rose-500';
+                if (timerSeconds < 20 || timerSeconds > 80) timeColor = 'text-slate-400 line-through';
+                else if (timerSeconds >= 20 && timerSeconds < 60) timeColor = 'text-amber-500';
+                else if (timerSeconds >= 60 && timerSeconds <= 80) timeColor = 'text-emerald-500';
+
+                let gradeBg = 'bg-blue-500';
+                if (totalScore >= 8.0 && totalScore < 10.0) gradeBg = 'bg-emerald-500';
+                else if (totalScore >= 10.0) gradeBg = 'bg-[#F4B532]';
+
+                const levelChosen = getLevelCount() + 1;
+                const third = (label, val, colorClass, cat, subNum) => `<div onclick="handleMetricClick('${cat}', ${subNum}, event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors"><span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">${label}</span><span class="text-sm font-black ${colorClass} leading-none mt-1 pointer-events-none">${val}</span></div>`;
+
+                document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
+                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)"><span class="text-2xl uppercase text-white tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span></div>`;
+                document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Pace", drillData.Delivery[2].val, drillData.Delivery[2].color, "Delivery", 2)}${third("Mumble", drillData.Delivery[3].val, drillData.Delivery[3].color, "Delivery", 3)}${third("Pause", drillData.Delivery[4].val, drillData.Delivery[4].color, "Delivery", 4)}</div>`;
+                document.getElementById('p3-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
+                document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Word Avg", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
+                document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Time", drillData.Extras[1].val, timeColor, "Extras", 1)}${third("Date", globalShortDate, "text-slate-600", "Extras", 2)}<div onclick="revertP6ToDefault(event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors"><span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">Grade</span><span class="text-sm font-black text-slate-800 leading-none mt-1 pointer-events-none">${totalScore}/10</span></div></div>`;
+
+                let transBg = gradeBg === 'bg-[#F4B532]' ? 'bg-[#F4B532]/80' : gradeBg + '/80';
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) {
+                    camOverlay.innerHTML = `<div class="${transBg} px-5 py-1.5 rounded-2xl backdrop-blur-sm shadow-xl flex items-baseline justify-center border border-white/20 whitespace-nowrap"><span class="text-[2.5rem] font-black tracking-tighter text-white leading-none">${totalScore}</span><span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${levelChosen}</span></div>`;
+                    camOverlay.classList.remove('opacity-0');
+                }
+
+                window.lastAchievedGrade = totalScore;
+                window.lastAchievedGradeFloat = parseFloat(totalScore);
+                window.lastAchievedTimeValid = (timerSeconds >= 20 && timerSeconds <= 80);
+                window.lastAchievedLevel = levelChosen;
+                window.lastAchievedBg = gradeBg;
+                
+                // === THE BRIDGE: SAVE TO FIREBASE ===
+                if (window.dbSaveScore && window.thps_currentPlayDate && window.lastAchievedTimeValid) {
+                    window.dbSaveScore(window.thps_currentPlayDate, levelChosen, window.lastAchievedGradeFloat);
+                }
+                
+                activeMenuTopic = 'RESULTS_DEFAULT'; renderP6Front(); 
+            }
+        }
+
+        function renderSideB() {
+            const p5 = document.getElementById('p5-back');
+            const data = drillData[currentCategory][currentSubNum];
+            let activeColor = col.textB;
+            if (currentCategory === 'Delivery') activeColor = col.textP2;
+            else if (currentCategory === 'Content') activeColor = col.textP3;
+            else if (currentCategory === 'Clarity') activeColor = col.textP4;
+
+            document.getElementById('p1-back').className = `face face-back ${col.w} ${col.borderW}`;
+            document.getElementById('p1-back').innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="text-[13px] font-black uppercase tracking-widest ${activeColor}">${data.name}</span></div>`;
+            ['p2-back', 'p3-back', 'p4-back'].forEach(id => document.getElementById(id).className = `face face-back ${col.w} ${col.borderW}`);
+            document.getElementById('p2-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">You:</strong> ${data.you}</span></div>`;
+            document.getElementById('p3-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Why:</strong> ${data.why}</span></div>`;
+            document.getElementById('p4-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Try:</strong> ${data.try}</span></div>`;
+            p5.className = `face face-back bg-slate-100 border border-slate-200 cursor-pointer hover:bg-slate-200 transition-colors`;
+            p5.innerHTML = `<div class="w-full h-full flex items-center justify-center gap-2" onclick="toggleFlip(5)"><i data-lucide="chevron-left" class="w-4 h-4 text-slate-600"></i><span class="text-[11px] font-black uppercase text-slate-600 tracking-widest">Back to Grid</span></div>`;
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function toggleFlip(panelNum) {
+            if (phase === 'RECORDING' || phase === 'PROCESSING') return;
+            if (panelNum === 6) {
+                const bar6 = document.getElementById('bar-6');
+                if (bar6) bar6.classList.toggle('flip-active');
+                if (bar6 && !bar6.classList.contains('flip-active') && isCameraOn) toggleCamera();
+                return; 
+            }
+            if (phase === 'MENU') {
+                if (panelNum >= 1 && panelNum <= 4) { activeMenuTopic = 'P' + panelNum; currentMenuPage = 1; renderP6Front(); } 
+                else if (panelNum === 5) { phase = 'START'; renderPhase(); }
+                return;
+            }
+            if (phase === 'START') {
+                if (panelNum === 5) return; 
+                const bar = document.getElementById(`bar-${panelNum}`);
+                if (bar) bar.classList.toggle('flip-active');
+                selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
+                updateLevelDisplay(); 
+            } 
+            else if (phase === 'RESULTS') {
+                if (sideBLevel === 3 && panelNum === 5) {
+                    sideBLevel = 0;
+                    for (let i = 1; i <= 5; i++) { const bar = document.getElementById(`bar-${i}`); if (bar) bar.classList.remove('flip-active'); }
+                }
+            }
+        }
+
+        async function handleActionClick(event) {
+            if (event) event.stopPropagation();
+            if (phase === 'START') {
+                if (isStarting) return; isStarting = true;
+                if (window.THPS && window.THPS.Audio) {
+                    const micSuccess = await window.THPS.Audio.startRecordingProcess();
+                    if (!micSuccess) { alert("Microphone access is required to proceed."); isStarting = false; resetGame(window.thps_currentPlayDate); return; }
+                }
+
+                const overlayFront = document.getElementById('countdown-overlay-front');
+                const overlayBack = document.getElementById('countdown-overlay-back');
+                if (overlayFront) overlayFront.classList.remove('opacity-0');
+                if (overlayBack) overlayBack.classList.remove('opacity-0');
+                
+                const steps = ["3", "2", "1", "Mic-Check!"];
+                for (let i = 0; i < steps.length; i++) {
+                    if (overlayFront) overlayFront.innerText = steps[i];
+                    if (overlayBack) overlayBack.innerText = steps[i];
+                    await new Promise(r => setTimeout(r, 800));
+                }
+                
+                if (overlayFront) overlayFront.classList.add('opacity-0');
+                if (overlayBack) overlayBack.classList.add('opacity-0'); 
+                isStarting = false; phase = 'RECORDING'; renderPhase(); timerSeconds = 0;
+
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
+                    const tProg = document.getElementById('timer-progress'), s1 = document.getElementById('star-1'), s2 = document.getElementById('star-2');
+                    if (tProg) tProg.style.width = progressPercent + '%';
+                    if (progressPercent >= 25 && s1) s1.classList.replace('text-slate-600', 'text-amber-400');
+                    if (progressPercent >= 75 && s2) s2.classList.replace('text-slate-600', 'text-amber-400');
+                    if (timerSeconds >= maxDurationSeconds) handleActionClick(null);
+                }, 1000);
+            } 
+            else if (phase === 'RECORDING') {
+                phase = 'PROCESSING'; clearInterval(timerInterval); renderPhase(); 
+                if (!isCameraOn) {
+                    const statusContainer = document.getElementById('camera-status-container');
+                    if (statusContainer) { statusContainer.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg><span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`; }
+                }
+
+                if (window.THPS && window.THPS.Audio) {
+                    const audioData = await window.THPS.Audio.stopRecordingProcess();
+                    if (window.THPS.NLP && audioData.transcript) {
+                        const nlpData = window.THPS.NLP.analyzeTranscript(audioData.transcript, audioData.timestamps || []);
+                        buildDynamicDrillData(nlpData, audioData.duration);
+                    } else {
+                        buildDynamicDrillData({numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, google10kCount: 0, numSentences: 0, reportMarkdownText: ""}, audioData.duration || 0);
+                    }
+                }
+                phase = 'RESULTS'; sideBLevel = 0; renderPhase();
+            }
+        }
+
+        function resetGame(targetDateStr) {
+            phase = 'MENU'; activeMenuTopic = 'LOGO'; currentMenuPage = 1; clearInterval(timerInterval);
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; sideBLevel = 0;
+            initApp(targetDateStr); 
+            
+            if (!isCameraOn) {
+                const statusContainer = document.getElementById('camera-status-container');
+                if (statusContainer) { statusContainer.classList.remove('opacity-0'); statusContainer.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg><span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`; }
+            }
+        }
+
+        async function toggleCamera() {
+            if (phase === 'RECORDING' || phase === 'PROCESSING' || isStarting || isCameraLoading) return;
+            const videoEl = document.getElementById('camera-feed'), statusContainer = document.getElementById('camera-status-container'), statusText = document.getElementById('camera-status');
+            isCameraLoading = true;
+
+            if (isCameraOn) {
+                if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+                videoEl.srcObject = null; videoEl.classList.replace('opacity-100', 'opacity-0');
+                statusContainer.classList.remove('opacity-0'); statusContainer.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg><span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
+                isCameraOn = false; cameraStream = null;
+            } else {
+                statusText.innerHTML = 'STARTING...';
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    videoEl.srcObject = cameraStream; videoEl.classList.replace('opacity-0', 'opacity-100');
+                    statusContainer.classList.add('opacity-0'); isCameraOn = true;
+                } catch (err) { statusText.innerHTML = '<span class="text-red-500">BLOCKED</span>'; }
+            }
+            isCameraLoading = false;
+        }
+
+        async function initApp(targetDateStr) {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`p${i}-front`);
+                if(el) { el.className = `face face-front ${col.w} border-slate-200`; el.innerHTML = `<div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">Loading...</div>`; }
+            }
+
+            try {
+                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
+                const data = await response.json();
+
+                // Load specifically for the Historic Date passed from the Hub
+                if (data[targetDateStr]) {
+                    b1 = data[targetDateStr].p1; b2 = `${data[targetDateStr].p2} about`; 
+                    b3 = `${data[targetDateStr].p3}, with`; b4 = `${data[targetDateStr].p4} examples.`;
+                } else {
+                    b1 = "Speak out loud!"; b2 = "Teach us about"; b3 = "Daily habits, with"; b4 = "Real-world examples.";
+                }
+                
+                const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json');
+                feedbackMatrix = await fbRes.json();
+                if (window.THPS && window.THPS.NLP) await window.THPS.NLP.loadDictionaries();
+            } catch (error) { console.warn("Dependency load failed", error); }
+
+            renderPhase(); if (window.lucide) window.lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
