@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Thumbnail Maker (V24.1 Edition)</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Permanent+Marker&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect, useCallback } = React;
+
+    // --- Inline Icons ---
+    const UploadIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    );
+    const ImageIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+    );
+    const DownloadIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    );
+    const CalendarIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    );
+    const RefreshIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    );
+    const StarIcon = ({ className }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+    );
+
+    // --- Component for individual prompts ---
+    const PromptRow = ({ textColor, bgColor, text, showStar = true, justify = "justify-start" }) => (
+      <div className={`w-full h-16 ${bgColor} rounded-[0.85rem] shadow-sm border border-slate-200 flex items-center px-6 relative z-30 ${justify}`}>
+        <span className={`text-[16px] font-black uppercase tracking-widest leading-tight ${textColor} ${showStar ? 'pr-10' : ''}`}>
+          {text}
+        </span>
+        {showStar && <StarIcon className="absolute right-5 w-6 h-6 text-[#F4B532] drop-shadow-sm" />}
+      </div>
+    );
+
+    function App() {
+      const [sourceImage, setSourceImage] = useState(null);
+      const [isProcessing, setIsProcessing] = useState(false);
+      const [shortsThumb, setShortsThumb] = useState(null);
+      const [standardThumb, setStandardThumb] = useState(null);
+      const [shortsSize, setShortsSize] = useState(0);
+      const [standardSize, setStandardSize] = useState(0);
+
+      // --- Data Integrations ---
+      const [promptsData, setPromptsData] = useState({});
+      const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+
+      const fileInputRef = useRef(null);
+
+      // Fetch JSON on mount
+      useEffect(() => {
+        fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json')
+          .then(res => res.json())
+          .then(data => setPromptsData(data))
+          .catch(err => console.error("Failed to load prompts DB:", err));
+      }, []);
+
+      // Calculate localized short date
+      const [y, m, d] = selectedDate.split('-');
+      const shortDate = `${d}/${m}/${y.substring(2)}`;
+
+      // Resolve actual daily prompts or fallbacks
+      let p1 = "Speak out loud!";
+      let p2 = "Teach us about";
+      let p3 = "Daily habits, with";
+      let p4 = "Real-world examples.";
+      if (promptsData[selectedDate]) {
+        p1 = promptsData[selectedDate].p1;
+        p2 = `${promptsData[selectedDate].p2} about`;
+        p3 = `${promptsData[selectedDate].p3}, with`;
+        p4 = `${promptsData[selectedDate].p4} examples.`;
+      }
+
+      const formatMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+
+      const optimizeImage = async (canvas, targetMB = 1.95) => {
+        const targetBytes = targetMB * 1024 * 1024;
+        let quality = 1.0;
+        let blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (blob.size <= targetBytes) return blob;
+
+        let minQ = 0.1, maxQ = 1.0, bestBlob = blob;
+        for (let i = 0; i < 7; i++) {
+          quality = (minQ + maxQ) / 2;
+          blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+          if (blob.size > targetBytes) { maxQ = quality; } else { minQ = quality; bestBlob = blob; }
+        }
+        return bestBlob;
+      };
+
+      const handleImageUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => setSourceImage(img);
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const generateThumbnails = useCallback(async () => {
+        if (!sourceImage) return;
+        setIsProcessing(true);
+
+        try {
+          // 1. SHORTS THUMBNAIL (Native 9:16 Center Crop)
+          const shortsCanvas = document.createElement('canvas');
+          shortsCanvas.width = 1080; shortsCanvas.height = 1920;
+          const sCtx = shortsCanvas.getContext('2d');
+          const sAspectRatio = 1080 / 1920;
+          const iAspectRatio = sourceImage.width / sourceImage.height;
+          let sx = 0, sy = 0, sw = sourceImage.width, sh = sourceImage.height;
+          if (iAspectRatio > sAspectRatio) { sw = sourceImage.height * sAspectRatio; sx = (sourceImage.width - sw) / 2; } 
+          else { sh = sourceImage.width / sAspectRatio; sy = (sourceImage.height - sh) / 2; }
+          sCtx.drawImage(sourceImage, sx, sy, sw, sh, 0, 0, 1080, 1920);
+
+          const shortsBlob = await optimizeImage(shortsCanvas);
+          setShortsThumb(URL.createObjectURL(shortsBlob));
+          setShortsSize(shortsBlob.size);
+
+          // 2. STANDARD THUMBNAIL (Prep-Board DOM Capture)
+          const board = document.getElementById('prep-board-hidden');
+          const canvas = await html2canvas(board, {
+            width: 1280, height: 720, scale: 1, useCORS: true, backgroundColor: '#f1f5f9'
+          });
+
+          const stdBlob = await optimizeImage(canvas);
+          setStandardThumb(URL.createObjectURL(stdBlob));
+          setStandardSize(stdBlob.size);
+
+        } catch (error) {
+          console.error("Error generating thumbnails:", error);
+          alert("Generation failed. Check the console.");
+        } finally {
+          setIsProcessing(false);
+        }
+      }, [sourceImage]);
+
+      // Auto-trigger generation if image or date changes, adding 150ms delay to let DOM repaint
+      useEffect(() => {
+        if (!sourceImage) return;
+        const timer = setTimeout(() => { generateThumbnails(); }, 150);
+        return () => clearTimeout(timer);
+      }, [sourceImage, selectedDate, promptsData, generateThumbnails]);
+
+      return (
+        <div className="min-h-screen p-6 font-sans text-slate-800">
+          <div className="max-w-6xl mx-auto space-y-8">
+            
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                Thumbnail Master <span className="text-indigo-600 text-lg align-top ml-2">V24.1</span>
+              </h1>
+              <p className="text-slate-500 max-w-xl mx-auto">
+                Upload your 9:16 capture, pick a broadcast date, and the DOM-engine will automatically composite your final graphic!
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              {/* LEFT CONTROLS */}
+              <div className="space-y-6">
+                
+                {/* Upload Card */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <UploadIcon className="w-5 h-5 text-indigo-500" />
+                    Upload Image
+                  </h2>
+                  <div 
+                    className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input type="file" className="hidden" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} />
+                    <ImageIcon className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                    <p className="text-sm font-medium text-slate-600">Click to browse or drag</p>
+                    <p className="text-xs text-slate-400 mt-1">Recommended: 1080x1920 px</p>
+                  </div>
+
+                  {sourceImage && (
+                    <div className="mt-4">
+                      <p className="text-xs text-green-600 font-semibold mb-2 flex items-center gap-1">
+                        ✓ Loaded ({sourceImage.width}x{sourceImage.height})
+                      </p>
+                      <button 
+                        onClick={generateThumbnails} disabled={isProcessing}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                      >
+                        {isProcessing ? <RefreshIcon className="w-4 h-4 animate-spin" /> : <RefreshIcon className="w-4 h-4" />}
+                        {isProcessing ? 'Generating...' : 'Force Regenerate'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Database Settings Card */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <CalendarIcon className="w-5 h-5 text-slate-500" />
+                    Challenge Settings
+                  </h2>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    Select the broadcast date. The thumbnail engine will automatically fetch the correct prompts and date card to render in Panel 2 and 3.
+                  </p>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase mb-2">Broadcast Date</label>
+                    <input 
+                      type="date" 
+                      className="w-full text-sm font-semibold text-slate-700 p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
+                      value={selectedDate}
+                      onChange={e => setSelectedDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* RIGHT PREVIEWS */}
+              <div className="lg:col-span-2 space-y-6">
+                
+                {/* 16:9 STANDARD */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="flex justify-between items-end mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900">Standard Thumbnail</h2>
+                      <p className="text-sm text-slate-500">1280 x 720 • 16:9 Aspect Ratio</p>
+                    </div>
+                    {standardThumb && (
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-slate-500 mb-1">Size: <span className={standardSize > 1.95 * 1024 * 1024 ? 'text-red-500' : 'text-green-600'}>{formatMB(standardSize)}</span></p>
+                        <a href={standardThumb} download={`mic_check_standard_${selectedDate}.jpg`} className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium py-1.5 px-4 rounded-lg inline-flex items-center gap-1.5 transition-colors">
+                          <DownloadIcon className="w-4 h-4" /> Download
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="bg-slate-100 rounded-xl overflow-hidden aspect-video relative flex items-center justify-center border border-slate-200 shadow-inner">
+                    {isProcessing ? (
+                      <p className="text-slate-400 text-sm font-medium animate-pulse">Rendering prep-board...</p>
+                    ) : standardThumb ? (
+                      <img src={standardThumb} alt="Standard Thumbnail" className="w-full h-full object-contain" />
+                    ) : (
+                      <p className="text-slate-400 text-sm font-medium">Upload an image to generate</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 9:16 SHORTS */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="flex justify-between items-end mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900">Shorts Thumbnail</h2>
+                      <p className="text-sm text-slate-500">1080 x 1920 • 9:16 Aspect Ratio</p>
+                    </div>
+                    {shortsThumb && (
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-slate-500 mb-1">Size: <span className={shortsSize > 1.95 * 1024 * 1024 ? 'text-red-500' : 'text-green-600'}>{formatMB(shortsSize)}</span></p>
+                        <a href={shortsThumb} download={`mic_check_shorts_${selectedDate}.jpg`} className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium py-1.5 px-4 rounded-lg inline-flex items-center gap-1.5 transition-colors">
+                          <DownloadIcon className="w-4 h-4" /> Download
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="bg-slate-100 rounded-xl overflow-hidden aspect-[9/16] w-64 mx-auto relative flex items-center justify-center border border-slate-200 shadow-inner">
+                    {isProcessing ? (
+                      <p className="text-slate-400 text-sm font-medium animate-pulse">Processing...</p>
+                    ) : shortsThumb ? (
+                      <img src={shortsThumb} alt="Shorts Thumbnail" className="w-full h-full object-contain" />
+                    ) : (
+                      <p className="text-slate-400 text-sm font-medium">Preview area</p>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* ============================================================== */}
+          {/* THE HIDDEN PREP-BOARD (Rendered exclusively for html2canvas)   */}
+          {/* ============================================================== */}
+          <div className="absolute top-[-9999px] left-[-9999px]">
+            <div id="prep-board-hidden" style={{ width: '1280px', height: '720px', position: 'relative', overflow: 'hidden', background: '#f1f5f9' }}>
+              
+              {/* PANEL 1: Uploaded Background Image (Spills top/left natively when anchored to bottom/right) */}
+              {sourceImage && (
+                <img 
+                  src={sourceImage.src} 
+                  style={{
+                    position: 'absolute',
+                    width: '1080px', 
+                    height: '720px',
+                    right: 0, 
+                    bottom: 0,
+                    objectFit: 'cover',
+                    objectPosition: 'bottom right',
+                    zIndex: 10
+                  }} 
+                  alt="Background"
+                />
+              )}
+
+              {/* STACKED CONTAINER: Panels 3 & 2 */}
+              <div style={{ position: 'absolute', left: '50px', bottom: '50px', zIndex: 30, width: '480px', height: '620px', display: 'flex', flexDirection: 'column' }}>
+                
+                {/* PANEL 3: Logo & Date (Total Height constraint: ~220px) */}
+                <div className="bg-[#AA0000] w-full rounded-t-[1.5rem] flex flex-col justify-center items-center shadow-lg border-b-2 border-[#8A0000] relative z-20 flex-shrink-0" style={{ height: '220px' }}>
+                  <span className="text-[3.5rem] uppercase text-white tracking-widest drop-shadow-md leading-none text-center" style={{ fontFamily: "'Permanent Marker', cursive" }}>
+                    Daily<br/>Mic-Check
+                  </span>
+                  <span className="text-2xl font-bold text-white tracking-widest uppercase mt-6">{shortDate}</span>
+                </div>
+
+                {/* PANEL 2: Prompts (Total Height constraint: 400px) */}
+                <div className="w-full bg-slate-100 rounded-b-[1.5rem] p-4 shadow-2xl flex flex-col justify-between relative z-30 border-x border-b border-slate-300 flex-grow" style={{ height: '400px' }}>
+                  <PromptRow textColor="text-[#AA0000]" bgColor="bg-white" text={p1} />
+                  <PromptRow textColor="text-[#9333EA]" bgColor="bg-white" text={p2} />
+                  <PromptRow textColor="text-[#2563EB]" bgColor="bg-white" text={p3} />
+                  <PromptRow textColor="text-[#047857]" bgColor="bg-white" text={p4} />
+                  
+                  {/* PANEL 5: Play Level 5 */}
+                  <PromptRow textColor="text-slate-900" bgColor="bg-[#F4B532]" text="PLAY LEVEL 5" showStar={false} justify="justify-center" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
