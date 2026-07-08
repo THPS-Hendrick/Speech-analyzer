@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mic-Check: Teaser / Landing Page</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: transparent; 
+        }
+
+        .perspective { perspective: 1200px; }
+        
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .flip-active { transform: rotateX(180deg); }
+
+        .face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .face-front { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .face-back { transform: rotateX(180deg); background-color: #f8fafc; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen">
+
+    <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
+        
+        <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] bg-[#AA0000] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#AA0000]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Want unlimited Mic-Checks?</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#9333EA] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#9333EA]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Become a member today!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#2563EB] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#2563EB]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Only $9 per month</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#047857] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#047857]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">or $90 per year!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Games, Courses, Discounts & More!</span>
+                </div>
+            </div>
+            
+            <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 mb-1 p-5">
+                <div class="flex w-full justify-between items-center px-2">
+                    <div class="flex flex-col items-start text-left">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Monthly Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$9</span>
+                        <span class="text-[9px] font-medium text-slate-400">(Cancel anytime)</span>
+                    </div>
+                    <div class="w-[1px] h-12 bg-slate-200"></div>
+                    <div class="flex flex-col items-end text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Annual Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$90</span>
+                        <span class="text-[9px] font-black text-amber-500">(Most popular)</span>
+                    </div>
+                </div>
+                <button onclick="window.location.href='https://tomhendrick.com/members'" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-[11px] rounded-[0.85rem] shadow-md transition-all active:scale-95 mt-2">
+                    Get Unlimited Mic-Checks
+                </button>
+            </div>
+        </div>
+        <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#AA0000]">Mic-Check Copyright <span id="copyright-year"></span></span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#9333EA]">is owned & exclusively licensed by:</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#2563EB]">Talent Academy Pty Ltd & Tom Hendrick</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#047857]">All rights reserved</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Card game available now!</span>
+                </div>
+            </div>
+            
+            <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-6 mb-1 p-6">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5bQi-Ani7eWjmKDT44EshxHMyolXHeiklREPCJkC3sQ&s=10" alt="Talent Academy" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
+                <div class="w-1/2 h-[1px] bg-slate-200"></div>
+                <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
+            </div>
+        </div>
+        <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
+            
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
+                <div id="bar-1" class="flipper">
+                    <div id="p1-front" class="face face-front"></div>
+                    <div id="p1-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)">
+                <div id="bar-2" class="flipper">
+                    <div id="p2-front" class="face face-front"></div>
+                    <div id="p2-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)">
+                <div id="bar-3" class="flipper">
+                    <div id="p3-front" class="face face-front"></div>
+                    <div id="p3-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)">
+                <div id="bar-4" class="flipper">
+                    <div id="p4-front" class="face face-front"></div>
+                    <div id="p4-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
+                <div id="bar-5" class="flipper">
+                    <div id="p5-front" class="face face-front overflow-hidden"></div>
+                    <div id="p5-back" class="face face-back"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-full flex-grow perspective group mb-1">
+            <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300"></div>
+                </div>
+        </div>
+
+    </div>
+
+    <div class="mt-8 flex gap-4">
+        <button onclick="toggleHubOverlay()" id="hub-btn" class="px-6 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95 flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub
+        </button>
+        <button onclick="toggleLegalOverlay()" id="legal-btn" class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            Legal
+        </button>
+        <button onclick="resetGame()" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            Reset
+        </button>
+    </div>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let globalShortDate = "";
+        
+        const col = {
+            p1: 'bg-[#AA0000]', textP1: 'text-[#AA0000]', borderP1: 'border-[#AA0000]',
+            p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
+            p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
+            p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
+            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200',
+            b: 'bg-slate-900', textB: 'text-slate-800'
+        };
+
+        let phase = 'MENU'; 
+        let activeMenuTopic = 'LOGO'; 
+        let currentMenuPage = 1;
+        let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+
+        // --- OVERLAY LOGIC ---
+        let isLegalOpen = false;
+        let isHubOpen = false;
+
+        function toggleLegalOverlay() {
+            if (isHubOpen) toggleHubOverlay(); // Close Hub if it's open
+            
+            isLegalOpen = !isLegalOpen;
+            const overlay = document.getElementById('legal-overlay');
+            const btn = document.getElementById('legal-btn');
+            
+            const yearSpan = document.getElementById('copyright-year');
+            if (yearSpan) yearSpan.innerText = new Date().getFullYear();
+
+            if (isLegalOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-100', 'bg-slate-800');
+                btn.classList.replace('text-slate-600', 'text-white');
+                btn.innerText = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-slate-100');
+                btn.classList.replace('text-white', 'text-slate-600');
+                btn.innerText = "LEGAL";
+            }
+        }
+
+        function toggleHubOverlay() {
+            if (isLegalOpen) toggleLegalOverlay(); // Close Legal if it's open
+            
+            isHubOpen = !isHubOpen;
+            const overlay = document.getElementById('hub-overlay');
+            const btn = document.getElementById('hub-btn');
+
+            if (isHubOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-white', 'bg-slate-800');
+                btn.classList.replace('text-slate-500', 'text-white');
+                btn.innerHTML = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-white');
+                btn.classList.replace('text-white', 'text-slate-500');
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub`;
+            }
+        }
+
+        // --- P6 DYNAMIC EXPLAINER CONTENT ---
+        const p3ScoringContent = [
+            "<strong>1. Delivery (Pace, Mumble, Pause):</strong><br>Scores your speed, clarity, and pacing. Green is ideal, Yellow needs adjustment, Red means you are speaking too fast, too slow, or not enunciating.",
+            "<strong>2. Content (Personal, Visual, Abstract):</strong><br>Scores the balance of your story. A perfect score blends personal anecdotes, visual imagery, and abstract concepts evenly.",
+            "<strong>3. Clarity (Word Avg, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Use shorter sentences and common English words to hit Green thresholds.",
+            "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20s or over 80s is disqualified so don't chicken out or ramble on!",
+            "<strong>5. Stars & Final Grade:</strong><br> All 10 sub-scores combine into a Final Grade out of 10. The Star rating reflects the difficulty level you completed."
+        ];
+
+        const p4TipsContent = [
+            "<strong>Pace:</strong> Aim for 110-150 words per minute. If you speak faster, you risk overwhelming the listener. Slower, and you lose their attention.",
+            "<strong>Mumble:</strong> Syllables per second (SPS). Keep it between 3.5 and 4.5. Open your mouth wider to hit those hard consonants.",
+            "<strong>Pause:</strong> Aim for 15-30% pause time. Silence is powerful—use it to let your audience digest your points.",
+            "<strong>Personal:</strong> Use 'I', 'Me', 'We' to build a connection. Aim for 30-60% personal pronoun density in your speeches.",
+            "<strong>Visual:</strong> Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.",
+            "<strong>Abstract:</strong> Don't get lost in the clouds. Keep complex, theoretical concepts to a minimum (10-30%).",
+            "<strong>Word Avg:</strong> Short sentences punch harder. Aim for 7 to 14 words per sentence. Edit out the fluff.",
+            "<strong>Eng 10K:</strong> Use simple, recognizable words. Over 85% of your speech should be from the 10,000 most common English words.",
+            "<strong>Pop:</strong> Readability grade level. Aim for a 5th to 10th-grade reading level to maximize mass-market appeal.",
+            "<strong>Time:</strong> Don't ramble! The goal is exactly 60 seconds. Going under 20s or over 80s will penalize your grade."
+        ];
+
+        function changeMenuPage(direction, event, maxPages) {
+            if (event) event.stopPropagation(); 
+            currentMenuPage += direction;
+            if (currentMenuPage < 1) currentMenuPage = maxPages;
+            if (currentMenuPage > maxPages) currentMenuPage = 1;
+            renderP6Front();
+        }
+
+        // --- DYNAMIC P6 RENDERER ---
+        function renderP6Front() {
+            const p6f = document.getElementById('p6-front');
+            if (!p6f) return;
+
+            if (activeMenuTopic === 'LOGO') {
+                p6f.className = `face face-front ${col.p1} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
+                p6f.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-center leading-none" style="font-family: 'Permanent Marker', cursive;">
+                        <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
+                        <span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
+                `;
+            } 
+            else if (activeMenuTopic === 'P1') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    <h3 class="text-[11px] font-black uppercase text-[#AA0000] tracking-widest mb-2">What is Mic-Check?</h3>
+                    <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">
+                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#AA0000]">START</strong> to "check" it out!
+                    </p>
+                `;
+            }
+            else if (activeMenuTopic === 'P2') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    <h3 class="text-[11px] font-black uppercase text-[#9333EA] tracking-widest mb-2">How to Play:</h3>
+                    <ol class="text-[10px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight">
+                        <li>Select stars to increase speech difficulty.</li>
+                        <li>Flip this panel to use Camera.</li>
+                        <li>Press start to play.</li>
+                        <li>Press stop to see scores & stats.</li>
+                    </ol>
+                `;
+            }
+            else if (activeMenuTopic === 'P3' || activeMenuTopic === 'P4') {
+                const maxP = activeMenuTopic === 'P3' ? 5 : 10;
+                const title = activeMenuTopic === 'P3' ? "Scoring" : "Tips";
+                const titleCol = activeMenuTopic === 'P3' ? "text-[#2563EB]" : "text-[#047857]";
+                const contentText = activeMenuTopic === 'P3' ? p3ScoringContent[currentMenuPage - 1] : p4TipsContent[currentMenuPage - 1];
+
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-between items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    <div class="w-full flex-1 flex flex-col items-start pr-4">
+                        <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3>
+                        <p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p>
+                    </div>
+                    
+                    <div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0">
+                        <button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span>
+                        <button onclick="changeMenuPage(1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+            }
+
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- SVGs ---
+        function createStar(type, size = 20, extraClass = "") {
+            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
+
+        // --- DATA DICTIONARIES ---
+        let b1 = "Yell at some point!";
+        let b2 = "Bore us about";
+        let b3 = "Cardboard boxes, with";
+        let b4 = "Private + Public examples.";
+
+        const matrix = {
+            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textW, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textW), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }, 
+            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
+        };
+
+        function getLevelCount() {
+            let count = 0;
+            if (selections[1] === 'B') count++;
+            if (selections[2] === 'B') count++;
+            if (selections[3] === 'B') count++;
+            if (selections[4] === 'B') count++;
+            return count;
+        }
+
+        // --- UI GENERATOR ---
+        function renderPhase() {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`bar-${i}`);
+                if (el) el.classList.remove('flip-active');
+            }
+
+            if (phase === 'MENU') {
+                const menuData = {
+                    1: { title: "What is Mic-Check?", bg: col.p1, text: col.textW },
+                    2: { title: "How to Play", bg: col.p2, text: col.textW },
+                    3: { title: "Scoring", bg: col.p3, text: col.textW },
+                    4: { title: "Tips", bg: col.p4, text: col.textW }
+                };
+
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${menuData[i].bg}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-center text-center"><span class="text-[12px] font-black uppercase tracking-widest ${menuData[i].text}">${menuData[i].title}</span></div>`;
+                }
+
+                document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900">START</span></div>`;
+                
+                renderP6Front();
+            }
+            else if (phase === 'START') {
+                for (let i = 1; i <= 4; i++) {
+                    const matrixData = matrix[i];
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrixData.bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrixData.bgB}`;
+
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorA}">${matrixData.A}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starA}</span>`;
+                    
+                    document.getElementById(`p${i}-back`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorB}">${matrixData.B}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starB}</span>`;
+                }
+
+                if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
+                if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
+                if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
+                if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
+
+                // In the teaser, we want the button to just say "PLAY" and act as a redirect
+                document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: 100%;"></div>
+                    <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="window.location.href='https://tomhendrick.com/mic-check'">
+                        <span id="p5-level-num" class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900 drop-shadow-sm">PLAY</span>
+                    </div>`;
+                document.getElementById('p5-back').className = 'face face-back';
+                document.getElementById('p5-back').innerHTML = ''; 
+                
+                activeMenuTopic = 'LOGO';
+                renderP6Front();
+            } 
+        }
+
+        // --- CORE NAVIGATION ---
+        function toggleFlip(panelNum) {
+            if (panelNum === 6) return; // Disabled for teaser
+            
+            if (phase === 'MENU') {
+                if (panelNum >= 1 && panelNum <= 4) {
+                    activeMenuTopic = 'P' + panelNum;
+                    currentMenuPage = 1;
+                    renderP6Front();
+                } else if (panelNum === 5) {
+                    phase = 'START';
+                    renderPhase();
+                }
+                return;
+            }
+
+            if (phase === 'START') {
+                if (panelNum === 5) return; 
+                const bar = document.getElementById(`bar-${panelNum}`);
+                if (bar) bar.classList.toggle('flip-active');
+                selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
+            } 
+        }
+
+        function resetGame() {
+            if (isLegalOpen) toggleLegalOverlay();
+            if (isHubOpen) toggleHubOverlay();
+            
+            phase = 'MENU';
+            activeMenuTopic = 'LOGO';
+            currentMenuPage = 1;
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; 
+            renderPhase();
+        }
+
+        // --- ASYNC INIT ---
+        async function initApp() {
+            const d = new Date();
+            globalShortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`p${i}-front`);
+                if(el) {
+                    el.className = `face face-front ${col.w} border-slate-200`;
+                    el.innerHTML = `<div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">Loading...</div>`;
+                }
+            }
+
+            try {
+                // We keep the dynamic fetch so the teaser always shows the correct daily content!
+                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
+                const data = await response.json();
+
+                const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' };
+                const todayAdelaide = new Intl.DateTimeFormat('en-CA', options).format(new Date());
+
+                if (data[todayAdelaide]) {
+                    b1 = data[todayAdelaide].p1;
+                    b2 = `${data[todayAdelaide].p2} about`; 
+                    b3 = `${data[todayAdelaide].p3}, with`; 
+                    b4 = `${data[todayAdelaide].p4} examples.`;
+                }
+            } catch (error) {
+                console.warn("Using fallback topic data.", error);
+            }
+
+            renderPhase();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
