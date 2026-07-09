@@ -8,6 +8,13 @@ class THPSCourseWidget extends HTMLElement {
 
     connectedCallback() {
         this.renderCourseSelector();
+        // Start the sync loop to mirror the global recording state
+        this.syncLoop = setInterval(() => this.updateTimerUI(), 100);
+    }
+
+    disconnectedCallback() {
+        // Clean up memory if the widget is removed from the dashboard
+        if (this.syncLoop) clearInterval(this.syncLoop);
     }
 
     // STATE 0: THE COURSE SELECTION MENU
@@ -15,17 +22,17 @@ class THPSCourseWidget extends HTMLElement {
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
                 <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                    <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    <i data-lucide="graduation-cap" class="w-8 h-8 pointer-events-none"></i>
                 </div>
                 <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-2 tracking-tight">Training Courses</h2>
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
-                        <span class="group-hover:text-indigo-700 transition-colors">Pitching Level 1</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1"></i>
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Pitching Level 1</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1 pointer-events-none"></i>
                     </button>
-                    </div>
+                </div>
             </div>
         `;
 
@@ -55,11 +62,11 @@ class THPSCourseWidget extends HTMLElement {
         if (window.lucide) window.lucide.createIcons({ root: this });
 
         try {
-            // Append timestamp to bust browser cache
+            // Cache buster included
             const response = await fetch(`${url}?t=${Date.now()}`);
             if (!response.ok) throw new Error("Network response was not ok");
             this.courseData = await response.json();
-            this.currentStep = 1; // Start at step 1
+            this.currentStep = 1; 
             this.renderCourseUI();
         } catch (error) {
             console.error("Course Load Error:", error);
@@ -81,13 +88,13 @@ class THPSCourseWidget extends HTMLElement {
 
         const activeModule = this.courseData.modules.find(m => m.step === this.currentStep) || this.courseData.modules[0];
 
-        // Generate the dynamic navigation list
+        // Generate dynamic nav drawer items
         const navItemsHTML = this.courseData.modules.map(mod => {
             const isActive = mod.step === this.currentStep;
             return `
                 <div class="thps-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}" data-step="${mod.step}">
-                    <span class="truncate pr-2">${mod.title}</span>
-                    <i data-lucide="${isActive ? 'check-circle' : 'circle'}" class="w-4 h-4 opacity-50 shrink-0"></i>
+                    <span class="truncate pr-2 pointer-events-none">${mod.title}</span>
+                    <i data-lucide="${isActive ? 'check-circle' : 'circle'}" class="w-4 h-4 opacity-50 shrink-0 pointer-events-none"></i>
                 </div>
             `;
         }).join('');
@@ -127,9 +134,22 @@ class THPSCourseWidget extends HTMLElement {
                         </div>
                         
                         <div class="thps-course-content-area space-y-6">
-                           <div class="p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-slate-200 rounded-xl">
-                               [ Activity Area: ${activeModule.type} ]
-                           </div>
+                            ${activeModule.type === 'recording' ? `
+                                <div class="mt-8 bg-slate-900 rounded-2xl p-6 text-center shadow-inner relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 pointer-events-none"></div>
+                                    
+                                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">Goal: 60 Seconds</div>
+                                    <div class="thps-course-timer text-5xl md:text-6xl font-mono font-black text-white tracking-wider mb-6 drop-shadow-md">00:00</div>
+                                    
+                                    <button class="thps-course-record-btn bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-8 py-3.5 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] active:scale-95 flex items-center justify-center gap-2 mx-auto w-full max-w-[250px]">
+                                        <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>
+                                    </button>
+                                </div>
+                            ` : `
+                                <div class="p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-slate-200 rounded-xl">
+                                    [ Activity Area: ${activeModule.type} ]
+                                </div>
+                            `}
                         </div>
                     </div>
                 </div>
@@ -147,6 +167,7 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         this.attachCourseListeners();
+        this.updateTimerUI(); // Ensure immediate sync on render
     }
 
     attachCourseListeners() {
@@ -204,6 +225,60 @@ class THPSCourseWidget extends HTMLElement {
                     this.renderCourseUI();
                 }
             });
+        }
+
+        // Start/Stop Recording Trigger
+        const recordBtn = this.querySelector('.thps-course-record-btn');
+        if (recordBtn) {
+            recordBtn.addEventListener('click', () => {
+                if (typeof window.toggleRecording === 'function') {
+                    window.toggleRecording();
+                } else {
+                    console.error("Global toggleRecording function not found.");
+                }
+            });
+        }
+    }
+
+    // Mirror the global window.isActive state
+    updateTimerUI() {
+        const timerDisplay = this.querySelector('.thps-course-timer');
+        const recordBtn = this.querySelector('.thps-course-record-btn');
+        const recordText = this.querySelector('.thps-course-record-text');
+        
+        if (!timerDisplay || !recordBtn) return;
+
+        if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+            // App is actively recording
+            const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+            let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
+            let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
+            
+            timerDisplay.innerText = `${m}:${s}`;
+            timerDisplay.classList.add('text-emerald-400');
+            
+            // Morph button to Stop state
+            if (!recordBtn.classList.contains('bg-rose-500')) {
+                recordBtn.classList.replace('bg-emerald-500', 'bg-rose-500');
+                recordBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-rose-400');
+                recordBtn.style.boxShadow = "0 0 20px rgba(243, 24, 73, 0.4)";
+                if (recordText) recordText.innerText = "Stop Task";
+                recordBtn.innerHTML = `<i data-lucide="square" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Stop Task</span>`;
+                if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+            }
+        } else {
+            // App is NOT recording
+            timerDisplay.classList.remove('text-emerald-400');
+            
+            // Morph button to Start state
+            if (recordBtn.classList.contains('bg-rose-500')) {
+                recordBtn.classList.replace('bg-rose-500', 'bg-emerald-500');
+                recordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-emerald-400');
+                recordBtn.style.boxShadow = "0 0 20px rgba(16,185,129,0.4)";
+                if (recordText) recordText.innerText = "Start Task";
+                recordBtn.innerHTML = `<i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>`;
+                if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+            }
         }
     }
 }
