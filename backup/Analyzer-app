@@ -348,8 +348,8 @@
     <script>
         lucide.createIcons();
         
-        let gameTimerInterval = null;
-        let isActive = false;
+        window.gameTimerInterval = null;
+        window.isActive = false;
         let reportMarkdownText = "";
 
         // ==========================================
@@ -502,9 +502,9 @@
             const actionBar = document.getElementById('action-bar');
             const timerProgress = document.getElementById('timer-progress');
             
-            if (isActive) {
-                clearInterval(gameTimerInterval);
-                isActive = false;
+            if (window.isActive) {
+                clearInterval(window.gameTimerInterval);
+                window.isActive = false;
                 if(btnText) btnText.innerText = 'TAP TO START RECORDING';
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
                 if(actionBar) {
@@ -515,7 +515,7 @@
                     window.THPS.Audio.stopRecordingProcess();
                 }
             } else {
-                isActive = true;
+                window.isActive = true;
                 if(btnText) btnText.innerText = 'TAP TO STOP';
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'square');
                 if(actionBar) {
@@ -530,12 +530,12 @@
                     window.THPS.Audio.startRecordingProcess();
                 }
                 
-                if (gameTimerInterval) clearInterval(gameTimerInterval);
-                gameTimerInterval = setInterval(() => {
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
+                window.gameTimerInterval = setInterval(() => {
                     const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
                     if (elapsedSecs >= 240) {
-                        clearInterval(gameTimerInterval);
-                        isActive = false;
+                        clearInterval(window.gameTimerInterval);
+                        window.isActive = false;
                         if(btnText) btnText.innerText = 'TAP TO START RECORDING';
                         if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
                         if(actionBar) {
