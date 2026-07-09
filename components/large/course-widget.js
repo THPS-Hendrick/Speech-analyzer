@@ -4,21 +4,21 @@ class THPSCourseWidget extends HTMLElement {
         this.isMenuOpen = false;
         this.currentStep = 0; 
         this.courseData = null;
-        this.lastEvaluation = null; // Stores Pass/Fail state for the UI
+        this.evaluations = {}; // The CourseRecordBook
     }
 
     connectedCallback() {
         this.renderCourseSelector();
         this.syncLoop = setInterval(() => this.updateTimerUI(), 100);
         
-        // PHASE 4: Listen for the Analyzer App's payload broadcast
+        // Listen for the Analyzer App's payload broadcast
         this.payloadHandler = this.processPayload.bind(this);
         window.addEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
     disconnectedCallback() {
         if (this.syncLoop) clearInterval(this.syncLoop);
-        // PHASE 4: Clean up event listener to prevent memory leaks
+        // Clean up event listener to prevent memory leaks
         window.removeEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
@@ -69,7 +69,7 @@ class THPSCourseWidget extends HTMLElement {
             if (!response.ok) throw new Error("Network response was not ok");
             this.courseData = await response.json();
             this.currentStep = 1; 
-            this.lastEvaluation = null;
+            this.evaluations = {}; // Wipe memory for the new course
             this.renderCourseUI();
         } catch (error) {
             console.error("Course Load Error:", error);
@@ -90,29 +90,32 @@ class THPSCourseWidget extends HTMLElement {
         if (!this.courseData) return;
 
         const activeModule = this.courseData.modules.find(m => m.step === this.currentStep) || this.courseData.modules[0];
+        
+        // Check our CourseRecordBook for an existing attempt on this step
+        const currentEval = this.evaluations[this.currentStep];
 
         const navItemsHTML = this.courseData.modules.map(mod => {
             const isActive = mod.step === this.currentStep;
+            const isCompleted = this.evaluations[mod.step] !== undefined;
             return `
                 <div class="thps-nav-item flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}" data-step="${mod.step}">
                     <span class="truncate pr-2 pointer-events-none">${mod.title}</span>
-                    <i data-lucide="${isActive ? 'check-circle' : 'circle'}" class="w-4 h-4 opacity-50 shrink-0 pointer-events-none"></i>
+                    <i data-lucide="${isActive ? 'circle-dot' : (isCompleted ? 'check-circle' : 'circle')}" class="w-4 h-4 opacity-50 shrink-0 pointer-events-none"></i>
                 </div>
             `;
         }).join('');
 
-        // PHASE 4: Determine what to show in the Activity Area (Timer vs Results)
         let activityAreaHTML = "";
         
         if (activeModule.type === 'recording') {
-            if (this.lastEvaluation && this.lastEvaluation.step === this.currentStep) {
+            if (currentEval) {
                 // Show Results Card
-                const isPass = this.lastEvaluation.passed;
+                const isPass = currentEval.passed;
                 const resultColor = isPass ? 'emerald' : 'amber';
                 const resultIcon = isPass ? 'check-circle' : 'alert-circle';
                 const resultTitle = isPass ? 'Goal Achieved!' : 'Keep Trying!';
                 
-                let breakdownHTML = this.lastEvaluation.results.map(res => {
+                let breakdownHTML = currentEval.results.map(res => {
                     return `
                         <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
                             <span class="text-xs font-bold text-slate-600">${res.label}</span>
@@ -133,7 +136,7 @@ class THPSCourseWidget extends HTMLElement {
                         <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-200">
                             ${breakdownHTML}
                         </div>
-                        <button class="thps-retry-btn bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all w-full flex items-center justify-center gap-2">
+                        <button class="thps-retry-btn bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all w-full flex items-center justify-center gap-2 active:scale-95">
                             <i data-lucide="refresh-cw" class="w-4 h-4 pointer-events-none"></i> Try Again
                         </button>
                     </div>
@@ -233,7 +236,7 @@ class THPSCourseWidget extends HTMLElement {
                 this.courseData = null;
                 this.currentStep = 0;
                 this.isMenuOpen = false;
-                this.lastEvaluation = null;
+                this.evaluations = {}; // Wipe memory on exit
                 this.renderCourseSelector();
             });
         }
@@ -243,29 +246,25 @@ class THPSCourseWidget extends HTMLElement {
             item.addEventListener('click', (e) => {
                 this.currentStep = parseInt(e.currentTarget.getAttribute('data-step'));
                 this.isMenuOpen = false; 
-                this.lastEvaluation = null; // Clear evaluation on nav change
                 this.renderCourseUI();
             });
         });
 
         const prevBtn = this.querySelector('.thps-nav-prev');
-        const nextBtn = this.querySelector('.thps-nav-next');
-        
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
                 if (this.currentStep > 1) {
                     this.currentStep--;
-                    this.lastEvaluation = null;
                     this.renderCourseUI();
                 }
             });
         }
         
+        const nextBtn = this.querySelector('.thps-nav-next');
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
                 if (this.currentStep < this.courseData.totalSteps) {
                     this.currentStep++;
-                    this.lastEvaluation = null;
                     this.renderCourseUI();
                 }
             });
@@ -283,34 +282,51 @@ class THPSCourseWidget extends HTMLElement {
         const retryBtn = this.querySelector('.thps-retry-btn');
         if (retryBtn) {
             retryBtn.addEventListener('click', () => {
-                this.lastEvaluation = null;
+                delete this.evaluations[this.currentStep];
                 this.renderCourseUI();
             });
         }
     }
 
-    // PHASE 4: CATCH THE PAYLOAD AND GRADE IT
     processPayload(e) {
         if (!this.courseData || this.currentStep === 0) return;
-        
         const payload = e.detail;
-        const activeModule = this.courseData.modules.find(m => m.step === this.currentStep);
         
-        // Ensure we are expecting a recording and the user actually spoke
+        // Is this a historical fetch or a fresh recording?
+        const isHistoryLoad = payload.id !== undefined; 
+
+        if (isHistoryLoad) {
+            // Check if our CourseRecordBook owns this historical attempt
+            let matchedStep = null;
+            for (const [stepStr, evalData] of Object.entries(this.evaluations)) {
+                if (evalData.payloadId === payload.id) {
+                    matchedStep = parseInt(stepStr);
+                    break;
+                }
+            }
+            
+            if (matchedStep !== null) {
+                this.currentStep = matchedStep; // Jump to the module that owns this data
+                this.renderCourseUI();
+            }
+            return; // Ignore foreign history loads
+        }
+
+        // It's a fresh recording! Grade it.
+        const activeModule = this.courseData.modules.find(m => m.step === this.currentStep);
         if (activeModule && activeModule.type === 'recording' && payload.text && payload.text.trim() !== '') {
-            this.evaluatePerformance(payload, activeModule);
+            const assignedId = window.thps_currentAttemptId; 
+            this.evaluatePerformance(payload, activeModule, assignedId);
         }
     }
 
-    evaluatePerformance(payload, module) {
+    evaluatePerformance(payload, module, assignedId) {
         if (!module.targets) return;
-
         let allPassed = true;
         let breakdown = [];
 
-        // Check each target defined in the JSON
         for (const [key, rules] of Object.entries(module.targets)) {
-            const actualValue = payload[key]; // e.g. payload.wpm, payload.visual
+            const actualValue = payload[key]; 
             
             if (actualValue !== undefined) {
                 const passed = actualValue >= rules.min && actualValue <= rules.max;
@@ -326,11 +342,11 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // Save state and trigger a re-render to show the Results Card
-        this.lastEvaluation = {
+        this.evaluations[this.currentStep] = {
             step: this.currentStep,
             passed: allPassed,
-            results: breakdown
+            results: breakdown,
+            payloadId: assignedId 
         };
         
         this.renderCourseUI();
