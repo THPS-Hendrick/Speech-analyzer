@@ -1,24 +1,27 @@
 {
     "title": "Pitching Level 1",
-    "totalSteps": 3,
+    "totalSteps": 2,
     "modules": [
         {
             "step": 1,
-            "title": "1. Self-Assessment",
-            "type": "slider",
-            "instructions": "Adjust the sliders below to indicate your current comfort levels."
+            "title": "1. The Baseline Pitch",
+            "type": "recording",
+            "instructions": "Pitch your idea in under 60 seconds. You must speak slowly and clearly.",
+            "targets": {
+                "time": { "min": 20, "max": 60, "label": "Time (Seconds)" },
+                "wpm": { "min": 100, "max": 150, "label": "Pace (WPM)" },
+                "sps": { "min": 3.0, "max": 5.0, "label": "Clarity (Syllables/Sec)" }
+            }
         },
         {
             "step": 2,
-            "title": "2. Visual Capacity",
-            "type": "audio",
-            "instructions": "Listen to the prompt and select your visual capacity."
-        },
-        {
-            "step": 3,
-            "title": "3. The Final Mic-Check",
+            "title": "2. Painting a Picture",
             "type": "recording",
-            "instructions": "Goal: 60 Seconds. Pitch your idea."
+            "instructions": "Describe a $10 million house. You must use highly visual language.",
+            "targets": {
+                "visual": { "min": 40, "max": 100, "label": "Visual Words (%)" },
+                "time": { "min": 30, "max": 90, "label": "Time (Seconds)" }
+            }
         }
     ]
 }
