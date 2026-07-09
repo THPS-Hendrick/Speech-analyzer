@@ -2,19 +2,24 @@ class THPSCourseWidget extends HTMLElement {
     constructor() {
         super();
         this.isMenuOpen = false;
-        this.currentStep = 0; // 0 = Selection Menu, 1+ = Course Modules
+        this.currentStep = 0; 
         this.courseData = null;
+        this.lastEvaluation = null; // Stores Pass/Fail state for the UI
     }
 
     connectedCallback() {
         this.renderCourseSelector();
-        // Start the sync loop to mirror the global recording state
         this.syncLoop = setInterval(() => this.updateTimerUI(), 100);
+        
+        // PHASE 4: Listen for the Analyzer App's payload broadcast
+        this.payloadHandler = this.processPayload.bind(this);
+        window.addEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
     disconnectedCallback() {
-        // Clean up memory if the widget is removed from the dashboard
         if (this.syncLoop) clearInterval(this.syncLoop);
+        // PHASE 4: Clean up event listener to prevent memory leaks
+        window.removeEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
     // STATE 0: THE COURSE SELECTION MENU
@@ -50,9 +55,7 @@ class THPSCourseWidget extends HTMLElement {
         });
     }
 
-    // THE FETCH ENGINE
     async fetchCourse(url) {
-        // Loading State
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
                 <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
@@ -62,11 +65,11 @@ class THPSCourseWidget extends HTMLElement {
         if (window.lucide) window.lucide.createIcons({ root: this });
 
         try {
-            // Cache buster included
             const response = await fetch(`${url}?t=${Date.now()}`);
             if (!response.ok) throw new Error("Network response was not ok");
             this.courseData = await response.json();
             this.currentStep = 1; 
+            this.lastEvaluation = null;
             this.renderCourseUI();
         } catch (error) {
             console.error("Course Load Error:", error);
@@ -88,7 +91,6 @@ class THPSCourseWidget extends HTMLElement {
 
         const activeModule = this.courseData.modules.find(m => m.step === this.currentStep) || this.courseData.modules[0];
 
-        // Generate dynamic nav drawer items
         const navItemsHTML = this.courseData.modules.map(mod => {
             const isActive = mod.step === this.currentStep;
             return `
@@ -98,6 +100,64 @@ class THPSCourseWidget extends HTMLElement {
                 </div>
             `;
         }).join('');
+
+        // PHASE 4: Determine what to show in the Activity Area (Timer vs Results)
+        let activityAreaHTML = "";
+        
+        if (activeModule.type === 'recording') {
+            if (this.lastEvaluation && this.lastEvaluation.step === this.currentStep) {
+                // Show Results Card
+                const isPass = this.lastEvaluation.passed;
+                const resultColor = isPass ? 'emerald' : 'amber';
+                const resultIcon = isPass ? 'check-circle' : 'alert-circle';
+                const resultTitle = isPass ? 'Goal Achieved!' : 'Keep Trying!';
+                
+                let breakdownHTML = this.lastEvaluation.results.map(res => {
+                    return `
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
+                            <span class="text-xs font-bold text-slate-600">${res.label}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Target: ${res.min}-${res.max}</span>
+                                <span class="text-sm font-black ${res.passed ? 'text-emerald-600' : 'text-rose-600'}">${res.actual}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                activityAreaHTML = `
+                    <div class="bg-white border-2 border-${resultColor}-200 rounded-2xl p-6 shadow-sm">
+                        <div class="flex items-center justify-center gap-2 text-${resultColor}-600 mb-4">
+                            <i data-lucide="${resultIcon}" class="w-6 h-6"></i>
+                            <h3 class="text-xl font-black uppercase tracking-tight">${resultTitle}</h3>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-200">
+                            ${breakdownHTML}
+                        </div>
+                        <button class="thps-retry-btn bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all w-full flex items-center justify-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 pointer-events-none"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Show Timer/Recording UI
+                activityAreaHTML = `
+                    <div class="mt-8 bg-slate-900 rounded-2xl p-6 text-center shadow-inner relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 pointer-events-none"></div>
+                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">Speak to achieve goals</div>
+                        <div class="thps-course-timer text-5xl md:text-6xl font-mono font-black text-white tracking-wider mb-6 drop-shadow-md">00:00</div>
+                        <button class="thps-course-record-btn bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-8 py-3.5 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] active:scale-95 flex items-center justify-center gap-2 mx-auto w-full max-w-[250px]">
+                            <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>
+                        </button>
+                    </div>
+                `;
+            }
+        } else {
+            activityAreaHTML = `
+                <div class="p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-slate-200 rounded-xl">
+                    [ Activity Area: ${activeModule.type} ]
+                </div>
+            `;
+        }
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
@@ -134,22 +194,7 @@ class THPSCourseWidget extends HTMLElement {
                         </div>
                         
                         <div class="thps-course-content-area space-y-6">
-                            ${activeModule.type === 'recording' ? `
-                                <div class="mt-8 bg-slate-900 rounded-2xl p-6 text-center shadow-inner relative overflow-hidden">
-                                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 pointer-events-none"></div>
-                                    
-                                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-3">Goal: 60 Seconds</div>
-                                    <div class="thps-course-timer text-5xl md:text-6xl font-mono font-black text-white tracking-wider mb-6 drop-shadow-md">00:00</div>
-                                    
-                                    <button class="thps-course-record-btn bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-8 py-3.5 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] active:scale-95 flex items-center justify-center gap-2 mx-auto w-full max-w-[250px]">
-                                        <i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>
-                                    </button>
-                                </div>
-                            ` : `
-                                <div class="p-8 text-center text-slate-400 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-slate-200 rounded-xl">
-                                    [ Activity Area: ${activeModule.type} ]
-                                </div>
-                            `}
+                            ${activityAreaHTML}
                         </div>
                     </div>
                 </div>
@@ -167,11 +212,10 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         this.attachCourseListeners();
-        this.updateTimerUI(); // Ensure immediate sync on render
+        this.updateTimerUI(); 
     }
 
     attachCourseListeners() {
-        // Toggle Drawer
         const toggleBtns = this.querySelectorAll('.thps-course-menu-toggle');
         const drawer = this.querySelector('.thps-course-drawer');
         toggleBtns.forEach(btn => {
@@ -183,29 +227,27 @@ class THPSCourseWidget extends HTMLElement {
             });
         });
 
-        // Exit Course (Return to menu)
         const exitBtn = this.querySelector('.thps-exit-course');
         if (exitBtn) {
             exitBtn.addEventListener('click', () => {
                 this.courseData = null;
                 this.currentStep = 0;
                 this.isMenuOpen = false;
+                this.lastEvaluation = null;
                 this.renderCourseSelector();
             });
         }
 
-        // Nav Drawer Items
         const navItems = this.querySelectorAll('.thps-nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
-                const step = parseInt(e.currentTarget.getAttribute('data-step'));
-                this.currentStep = step;
-                this.isMenuOpen = false; // Auto close on selection
+                this.currentStep = parseInt(e.currentTarget.getAttribute('data-step'));
+                this.isMenuOpen = false; 
+                this.lastEvaluation = null; // Clear evaluation on nav change
                 this.renderCourseUI();
             });
         });
 
-        // Footer Prev/Next
         const prevBtn = this.querySelector('.thps-nav-prev');
         const nextBtn = this.querySelector('.thps-nav-next');
         
@@ -213,6 +255,7 @@ class THPSCourseWidget extends HTMLElement {
             prevBtn.addEventListener('click', () => {
                 if (this.currentStep > 1) {
                     this.currentStep--;
+                    this.lastEvaluation = null;
                     this.renderCourseUI();
                 }
             });
@@ -222,25 +265,77 @@ class THPSCourseWidget extends HTMLElement {
             nextBtn.addEventListener('click', () => {
                 if (this.currentStep < this.courseData.totalSteps) {
                     this.currentStep++;
+                    this.lastEvaluation = null;
                     this.renderCourseUI();
                 }
             });
         }
 
-        // Start/Stop Recording Trigger
         const recordBtn = this.querySelector('.thps-course-record-btn');
         if (recordBtn) {
             recordBtn.addEventListener('click', () => {
                 if (typeof window.toggleRecording === 'function') {
                     window.toggleRecording();
-                } else {
-                    console.error("Global toggleRecording function not found.");
                 }
+            });
+        }
+
+        const retryBtn = this.querySelector('.thps-retry-btn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                this.lastEvaluation = null;
+                this.renderCourseUI();
             });
         }
     }
 
-    // Mirror the global window.isActive state
+    // PHASE 4: CATCH THE PAYLOAD AND GRADE IT
+    processPayload(e) {
+        if (!this.courseData || this.currentStep === 0) return;
+        
+        const payload = e.detail;
+        const activeModule = this.courseData.modules.find(m => m.step === this.currentStep);
+        
+        // Ensure we are expecting a recording and the user actually spoke
+        if (activeModule && activeModule.type === 'recording' && payload.text && payload.text.trim() !== '') {
+            this.evaluatePerformance(payload, activeModule);
+        }
+    }
+
+    evaluatePerformance(payload, module) {
+        if (!module.targets) return;
+
+        let allPassed = true;
+        let breakdown = [];
+
+        // Check each target defined in the JSON
+        for (const [key, rules] of Object.entries(module.targets)) {
+            const actualValue = payload[key]; // e.g. payload.wpm, payload.visual
+            
+            if (actualValue !== undefined) {
+                const passed = actualValue >= rules.min && actualValue <= rules.max;
+                if (!passed) allPassed = false;
+                
+                breakdown.push({
+                    label: rules.label,
+                    min: rules.min,
+                    max: rules.max,
+                    actual: (key === 'time' ? window.formatMetric('time', actualValue) : (key.includes('Percent') || ['visual', 'personal', 'intangible', 'simple', 'pause'].includes(key) ? Math.round(actualValue) + '%' : Number(actualValue).toFixed(1))),
+                    passed: passed
+                });
+            }
+        }
+
+        // Save state and trigger a re-render to show the Results Card
+        this.lastEvaluation = {
+            step: this.currentStep,
+            passed: allPassed,
+            results: breakdown
+        };
+        
+        this.renderCourseUI();
+    }
+
     updateTimerUI() {
         const timerDisplay = this.querySelector('.thps-course-timer');
         const recordBtn = this.querySelector('.thps-course-record-btn');
@@ -249,7 +344,6 @@ class THPSCourseWidget extends HTMLElement {
         if (!timerDisplay || !recordBtn) return;
 
         if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
-            // App is actively recording
             const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
             let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
             let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
@@ -257,7 +351,6 @@ class THPSCourseWidget extends HTMLElement {
             timerDisplay.innerText = `${m}:${s}`;
             timerDisplay.classList.add('text-emerald-400');
             
-            // Morph button to Stop state
             if (!recordBtn.classList.contains('bg-rose-500')) {
                 recordBtn.classList.replace('bg-emerald-500', 'bg-rose-500');
                 recordBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-rose-400');
@@ -267,10 +360,8 @@ class THPSCourseWidget extends HTMLElement {
                 if (window.lucide) window.lucide.createIcons({ root: recordBtn });
             }
         } else {
-            // App is NOT recording
             timerDisplay.classList.remove('text-emerald-400');
             
-            // Morph button to Start state
             if (recordBtn.classList.contains('bg-rose-500')) {
                 recordBtn.classList.replace('bg-rose-500', 'bg-emerald-500');
                 recordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-emerald-400');
