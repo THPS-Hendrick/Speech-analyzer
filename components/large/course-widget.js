@@ -5,11 +5,12 @@ class THPSCourseWidget extends HTMLElement {
         this.currentStep = 0; 
         this.courseData = null;
         this.evaluations = {}; // The CourseRecordBook
+        this.prompts = null;
     }
 
     connectedCallback() {
         this.renderCourseSelector();
-        this.syncLoop = setInterval(() => this.updateTimerUI(), 100);
+        this.syncLoop = setInterval(() => this.updateTimerUI(), 50);
         
         // Listen for the Analyzer App's payload broadcast
         this.payloadHandler = this.processPayload.bind(this);
@@ -18,7 +19,6 @@ class THPSCourseWidget extends HTMLElement {
 
     disconnectedCallback() {
         if (this.syncLoop) clearInterval(this.syncLoop);
-        // Clean up event listener to prevent memory leaks
         window.removeEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
@@ -33,6 +33,10 @@ class THPSCourseWidget extends HTMLElement {
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count.json">
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
+                        <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
+                    </button>
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Pitching Level 1</span>
                         <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1 pointer-events-none"></i>
@@ -68,9 +72,16 @@ class THPSCourseWidget extends HTMLElement {
             const response = await fetch(`${url}?t=${Date.now()}`);
             if (!response.ok) throw new Error("Network response was not ok");
             this.courseData = await response.json();
-            this.currentStep = 1; 
-            this.evaluations = {}; // Wipe memory for the new course
-            this.renderCourseUI();
+            this.evaluations = {}; 
+
+            // THE ROUTER SECTION
+            if (this.courseData.mode === 'arcade') {
+                this.currentStep = 'arcade';
+                this.renderArcadeUI();
+            } else {
+                this.currentStep = 1; 
+                this.renderCourseUI();
+            }
         } catch (error) {
             console.error("Course Load Error:", error);
             this.innerHTML = `
@@ -85,13 +96,118 @@ class THPSCourseWidget extends HTMLElement {
         }
     }
 
-    // STATE 1+: THE ACTIVE COURSE UI
+    // ARCADE MODE: REPEAT + COUNT UI
+    async renderArcadeUI() {
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
+                <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
+                <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Loading Custom Prompts...</p>
+            </div>
+        `;
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        // Fetch custom prompts in parallel from subfolder
+        try {
+            const baseUrl = 'https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/';
+            const [qRes, rRes, cRes] = await Promise.all([
+                fetch(`${baseUrl}prompts-questions.json?t=${Date.now()}`),
+                fetch(`${baseUrl}prompts-repeat.json?t=${Date.now()}`),
+                fetch(`${baseUrl}prompts-count.json?t=${Date.now()}`)
+            ]);
+            this.prompts = {
+                question: await qRes.json(),
+                repeat: await rRes.json(),
+                count: await cRes.json()
+            };
+        } catch (e) {
+            console.error("Prompt Fetch Error, loading defaults:", e);
+            this.prompts = {
+                question: ["What's better: unlimited time or money?"],
+                repeat: ["Problem + Options + Solution"],
+                count: ["1. First, 2. Second, 3. Third"]
+            };
+        }
+
+        const getRandomPrompt = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
+                <!-- MINI EXIT BUTTON -->
+                <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
+                    Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
+                </button>
+
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-5 mt-4 text-center">${this.courseData.title}</h2>
+
+                <!-- THREE RESPONSIVE PROMPT FIELDS -->
+                <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 justify-center">
+                    
+                    <!-- Question Prompt Field (Max 40 chars spacing optimized) -->
+                    <div id="btn-prompt-q" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
+                        <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2.5 left-4">Question Prompt</span>
+                        <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-indigo-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[28rem] truncate" id="text-prompt-q">${getRandomPrompt(this.prompts.question)}</span>
+                    </div>
+
+                    <!-- Repeat Prompt Field (Max 30 chars spacing optimized) -->
+                    <div id="btn-prompt-r" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-emerald-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
+                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2.5 left-4">Repeat Framework</span>
+                        <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-emerald-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[22rem] truncate" id="text-prompt-r">${getRandomPrompt(this.prompts.repeat)}</span>
+                    </div>
+
+                    <!-- Count Prompt Field (Max 30 chars spacing optimized) -->
+                    <div id="btn-prompt-c" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
+                        <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2.5 left-4">Count Sequence</span>
+                        <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-amber-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[22rem] truncate" id="text-prompt-c">${getRandomPrompt(this.prompts.count)}</span>
+                    </div>
+                </div>
+
+                <!-- SLEEK ARCADE TIMER BAR PANEL -->
+                <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
+                    <!-- Progress Progression Bar Fill -->
+                    <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                    
+                    <!-- Pacing Target Indicators (Stars positioned relative to 80s ceiling) -->
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 37.5%;" title="30 Second Milestone">
+                        <i data-lucide="star" id="star-marker-30" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;" title="60 Second Target Goal">
+                        <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    
+                    <!-- Shared Combined Toggle Trigger Button -->
+                    <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
+                        <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+        
+        // Wire click selectors
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            this.courseData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
+        this.querySelector('#btn-prompt-q').addEventListener('click', () => { this.querySelector('#text-prompt-q').innerText = getRandomPrompt(this.prompts.question); });
+        this.querySelector('#btn-prompt-r').addEventListener('click', () => { this.querySelector('#text-prompt-r').innerText = getRandomPrompt(this.prompts.repeat); });
+        this.querySelector('#btn-prompt-c').addEventListener('click', () => { this.querySelector('#text-prompt-c').innerText = getRandomPrompt(this.prompts.count); });
+
+        this.querySelector('#arcade-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        });
+    }
+
+    // LINEAR COURSE UI SCREEN
     renderCourseUI() {
         if (!this.courseData) return;
 
         const activeModule = this.courseData.modules.find(m => m.step === this.currentStep) || this.courseData.modules[0];
-        
-        // Check our CourseRecordBook for an existing attempt on this step
         const currentEval = this.evaluations[this.currentStep];
 
         const navItemsHTML = this.courseData.modules.map(mod => {
@@ -109,7 +225,6 @@ class THPSCourseWidget extends HTMLElement {
         
         if (activeModule.type === 'recording') {
             if (currentEval) {
-                // Show Results Card
                 const isPass = currentEval.passed;
                 const resultColor = isPass ? 'emerald' : 'amber';
                 const resultIcon = isPass ? 'check-circle' : 'alert-circle';
@@ -142,7 +257,6 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
                 `;
             } else {
-                // Show Timer/Recording UI
                 activityAreaHTML = `
                     <div class="mt-8 bg-slate-900 rounded-2xl p-6 text-center shadow-inner relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 pointer-events-none"></div>
@@ -162,7 +276,6 @@ class THPSCourseWidget extends HTMLElement {
             `;
         }
 
-        // NOTE: The drawer now uses -translate-x-[120%] 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
                 
@@ -175,7 +288,7 @@ class THPSCourseWidget extends HTMLElement {
                     Exit <i data-lucide="x" class="w-3 h-3 sm:w-4 sm:h-4 pointer-events-none"></i>
                 </button>
 
-                <div class="thps-course-drawer absolute inset-y-0 left-0 w-full md:w-72 bg-slate-900 text-slate-300 transform -translate-x-[120%] transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl">
+                <div class="thps-course-drawer absolute inset-y-0 left-0 w-full md:w-72 bg-slate-900 text-slate-300 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl">
                     <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-950">
                         <span class="font-black text-white tracking-widest uppercase text-xs truncate pr-2">${this.courseData.title}</span>
                         <button class="thps-course-menu-toggle text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors shrink-0">
@@ -220,15 +333,14 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     attachCourseListeners() {
-        // Toggle Drawer logic updated to use 120%
         const toggleBtns = this.querySelectorAll('.thps-course-menu-toggle');
         const drawer = this.querySelector('.thps-course-drawer');
         toggleBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.isMenuOpen = !this.isMenuOpen;
-                if (this.isMenuOpen) drawer.classList.remove('-translate-x-[120%]');
-                else drawer.classList.add('-translate-x-[120%]');
+                if (this.isMenuOpen) drawer.classList.remove('-translate-x-full');
+                else drawer.classList.add('-translate-x-full');
             });
         });
 
@@ -238,7 +350,7 @@ class THPSCourseWidget extends HTMLElement {
                 this.courseData = null;
                 this.currentStep = 0;
                 this.isMenuOpen = false;
-                this.evaluations = {}; // Wipe memory on exit
+                this.evaluations = {}; 
                 this.renderCourseSelector();
             });
         }
@@ -292,13 +404,14 @@ class THPSCourseWidget extends HTMLElement {
 
     processPayload(e) {
         if (!this.courseData || this.currentStep === 0) return;
-        const payload = e.detail;
         
-        // Is this a historical fetch or a fresh recording?
+        // Bypass grading metrics if inside independent Arcade mode
+        if (this.currentStep === 'arcade') return;
+
+        const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
 
         if (isHistoryLoad) {
-            // Check if our CourseRecordBook owns this historical attempt
             let matchedStep = null;
             for (const [stepStr, evalData] of Object.entries(this.evaluations)) {
                 if (evalData.payloadId === payload.id) {
@@ -308,13 +421,12 @@ class THPSCourseWidget extends HTMLElement {
             }
             
             if (matchedStep !== null) {
-                this.currentStep = matchedStep; // Jump to the module that owns this data
+                this.currentStep = matchedStep; 
                 this.renderCourseUI();
             }
-            return; // Ignore foreign history loads
+            return; 
         }
 
-        // It's a fresh recording! Grade it.
         const activeModule = this.courseData.modules.find(m => m.step === this.currentStep);
         if (activeModule && activeModule.type === 'recording' && payload.text && payload.text.trim() !== '') {
             const assignedId = window.thps_currentAttemptId; 
@@ -355,38 +467,77 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     updateTimerUI() {
+        // 1. Sync Linear Course UI Timer elements
         const timerDisplay = this.querySelector('.thps-course-timer');
         const recordBtn = this.querySelector('.thps-course-record-btn');
         const recordText = this.querySelector('.thps-course-record-text');
         
-        if (!timerDisplay || !recordBtn) return;
-
-        if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
-            const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
-            let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
-            let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
-            
-            timerDisplay.innerText = `${m}:${s}`;
-            timerDisplay.classList.add('text-emerald-400');
-            
-            if (!recordBtn.classList.contains('bg-rose-500')) {
-                recordBtn.classList.replace('bg-emerald-500', 'bg-rose-500');
-                recordBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-rose-400');
-                recordBtn.style.boxShadow = "0 0 20px rgba(243, 24, 73, 0.4)";
-                if (recordText) recordText.innerText = "Stop Task";
-                recordBtn.innerHTML = `<i data-lucide="square" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Stop Task</span>`;
-                if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+        if (timerDisplay && recordBtn) {
+            if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
+                let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
+                
+                timerDisplay.innerText = `${m}:${s}`;
+                timerDisplay.classList.add('text-emerald-400');
+                
+                if (!recordBtn.classList.contains('bg-rose-500')) {
+                    recordBtn.classList.replace('bg-emerald-500', 'bg-rose-500');
+                    recordBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-rose-400');
+                    recordBtn.style.boxShadow = "0 0 20px rgba(243, 24, 73, 0.4)";
+                    if (recordText) recordText.innerText = "Stop Task";
+                    recordBtn.innerHTML = `<i data-lucide="square" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Stop Task</span>`;
+                    if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+                }
+            } else {
+                timerDisplay.classList.remove('text-emerald-400');
+                
+                if (recordBtn.classList.contains('bg-rose-500')) {
+                    recordBtn.classList.replace('bg-rose-500', 'bg-emerald-500');
+                    recordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-emerald-400');
+                    recordBtn.style.boxShadow = "0 0 20px rgba(16,185,129,0.4)";
+                    if (recordText) recordText.innerText = "Start Task";
+                    recordBtn.innerHTML = `<i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>`;
+                    if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+                }
             }
-        } else {
-            timerDisplay.classList.remove('text-emerald-400');
-            
-            if (recordBtn.classList.contains('bg-rose-500')) {
-                recordBtn.classList.replace('bg-rose-500', 'bg-emerald-500');
-                recordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-emerald-400');
-                recordBtn.style.boxShadow = "0 0 20px rgba(16,185,129,0.4)";
-                if (recordText) recordText.innerText = "Start Task";
-                recordBtn.innerHTML = `<i data-lucide="mic" class="w-5 h-5 pointer-events-none"></i> <span class="thps-course-record-text pointer-events-none">Start Task</span>`;
-                if (window.lucide) window.lucide.createIcons({ root: recordBtn });
+        }
+
+        // 2. Sync Independent Arcade Mode Timer Elements
+        const arcadeProgress = this.querySelector('#arcade-progress');
+        const arcadeBtn = this.querySelector('#arcade-record-btn');
+        const arcadeIcon = this.querySelector('#arcade-record-icon');
+        const star30 = this.querySelector('#star-marker-30');
+        const star60 = this.querySelector('#star-marker-60');
+        
+        if (arcadeProgress && arcadeBtn && arcadeIcon) {
+            if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                
+                // Max 80 seconds scaling ceiling for visual progress mapping
+                const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
+                arcadeProgress.style.width = `${fillPct}%`;
+                
+                // Highlight pacing target milestone star nodes dynamically
+                if (elapsedSecs >= 30 && star30) star30.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
+                if (elapsedSecs >= 60 && star60) star60.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
+                
+                if (!arcadeIcon.classList.contains('text-rose-500')) {
+                    arcadeIcon.setAttribute('data-lucide', 'square');
+                    arcadeIcon.className = "w-5 h-5 pointer-events-none text-rose-500 scale-95";
+                    if (window.lucide) window.lucide.createIcons({ root: arcadeBtn });
+                }
+            } else {
+                // Clear bar states on stop transitions
+                arcadeProgress.style.width = `0%`; 
+                if (star30) star30.className = "w-4 h-4 text-slate-400/50";
+                if (star60) star60.className = "w-4 h-4 text-slate-400/50";
+                
+                if (arcadeIcon.getAttribute('data-lucide') !== 'mic') {
+                    arcadeIcon.setAttribute('data-lucide', 'mic');
+                    arcadeIcon.className = "w-5 h-5 pointer-events-none text-white";
+                    if (window.lucide) window.lucide.createIcons({ root: arcadeBtn });
+                }
             }
         }
     }
