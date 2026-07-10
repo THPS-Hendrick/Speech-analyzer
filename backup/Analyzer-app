@@ -59,7 +59,7 @@
 
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
 
-    <div id="history-menu-drawer" class="fixed top-[10vh] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-[120%] transition-transform duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
+    <div id="history-menu-drawer" class="fixed top-[10vh] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <div id="widget-menu-drawer" class="fixed top-[10vh] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-[120%] transition-transform duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
+    <div id="widget-menu-drawer" class="fixed top-[10vh] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
