@@ -59,7 +59,7 @@
 
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
 
-    <div id="history-menu-drawer" class="fixed top-[10vh] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
+    <div id="history-menu-drawer" class="fixed top-[10vh] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <div id="widget-menu-drawer" class="fixed top-[10vh] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
+    <div id="widget-menu-drawer" class="fixed top-[10vh] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
         <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -153,7 +153,7 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
                         </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
                         </div>
                     </div>
@@ -420,16 +420,19 @@
             "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
         };
 
+        let menuOverlayTimeout = null;
+
         window.closeAllMenus = function() {
             const widgetDrawer = document.getElementById('widget-menu-drawer');
             const historyDrawer = document.getElementById('history-menu-drawer');
             const overlay = document.getElementById('widget-menu-overlay');
             
             overlay.classList.add('opacity-0');
-            if(widgetDrawer) widgetDrawer.classList.add('translate-x-full');
-            if(historyDrawer) historyDrawer.classList.add('-translate-x-full');
+            if(widgetDrawer) widgetDrawer.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
+            if(historyDrawer) historyDrawer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
             
-            setTimeout(() => {
+            if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+            menuOverlayTimeout = setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 300); 
         };
@@ -440,10 +443,12 @@
 
             if (drawer.classList.contains('translate-x-full')) {
                 window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+                
                 overlay.classList.remove('hidden');
                 setTimeout(() => {
                     overlay.classList.remove('opacity-0');
-                    drawer.classList.remove('translate-x-full');
+                    drawer.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
                 }, 10);
             } else {
                 window.closeAllMenus();
@@ -456,10 +461,12 @@
 
             if (drawer.classList.contains('-translate-x-full')) {
                 window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+                
                 overlay.classList.remove('hidden');
                 setTimeout(() => {
                     overlay.classList.remove('opacity-0');
-                    drawer.classList.remove('-translate-x-full');
+                    drawer.classList.remove('-translate-x-full', 'opacity-0', 'pointer-events-none');
                 }, 10);
             } else {
                 window.closeAllMenus();
