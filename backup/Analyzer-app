@@ -401,7 +401,7 @@
             }
         }, 1000);
 
-        const EXPLANATIONS_URL = "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/explanations.json"; 
+        const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
         let explanationsData = null;
         const FALLBACK_EXPLANATIONS = {
             "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
