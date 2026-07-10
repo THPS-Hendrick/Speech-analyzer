@@ -132,52 +132,43 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
-                <!-- MINI EXIT BUTTON -->
                 <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
                 <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-5 mt-4 text-center">${this.courseData.title}</h2>
 
-                <!-- THREE RESPONSIVE PROMPT FIELDS -->
                 <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 justify-center">
                     
-                    <!-- Question Prompt Field (Max 40 chars spacing optimized) -->
                     <div id="btn-prompt-q" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2.5 left-4">Question Prompt</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-indigo-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[28rem] truncate" id="text-prompt-q">${getRandomPrompt(this.prompts.question)}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-q">${getRandomPrompt(this.prompts.question)}</span>
                     </div>
 
-                    <!-- Repeat Prompt Field (Max 30 chars spacing optimized) -->
                     <div id="btn-prompt-r" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-emerald-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2.5 left-4">Repeat Framework</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-emerald-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[22rem] truncate" id="text-prompt-r">${getRandomPrompt(this.prompts.repeat)}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-r">${getRandomPrompt(this.prompts.repeat)}</span>
                     </div>
 
-                    <!-- Count Prompt Field (Max 30 chars spacing optimized) -->
                     <div id="btn-prompt-c" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2.5 left-4">Count Sequence</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-amber-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 px-2 leading-snug max-w-[22rem] truncate" id="text-prompt-c">${getRandomPrompt(this.prompts.count)}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-c">${getRandomPrompt(this.prompts.count)}</span>
                     </div>
                 </div>
 
-                <!-- SLEEK ARCADE TIMER BAR PANEL -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
-                    <!-- Progress Progression Bar Fill -->
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
-                    <!-- Pacing Target Indicators (Stars positioned relative to 80s ceiling) -->
-                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 37.5%;" title="30 Second Milestone">
-                        <i data-lucide="star" id="star-marker-30" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;" title="20 Second Milestone">
+                        <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
                     <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;" title="60 Second Target Goal">
                         <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
                     
-                    <!-- Shared Combined Toggle Trigger Button -->
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
@@ -507,7 +498,7 @@ class THPSCourseWidget extends HTMLElement {
         const arcadeProgress = this.querySelector('#arcade-progress');
         const arcadeBtn = this.querySelector('#arcade-record-btn');
         const arcadeIcon = this.querySelector('#arcade-record-icon');
-        const star30 = this.querySelector('#star-marker-30');
+        const star20 = this.querySelector('#star-marker-20');
         const star60 = this.querySelector('#star-marker-60');
         
         if (arcadeProgress && arcadeBtn && arcadeIcon) {
@@ -519,7 +510,7 @@ class THPSCourseWidget extends HTMLElement {
                 arcadeProgress.style.width = `${fillPct}%`;
                 
                 // Highlight pacing target milestone star nodes dynamically
-                if (elapsedSecs >= 30 && star30) star30.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
+                if (elapsedSecs >= 20 && star20) star20.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
                 if (elapsedSecs >= 60 && star60) star60.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
                 
                 if (!arcadeIcon.classList.contains('text-rose-500')) {
@@ -530,12 +521,12 @@ class THPSCourseWidget extends HTMLElement {
             } else {
                 // Clear bar states on stop transitions
                 arcadeProgress.style.width = `0%`; 
-                if (star30) star30.className = "w-4 h-4 text-slate-400/50";
-                if (star60) star60.className = "w-4 h-4 text-slate-400/50";
+                if (star20) star20.className = "w-4 h-4 text-slate-400/50 transition-colors";
+                if (star60) star60.className = "w-4 h-4 text-slate-400/50 transition-colors";
                 
                 if (arcadeIcon.getAttribute('data-lucide') !== 'mic') {
                     arcadeIcon.setAttribute('data-lucide', 'mic');
-                    arcadeIcon.className = "w-5 h-5 pointer-events-none text-white";
+                    arcadeIcon.className = "w-5 h-5 pointer-events-none text-white transition-transform";
                     if (window.lucide) window.lucide.createIcons({ root: arcadeBtn });
                 }
             }
