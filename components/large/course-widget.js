@@ -33,11 +33,11 @@ class THPSCourseWidget extends HTMLElement {
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
-                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/repeat-count.json">
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/repeat-count.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
                         <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
-                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Pitching Level 1</span>
                         <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1 pointer-events-none"></i>
                     </button>
@@ -108,7 +108,7 @@ class THPSCourseWidget extends HTMLElement {
 
         // Fetch custom prompts in parallel from subfolder
         try {
-            const baseUrl = 'https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/';
+            const baseUrl = 'https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/';
             const [qRes, rRes, cRes] = await Promise.all([
                 fetch(`${baseUrl}prompts-questions.json?t=${Date.now()}`),
                 fetch(`${baseUrl}prompts-repeat.json?t=${Date.now()}`),
