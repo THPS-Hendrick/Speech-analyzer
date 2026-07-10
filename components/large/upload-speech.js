@@ -30,7 +30,7 @@ class ThpsUploadSpeech extends HTMLElement {
                     </div>
                     
                     <button id="btn-export-session" class="w-full mt-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-slate-200 shadow-sm relative z-10 active:scale-95">
-                        <i data-lucide="download" class="w-4 h-4"></i> Export Current Session
+                        <i data-lucide="download" class="w-4 h-4"></i> Get Session Data
                     </button>
                 </div>
 
@@ -65,12 +65,15 @@ class ThpsUploadSpeech extends HTMLElement {
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-3 mt-2">
-                        <button id="btn-download-snip" class="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2 shadow-sm">
-                            <i data-lucide="download" class="w-4 h-4"></i> Download Snip
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
+                        <button id="btn-download-snip" class="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-600 rounded-xl text-[10px] xl:text-xs font-bold uppercase tracking-widest hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-1.5 shadow-sm px-1">
+                            <i data-lucide="music" class="w-3.5 h-3.5 shrink-0"></i> <span class="truncate">Download Snip</span>
                         </button>
-                        <button id="btn-analyze-snip" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 shadow-md">
-                            <i data-lucide="cpu" class="w-4 h-4"></i> Analyze Snip
+                        <button id="btn-export-snip-data" class="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-600 rounded-xl text-[10px] xl:text-xs font-bold uppercase tracking-widest hover:border-indigo-400 hover:text-indigo-600 transition-all flex items-center justify-center gap-1.5 shadow-sm px-1">
+                            <i data-lucide="file-json" class="w-3.5 h-3.5 shrink-0"></i> <span class="truncate">Get Snip Data</span>
+                        </button>
+                        <button id="btn-analyze-snip" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-[10px] xl:text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all flex items-center justify-center gap-1.5 shadow-md px-1">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5 shrink-0"></i> <span class="truncate">Analyze Snip</span>
                         </button>
                     </div>
                 </div>
@@ -123,7 +126,7 @@ class ThpsUploadSpeech extends HTMLElement {
             }
         });
 
-        // Session Data Export
+        // Session Data Export (Before file uploaded)
         this.querySelector('#btn-export-session').addEventListener('click', () => this.exportSession());
 
         // Reset File
@@ -157,6 +160,7 @@ class ThpsUploadSpeech extends HTMLElement {
 
         // Action Buttons
         this.querySelector('#btn-download-snip').addEventListener('click', () => this.downloadSnip());
+        this.querySelector('#btn-export-snip-data').addEventListener('click', () => this.exportSession());
         this.querySelector('#btn-analyze-snip').addEventListener('click', () => this.analyzeSnip());
     }
 
@@ -419,6 +423,11 @@ class ThpsUploadSpeech extends HTMLElement {
                 window.THPS.Audio.lastRecordedDuration = duration;
                 window.THPS.Audio.wordTimestamps = finalStitchedWords;
                 window.THPS.Audio.volumeData = volumeData;
+            }
+
+            // NEW: Advance attempt ID to prevent overwriting previous snip attempts!
+            if (window.thps_lastPayload && (window.thps_lastPayload.text.trim() !== '' || window.thps_lastPayload.time > 0)) {
+                window.thps_currentAttemptId++;
             }
 
             const inputEl = document.getElementById('cba-inputText');
