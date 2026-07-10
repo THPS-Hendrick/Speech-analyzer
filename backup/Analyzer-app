@@ -153,7 +153,7 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
                         </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
                         </div>
                     </div>
@@ -310,6 +310,10 @@
                     </div>
 
                     <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-course-widget></thps-course-widget>
+                        </div>
 
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-live-mic-timer></thps-live-mic-timer>
