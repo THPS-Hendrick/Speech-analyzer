@@ -162,6 +162,7 @@ class THPSCourseWidget extends HTMLElement {
             `;
         }
 
+        // NOTE: The drawer now uses -translate-x-[120%] 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
                 
@@ -174,7 +175,7 @@ class THPSCourseWidget extends HTMLElement {
                     Exit <i data-lucide="x" class="w-3 h-3 sm:w-4 sm:h-4 pointer-events-none"></i>
                 </button>
 
-                <div class="thps-course-drawer absolute inset-y-0 left-0 w-full md:w-72 bg-slate-900 text-slate-300 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl">
+                <div class="thps-course-drawer absolute inset-y-0 left-0 w-full md:w-72 bg-slate-900 text-slate-300 transform -translate-x-[120%] transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-2xl">
                     <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-950">
                         <span class="font-black text-white tracking-widest uppercase text-xs truncate pr-2">${this.courseData.title}</span>
                         <button class="thps-course-menu-toggle text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors shrink-0">
@@ -219,14 +220,15 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     attachCourseListeners() {
+        // Toggle Drawer logic updated to use 120%
         const toggleBtns = this.querySelectorAll('.thps-course-menu-toggle');
         const drawer = this.querySelector('.thps-course-drawer');
         toggleBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.isMenuOpen = !this.isMenuOpen;
-                if (this.isMenuOpen) drawer.classList.remove('-translate-x-full');
-                else drawer.classList.add('-translate-x-full');
+                if (this.isMenuOpen) drawer.classList.remove('-translate-x-[120%]');
+                else drawer.classList.add('-translate-x-[120%]');
             });
         });
 
