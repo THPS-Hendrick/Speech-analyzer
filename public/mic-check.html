@@ -53,6 +53,48 @@
 
     <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
         
+        <!-- HUB OVERLAY START -->
+        <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] bg-[#AA0000] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#AA0000]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Want unlimited Mic-Checks?</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#9333EA] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#9333EA]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Become a member today!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#2563EB] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#2563EB]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Only $9 per month</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#047857] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#047857]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">or $90 per year!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Games, Courses, Discounts & More!</span>
+                </div>
+            </div>
+            
+            <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 mb-1 p-5">
+                <div class="flex w-full justify-between items-center px-2">
+                    <div class="flex flex-col items-start text-left">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Monthly Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$9</span>
+                        <span class="text-[9px] font-medium text-slate-400">(Cancel anytime)</span>
+                    </div>
+                    <div class="w-[1px] h-12 bg-slate-200"></div>
+                    <div class="flex flex-col items-end text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Annual Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$90</span>
+                        <span class="text-[9px] font-black text-amber-500">(Most popular)</span>
+                    </div>
+                </div>
+                <button onclick="window.location.href='https://tomhendrick.com/members'" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-[11px] rounded-[0.85rem] shadow-md transition-all active:scale-95 mt-2">
+                    Get Unlimited Mic-Checks
+                </button>
+            </div>
+        </div>
+        <!-- HUB OVERLAY END -->
+
+        <!-- LEGAL OVERLAY START -->
         <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
             <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
                 <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
@@ -78,6 +120,8 @@
                 <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
             </div>
         </div>
+        <!-- LEGAL OVERLAY END -->
+
         <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
             
             <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
@@ -147,7 +191,7 @@
     </div>
 
     <div class="mt-8 flex gap-4">
-        <button class="px-6 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95 flex items-center gap-2">
+        <button onclick="toggleHubOverlay()" id="hub-btn" class="px-6 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95 flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub
         </button>
         <button onclick="toggleLegalOverlay()" id="legal-btn" class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
@@ -196,10 +240,13 @@
         let feedbackMatrix = {};
         let drillData = {}; 
 
-        // --- LEGAL OVERLAY LOGIC ---
+        // --- OVERLAY LOGIC ---
         let isLegalOpen = false;
+        let isHubOpen = false;
 
         function toggleLegalOverlay() {
+            if (isHubOpen) toggleHubOverlay(); // Close Hub if it's open
+            
             isLegalOpen = !isLegalOpen;
             const overlay = document.getElementById('legal-overlay');
             const btn = document.getElementById('legal-btn');
@@ -220,6 +267,28 @@
                 btn.classList.replace('bg-slate-800', 'bg-slate-100');
                 btn.classList.replace('text-white', 'text-slate-600');
                 btn.innerText = "LEGAL";
+            }
+        }
+
+        function toggleHubOverlay() {
+            if (isLegalOpen) toggleLegalOverlay(); // Close Legal if it's open
+            
+            isHubOpen = !isHubOpen;
+            const overlay = document.getElementById('hub-overlay');
+            const btn = document.getElementById('hub-btn');
+
+            if (isHubOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-white', 'bg-slate-800');
+                btn.classList.replace('text-slate-500', 'text-white');
+                btn.innerHTML = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-white');
+                btn.classList.replace('text-white', 'text-slate-500');
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub`;
             }
         }
 
@@ -895,6 +964,7 @@
 
         function resetGame() {
             if (isLegalOpen) toggleLegalOverlay(); // Closes the legal screen if open!
+            if (isHubOpen) toggleHubOverlay();     // Closes the hub screen if open!
             
             phase = 'MENU';
             activeMenuTopic = 'LOGO';
