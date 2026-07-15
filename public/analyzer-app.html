@@ -26,8 +26,9 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/compare-speech.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/course-widget.js"></script>
-    <!-- ADDED: Diagnostic Course Widget -->
+    <!-- ADDED: Diagnostic Course & Report Card Widgets -->
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/diagnostic.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
     
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
@@ -110,9 +111,9 @@
         </div>
 
         <div class="flex w-full border-b border-slate-200 bg-white">
-            <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Small</button>
+            <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Small</button>
             <button onclick="window.switchWidgetTab('medium')" id="tab-btn-medium" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Medium</button>
-            <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Large</button>
+            <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Large</button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
@@ -215,7 +216,11 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-diagnostic', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="stethoscope" class="w-4 h-4 mb-1"></i> Diagnostic Course
                         </div>
-                        <!-- END Diagnostic Course Button -->
+                        <!-- ADDED: Report Card Button -->
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-report-card', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="file-text" class="w-4 h-4 mb-1"></i> Report Card
+                        </div>
+                        <!-- END Diagnostic Course & Report Buttons -->
                         
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-course-widget', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="graduation-cap" class="w-4 h-4 mb-1"></i> Courses
