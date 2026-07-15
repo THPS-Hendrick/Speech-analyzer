@@ -6,6 +6,11 @@ class THPSCourseWidget extends HTMLElement {
         this.courseData = null;
         this.evaluations = {}; // The CourseRecordBook
         this.prompts = null;
+        
+        // ESL Specific State
+        this.eslCategory = null;
+        this.eslSentences = [];
+        this.eslIndex = 0;
     }
 
     connectedCallback() {
@@ -33,10 +38,17 @@ class THPSCourseWidget extends HTMLElement {
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
+                    <!-- NEW ESL LEVEL 1 BUTTON -->
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/esl-level-1/esl-level-1.json">
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">ESL Level 1: Pronunciation</span>
+                        <i data-lucide="mic-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
+                    </button>
+                    <!-- REPEAT + COUNT ARCADE -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/repeat-count.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
                         <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
+                    <!-- PITCHING LEVEL 1 -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Pitching Level 1</span>
                         <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1 pointer-events-none"></i>
@@ -78,6 +90,9 @@ class THPSCourseWidget extends HTMLElement {
             if (this.courseData.mode === 'arcade') {
                 this.currentStep = 'arcade';
                 this.renderArcadeUI();
+            } else if (this.courseData.mode === 'esl') {
+                this.currentStep = 'esl-menu';
+                this.renderEslMenu();
             } else {
                 this.currentStep = 1; 
                 this.renderCourseUI();
@@ -96,7 +111,184 @@ class THPSCourseWidget extends HTMLElement {
         }
     }
 
+    // ==========================================
+    // ESL LEVEL 1: VOCAL FITNESS ARCADE
+    // ==========================================
+    
+    renderEslMenu() {
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-6 md:p-8">
+                <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
+                    Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
+                </button>
+
+                <div class="text-center mb-6 mt-4">
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Vocal Fitness</h2>
+                    <p class="text-slate-500 text-sm mt-1">Select a phonetic category to train.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mx-auto flex-1 content-center">
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="stops">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-indigo-600 mb-1 pointer-events-none">Stops</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">P, B, T, D, K, G</span>
+                    </button>
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-emerald-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="hiss">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-emerald-600 mb-1 pointer-events-none">Hiss</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">F, V, S, Z, SH, TH</span>
+                    </button>
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-amber-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="slice">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-amber-600 mb-1 pointer-events-none">Slice</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">CH, J</span>
+                    </button>
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-rose-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="humm">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-rose-600 mb-1 pointer-events-none">Humm</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">M, N, NG</span>
+                    </button>
+                    <button class="thps-esl-cat-btn group sm:col-span-2 bg-white border-2 border-slate-200 hover:border-blue-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95 max-w-sm mx-auto w-full" data-cat="glide">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-blue-600 mb-1 pointer-events-none">Glide</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">L, R, Y, W</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            this.courseData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
+        const btns = this.querySelectorAll('.thps-esl-cat-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.currentTarget.getAttribute('data-cat');
+                this.loadEslCategory(category);
+            });
+        });
+    }
+
+    async loadEslCategory(category) {
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
+                <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
+                <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Loading Sentences...</p>
+            </div>
+        `;
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        try {
+            const url = `https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/esl-level-1/${category}.json`;
+            const res = await fetch(`${url}?t=${Date.now()}`);
+            if (!res.ok) throw new Error("Could not load category");
+            this.eslSentences = await res.json();
+            this.eslCategory = category.toUpperCase();
+            this.eslIndex = 0;
+            this.currentStep = 'esl-drill';
+            this.renderEslDrill();
+        } catch (e) {
+            console.error("ESL Prompt Fetch Error:", e);
+            alert("Failed to load sentences for this category.");
+            this.renderEslMenu();
+        }
+    }
+
+    renderEslDrill() {
+        const sentence = this.eslSentences[this.eslIndex];
+
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
+                <!-- TOP HEADER -->
+                <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
+                    <button class="thps-esl-back text-slate-300 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
+                        <i data-lucide="arrow-left" class="w-4 h-4 pointer-events-none"></i> Back
+                    </button>
+                    <div class="text-center">
+                        <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest">${this.eslCategory} PRACTICE</span>
+                        <span class="block text-sm font-bold">Drill ${this.eslIndex + 1} of ${this.eslSentences.length}</span>
+                    </div>
+                    <div class="w-16"></div> <!-- Spacer for flex alignment -->
+                </div>
+
+                <!-- MAIN DRILL AREA -->
+                <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
+                    
+                    <!-- Target Sentence -->
+                    <div class="w-full max-w-2xl bg-white border-2 border-indigo-100 rounded-2xl p-6 md:p-8 shadow-sm text-center mb-8">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Target Sentence</span>
+                        <p class="text-2xl md:text-3xl font-bold text-slate-800 leading-tight w-[95%] mx-auto line-clamp-3">${sentence}</p>
+                    </div>
+
+                    <!-- Precision Timer & Controls -->
+                    <div class="flex flex-col items-center justify-center mb-8">
+                        <div class="thps-esl-timer text-5xl md:text-6xl font-mono font-black text-slate-800 tracking-wider mb-4 drop-shadow-sm transition-colors">0.00<span class="text-2xl text-slate-400">s</span></div>
+                        <button id="esl-record-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-16 h-16 rounded-full font-black flex items-center justify-center transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] active:scale-90">
+                            <i data-lucide="mic" id="esl-record-icon" class="w-6 h-6 pointer-events-none transition-transform"></i>
+                        </button>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3" id="esl-record-text">Tap to Start</span>
+                    </div>
+
+                    <!-- Live Transcript Output -->
+                    <div class="w-full max-w-md bg-slate-100 border border-slate-200 rounded-xl p-4 relative">
+                        <span class="absolute -top-2.5 left-4 bg-slate-100 px-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">What we heard:</span>
+                        <p id="esl-transcript" class="text-sm font-medium text-slate-600 text-center min-h-[1.25rem] italic">...</p>
+                    </div>
+                </div>
+
+                <!-- BOTTOM NAVIGATION -->
+                <div class="bg-white border-t border-slate-200 p-4 flex justify-between items-center shrink-0 z-20">
+                    <button class="thps-esl-prev px-6 py-3 rounded-xl font-bold text-sm text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2 active:scale-95 ${this.eslIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${this.eslIndex === 0 ? 'disabled' : ''}>
+                        <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i> Prev
+                    </button>
+                    <button class="thps-esl-next px-6 py-3 rounded-xl font-bold text-sm text-white bg-slate-800 hover:bg-slate-900 transition-colors shadow-md flex items-center gap-2 active:scale-95 ${this.eslIndex === this.eslSentences.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${this.eslIndex === this.eslSentences.length - 1 ? 'disabled' : ''}>
+                        Next <i data-lucide="chevron-right" class="w-4 h-4 pointer-events-none"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+        
+        // Listeners
+        this.querySelector('.thps-esl-back').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording(); // Safety stop
+            this.currentStep = 'esl-menu';
+            this.renderEslMenu();
+        });
+
+        this.querySelector('.thps-esl-prev').addEventListener('click', () => {
+            if (this.eslIndex > 0) {
+                if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+                this.eslIndex--;
+                this.renderEslDrill();
+            }
+        });
+
+        this.querySelector('.thps-esl-next').addEventListener('click', () => {
+            if (this.eslIndex < this.eslSentences.length - 1) {
+                if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+                this.eslIndex++;
+                this.renderEslDrill();
+            }
+        });
+
+        this.querySelector('#esl-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') {
+                window.toggleRecording();
+                // Clear the transcript box manually on new start
+                if (!window.isActive) {
+                    const tBox = this.querySelector('#esl-transcript');
+                    if (tBox) tBox.innerText = 'Listening...';
+                }
+            }
+        });
+    }
+
+
+    // ==========================================
     // ARCADE MODE: REPEAT + COUNT UI
+    // ==========================================
     async renderArcadeUI() {
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
@@ -132,26 +324,31 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
+                <!-- MINI EXIT BUTTON -->
                 <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
                 <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-5 mt-4 text-center">${this.courseData.title}</h2>
 
+                <!-- THREE RESPONSIVE PROMPT FIELDS -->
                 <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 justify-center">
                     
+                    <!-- Question Prompt Field -->
                     <div id="btn-prompt-q" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2.5 left-4">Question Prompt</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-indigo-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-q">${getRandomPrompt(this.prompts.question)}</span>
                     </div>
 
+                    <!-- Repeat Prompt Field -->
                     <div id="btn-prompt-r" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-emerald-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2.5 left-4">Repeat Framework</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-emerald-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-r">${getRandomPrompt(this.prompts.repeat)}</span>
                     </div>
 
+                    <!-- Count Prompt Field -->
                     <div id="btn-prompt-c" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2.5 left-4">Count Sequence</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-amber-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
@@ -159,9 +356,12 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
                 </div>
 
+                <!-- SLEEK ARCADE TIMER BAR PANEL -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
+                    <!-- Progress Progression Bar Fill -->
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
+                    <!-- Pacing Target Indicators (Stars positioned relative to 80s ceiling) -->
                     <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;" title="20 Second Milestone">
                         <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
@@ -169,6 +369,7 @@ class THPSCourseWidget extends HTMLElement {
                         <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
                     
+                    <!-- Shared Combined Toggle Trigger Button -->
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
@@ -194,7 +395,9 @@ class THPSCourseWidget extends HTMLElement {
         });
     }
 
+    // ==========================================
     // LINEAR COURSE UI SCREEN
+    // ==========================================
     renderCourseUI() {
         if (!this.courseData) return;
 
@@ -396,8 +599,8 @@ class THPSCourseWidget extends HTMLElement {
     processPayload(e) {
         if (!this.courseData || this.currentStep === 0) return;
         
-        // Bypass grading metrics if inside independent Arcade mode
-        if (this.currentStep === 'arcade') return;
+        // Bypass grading metrics if inside independent Arcade or ESL mode
+        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill') return;
 
         const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
@@ -528,6 +731,56 @@ class THPSCourseWidget extends HTMLElement {
                     arcadeIcon.setAttribute('data-lucide', 'mic');
                     arcadeIcon.className = "w-5 h-5 pointer-events-none text-white transition-transform";
                     if (window.lucide) window.lucide.createIcons({ root: arcadeBtn });
+                }
+            }
+        }
+
+        // 3. Sync ESL Level 1 Timer & Transcript
+        const eslTimer = this.querySelector('.thps-esl-timer');
+        const eslRecordBtn = this.querySelector('#esl-record-btn');
+        const eslRecordIcon = this.querySelector('#esl-record-icon');
+        const eslRecordText = this.querySelector('#esl-record-text');
+        const eslTranscript = this.querySelector('#esl-transcript');
+
+        if (eslTimer && eslRecordBtn) {
+            if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+                // High-precision stopwatch format (e.g., "3.45s")
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                eslTimer.innerHTML = `${elapsedSecs.toFixed(2)}<span class="text-2xl text-slate-400">s</span>`;
+                eslTimer.classList.add('text-indigo-600');
+
+                // Live Transcript sync
+                const liveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
+                if (eslTranscript && liveText) eslTranscript.innerText = liveText;
+
+                if (!eslRecordBtn.classList.contains('bg-rose-500')) {
+                    eslRecordBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
+                    eslRecordBtn.classList.replace('hover:bg-indigo-500', 'hover:bg-rose-400');
+                    eslRecordBtn.style.boxShadow = "0 0 15px rgba(243, 24, 73, 0.4)";
+                    if (eslRecordText) eslRecordText.innerText = "Stop Drill";
+                    
+                    if (eslRecordIcon) {
+                        eslRecordIcon.setAttribute('data-lucide', 'square');
+                        if (window.lucide) window.lucide.createIcons({ root: eslRecordBtn });
+                    }
+                }
+            } else {
+                eslTimer.classList.remove('text-indigo-600');
+                
+                // Final Transcript Sync on Stop
+                const finalLiveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
+                if (eslTranscript && finalLiveText) eslTranscript.innerText = finalLiveText;
+
+                if (eslRecordBtn.classList.contains('bg-rose-500')) {
+                    eslRecordBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
+                    eslRecordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-indigo-500');
+                    eslRecordBtn.style.boxShadow = "0 0 15px rgba(79,70,229,0.4)";
+                    if (eslRecordText) eslRecordText.innerText = "Tap to Start";
+                    
+                    if (eslRecordIcon) {
+                        eslRecordIcon.setAttribute('data-lucide', 'mic');
+                        if (window.lucide) window.lucide.createIcons({ root: eslRecordBtn });
+                    }
                 }
             }
         }
