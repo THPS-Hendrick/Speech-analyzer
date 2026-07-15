@@ -125,16 +125,75 @@
             <!-- PAGE 3: Test 2 (VVIQ) -->
             <section id="page-3" class="page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
                 <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 2: VVIQ Test</h3>
-                <p class="text-slate-500 mb-6">Play the audio prompt and have the client assess their visualization capability.</p>
+                <p class="text-slate-500 mb-6">Play the audio script or read it aloud to help the client assess their visualization capability.</p>
                 
                 <div class="bg-slate-100 p-6 rounded-xl mb-8 border border-slate-200 flex flex-col items-center">
-                    <i class="fas fa-headphones-alt text-4xl text-slate-400 mb-4"></i>
-                    <!-- Placeholder Audio. In a real environment, replace src with the actual file path -->
-                    <audio controls class="w-full max-w-md shadow-sm rounded-full">
-                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                    <p class="text-xs text-slate-400 mt-2">Placeholder audio. Replace with actual prompt.</p>
+                    
+                    <!-- TTS Audio Button -->
+                    <button id="tts-btn" onclick="toggleTTS()" class="mb-4 px-6 py-3 rounded-full font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all duration-300 flex items-center justify-center w-full max-w-xs">
+                        <i class="fas fa-play mr-2" id="tts-icon"></i> <span id="tts-label">Play Audio Script</span>
+                    </button>
+                    
+                    <!-- Scrolling Script Container -->
+                    <div id="phantasia-script" class="w-full h-64 overflow-y-auto bg-white border border-slate-300 rounded-lg p-5 text-slate-700 text-sm leading-relaxed shadow-inner">
+                        <p class="mb-3">This test goes for about 4 minutes.</p>
+                        
+                        <p class="mb-3">This is a Phantasia Test.<br>
+                        Phantasia means "to make visable images in your mind".<br>
+                        The Phantasia test is about whether seeing images in your mind is easy or hard for you.<br>
+                        Speakers that struggle to see images in their mind are likely to struggle to speak easily without a script.<br>
+                        However, speakers that are very good at creating images in their head may struggle to speak slowly or stay on topic.<br>
+                        Imagining images effortlessly and involuntarily is called Hyper-phantasia.<br>
+                        Struggling to see images in your mind is called Hypo-phantasia.<br>
+                        Being unable to see images in your mind at all is called Aphantasia, and is perfectly normal.<br>
+                        Everyone is somewhere from Aphantasia (unable to see images in their mind) to Hyper-phantasia (involuntarily sees lots of images in their mind).</p>
+                        
+                        <p class="mb-3">In this test, I need you to keep your eyes open, and try to see everything that is described.<br>
+                        Let's begin the Phantasia Test.</p>
+                        
+                        <p class="mb-3">All I want you to see in your mind is the colour black.<br>
+                        Like a room with no light in it at all. Your mind is entirely black.</p>
+                        
+                        <p class="mb-3">Now, see an apple. It's a normal Apple, about the size of your fist, in the middle of that black screen.<br>
+                        The Apple is Red.<br>
+                        Growing from that Red Apple, is a short brown wooden stem.<br>
+                        The brown wooden stem is about half the size of your smallest finger.<br>
+                        Growing from that brown stem on top of the red apple, is a small green leaf.<br>
+                        The green leaf starts small, about the size of your finger nail.<br>
+                        Then, the green leaf grows bigger, until it is about the size of your longest finger.<br>
+                        See Red Apple, with brown wooden stem, with green leaf.</p>
+                        
+                        <p class="mb-3">Now, remove the Red Apple, but keep the brown wooden stem, and keep the green leaf.<br>
+                        Only the brown stem and green leaf remain.<br>
+                        Now, replace the ordinary red apple with a diamond.<br>
+                        The wooden stem and the green leaf are now growing from that diamond.</p>
+                        
+                        <p class="mb-3">Make the diamond the colour Red and about the size of your fist.<br>
+                        Now, imagine cutting the red diamond into the shape of an apple.<br>
+                        Notice the surface of the red diamond, how it is shiny, almost transparent, and now crafted into the shape of an apple.</p>
+                        
+                        <p class="mb-3">You now have a red apple-shaped diamond, with wooden stem and green leaf.<br>
+                        Now, imagine rotating that entire object (apple-diamond, stem and leaf) together as slowly as you can. Control the spin, as slowly as you can.<br>
+                        Notice how the surface of the red apple-diamond gives off light as it rotates slowly - like a disco-ball.<br>
+                        And stop.</p>
+                        
+                        <p class="mb-3">Your answers to these 2 questions will determine if you are Aphantasia (cannot see images), Hypo-phantasia (struggle to see images), Phantasia (easily see images), Hyper-phantasia (effortlessly and involuntarily see images).</p>
+                        
+                        <p class="mb-3">Question one: was it difficult to see everything I described?<br>
+                        Question two: did you see more than what was described without trying to see more?</p>
+                        
+                        <p class="mb-3">If you saw absolutely nothing at all, then you have Aphantasia. Aphantasia is the inability to generate images in your head.</p>
+                        
+                        <p class="mb-3">If trying to see the objects in your head was a challenge or a strain, then you have Hypo-phantasia. Hypo-phantasia is a difficulty or delay with image generation in your head.</p>
+                        
+                        <p class="mb-3">If seeing everything that was described was almost effortless, then you have Phantasia. Phantasia or near-effortless and compliant image generation is what about 60% of the population has.</p>
+                        
+                        <p class="mb-3">However, if seeing what was described was effortless, and you saw more than what was described without trying, then you have Hyper-phantasia. Hyperphantasia is characterised by effortless and involuntary image generation. For example, you may not have been able to stop yourself from seeing a worm come out of the apple - or an orchard of apple trees.</p>
+                        
+                        <p class="mb-3">Select which of the 4 options best described your experience and move on to the next activity.</p>
+                        
+                        <p>If you didn't understand the test, try it again.</p>
+                    </div>
                 </div>
 
                 <h4 class="font-semibold text-slate-700 mb-4">Select Client's Imagery Category:</h4>
@@ -288,7 +347,7 @@
                     <div>
                         <img src="https://content.api.news/v3/images/bin/42df73e55c8f6009e64b1997f5d2cb75">
                         
-                        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg">
+                        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg mt-4">
                             <h4 class="font-bold text-indigo-800 mb-2"><i class="fas fa-info-circle mr-2"></i>Instructions</h4>
                             <p class="text-sm text-indigo-900 leading-relaxed">
                                 For 60 seconds, Say only what can literally be seen in the image (size, colour, position, objects, etc). 
@@ -325,7 +384,7 @@
                             <img src="https://placehold.co/800x600/94a3b8/ffffff?text=$10+Million+House" alt="Blurry house" class="w-full h-full object-cover blur-md scale-110">
                         </div>
                         
-                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg mt-4">
                             <h4 class="font-bold text-amber-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Instructions</h4>
                             <p class="text-sm text-amber-900 leading-relaxed">
                                 For 60 seconds, visually describe what a $10 million house might look like (size, colour, position, objects, etc). 
@@ -398,6 +457,10 @@
         const TOTAL_PAGES = 13;
         let currentPage = 1;
         let activeTimers = {};
+        
+        // TTS State variables
+        let isPlayingTTS = false;
+        let ttsUtterance = null;
 
         // Test 5 Configuration
         const test5Data = [
@@ -504,6 +567,12 @@
         function goToPage(pageNum) {
             if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
             
+            // Stop TTS Audio if leaving Page 3
+            if (currentPage === 3 && typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                resetTTSButton();
+            }
+
             // Hide old page
             document.getElementById(`page-${currentPage}`).classList.remove('active');
             
@@ -609,6 +678,57 @@
             document.getElementById('toast-msg').innerText = msg;
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+        }
+        
+        // --- TEXT TO SPEECH (TTS) LOGIC ---
+        function resetTTSButton() {
+            isPlayingTTS = false;
+            const btn = document.getElementById('tts-btn');
+            btn.classList.replace('bg-red-500', 'bg-indigo-600');
+            btn.classList.replace('hover:bg-red-600', 'hover:bg-indigo-700');
+            document.getElementById('tts-icon').className = 'fas fa-play mr-2';
+            document.getElementById('tts-label').innerText = 'Play Audio Script';
+        }
+
+        function toggleTTS() {
+            const textToRead = document.getElementById('phantasia-script').innerText;
+            const btn = document.getElementById('tts-btn');
+
+            if (isPlayingTTS || window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                resetTTSButton();
+                return;
+            }
+
+            ttsUtterance = new SpeechSynthesisUtterance(textToRead);
+            
+            // Try to find a human-sounding / premium voice
+            const voices = window.speechSynthesis.getVoices();
+            let selectedVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Siri'));
+            if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith('en-')); // fallback to any english
+            if (selectedVoice) ttsUtterance.voice = selectedVoice;
+
+            // Tune pacing for the diagnostic
+            ttsUtterance.rate = 0.85; 
+            ttsUtterance.pitch = 1.0;
+
+            ttsUtterance.onend = () => {
+                resetTTSButton();
+            };
+
+            window.speechSynthesis.speak(ttsUtterance);
+            isPlayingTTS = true;
+            
+            // Update button UI to Stop state
+            btn.classList.replace('bg-indigo-600', 'bg-red-500');
+            btn.classList.replace('hover:bg-indigo-700', 'hover:bg-red-600');
+            document.getElementById('tts-icon').className = 'fas fa-stop mr-2';
+            document.getElementById('tts-label').innerText = 'Stop Audio';
+        }
+        
+        // Ensure browser preloads available voices
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+          speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
         }
 
         // --- DATA COMPILATION ---
