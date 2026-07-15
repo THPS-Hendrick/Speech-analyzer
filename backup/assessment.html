@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THPS Diagnostic Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Range Slider Styling */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #4f46e5; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 4px; }
+        
+        .toast { transition: opacity 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-transparent text-slate-800">
+
+    <!-- Isolated App Wrapper for Squarespace -->
+    <div class="flex flex-row w-full h-[85vh] min-h-[700px] overflow-hidden rounded-xl border border-slate-200 shadow-xl bg-slate-50 relative" style="flex-direction: row !important; font-family: 'Inter', sans-serif;">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-20 md:w-64 bg-slate-900 text-slate-300 flex flex-col h-full shadow-xl z-20 flex-shrink-0 transition-all duration-300 overflow-y-auto">
+            <div class="p-4 md:p-6 bg-slate-950 text-center md:text-left flex items-center justify-center md:justify-start">
+        
+        <nav class="flex-1 py-4 flex flex-col gap-1 px-2" id="nav-menu">
+            <!-- Dynamically generated navigation will go here -->
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50">
+        <header class="bg-white shadow-sm border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+            <h2 class="text-xl font-semibold text-slate-700" id="header-title">Client Details</h2>
+            <div class="text-sm font-medium text-slate-400">Step <span id="current-step">1</span> of 13</div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 relative" id="form-container">
+            
+            <!-- PAGE 1: Client Details -->
+            <section id="page-1" class="page active max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-6 text-slate-800">1. Client Information</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Client Name</label>
+                        <input type="text" id="clientName" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Enter client's full name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Date</label>
+                        <input type="date" id="assessmentDate" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Goals & Challenges (approx 50 words)</label>
+                        <textarea id="goalsChallenges" rows="4" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Record the client's main objectives and hurdles here..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: Test 1 -->
+            <section id="page-2" class="page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 1</h3>
+                <p class="text-slate-500 mb-8">Sympathetic Adrenomedullary System test. Score from 1 to 10.</p>
+                
+                <div class="space-y-8">
+                    <!-- Q1 -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="font-semibold text-slate-700">1. Preparation Discomfort</label>
+                            <span class="text-xl font-bold text-indigo-600 w-8 text-center" id="val-q1">5</span>
+                        </div>
+                        <input type="range" id="t1-q1" min="1" max="10" value="5" oninput="document.getElementById('val-q1').innerText = this.value">
+                        <div class="flex justify-between text-xs text-slate-400 mt-2 font-medium">
+                            <span>1 (None)</span><span>10 (Severe)</span>
+                        </div>
+                    </div>
+                    <!-- Q2 -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="font-semibold text-slate-700">2. Presentation Discomfort</label>
+                            <span class="text-xl font-bold text-indigo-600 w-8 text-center" id="val-q2">5</span>
+                        </div>
+                        <input type="range" id="t1-q2" min="1" max="10" value="5" oninput="document.getElementById('val-q2').innerText = this.value">
+                        <div class="flex justify-between text-xs text-slate-400 mt-2 font-medium">
+                            <span>1 (None)</span><span>10 (Severe)</span>
+                        </div>
+                    </div>
+                    <!-- Q3 -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="font-semibold text-slate-700">3. Communicating Conflict to Others</label>
+                            <span class="text-xl font-bold text-indigo-600 w-8 text-center" id="val-q3">5</span>
+                        </div>
+                        <input type="range" id="t1-q3" min="1" max="10" value="5" oninput="document.getElementById('val-q3').innerText = this.value">
+                        <div class="flex justify-between text-xs text-slate-400 mt-2 font-medium">
+                            <span>1 (None)</span><span>10 (Severe)</span>
+                        </div>
+                    </div>
+                    <!-- Q4 -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="font-semibold text-slate-700">4. Receiving Conflict from Others</label>
+                            <span class="text-xl font-bold text-indigo-600 w-8 text-center" id="val-q4">5</span>
+                        </div>
+                        <input type="range" id="t1-q4" min="1" max="10" value="5" oninput="document.getElementById('val-q4').innerText = this.value">
+                        <div class="flex justify-between text-xs text-slate-400 mt-2 font-medium">
+                            <span>1 (None)</span><span>10 (Severe)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: Test 2 (VVIQ) -->
+            <section id="page-3" class="page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 2: VVIQ Test</h3>
+                <p class="text-slate-500 mb-6">Play the audio prompt and have the client assess their visualization capability.</p>
+                
+                <div class="bg-slate-100 p-6 rounded-xl mb-8 border border-slate-200 flex flex-col items-center">
+                    <i class="fas fa-headphones-alt text-4xl text-slate-400 mb-4"></i>
+                    <!-- Placeholder Audio. In a real environment, replace src with the actual file path -->
+                    <audio controls class="w-full max-w-md shadow-sm rounded-full">
+                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <p class="text-xs text-slate-400 mt-2">Placeholder audio. Replace with actual prompt.</p>
+                </div>
+
+                <h4 class="font-semibold text-slate-700 mb-4">Select Client's Imagery Category:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="cursor-pointer border-2 border-slate-200 rounded-lg p-4 flex items-center hover:border-indigo-400 transition-colors bg-white">
+                        <input type="radio" name="vviq" value="Aphantasia" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <div class="ml-3">
+                            <span class="block font-semibold text-slate-800">Aphantasia</span>
+                            <span class="block text-xs text-slate-500">No visual imagination</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer border-2 border-slate-200 rounded-lg p-4 flex items-center hover:border-indigo-400 transition-colors bg-white">
+                        <input type="radio" name="vviq" value="Hypophantasia" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <div class="ml-3">
+                            <span class="block font-semibold text-slate-800">Hypophantasia</span>
+                            <span class="block text-xs text-slate-500">Weak visual imagination</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer border-2 border-slate-200 rounded-lg p-4 flex items-center hover:border-indigo-400 transition-colors bg-white">
+                        <input type="radio" name="vviq" value="Phantasia" checked class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <div class="ml-3">
+                            <span class="block font-semibold text-slate-800">Phantasia</span>
+                            <span class="block text-xs text-slate-500">Typical visual imagination</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer border-2 border-slate-200 rounded-lg p-4 flex items-center hover:border-indigo-400 transition-colors bg-white">
+                        <input type="radio" name="vviq" value="Hyperphantasia" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <div class="ml-3">
+                            <span class="block font-semibold text-slate-800">Hyperphantasia</span>
+                            <span class="block text-xs text-slate-500">Extremely vivid imagination</span>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- PAGE 4: Test 3 (Sound Change) -->
+            <section id="page-4" class="page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 3: Sound Change Test</h3>
+                <p class="text-slate-500 mb-6">Play audio, then have client read excerpts. Tick if performed sufficiently.</p>
+                
+                <div class="bg-slate-100 p-4 rounded-xl mb-6 border border-slate-200 flex flex-col items-center">
+                    <audio controls class="w-full max-w-md shadow-sm rounded-full">
+                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+                    </audio>
+                </div>
+
+                <div class="space-y-3" id="accordion-container">
+                    <!-- Acc 1 -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <button class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors" onclick="toggleAcc('acc1', 'icon1')">
+                            <div class="flex items-center gap-3">
+                                <i id="icon1" class="fas fa-chevron-right text-slate-400 transition-transform"></i>
+                                <span class="font-bold text-slate-700">1 Very Serious</span>
+                            </div>
+                            <div class="flex items-center" onclick="event.stopPropagation()">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-md border border-slate-300 shadow-sm hover:bg-indigo-50">
+                                    <input type="checkbox" id="sc_check_1" class="w-4 h-4 text-indigo-600 rounded">
+                                    <span class="text-sm font-medium text-slate-600">Passed</span>
+                                </label>
+                            </div>
+                        </button>
+                        <div id="acc1" class="hidden p-5 border-t border-slate-200 text-slate-600 italic bg-white leading-relaxed">
+                            "1- You know, when you get old in life things get taken from you. I mean that's...part of life.<br><br>
+                            1- You find out life's this game of inches"
+                        </div>
+                    </div>
+                    <!-- Acc 2 -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <button class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors" onclick="toggleAcc('acc2', 'icon2')">
+                            <div class="flex items-center gap-3">
+                                <i id="icon2" class="fas fa-chevron-right text-slate-400 transition-transform"></i>
+                                <span class="font-bold text-slate-700">2 Serious</span>
+                            </div>
+                            <div class="flex items-center" onclick="event.stopPropagation()">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-md border border-slate-300 shadow-sm hover:bg-indigo-50">
+                                    <input type="checkbox" id="sc_check_2" class="w-4 h-4 text-indigo-600 rounded">
+                                    <span class="text-sm font-medium text-slate-600">Passed</span>
+                                </label>
+                            </div>
+                        </button>
+                        <div id="acc2" class="hidden p-5 border-t border-slate-200 text-slate-600 italic bg-white leading-relaxed">
+                            "2- So is football. Because in either game, life or football, the margin for error is so small.<br><br>
+                            2- One-half a step too late, or too early, and you don't quite make it."
+                        </div>
+                    </div>
+                    <!-- Acc 3 -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <button class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors" onclick="toggleAcc('acc3', 'icon3')">
+                            <div class="flex items-center gap-3">
+                                <i id="icon3" class="fas fa-chevron-right text-slate-400 transition-transform"></i>
+                                <span class="font-bold text-slate-700">3 Normal</span>
+                            </div>
+                            <div class="flex items-center" onclick="event.stopPropagation()">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-md border border-slate-300 shadow-sm hover:bg-indigo-50">
+                                    <input type="checkbox" id="sc_check_3" class="w-4 h-4 text-indigo-600 rounded">
+                                    <span class="text-sm font-medium text-slate-600">Passed</span>
+                                </label>
+                            </div>
+                        </button>
+                        <div id="acc3" class="hidden p-5 border-t border-slate-200 text-slate-600 italic bg-white leading-relaxed">
+                            "3- But the inches we need are everywhere.<br><br>
+                            3- They're in every break of the game, every minute, every second."
+                        </div>
+                    </div>
+                    <!-- Acc 4 -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <button class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors" onclick="toggleAcc('acc4', 'icon4')">
+                            <div class="flex items-center gap-3">
+                                <i id="icon4" class="fas fa-chevron-right text-slate-400 transition-transform"></i>
+                                <span class="font-bold text-slate-700">4 Animated</span>
+                            </div>
+                            <div class="flex items-center" onclick="event.stopPropagation()">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-md border border-slate-300 shadow-sm hover:bg-indigo-50">
+                                    <input type="checkbox" id="sc_check_4" class="w-4 h-4 text-indigo-600 rounded">
+                                    <span class="text-sm font-medium text-slate-600">Passed</span>
+                                </label>
+                            </div>
+                        </button>
+                        <div id="acc4" class="hidden p-5 border-t border-slate-200 text-slate-600 italic bg-white leading-relaxed">
+                            "4- On this team, we fight for that inch.<br><br>
+                            4- On this team, we tear ourselves and everyone else around us to pieces for that inch."
+                        </div>
+                    </div>
+                    <!-- Acc 5 -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                        <button class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors" onclick="toggleAcc('acc5', 'icon5')">
+                            <div class="flex items-center gap-3">
+                                <i id="icon5" class="fas fa-chevron-right text-slate-400 transition-transform"></i>
+                                <span class="font-bold text-slate-700">5 Very Animated</span>
+                            </div>
+                            <div class="flex items-center" onclick="event.stopPropagation()">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-md border border-slate-300 shadow-sm hover:bg-indigo-50">
+                                    <input type="checkbox" id="sc_check_5" class="w-4 h-4 text-indigo-600 rounded">
+                                    <span class="text-sm font-medium text-slate-600">Passed</span>
+                                </label>
+                            </div>
+                        </button>
+                        <div id="acc5" class="hidden p-5 border-t border-slate-200 text-slate-600 italic bg-white leading-relaxed">
+                            "5 - We claw with our fingernails for that inch, because we know when we add up all those inches - that's gonna make the difference between winning and losing!<br><br>
+                            5 - Between livin' and dyin'!"
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 5: Test 4 (Visual Part 1) -->
+            <section id="page-5" class="page max-w-5xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 4: Word Association Visual (Part 1)</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <img src="https://content.api.news/v3/images/bin/42df73e55c8f6009e64b1997f5d2cb75">
+                        
+                        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-indigo-800 mb-2"><i class="fas fa-info-circle mr-2"></i>Instructions</h4>
+                            <p class="text-sm text-indigo-900 leading-relaxed">
+                                For 60 seconds, Say only what can literally be seen in the image (size, colour, position, objects, etc). 
+                                <br><br><b>Goal:</b> Speak under 120 wpm, Visual Content over 50%
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <!-- Timer UI -->
+                        <div class="bg-slate-900 rounded-lg p-6 mb-4 flex flex-col items-center justify-center text-white shadow-inner">
+                            <div class="text-5xl font-mono tracking-wider font-bold" id="timer1-display">01:00</div>
+                            <div class="flex gap-3 mt-4">
+                                <button onclick="startTimer('timer1', 60)" class="bg-emerald-500 hover:bg-emerald-600 px-6 py-2 rounded-full font-bold transition">Start</button>
+                                <button onclick="resetTimer('timer1', 60)" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-full font-bold transition">Reset</button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Assessor Notes & Transcript (Max 1000 words)</label>
+                            <textarea id="t4_p1_notes" class="flex-1 w-full border border-slate-300 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 outline-none resize-none min-h-[200px]" placeholder="Type transcript and technical feedback here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 6: Test 4 (Visual Part 2) -->
+            <section id="page-6" class="page max-w-5xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 4: Word Association Visual (Part 2)</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <!-- Blurry Image -->
+                        <div class="relative overflow-hidden rounded-lg shadow-md border border-slate-200 aspect-video mb-4">
+                            <img src="https://placehold.co/800x600/94a3b8/ffffff?text=$10+Million+House" alt="Blurry house" class="w-full h-full object-cover blur-md scale-110">
+                        </div>
+                        
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Instructions</h4>
+                            <p class="text-sm text-amber-900 leading-relaxed">
+                                For 60 seconds, visually describe what a $10 million house might look like (size, colour, position, objects, etc). 
+                                <br><br><b>Goal:</b> Speak over 180 wpm, Visual Content over 50%
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <!-- Timer UI -->
+                        <div class="bg-slate-900 rounded-lg p-6 mb-4 flex flex-col items-center justify-center text-white shadow-inner">
+                            <div class="text-5xl font-mono tracking-wider font-bold" id="timer2-display">01:00</div>
+                            <div class="flex gap-3 mt-4">
+                                <button onclick="startTimer('timer2', 60)" class="bg-emerald-500 hover:bg-emerald-600 px-6 py-2 rounded-full font-bold transition">Start</button>
+                                <button onclick="resetTimer('timer2', 60)" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-full font-bold transition">Reset</button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Assessor Notes & Transcript (Max 1000 words)</label>
+                            <textarea id="t4_p2_notes" class="flex-1 w-full border border-slate-300 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 outline-none resize-none min-h-[200px]" placeholder="Type transcript and technical feedback here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGES 7 to 12 are generated dynamically via JS below to save repetition, but structured here -->
+            <div id="test5-pages-container"></div>
+
+            <!-- PAGE 13: Results -->
+            <section id="page-13" class="page max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-lg border border-slate-200">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mb-4">
+                        <i class="fas fa-check-double text-3xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-slate-800">THPS Diagnostic Finished</h3>
+                    <p class="text-slate-500 mt-2">Review the markdown report below, then copy and send to the client.</p>
+                </div>
+
+                <div class="relative group">
+                    <textarea id="results-markdown" class="w-full h-96 bg-slate-900 text-emerald-400 font-mono text-sm p-6 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 overflow-y-auto" readonly></textarea>
+                    
+                    <button onclick="copyResults()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition shadow-lg z-10">
+                        <i class="fas fa-copy"></i> Copy Results
+                    </button>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer Navigation -->
+        <footer class="bg-white border-t border-slate-200 p-4 md:px-8 flex justify-between z-10">
+            <button id="btn-prev" onclick="prevPage()" class="px-6 py-2.5 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-arrow-left mr-2"></i> Previous
+            </button>
+            <button id="btn-next" onclick="nextPage()" class="px-6 py-2.5 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm">
+                Next <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </footer>
+    </main>
+
+    </div> <!-- End of Isolated App Wrapper -->
+
+    <!-- Custom Toast Notification -->
+    <div id="toast" class="toast fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl z-50 opacity-0 pointer-events-none flex items-center gap-2 font-medium">
+        <i class="fas fa-check-circle text-emerald-400"></i> <span id="toast-msg">Copied to clipboard!</span>
+    </div>
+
+    <script>
+        // --- DATA & CONFIG ---
+        const TOTAL_PAGES = 13;
+        let currentPage = 1;
+        let activeTimers = {};
+
+        // Test 5 Configuration
+        const test5Data = [
+            { pageId: 7, title: "Test 5: Word (underlined)", questions: [
+                "1. Would you invest in a <u>bakery</u>?", "2. Would you <u>invest</u> in a theme park?", "3. Would you rather <u>coffee or tea</u>?", "4. Would you rather have <u>a home</u> by the beach or in the mountains?", "5. What's your <u>dream job</u> if money didn't matter?"
+            ]},
+            { pageId: 8, title: "Test 5: Word (no underline)", questions: [
+                "1. What does the ideal Sunday look like?", "2. Would you invest in a board game?", "3. Would you invest in a fashion store?", "4. What's better: summer or winter?", "5. Would you rather lose a phone or wallet?"
+            ]},
+            { pageId: 9, title: "Test 5: Question", questions: [
+                "1. What does the ideal birthday look like?", "2. What's the best way to spend a rainy day?", "3. Would you invest in a jazz club?", "4. Would you invest in a rooftop bar?", "5. What's better: skydiving or scuba diving?"
+            ]},
+            { pageId: 10, title: "Test 5: Statement", questions: [
+                "1. Would you rather live on a boat or bus?", "2. What's your go-to comfort food?", "3. What's your dream festival or event?", "4. Would you invest in a yoga studio?", "5. Would you invest in an indie movie?"
+            ]},
+            { pageId: 11, title: "Test 5: Clarify in 2 (Small Big)", questions: [
+                "1. What's your ideal daily routine?", "2. What makes a perfect morning?", "3. Would you invest in a chocolate factory?", "4. Could you live without the internet?", "5. What's better: unlimited travel or time?"
+            ]},
+            { pageId: 12, title: "Test 5: Clarify in 2 (opposites)", questions: [
+                "1. Would you invest in a local newspaper?", "2. What's better: famous or anonymous?", "3. Would you invest in a casino?", "4. Would you invest in a cooking school?", "5. What's better: early or fashionably late?"
+            ]}
+        ];
+
+        // Sidebar Configuration
+        const navItems = [
+            { id: 1, icon: 'fa-user', label: 'Client Details' },
+            { id: 2, icon: 'fa-heartbeat', label: 'Test 1: SAMS' },
+            { id: 3, icon: 'fa-eye', label: 'Test 2: VVIQ' },
+            { id: 4, icon: 'fa-volume-up', label: 'Test 3: Sound Change' },
+            { id: 5, icon: 'fa-image', label: 'Test 4: Visual Pt 1' },
+            { id: 6, icon: 'fa-camera', label: 'Test 4: Visual Pt 2' },
+            { id: 7, icon: 'fa-list-ol', label: 'Test 5: P1' },
+            { id: 8, icon: 'fa-list-ol', label: 'Test 5: P2' },
+            { id: 9, icon: 'fa-question', label: 'Test 5: P3' },
+            { id: 10, icon: 'fa-quote-left', label: 'Test 5: P4' },
+            { id: 11, icon: 'fa-compress-arrows-alt', label: 'Test 5: P5' },
+            { id: 12, icon: 'fa-exchange-alt', label: 'Test 5: P6' },
+            { id: 13, icon: 'fa-flag-checkered', label: 'Results' }
+        ];
+
+        // --- INITIALIZATION ---
+        function initApp() {
+            // Build Nav
+            const navMenu = document.getElementById('nav-menu');
+            navItems.forEach(item => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.onclick = (e) => { e.preventDefault(); goToPage(item.id); };
+                a.id = `nav-item-${item.id}`;
+                a.className = `flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${item.id === 1 ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
+                
+                a.innerHTML = `<i class="fas ${item.icon} w-6 text-center ${item.id === 1 ? 'text-white' : 'text-slate-500'}"></i> <span class="hidden md:block truncate ml-2">${item.label}</span>`;
+                navMenu.appendChild(a);
+            });
+
+            // Build Test 5 Pages
+            const t5Container = document.getElementById('test5-pages-container');
+            test5Data.forEach(block => {
+                const section = document.createElement('section');
+                section.id = `page-${block.pageId}`;
+                section.className = 'page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100';
+                
+                let html = `
+                    <h3 class="text-2xl font-bold mb-2 text-slate-800">${block.title}</h3>
+                    <p class="text-slate-500 mb-6">Word Association Categories. Tick applicable observations.</p>
+                    <div class="space-y-4">
+                `;
+
+                block.questions.forEach((q, idx) => {
+                    const qId = `t5_p${block.pageId}_q${idx+1}`;
+                    html += `
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-5">
+                            <p class="font-semibold text-slate-800 mb-3">${q}</p>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="${qId}_correct" class="t5-cb w-4 h-4 text-indigo-600 rounded" data-page="${block.pageId}" data-q="${idx+1}" data-type="Correct">
+                                    <span class="text-sm text-slate-600">Correct</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="${qId}_nodelay" class="t5-cb w-4 h-4 text-indigo-600 rounded" data-page="${block.pageId}" data-q="${idx+1}" data-type="No Delay">
+                                    <span class="text-sm text-slate-600">No Delay</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="${qId}_voice" class="t5-cb w-4 h-4 text-indigo-600 rounded" data-page="${block.pageId}" data-q="${idx+1}" data-type="Voice Added">
+                                    <span class="text-sm text-slate-600">Voice Added</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                t5Container.appendChild(section);
+            });
+
+            // Set today's date
+            document.getElementById('assessmentDate').valueAsDate = new Date();
+
+            updateUI();
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function goToPage(pageNum) {
+            if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
+            
+            // Hide old page
+            document.getElementById(`page-${currentPage}`).classList.remove('active');
+            
+            // Update Navigation UI
+            const oldNav = document.getElementById(`nav-item-${currentPage}`);
+            if(oldNav) {
+                oldNav.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                oldNav.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-white');
+                oldNav.querySelector('i').classList.replace('text-white', 'text-slate-500');
+            }
+
+            currentPage = pageNum;
+
+            // Show new page
+            document.getElementById(`page-${currentPage}`).classList.add('active');
+            
+            const newNav = document.getElementById(`nav-item-${currentPage}`);
+            if(newNav) {
+                newNav.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                newNav.classList.remove('text-slate-400', 'hover:bg-slate-800', 'hover:text-white');
+                newNav.querySelector('i').classList.replace('text-slate-500', 'text-white');
+            }
+
+            // Scroll to top of container
+            document.getElementById('form-container').scrollTop = 0;
+
+            // Generate Results if on final page
+            if(currentPage === TOTAL_PAGES) {
+                generateResults();
+            }
+
+            updateUI();
+        }
+
+        function nextPage() { goToPage(currentPage + 1); }
+        function prevPage() { goToPage(currentPage - 1); }
+
+        function updateUI() {
+            document.getElementById('current-step').innerText = currentPage;
+            const currentNav = navItems.find(n => n.id === currentPage);
+            document.getElementById('header-title').innerText = currentNav ? currentNav.label : 'Diagnostic';
+
+            document.getElementById('btn-prev').disabled = currentPage === 1;
+            
+            const nextBtn = document.getElementById('btn-next');
+            if (currentPage === TOTAL_PAGES) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+                nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
+            }
+        }
+
+        // --- COMPONENT LOGIC ---
+        function toggleAcc(id, iconId) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(iconId);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.classList.add('rotate-90');
+            } else {
+                el.classList.add('hidden');
+                icon.classList.remove('rotate-90');
+            }
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer(id, duration) {
+            if (activeTimers[id]) clearInterval(activeTimers[id].interval);
+            
+            const display = document.getElementById(`${id}-display`);
+            let time = duration;
+            display.innerText = formatTime(time);
+            display.classList.add('text-emerald-400');
+
+            activeTimers[id] = {
+                interval: setInterval(() => {
+                    time--;
+                    display.innerText = formatTime(time);
+                    if (time <= 10) display.classList.replace('text-emerald-400', 'text-red-500');
+                    if (time <= 0) {
+                        clearInterval(activeTimers[id].interval);
+                        showToast("Time's up!");
+                    }
+                }, 1000)
+            };
+        }
+
+        function resetTimer(id, duration) {
+            if (activeTimers[id]) clearInterval(activeTimers[id].interval);
+            const display = document.getElementById(`${id}-display`);
+            display.innerText = formatTime(duration);
+            display.classList.remove('text-emerald-400', 'text-red-500');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+        }
+
+        // --- DATA COMPILATION ---
+        function generateResults() {
+            const clientName = document.getElementById('clientName').value || 'Unspecified';
+            const date = document.getElementById('assessmentDate').value || new Date().toLocaleDateString();
+            const goals = document.getElementById('goalsChallenges').value || 'None recorded.';
+
+            // Test 1
+            const t1q1 = document.getElementById('t1-q1').value;
+            const t1q2 = document.getElementById('t1-q2').value;
+            const t1q3 = document.getElementById('t1-q3').value;
+            const t1q4 = document.getElementById('t1-q4').value;
+
+            // Test 2
+            const vviq = document.querySelector('input[name="vviq"]:checked').value;
+
+            // Test 3
+            const t3_scores = [];
+            for(let i=1; i<=5; i++) {
+                if(document.getElementById(`sc_check_${i}`).checked) t3_scores.push(`Level ${i} (${['Very Serious','Serious','Normal','Animated','Very Animated'][i-1]})`);
+            }
+            const t3_result = t3_scores.length > 0 ? t3_scores.join(', ') : 'None passed.';
+
+            // Test 4
+            const t4p1 = document.getElementById('t4_p1_notes').value || 'No notes.';
+            const t4p2 = document.getElementById('t4_p2_notes').value || 'No notes.';
+
+            // Test 5 Processing
+            let t5Markdown = "";
+            test5Data.forEach(block => {
+                t5Markdown += `### ${block.title}\n`;
+                block.questions.forEach((q, idx) => {
+                    const qId = `t5_p${block.pageId}_q${idx+1}`;
+                    const c = document.getElementById(`${qId}_correct`).checked ? '☑ Correct ' : '☐ Correct ';
+                    const n = document.getElementById(`${qId}_nodelay`).checked ? '☑ No Delay ' : '☐ No Delay ';
+                    const v = document.getElementById(`${qId}_voice`).checked ? '☑ Voice Added' : '☐ Voice Added';
+                    
+                    // Only log if something was checked, to keep report clean, OR log all if you prefer full record. Logging all.
+                    t5Markdown += `- **Q:** ${q}\n  - ${c} | ${n} | ${v}\n`;
+                });
+                t5Markdown += `\n`;
+            });
+
+            // Markdown Construction
+            const md = `# THPS Diagnostic Assessment Report
+**Client Name:** ${clientName}
+**Date:** ${date}
+
+## Background & Goals
+${goals}
+
+---
+
+## Test 1: Sympathetic Adrenomedullary System (1-10)
+- **Preparation Discomfort:** ${t1q1}/10
+- **Presentation Discomfort:** ${t1q2}/10
+- **Communicating Conflict to Others:** ${t1q3}/10
+- **Receiving Conflict from Others:** ${t1q4}/10
+
+---
+
+## Test 2: VVIQ Score
+**Result:** ${vviq}
+
+---
+
+## Test 3: Sound Change Ranges Passed
+**Result:** ${t3_result}
+
+---
+
+## Test 4: Word Association Visual Capacity
+### Part 1 (Under 120 WPM, Visual > 50%)
+${t4p1}
+
+### Part 2 (Over 180 WPM, Visual > 50%)
+${t4p2}
+
+---
+
+## Test 5: Word Association Categories Performance
+${t5Markdown}
+
+*Report generated via THPS Diagnostic App*
+`;
+            document.getElementById('results-markdown').value = md;
+        }
+
+        function copyResults() {
+            const txt = document.getElementById('results-markdown');
+            txt.select();
+            txt.setSelectionRange(0, 99999); // Mobile
+            try {
+                document.execCommand('copy');
+                showToast("Results copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy. Please copy manually.");
+            }
+        }
+
+        // Boot
+        window.onload = initApp;
+    </script>
+</body>
+</html>
