@@ -144,9 +144,14 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="text-lg font-black text-slate-700 group-hover:text-rose-600 mb-1 pointer-events-none">Humm</span>
                         <span class="text-xs font-bold text-slate-400 pointer-events-none">M, N, NG</span>
                     </button>
-                    <button class="thps-esl-cat-btn group sm:col-span-2 bg-white border-2 border-slate-200 hover:border-blue-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95 max-w-sm mx-auto w-full" data-cat="glide">
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-blue-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="glide">
                         <span class="text-lg font-black text-slate-700 group-hover:text-blue-600 mb-1 pointer-events-none">Glide</span>
                         <span class="text-xs font-bold text-slate-400 pointer-events-none">L, R, Y, W</span>
+                    </button>
+                    <!-- NEW ADVANCED OPTION -->
+                    <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-violet-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="advanced">
+                        <span class="text-lg font-black text-slate-700 group-hover:text-violet-600 mb-1 pointer-events-none">Advanced</span>
+                        <span class="text-xs font-bold text-slate-400 pointer-events-none">Complex Clusters</span>
                     </button>
                 </div>
             </div>
