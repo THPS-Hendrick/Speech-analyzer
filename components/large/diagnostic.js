@@ -426,7 +426,7 @@ class THPSDiagnostic extends HTMLElement {
             .thps-diag-range::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; }
         </style>
         
-        <div class="flex flex-row w-full h-[85vh] min-h-[700px] overflow-hidden rounded-xl border border-slate-200 shadow-xl bg-slate-50 font-['Inter',sans-serif]">
+        <div class="flex flex-row w-full h-[700px] min-h-[700px] overflow-hidden rounded-xl border border-slate-200 shadow-xl bg-slate-50 font-['Inter',sans-serif]">
             <aside class="w-20 md:w-64 bg-slate-900 text-slate-300 flex flex-col h-full shadow-xl z-20 flex-shrink-0 thps-diag-scroll overflow-y-auto">
                 <nav class="flex-1 py-4 flex flex-col gap-1 px-2" data-ref="nav-menu"></nav>
             </aside>
