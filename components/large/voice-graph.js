@@ -1,6 +1,6 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v4.0)
-// Includes Canvas Pause Bars, Pace Backgrounds, Percentile Voice Variance, and Dual Engines
+// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v5.0)
+// Includes Canvas Pause Bars, Accordion Pace Runs, Percentile Voice Variance, and Dual Engines
 // ==========================================
 
 class ThpsVoiceGraph extends HTMLElement {
@@ -142,13 +142,13 @@ class ThpsVoiceGraph extends HTMLElement {
         const staff = this.querySelector('.thps-staff-words');
         
         let pauses = []; 
-        let chunkPaces = []; 
+        let runPaces = []; // NEW: Replaces chunkPaces
 
         let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
         let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
         let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         
-        // --- PHD MATH PHASE 1: HYBRID PAUSE ENGINE ---
+        // --- PHD MATH PHASE 1: HYBRID PAUSE & PACE (ACCORDION) ENGINE ---
         let expectedSyllableLength = 0.250; 
         
         if (this.pauseMode === 'dynamic') {
@@ -163,34 +163,82 @@ class ThpsVoiceGraph extends HTMLElement {
             expectedSyllableLength = 1.0 / dynamicSPS; 
         }
 
-        for (let i = 0; i < data.wordTimestamps.length - 1; i++) {
+        let currentRunWords = [];
+
+        for (let i = 0; i < data.wordTimestamps.length; i++) {
             const currWord = data.wordTimestamps[i];
-            const nextWord = data.wordTimestamps[i+1];
-            
             const sylCount = this.countSyllablesLocal(currWord.word);
-            const expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
+            currentRunWords.push({ word: currWord, sylCount: sylCount });
             
-            const truePause = Math.max(0, nextWord.start - expectedNextStart);
+            let isEndOfRun = false;
+            let expectedNextStart = 0;
+            let truePause = 0;
+            
+            if (i === data.wordTimestamps.length - 1) {
+                isEndOfRun = true;
+            } else {
+                const nextWord = data.wordTimestamps[i+1];
+                expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
+                truePause = Math.max(0, nextWord.start - expectedNextStart);
 
-            if (truePause > 0.05) { 
-                let pColor = '', pY = 0;
-                
-                if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
-                else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
-                else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
-                else if (truePause <= 1.400) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; }
-                else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; }
+                if (truePause > 0.05) { 
+                    isEndOfRun = true;
+                    // Log the Pause
+                    let pColor = '', pY = 0;
+                    if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
+                    else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
+                    else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
+                    else if (truePause <= 1.400) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; }
+                    else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; }
 
-                pauses.push({ 
-                    start: expectedNextStart, 
-                    duration: truePause, 
-                    color: pColor, 
-                    yPct: pY 
+                    pauses.push({ 
+                        start: expectedNextStart, 
+                        duration: truePause, 
+                        color: pColor, 
+                        yPct: pY 
+                    });
+                }
+            }
+
+            if (isEndOfRun) {
+                // Log the Pace (Accordion Ratio) for the completed Run
+                let ratio = 1.0;
+                let actualTime = 0;
+                let expectedTime = 0;
+                let blockWidth = sylCount * expectedSyllableLength; // Default fallback for 1-word runs
+
+                if (currentRunWords.length >= 2) {
+                    actualTime = currentRunWords[currentRunWords.length - 1].word.start - currentRunWords[0].word.start;
+                    
+                    let expectedSyllables = 0;
+                    for (let j = 0; j < currentRunWords.length - 1; j++) {
+                        expectedSyllables += currentRunWords[j].sylCount;
+                    }
+                    expectedTime = expectedSyllables * expectedSyllableLength;
+                    ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
+                    blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * expectedSyllableLength);
+                }
+
+                // Bucket the ratio
+                let paceColor = '', paceRow = 2;
+                if (ratio < 0.75) { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; } // Rose (Rapid Fire)
+                else if (ratio < 0.91) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; } // Amber (Brisk)
+                else if (ratio <= 1.10) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; } // Emerald (On Pace)
+                else if (ratio <= 1.30) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; } // Blue (Deliberate)
+                else { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; } // Slate (Drawn Out)
+
+                runPaces.push({
+                    start: currentRunWords[0].word.start,
+                    width: blockWidth,
+                    color: paceColor,
+                    row: paceRow
                 });
+
+                currentRunWords = []; // Reset for next run
             }
         }
 
-        // --- PHD MATH PHASE 2: PACE & TRUE LOGARITHMIC VOICE VARIANCE ---
+        // --- PHD MATH PHASE 2: TRUE LOGARITHMIC VOICE VARIANCE ---
         let validChunks = [];
         let numChunks = Math.ceil(duration / 3);
 
@@ -198,25 +246,6 @@ class ThpsVoiceGraph extends HTMLElement {
             let chunkStart = c * 3;
             let chunkEnd = chunkStart + 3;
             
-            let sylCount = 0;
-            data.wordTimestamps.forEach(w => {
-                if (w.start >= chunkStart && w.start < chunkEnd) {
-                    sylCount += this.countSyllablesLocal(w.word);
-                }
-            });
-            
-            if (sylCount > 0) {
-                let paceColor = '', paceRow = 0;
-
-                if (sylCount <= 8) { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; }
-                else if (sylCount <= 10) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; }
-                else if (sylCount <= 13) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; }
-                else if (sylCount <= 15) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; }
-                else { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; }
-                
-                chunkPaces.push({ start: chunkStart, width: 3, color: paceColor, row: paceRow });
-            }
-
             let pauseInChunk = 0;
             pauses.forEach(p => {
                 let pEnd = p.start + p.duration;
@@ -233,13 +262,11 @@ class ThpsVoiceGraph extends HTMLElement {
                 if (data.volumeData && data.volumeData.length > 0) {
                     data.volumeData.forEach(v => {
                         if (v.time >= chunkStart && v.time < chunkEnd) {
-                            // Convert dB to linear power for true acoustic averaging
                             linearSum += Math.pow(10, v.db / 10);
                             dbCount++;
                         }
                     });
                 }
-                // Convert linear average back to decibels
                 let avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40; 
                 validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
             }
@@ -247,23 +274,20 @@ class ThpsVoiceGraph extends HTMLElement {
 
         // --- PHD MATH PHASE 3: PERCENTILE SORTING & GLOBAL CLAMP ---
         
-        // 1. Sort valid chunks from quietest to loudest
         validChunks.sort((a, b) => a.db - b.db);
 
-        // 2. Find Percentiles
         let floorDb = -40;
         let ceilingDb = -10;
 
         if (validChunks.length > 0) {
-            let floorIndex = Math.floor(validChunks.length * 0.05); // 5th Percentile
-            let ceilIndex = Math.floor(validChunks.length * 0.95);  // 95th Percentile
+            let floorIndex = Math.floor(validChunks.length * 0.05); 
+            let ceilIndex = Math.floor(validChunks.length * 0.95);  
             if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
             
             floorDb = validChunks[floorIndex].db;
             ceilingDb = validChunks[ceilIndex].db;
         }
 
-        // 3. The Global Clamp (Enforce Minimum 15 dB Range for Dynamic Mode)
         let range = ceilingDb - floorDb;
         if (range < 15) {
             let midPoint = (ceilingDb + floorDb) / 2;
@@ -272,14 +296,12 @@ class ThpsVoiceGraph extends HTMLElement {
             range = 15;
         }
 
-        // 4. Override Bounds if on Global Benchmark Mode (Fixed Standard)
         if (this.pauseMode === 'global') {
             floorDb = -35;
-            ceilingDb = -15; // 20 dB Strict Benchmark Range
+            ceilingDb = -15; 
             range = 20;
         }
 
-        // 5. Calculate Step Size for the 5 Buckets
         let step = range / 5;
         let bounds = [
             floorDb + step,       
@@ -288,7 +310,6 @@ class ThpsVoiceGraph extends HTMLElement {
             floorDb + (step * 4)  
         ];
 
-        // 6. Generate Dynamic Labels (ex: < -28dB, -25dB, etc.)
         let voiceLabels = [
             `< ${Math.round(bounds[0])}dB`,
             `${Math.round(bounds[0])}dB`,
@@ -297,7 +318,6 @@ class ThpsVoiceGraph extends HTMLElement {
             `> ${Math.round(bounds[3])}dB`
         ];
         
-        // 7. Sort the chunks into the new dynamic buckets
         validChunks.forEach(vc => {
             if (vc.db < bounds[0]) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
             else if (vc.db < bounds[1]) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
@@ -342,8 +362,6 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
         }
 
-        // A) Solid Intensity Blocks
-        // Re-sort the chunks by time so they draw left-to-right correctly
         validChunks.sort((a, b) => a.start - b.start);
         
         validChunks.forEach(vc => {
@@ -359,7 +377,6 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.shadowBlur = 0;
         });
 
-        // B) Pause Overlay Bars
         pauses.forEach(p => {
             let x = p.start * PIXELS_PER_SEC;
             let w = p.duration * PIXELS_PER_SEC;
@@ -380,16 +397,16 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.shadowBlur = 0;
         });
 
-        // --- VISUAL PAINTING 3: SPEECH STAFF (PACE BARS & WORDS) ---
+        // --- VISUAL PAINTING 3: SPEECH STAFF (RUN PACE BARS & WORDS) ---
         staff.querySelectorAll('.staff-item').forEach(el => el.remove());
 
-        chunkPaces.forEach(cp => {
+        runPaces.forEach(rp => {
             const bar = document.createElement('div');
             bar.className = 'staff-item absolute opacity-30 pointer-events-none rounded-sm z-0';
-            bar.style.backgroundColor = cp.color;
-            bar.style.left = `${cp.start * PIXELS_PER_SEC}px`;
-            bar.style.width = `${cp.width * PIXELS_PER_SEC}px`;
-            bar.style.top = `${cp.row * 20}%`;
+            bar.style.backgroundColor = rp.color;
+            bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
+            bar.style.width = `${rp.width * PIXELS_PER_SEC}px`;
+            bar.style.top = `${rp.row * 20}%`;
             bar.style.height = `20%`;
             staff.appendChild(bar);
         });
@@ -455,13 +472,11 @@ class ThpsVoiceGraph extends HTMLElement {
             });
         };
 
-        // NEW: Changed the first labels array from ['v.short', 'short', 'norm', 'long', 'v.long'] to strict numerical cutoffs.
         drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['short', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
-        
-        // Pass the dynamically generated voiceLabels into the Vertical Bars renderer
         drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
         
-        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['v.slow', 'slow', 'norm', 'fast', 'v.fast'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        // NEW: Updated the Pace labels to match the Accordion Ratio Multipliers
+        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['> 1.30x', '1.10x', '1.00x', '0.90x', '< 0.75x'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
     }
 }
 
