@@ -199,7 +199,15 @@ window.THPS.Audio.startRecordingProcess = async function() {
     if (inputEl) inputEl.placeholder = "Listening... speak clearly into your microphone.";
 
     try {
-        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+        // --- NEW: KILLED AUTO GAIN CONTROL, NOISE SUPPRESSION, AND ECHO CANCELLATION ---
+        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: { 
+                channelCount: 1,
+                autoGainControl: false,
+                noiseSuppression: false,
+                echoCancellation: false
+            } 
+        });
         
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContextClass({ sampleRate: 16000 });
