@@ -1,6 +1,6 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v3.0)
-// Includes Canvas Pause Bars, Pace Backgrounds, Vertical Voice Variance, and Dual Pause Engines
+// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v4.0)
+// Includes Canvas Pause Bars, Pace Backgrounds, Percentile Voice Variance, and Dual Engines
 // ==========================================
 
 class ThpsVoiceGraph extends HTMLElement {
@@ -125,7 +125,7 @@ class ThpsVoiceGraph extends HTMLElement {
 
     update(data) {
         if (!data || !data.wordTimestamps || data.wordTimestamps.length === 0) return;
-        this.lastData = data; // Cache for toggling
+        this.lastData = data; 
         
         this.querySelector('.thps-vg-placeholder').style.display = 'none';
         
@@ -149,7 +149,7 @@ class ThpsVoiceGraph extends HTMLElement {
         let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         
         // --- PHD MATH PHASE 1: HYBRID PAUSE ENGINE ---
-        let expectedSyllableLength = 0.250; // Global Default (250ms = 4 SPS)
+        let expectedSyllableLength = 0.250; 
         
         if (this.pauseMode === 'dynamic') {
             const firstWord = data.wordTimestamps[0];
@@ -160,7 +160,7 @@ class ThpsVoiceGraph extends HTMLElement {
             data.wordTimestamps.forEach(w => totalSyllables += this.countSyllablesLocal(w.word));
             
             const dynamicSPS = totalSyllables / Math.max(0.1, totalSpeakingTime);
-            expectedSyllableLength = 1.0 / dynamicSPS; // Scale the timeline
+            expectedSyllableLength = 1.0 / dynamicSPS; 
         }
 
         for (let i = 0; i < data.wordTimestamps.length - 1; i++) {
@@ -170,14 +170,11 @@ class ThpsVoiceGraph extends HTMLElement {
             const sylCount = this.countSyllablesLocal(currWord.word);
             const expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
             
-            // Calculate True Pause & Clamp negative numbers to 0
             const truePause = Math.max(0, nextWord.start - expectedNextStart);
 
-            // Log if there's actual measurable silence
-            if (truePause > 0.05) { // 50ms tolerance buffer for STT fuzziness
+            if (truePause > 0.05) { 
                 let pColor = '', pY = 0;
                 
-                // Strict 350ms Buckets
                 if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
                 else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
                 else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
@@ -193,16 +190,14 @@ class ThpsVoiceGraph extends HTMLElement {
             }
         }
 
-        // --- PHD MATH PHASE 2: PACE & VOICE VARIANCE (3s CHUNKS) ---
+        // --- PHD MATH PHASE 2: PACE & TRUE LOGARITHMIC VOICE VARIANCE ---
         let validChunks = [];
-        let totalDb = 0;
         let numChunks = Math.ceil(duration / 3);
 
         for(let c = 0; c < numChunks; c++) {
             let chunkStart = c * 3;
             let chunkEnd = chunkStart + 3;
             
-            // A) Pace Math (Syllables per 3s window)
             let sylCount = 0;
             data.wordTimestamps.forEach(w => {
                 if (w.start >= chunkStart && w.start < chunkEnd) {
@@ -222,7 +217,6 @@ class ThpsVoiceGraph extends HTMLElement {
                 chunkPaces.push({ start: chunkStart, width: 3, color: paceColor, row: paceRow });
             }
 
-            // B) Voice Math (Intensity Filtered by True Pauses)
             let pauseInChunk = 0;
             pauses.forEach(p => {
                 let pEnd = p.start + p.duration;
@@ -235,30 +229,80 @@ class ThpsVoiceGraph extends HTMLElement {
 
             let activeTime = 3 - pauseInChunk;
             if (activeTime >= 0.2) { 
-                let dbSum = 0; let dbCount = 0;
+                let linearSum = 0; let dbCount = 0;
                 if (data.volumeData && data.volumeData.length > 0) {
                     data.volumeData.forEach(v => {
                         if (v.time >= chunkStart && v.time < chunkEnd) {
-                            dbSum += v.db;
+                            // Convert dB to linear power for true acoustic averaging
+                            linearSum += Math.pow(10, v.db / 10);
                             dbCount++;
                         }
                     });
                 }
-                let avgDb = dbCount > 0 ? (dbSum / dbCount) : -40; 
+                // Convert linear average back to decibels
+                let avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40; 
                 validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
-                totalDb += avgDb;
             }
         }
 
-        // --- PHD MATH PHASE 3: INTENSITY SORTING ---
-        let globalAvgDb = validChunks.length > 0 ? (totalDb / validChunks.length) : -40;
+        // --- PHD MATH PHASE 3: PERCENTILE SORTING & GLOBAL CLAMP ---
         
+        // 1. Sort valid chunks from quietest to loudest
+        validChunks.sort((a, b) => a.db - b.db);
+
+        // 2. Find Percentiles
+        let floorDb = -40;
+        let ceilingDb = -10;
+
+        if (validChunks.length > 0) {
+            let floorIndex = Math.floor(validChunks.length * 0.05); // 5th Percentile
+            let ceilIndex = Math.floor(validChunks.length * 0.95);  // 95th Percentile
+            if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
+            
+            floorDb = validChunks[floorIndex].db;
+            ceilingDb = validChunks[ceilIndex].db;
+        }
+
+        // 3. The Global Clamp (Enforce Minimum 15 dB Range for Dynamic Mode)
+        let range = ceilingDb - floorDb;
+        if (range < 15) {
+            let midPoint = (ceilingDb + floorDb) / 2;
+            floorDb = midPoint - 7.5;
+            ceilingDb = midPoint + 7.5;
+            range = 15;
+        }
+
+        // 4. Override Bounds if on Global Benchmark Mode (Fixed Standard)
+        if (this.pauseMode === 'global') {
+            floorDb = -35;
+            ceilingDb = -15; // 20 dB Strict Benchmark Range
+            range = 20;
+        }
+
+        // 5. Calculate Step Size for the 5 Buckets
+        let step = range / 5;
+        let bounds = [
+            floorDb + step,       
+            floorDb + (step * 2), 
+            floorDb + (step * 3), 
+            floorDb + (step * 4)  
+        ];
+
+        // 6. Generate Dynamic Labels (ex: < -28dB, -25dB, etc.)
+        let voiceLabels = [
+            `< ${Math.round(bounds[0])}dB`,
+            `${Math.round(bounds[0])}dB`,
+            `${Math.round(bounds[1])}dB`,
+            `${Math.round(bounds[2])}dB`,
+            `> ${Math.round(bounds[3])}dB`
+        ];
+        
+        // 7. Sort the chunks into the new dynamic buckets
         validChunks.forEach(vc => {
-            let diff = vc.db - globalAvgDb;
-            if (diff < -10) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
-            else if (diff < -5) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
-            else if (diff <= 5) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
-            else if (diff <= 10) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
+            if (vc.db < bounds[0]) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
+            else if (vc.db < bounds[1]) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
+            else if (vc.db < bounds[2]) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
+            else if (vc.db < bounds[3]) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
             else { voiceCounts.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
         });
 
@@ -284,7 +328,7 @@ class ThpsVoiceGraph extends HTMLElement {
 
         // --- VISUAL PAINTING 2: CANVAS BLOCKS & PAUSE BARS ---
         const canvasHeight = canvas.parentElement.clientHeight;
-        canvas.width = trackWidth * 2; // HDPI scaling
+        canvas.width = trackWidth * 2; 
         canvas.height = canvasHeight * 2;
         const ctx = canvas.getContext('2d');
         ctx.scale(2, 2); 
@@ -299,6 +343,9 @@ class ThpsVoiceGraph extends HTMLElement {
         }
 
         // A) Solid Intensity Blocks
+        // Re-sort the chunks by time so they draw left-to-right correctly
+        validChunks.sort((a, b) => a.start - b.start);
+        
         validChunks.forEach(vc => {
             let x = vc.start * PIXELS_PER_SEC;
             let w = 3 * PIXELS_PER_SEC;
@@ -409,7 +456,10 @@ class ThpsVoiceGraph extends HTMLElement {
         };
 
         drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['v.short', 'short', 'norm', 'long', 'v.long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
-        drawVerticalBars('.thps-bar-container-voice', voiceCounts, ['v.low', 'low', 'norm', 'high', 'v.high'], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
+        
+        // Pass the dynamically generated voiceLabels into the Vertical Bars renderer
+        drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
+        
         drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['v.slow', 'slow', 'norm', 'fast', 'v.fast'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
     }
 }
