@@ -455,7 +455,8 @@ class ThpsVoiceGraph extends HTMLElement {
             });
         };
 
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['v.short', 'short', 'norm', 'long', 'v.long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        // NEW: Changed the first labels array from ['v.short', 'short', 'norm', 'long', 'v.long'] to strict numerical cutoffs.
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['short', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
         
         // Pass the dynamically generated voiceLabels into the Vertical Bars renderer
         drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
