@@ -1,13 +1,18 @@
 // ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v2.3)
-// Includes Canvas Pause Bars, Pace Backgrounds, and Vertical Voice Variance Bars
+// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v3.0)
+// Includes Canvas Pause Bars, Pace Backgrounds, Vertical Voice Variance, and Dual Pause Engines
 // ==========================================
 
 class ThpsVoiceGraph extends HTMLElement {
+    constructor() {
+        super();
+        this.pauseMode = 'dynamic'; // Default to relative speaker cadence
+        this.lastData = null; // Cache the data so we can instantly recalculate on toggle
+    }
+
     connectedCallback() {
         this.innerHTML = `
             <style>
-                /* Upgraded Scrollbar: Thick borders act as padding to make the thumb 'shorter' and sleeker */
                 .custom-scrollbar::-webkit-scrollbar { height: 14px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 4px solid #f8fafc; }
@@ -23,6 +28,11 @@ class ThpsVoiceGraph extends HTMLElement {
                     <div>
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Graph</h3>
                         <p class="text-[10px] text-slate-400 mt-0.5">Variance in Pause, Voice, & Pace</p>
+                    </div>
+                    <!-- NEW: The Engine Mode Toggle -->
+                    <div class="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
+                        <button data-action="setModeDynamic" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600">Dynamic</button>
+                        <button data-action="setModeGlobal" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600">Global</button>
                     </div>
                 </div>
                 
@@ -48,7 +58,7 @@ class ThpsVoiceGraph extends HTMLElement {
                                 <div class="w-full h-px bg-slate-300"></div>
                                 <div class="w-full h-px bg-slate-300"></div>
                             </div>
-                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -76,13 +86,32 @@ class ThpsVoiceGraph extends HTMLElement {
             else this.remove(); 
         });
 
+        // Toggle Listeners
+        this.querySelector('[data-action="setModeDynamic"]').addEventListener('click', () => this.setMode('dynamic'));
+        this.querySelector('[data-action="setModeGlobal"]').addEventListener('click', () => this.setMode('global'));
+
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
         
-        // NEW: THE "WAKE-UP" CATCH-UP CHECK
         if (window.thps_lastPayload) {
             setTimeout(() => this.update(window.thps_lastPayload), 50);
         }
+    }
 
+    setMode(mode) {
+        this.pauseMode = mode;
+        const dynBtn = this.querySelector('[data-action="setModeDynamic"]');
+        const globBtn = this.querySelector('[data-action="setModeGlobal"]');
+        
+        if (mode === 'dynamic') {
+            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
+            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
+        } else {
+            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
+            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
+        }
+        
+        // Recalculate graph and all dependent maths instantly
+        if (this.lastData) this.update(this.lastData);
     }
 
     countSyllablesLocal(word) {
@@ -95,13 +124,12 @@ class ThpsVoiceGraph extends HTMLElement {
     }
 
     update(data) {
-        if (!data.wordTimestamps || data.wordTimestamps.length === 0) return;
+        if (!data || !data.wordTimestamps || data.wordTimestamps.length === 0) return;
+        this.lastData = data; // Cache for toggling
         
         this.querySelector('.thps-vg-placeholder').style.display = 'none';
         
         const duration = Math.max(data.time || 1, Math.ceil(data.wordTimestamps[data.wordTimestamps.length - 1].end));
-        
-        // Setup Fixed Pixel Scaling (50 pixels = 1 second)
         const PIXELS_PER_SEC = 50;
         const scrollWrapper = this.querySelector('#thps-scroll-wrapper');
         const track = this.querySelector('.thps-sync-track');
@@ -113,27 +141,55 @@ class ThpsVoiceGraph extends HTMLElement {
         const axis = this.querySelector('.thps-time-axis');
         const staff = this.querySelector('.thps-staff-words');
         
-        // Arrays for UI elements
         let pauses = []; 
-        let chunkPaces = []; // Used for the background pace bars
+        let chunkPaces = []; 
 
         let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
         let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
         let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         
-        // --- PHD MATH PHASE 1: PAUSE VARIANCE ---
+        // --- PHD MATH PHASE 1: HYBRID PAUSE ENGINE ---
+        let expectedSyllableLength = 0.250; // Global Default (250ms = 4 SPS)
+        
+        if (this.pauseMode === 'dynamic') {
+            const firstWord = data.wordTimestamps[0];
+            const lastWord = data.wordTimestamps[data.wordTimestamps.length - 1];
+            const totalSpeakingTime = (lastWord.start + 1.0) - firstWord.start;
+            
+            let totalSyllables = 0;
+            data.wordTimestamps.forEach(w => totalSyllables += this.countSyllablesLocal(w.word));
+            
+            const dynamicSPS = totalSyllables / Math.max(0.1, totalSpeakingTime);
+            expectedSyllableLength = 1.0 / dynamicSPS; // Scale the timeline
+        }
+
         for (let i = 0; i < data.wordTimestamps.length - 1; i++) {
-            let gap = data.wordTimestamps[i+1].start - data.wordTimestamps[i].start;
-            if (gap >= 0.500) {
+            const currWord = data.wordTimestamps[i];
+            const nextWord = data.wordTimestamps[i+1];
+            
+            const sylCount = this.countSyllablesLocal(currWord.word);
+            const expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
+            
+            // Calculate True Pause & Clamp negative numbers to 0
+            const truePause = Math.max(0, nextWord.start - expectedNextStart);
+
+            // Log if there's actual measurable silence
+            if (truePause > 0.05) { // 50ms tolerance buffer for STT fuzziness
                 let pColor = '', pY = 0;
                 
-                if (gap < 0.650) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; } // slate-300 (Top)
-                else if (gap < 0.800) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; } // blue-400
-                else if (gap < 0.950) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; } // emerald-500 (Middle)
-                else if (gap < 1.100) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; } // amber-400
-                else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; } // rose-500 (Bottom)
+                // Strict 350ms Buckets
+                if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
+                else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
+                else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
+                else if (truePause <= 1.400) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; }
+                else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; }
 
-                pauses.push({ start: data.wordTimestamps[i].start, duration: gap, color: pColor, yPct: pY });
+                pauses.push({ 
+                    start: expectedNextStart, 
+                    duration: truePause, 
+                    color: pColor, 
+                    yPct: pY 
+                });
             }
         }
 
@@ -146,7 +202,7 @@ class ThpsVoiceGraph extends HTMLElement {
             let chunkStart = c * 3;
             let chunkEnd = chunkStart + 3;
             
-            // A) Pace Math (Syllables per 3s window scaled properly)
+            // A) Pace Math (Syllables per 3s window)
             let sylCount = 0;
             data.wordTimestamps.forEach(w => {
                 if (w.start >= chunkStart && w.start < chunkEnd) {
@@ -157,16 +213,16 @@ class ThpsVoiceGraph extends HTMLElement {
             if (sylCount > 0) {
                 let paceColor = '', paceRow = 0;
 
-                if (sylCount <= 8) { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; } // Top row
+                if (sylCount <= 8) { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; }
                 else if (sylCount <= 10) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; }
                 else if (sylCount <= 13) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; }
                 else if (sylCount <= 15) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; }
-                else { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; } // Bottom row
+                else { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; }
                 
                 chunkPaces.push({ start: chunkStart, width: 3, color: paceColor, row: paceRow });
             }
 
-            // B) Voice Math (Intensity Filtered by Pauses)
+            // B) Voice Math (Intensity Filtered by True Pauses)
             let pauseInChunk = 0;
             pauses.forEach(p => {
                 let pEnd = p.start + p.duration;
@@ -199,13 +255,12 @@ class ThpsVoiceGraph extends HTMLElement {
         
         validChunks.forEach(vc => {
             let diff = vc.db - globalAvgDb;
-            if (diff < -10) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } // Purple (15%)
-            else if (diff < -5) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } // Blue (30%)
-            else if (diff <= 5) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } // Green (50%)
-            else if (diff <= 10) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } // Yellow (75%)
-            else { voiceCounts.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } // Red (97%)
+            if (diff < -10) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
+            else if (diff < -5) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
+            else if (diff <= 5) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
+            else if (diff <= 10) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
+            else { voiceCounts.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
         });
-
 
         // --- VISUAL PAINTING 1: TIME AXIS ---
         axis.innerHTML = '';
@@ -214,14 +269,12 @@ class ThpsVoiceGraph extends HTMLElement {
             let isMajor = (i % 5 === 0);
             
             if (isMajor) {
-                // Major marker: Just the centered text
                 let label = document.createElement('span');
                 label.className = 'absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold -translate-x-1/2 select-none';
                 label.style.left = `${xPos}px`;
                 label.innerText = `${i}s`;
                 axis.appendChild(label);
             } else {
-                // Minor tick
                 let tick = document.createElement('div');
                 tick.className = `absolute bottom-0 border-l border-slate-500/50 h-2`;
                 tick.style.left = `${xPos}px`;
@@ -238,7 +291,6 @@ class ThpsVoiceGraph extends HTMLElement {
         
         ctx.clearRect(0, 0, trackWidth, canvasHeight);
         
-        // Draw 3-Second Grid Background Lines
         ctx.strokeStyle = 'rgba(255,255,255,0.03)';
         ctx.lineWidth = 1;
         for(let i=0; i<duration; i+=3) {
@@ -246,7 +298,7 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
         }
 
-        // A) Draw Solid Intensity Blocks
+        // A) Solid Intensity Blocks
         validChunks.forEach(vc => {
             let x = vc.start * PIXELS_PER_SEC;
             let w = 3 * PIXELS_PER_SEC;
@@ -260,12 +312,12 @@ class ThpsVoiceGraph extends HTMLElement {
             ctx.shadowBlur = 0;
         });
 
-        // B) Draw Pause Overlay Bars
+        // B) Pause Overlay Bars
         pauses.forEach(p => {
             let x = p.start * PIXELS_PER_SEC;
             let w = p.duration * PIXELS_PER_SEC;
-            let h = canvasHeight * 0.10; // 10% height of the acoustic timeline
-            let y = (p.yPct * canvasHeight) - (h / 2); // Placed at calculated vertical %
+            let h = canvasHeight * 0.10; 
+            let y = (p.yPct * canvasHeight) - (h / 2); 
             
             ctx.fillStyle = p.color;
             ctx.shadowBlur = 8;
@@ -278,15 +330,12 @@ class ThpsVoiceGraph extends HTMLElement {
             } else {
                 ctx.fillRect(x, y, w, h);
             }
-            
             ctx.shadowBlur = 0;
         });
 
         // --- VISUAL PAINTING 3: SPEECH STAFF (PACE BARS & WORDS) ---
-        // Clean out old text but keep the visual grid lines
         staff.querySelectorAll('.staff-item').forEach(el => el.remove());
 
-        // A) Draw Pace Background Bars (z-index 0)
         chunkPaces.forEach(cp => {
             const bar = document.createElement('div');
             bar.className = 'staff-item absolute opacity-30 pointer-events-none rounded-sm z-0';
@@ -298,7 +347,6 @@ class ThpsVoiceGraph extends HTMLElement {
             staff.appendChild(bar);
         });
 
-        // B) Draw Word Spans (z-index 10+)
         data.wordTimestamps.forEach((w, index) => {
             const span = document.createElement('span');
             span.innerText = w.word;
@@ -306,10 +354,7 @@ class ThpsVoiceGraph extends HTMLElement {
             const xPos = w.start * PIXELS_PER_SEC; 
             const row = index % 5;
             
-            // Default styling
             let textColorCls = 'text-slate-700';
-            
-            // Apply NLP Color Codes
             if (w.colorType === 'personal') textColorCls = 'text-emerald-500';
             else if (w.colorType === 'visual') textColorCls = 'text-rose-500';
             else if (w.colorType === 'overlap') textColorCls = 'text-fuchsia-600';
@@ -325,13 +370,11 @@ class ThpsVoiceGraph extends HTMLElement {
         const drawHorizontalBars = (containerClass, countsObj, labels, colors) => {
             const container = this.querySelector(containerClass);
             container.innerHTML = '';
-            
             const maxVal = Math.max(...Object.values(countsObj), 1); 
             
             Object.keys(countsObj).forEach((key, idx) => {
                 const count = countsObj[key];
                 const widthPct = Math.max(5, (count / maxVal) * 100); 
-                
                 container.innerHTML += `
                     <div class="flex items-center gap-2">
                         <span class="w-12 text-right">${labels[idx]}:</span>
@@ -348,13 +391,11 @@ class ThpsVoiceGraph extends HTMLElement {
             const container = this.querySelector(containerClass);
             container.innerHTML = `<div class="flex items-end justify-between w-full h-full pt-1 pb-1"></div>`;
             const wrapper = container.firstElementChild;
-            
             const maxVal = Math.max(...Object.values(countsObj), 1); 
             
             Object.keys(countsObj).forEach((key, idx) => {
                 const count = countsObj[key];
                 const heightPct = Math.max(5, (count / maxVal) * 100); 
-                
                 wrapper.innerHTML += `
                     <div class="flex flex-col items-center justify-end gap-1 flex-1 h-full">
                         <span class="text-[9px] font-bold text-slate-700">${count}</span>
@@ -367,29 +408,9 @@ class ThpsVoiceGraph extends HTMLElement {
             });
         };
 
-        // Pause (Horizontal)
-        drawHorizontalBars(
-            '.thps-bar-container-pause', 
-            pauseCounts, 
-            ['v.short', 'short', 'norm', 'long', 'v.long'],
-            ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']
-        );
-
-        // Voice (Vertical EQ style!)
-        drawVerticalBars(
-            '.thps-bar-container-voice', 
-            voiceCounts, 
-            ['v.low', 'low', 'norm', 'high', 'v.high'],
-            ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']
-        );
-
-        // Pace (Horizontal)
-        drawHorizontalBars(
-            '.thps-bar-container-pace', 
-            paceCounts, 
-            ['v.slow', 'slow', 'norm', 'fast', 'v.fast'],
-            ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']
-        );
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['v.short', 'short', 'norm', 'long', 'v.long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        drawVerticalBars('.thps-bar-container-voice', voiceCounts, ['v.low', 'low', 'norm', 'high', 'v.high'], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
+        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['v.slow', 'slow', 'norm', 'fast', 'v.fast'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
     }
 }
 
