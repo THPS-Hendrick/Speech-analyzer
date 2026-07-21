@@ -1,6 +1,6 @@
 {
   "mode": "voice-choice",
-  "title": "Voice Choice: Dynamic Range",
+  "title": "Voice Choice: Intensity",
   "speeches": [
     {
       "title": "Al Pacino - Any Given Sunday",
@@ -17,75 +17,94 @@
         { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
         { "intensity": 5, "text": "Between livin' and dyin'!" }
       ]
-      "title": "Al Pacino - Any Given Sunday",
-      "description": "Move through the 1 to 5 Sound Change Range",
+    },
+    {
+      "title": "Milla Jovovich - Joan of Arc",
+      "description": "Spending Time with 5s and 0s (explode then recover)",
       "lines": [
-        { "intensity": 1, "text": "You know, when you get old in life things get taken from you. I mean that's...part of life." },
-        { "intensity": 1, "text": "You find out life's this game of inches" },
-        { "intensity": 2, "text": "So is football. Because in either game, life or football, the margin for error is so small." },
-        { "intensity": 2, "text": "One-half a step too late, or too early, and you don't quite make it." },
-        { "intensity": 3, "text": "But the inches we need are everywhere." },
-        { "intensity": 3, "text": "They're in every break of the game, every minute, every second." },
-        { "intensity": 4, "text": "On this team, we fight for that inch." },
-        { "intensity": 4, "text": "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
-        { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
-        { "intensity": 5, "text": "Between livin' and dyin'!" }
+        { "intensity": 5, "text": "I have a message for your King Henry." },
+        { "intensity": 5, "text": "It is a message from God." },
+        { "intensity": 5, "text": "Go home." },
+        { "intensity": 5, "text": "Go now, in peace." },
+        { "intensity": 5, "text": "If you do not go now, you will be buried in this field." },
+        { "intensity": 5, "text": "I have seen enough blood. But if you want more, I can't stop you." },
+        { "intensity": 5, "text": "I can only warn you, that it will be your blood, not ours." },
+        { "intensity": 5, "text": "I am waiting for your answer." }
       ]
-            "title": "Al Pacino - Any Given Sunday",
-      "description": "Move through the 1 to 5 Sound Change Range",
+    },
+    {
+      "title": "Jack Nicholson - A Few Good Men",
+      "description": "One Extreme (5)... Another Extreme (1) then Recover (3)",
       "lines": [
-        { "intensity": 1, "text": "You know, when you get old in life things get taken from you. I mean that's...part of life." },
-        { "intensity": 1, "text": "You find out life's this game of inches" },
-        { "intensity": 2, "text": "So is football. Because in either game, life or football, the margin for error is so small." },
-        { "intensity": 2, "text": "One-half a step too late, or too early, and you don't quite make it." },
-        { "intensity": 3, "text": "But the inches we need are everywhere." },
-        { "intensity": 3, "text": "They're in every break of the game, every minute, every second." },
-        { "intensity": 4, "text": "On this team, we fight for that inch." },
-        { "intensity": 4, "text": "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
-        { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
-        { "intensity": 5, "text": "Between livin' and dyin'!" }
+        { "intensity": 5, "text": "You can't handle the truth!!" },
+        { "intensity": 1, "text": "Son, we live in a world that has walls and those walls have to be guarded by men with guns." },
+        { "intensity": 3, "text": "Whose gonna do it? You?" },
+        { "intensity": 5, "text": "You Lieutenant Wineburg?" },
+        { "intensity": 3, "text": "I have a greater responsibility than you can possibly fathom. You weep for Santiago and you curse the marines." },
+        { "intensity": 5, "text": "You have that luxury. The luxury of not knowing what I know." },
+        { "intensity": 1, "text": "That Santiago's death, while tragic" },
+        { "intensity": 5, "text": "--probably saved lives!" },
+        { "intensity": 3, "text": "And my existence, although gro-tesque and incomprehensible to you," },
+        { "intensity": 5, "text": "saves lives!!" },
+        { "intensity": 1, "text": "You don't want the truth because deep down in places you don't talk about at parties, you want me on that wall. You need me on that wall." },
+        { "intensity": 3, "text": "We use words like Honour, code, loyalty." },
+        { "intensity": 5, "text": "We use those words as the backbone of a life spent defending something." },
+        { "intensity": 1, "text": "... You use them as a punchline." }
       ]
-            "title": "Al Pacino - Any Given Sunday",
-      "description": "Move through the 1 to 5 Sound Change Range",
+    },
+    {
+      "title": "Julia Gillard - Address to Parliament",
+      "description": "Firm (4) but controlled (2) in a formal environment",
       "lines": [
-        { "intensity": 1, "text": "You know, when you get old in life things get taken from you. I mean that's...part of life." },
-        { "intensity": 1, "text": "You find out life's this game of inches" },
-        { "intensity": 2, "text": "So is football. Because in either game, life or football, the margin for error is so small." },
-        { "intensity": 2, "text": "One-half a step too late, or too early, and you don't quite make it." },
-        { "intensity": 3, "text": "But the inches we need are everywhere." },
-        { "intensity": 3, "text": "They're in every break of the game, every minute, every second." },
-        { "intensity": 4, "text": "On this team, we fight for that inch." },
-        { "intensity": 4, "text": "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
-        { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
-        { "intensity": 5, "text": "Between livin' and dyin'!" }
+        { "intensity": 3, "text": "Thank you madam Speaker and I rise to oppose the motion moved by the leader of the opposition." },
+        { "intensity": 4, "text": "And in so doing I say to the leader of the opposition, I will not be lectured about sexism and misogyny by. this. man. I will not." },
+        { "intensity": 2, "text": "And the government will not be lectured about sexism and misogyny by this man." },
+        { "intensity": 4, "text": "Not now, not ever." },
+        { "intensity": 2, "text": "The leader of the opposition says that people who hold sexist views and who are misogynists are not appropriate for high office." },
+        { "intensity": 3, "text": "Well, I hope the leader of the opposition has got a piece of paper; and he is writing out his resignation." },
+        { "intensity": 2, "text": "Because if he wants to know what misogyny looks like in modern Australia, he doesn't need a motion in the House of Representatives," },
+        { "intensity": 4, "text": "He needs a mirror!" }
       ]
-            "title": "Al Pacino - Any Given Sunday",
-      "description": "Move through the 1 to 5 Sound Change Range",
+    },
+    {
+      "title": "George Clooney - Up In The Air",
+      "description": "Very Subtle. As close to 3 while still getting to 2 and 4.",
       "lines": [
-        { "intensity": 1, "text": "You know, when you get old in life things get taken from you. I mean that's...part of life." },
-        { "intensity": 1, "text": "You find out life's this game of inches" },
-        { "intensity": 2, "text": "So is football. Because in either game, life or football, the margin for error is so small." },
-        { "intensity": 2, "text": "One-half a step too late, or too early, and you don't quite make it." },
-        { "intensity": 3, "text": "But the inches we need are everywhere." },
-        { "intensity": 3, "text": "They're in every break of the game, every minute, every second." },
-        { "intensity": 4, "text": "On this team, we fight for that inch." },
-        { "intensity": 4, "text": "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
-        { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
-        { "intensity": 5, "text": "Between livin' and dyin'!" }
+        { "intensity": 2, "text": "How much does your life weigh?" },
+        { "intensity": 3, "text": "Imagine for a second that you're carrying a backpack." },
+        { "intensity": 2, "text": "I want you to feel the straps on your shoulders." },
+        { "intensity": 2, "text": "Feel 'em?" },
+        { "intensity": 3, "text": "Now I want you to pack it with all the stuff that you have in your life. You start with the little things." },
+        { "intensity": 4, "text": "The things on shelves and in drawers, the knick-knacks, the collectibles." },
+        { "intensity": 2, "text": "Feel the weight as that adds up." },
+        { "intensity": 4, "text": "Then you start adding larger stuff, clothes, table-top appliances, lamps, linens, your TV." },
+        { "intensity": 3, "text": "The backpack should be getting pretty heavy now." },
+        { "intensity": 4, "text": "And you go bigger. Your couch, bed, your kitchen table. Stuff it all in there. Your car, get it in there. Your home, whether it's a studio apartment or a two bedroom house." },
+        { "intensity": 3, "text": "I want you to stuff it all into that backpack." },
+        { "intensity": 2, "text": "Now try to walk." }
       ]
-            "title": "Al Pacino - Any Given Sunday",
-      "description": "Move through the 1 to 5 Sound Change Range",
+    },
+    {
+      "title": "Alec Baldwin - Glengarry Glen Ross",
+      "description": "Put it all together in rapid succession",
       "lines": [
-        { "intensity": 1, "text": "You know, when you get old in life things get taken from you. I mean that's...part of life." },
-        { "intensity": 1, "text": "You find out life's this game of inches" },
-        { "intensity": 2, "text": "So is football. Because in either game, life or football, the margin for error is so small." },
-        { "intensity": 2, "text": "One-half a step too late, or too early, and you don't quite make it." },
-        { "intensity": 3, "text": "But the inches we need are everywhere." },
-        { "intensity": 3, "text": "They're in every break of the game, every minute, every second." },
-        { "intensity": 4, "text": "On this team, we fight for that inch." },
-        { "intensity": 4, "text": "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
-        { "intensity": 5, "text": "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
-        { "intensity": 5, "text": "Between livin' and dyin'!" }
+        { "intensity": 4, "text": "Let me have your attention for the moment." },
+        { "intensity": 2, "text": "Because you're talking about what?" },
+        { "intensity": 3, "text": "Complaining about that sale you didn't make?" },
+        { "intensity": 4, "text": "Making excuses for why they're not buying today?" },
+        { "intensity": 2, "text": "Let's talk about something important." },
+        { "intensity": 4, "text": "... Let's talk about something important!" },
+        { "intensity": 5, "text": "Put that coffee, down!!! ..." },
+        { "intensity": 1, "text": "Coffee is for closers..." },
+        { "intensity": 2, "text": "You think I'm joking? ... I am not joking..." },
+        { "intensity": 3, "text": "I am here from Mitch & Murray, and I am here on a mission of mercy!" },
+        { "intensity": 5, "text": "The good news is... you're fired." },
+        { "intensity": 3, "text": "The bad news is that all of you have just one week to regain your jobs. Starting with tonight." },
+        { "intensity": 1, "text": "Oh? Have I got your attention now? Good." },
+        { "intensity": 4, "text": "Because we're adding a little something to this week's sales contest." },
+        { "intensity": 4, "text": "First prize is a Nissan El Dorado sedan." },
+        { "intensity": 2, "text": "Second prize ... a lovely set of steak knives." },
+        { "intensity": 3, "text": "Third prize is you're fired." }
       ]
     }
   ]
