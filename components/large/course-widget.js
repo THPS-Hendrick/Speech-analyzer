@@ -11,6 +11,10 @@ class THPSCourseWidget extends HTMLElement {
         this.eslCategory = null;
         this.eslSentences = [];
         this.eslIndex = 0;
+
+        // Voice Choice Specific State
+        this.vcActiveSpeechIndex = 0;
+        this.vcLineIndex = 0;
     }
 
     connectedCallback() {
@@ -38,7 +42,7 @@ class THPSCourseWidget extends HTMLElement {
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
-                    <!-- NEW ESL LEVEL 1 BUTTON -->
+                    <!-- ESL LEVEL 1 BUTTON -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/esl-level-1/esl-level-1.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">ESL Level 1: Pronunciation</span>
                         <i data-lucide="mic-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
@@ -48,10 +52,10 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
                         <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
-                    <!-- PITCHING LEVEL 1 -->
-                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/dummy-course.json">
-                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Pitching Level 1</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors group-hover:translate-x-1 pointer-events-none"></i>
+                    <!-- NEW VOICE CHOICE COURSE -->
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/voice-choice/voice-choice.json">
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Voice Choice: Intensity</span>
+                        <i data-lucide="sliders" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
                 </div>
             </div>
@@ -93,6 +97,9 @@ class THPSCourseWidget extends HTMLElement {
             } else if (this.courseData.mode === 'esl') {
                 this.currentStep = 'esl-menu';
                 this.renderEslMenu();
+            } else if (this.courseData.mode === 'voice-choice') {
+                this.currentStep = 'vc-menu';
+                this.renderVoiceChoiceMenu();
             } else {
                 this.currentStep = 1; 
                 this.renderCourseUI();
@@ -112,10 +119,204 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     // ==========================================
+    // VOICE CHOICE: MENU & GLIDING PROMPTER
+    // ==========================================
+
+    renderVoiceChoiceMenu() {
+        const speechOptions = this.courseData.speeches.map((speech, index) => `
+            <button class="thps-vc-select-btn group bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-xl p-4 flex flex-col items-start justify-center text-left transition-all shadow-sm active:scale-95 w-full" data-index="${index}">
+                <span class="text-sm font-black text-slate-700 group-hover:text-indigo-600 mb-1 pointer-events-none">${speech.title}</span>
+                <span class="text-xs font-bold text-slate-400 pointer-events-none">${speech.description}</span>
+            </button>
+        `).join('');
+
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-6 md:p-8">
+                <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
+                    Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
+                </button>
+
+                <div class="text-center mb-6 mt-4">
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Voice Choice</h2>
+                    <p class="text-slate-500 text-sm mt-1">Select a script to practice intensity modulation.</p>
+                </div>
+
+                <div class="flex flex-col gap-4 w-full max-w-xl mx-auto flex-1 overflow-y-auto custom-scrollbar p-2">
+                    ${speechOptions}
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            this.courseData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
+        this.querySelectorAll('.thps-vc-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.vcActiveSpeechIndex = parseInt(e.currentTarget.getAttribute('data-index'));
+                this.vcLineIndex = 0;
+                this.currentStep = 'vc-prompter';
+                this.renderVoiceChoicePrompter();
+            });
+        });
+    }
+
+    renderVoiceChoicePrompter() {
+        const speech = this.courseData.speeches[this.vcActiveSpeechIndex];
+        
+        // Generate Color based on Intensity
+        const getStyle = (intensity) => {
+            switch(parseInt(intensity)) {
+                case 0: return { bg: 'bg-slate-200', text: 'text-slate-600', ring: 'ring-slate-200' };
+                case 1: return { bg: 'bg-slate-700', text: 'text-white', ring: 'ring-slate-700' };
+                case 2: return { bg: 'bg-sky-500', text: 'text-white', ring: 'ring-sky-500' };
+                case 3: return { bg: 'bg-emerald-500', text: 'text-white', ring: 'ring-emerald-500' };
+                case 4: return { bg: 'bg-amber-500', text: 'text-white', ring: 'ring-amber-500' };
+                case 5: return { bg: 'bg-rose-600', text: 'text-white', ring: 'ring-rose-600' };
+                default: return { bg: 'bg-slate-200', text: 'text-slate-600', ring: 'ring-slate-200' };
+            }
+        };
+
+        const linesHTML = speech.lines.map((line, index) => {
+            const style = getStyle(line.intensity);
+            // We use padding block to ensure smooth scroll snapping/gliding anchors.
+            return `
+                <div class="vc-line-wrapper py-3 w-full" id="vc-line-${index}">
+                    <div class="vc-line-content flex gap-4 p-4 rounded-2xl border-2 border-transparent transition-all duration-300 ${index === this.vcLineIndex ? 'opacity-100 bg-white shadow-sm ring-1 ' + style.ring : 'opacity-40 grayscale'}">
+                        <div class="shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${style.bg} ${style.text}">
+                            <span class="text-xl font-black leading-none">${line.intensity}</span>
+                        </div>
+                        <div class="flex-1 flex items-center">
+                            <p class="text-lg md:text-xl font-bold text-slate-800 leading-snug">${line.text}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
+                <!-- TOP HEADER -->
+                <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
+                    <button class="thps-vc-back text-slate-300 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
+                        <i data-lucide="arrow-left" class="w-4 h-4 pointer-events-none"></i> Scripts
+                    </button>
+                    <div class="text-center truncate px-4">
+                        <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest">VOICE CHOICE</span>
+                        <span class="block text-sm font-bold truncate">${speech.title}</span>
+                    </div>
+                    <div class="w-16"></div> <!-- Spacer -->
+                </div>
+
+                <!-- GLIDING PROMPTER AREA -->
+                <div class="flex-1 relative flex flex-col">
+                    
+                    <!-- Scroll Viewport -->
+                    <div id="vc-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative px-4 md:px-12 py-10">
+                        <div class="max-w-2xl mx-auto flex flex-col pb-48"> <!-- Extra padding bottom so last line can hit top -->
+                            ${linesHTML}
+                        </div>
+                    </div>
+                    
+                    <!-- Overlay Gradients to focus the center/top view -->
+                    <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none z-10"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
+                </div>
+
+                <!-- CONTROLS & RECORDING PANEL -->
+                <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
+                    <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-3">
+                        <button class="thps-vc-up p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90" ${this.vcLineIndex === 0 ? 'disabled' : ''}>
+                            <i data-lucide="chevron-up" class="w-6 h-6 pointer-events-none"></i>
+                        </button>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="thps-vc-timer text-3xl font-mono font-black text-slate-800 tracking-wider mb-2">00:00</div>
+                            <button id="vc-record-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-2.5 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] active:scale-95 flex items-center gap-2">
+                                <i data-lucide="mic" id="vc-record-icon" class="w-4 h-4 pointer-events-none transition-transform"></i> <span id="vc-record-text">Start Performance</span>
+                            </button>
+                        </div>
+
+                        <button class="thps-vc-down p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90" ${this.vcLineIndex === speech.lines.length - 1 ? 'disabled' : ''}>
+                            <i data-lucide="chevron-down" class="w-6 h-6 pointer-events-none"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        this.querySelector('.thps-vc-back').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+            this.currentStep = 'vc-menu';
+            this.renderVoiceChoiceMenu();
+        });
+
+        const updateScrollAndStyles = () => {
+            const viewport = this.querySelector('#vc-scroll-viewport');
+            const lines = this.querySelectorAll('.vc-line-content');
+            
+            // Update visual styles (opacity and highlight)
+            lines.forEach((line, idx) => {
+                if (idx === this.vcLineIndex) {
+                    line.classList.remove('opacity-40', 'grayscale');
+                    line.classList.add('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
+                } else {
+                    line.classList.add('opacity-40', 'grayscale');
+                    line.classList.remove('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
+                }
+            });
+
+            // Smooth glide to the wrapper
+            const targetWrapper = this.querySelector(`#vc-line-${this.vcLineIndex}`);
+            if (targetWrapper && viewport) {
+                // Scroll the wrapper to the top of the viewport (with a small padding buffer)
+                viewport.scrollTo({
+                    top: targetWrapper.offsetTop - 40,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Update button states
+            this.querySelector('.thps-vc-up').disabled = this.vcLineIndex === 0;
+            this.querySelector('.thps-vc-down').disabled = this.vcLineIndex === speech.lines.length - 1;
+        };
+
+        this.querySelector('.thps-vc-up').addEventListener('click', () => {
+            if (this.vcLineIndex > 0) {
+                this.vcLineIndex--;
+                updateScrollAndStyles();
+            }
+        });
+
+        this.querySelector('.thps-vc-down').addEventListener('click', () => {
+            if (this.vcLineIndex < speech.lines.length - 1) {
+                this.vcLineIndex++;
+                updateScrollAndStyles();
+            }
+        });
+
+        this.querySelector('#vc-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') {
+                window.toggleRecording();
+            }
+        });
+    }
+
+    // ... (Keep renderEslMenu, renderEslDrill, renderArcadeUI, renderCourseUI here identically as before)
+    // [I have omitted them in this view purely to keep the code block focused, but they remain intact in the logic exactly as provided in your prompt above. Ensure you keep them when pasting this replacement!]
+    
+    // ==========================================
     // ESL LEVEL 1: VOCAL FITNESS ARCADE
     // ==========================================
     
     renderEslMenu() {
+        // [Existing code from prompt]
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-6 md:p-8">
                 <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
@@ -289,7 +490,6 @@ class THPSCourseWidget extends HTMLElement {
             }
         });
     }
-
 
     // ==========================================
     // ARCADE MODE: REPEAT + COUNT UI
@@ -604,8 +804,8 @@ class THPSCourseWidget extends HTMLElement {
     processPayload(e) {
         if (!this.courseData || this.currentStep === 0) return;
         
-        // Bypass grading metrics if inside independent Arcade or ESL mode
-        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill') return;
+        // Bypass grading metrics if inside independent Arcade, ESL, or Voice Choice modes
+        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter') return;
 
         const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
@@ -713,11 +913,9 @@ class THPSCourseWidget extends HTMLElement {
             if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
                 const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
                 
-                // Max 80 seconds scaling ceiling for visual progress mapping
                 const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
                 arcadeProgress.style.width = `${fillPct}%`;
                 
-                // Highlight pacing target milestone star nodes dynamically
                 if (elapsedSecs >= 20 && star20) star20.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
                 if (elapsedSecs >= 60 && star60) star60.className = "w-4 h-4 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]";
                 
@@ -727,7 +925,6 @@ class THPSCourseWidget extends HTMLElement {
                     if (window.lucide) window.lucide.createIcons({ root: arcadeBtn });
                 }
             } else {
-                // Clear bar states on stop transitions
                 arcadeProgress.style.width = `0%`; 
                 if (star20) star20.className = "w-4 h-4 text-slate-400/50 transition-colors";
                 if (star60) star60.className = "w-4 h-4 text-slate-400/50 transition-colors";
@@ -749,12 +946,10 @@ class THPSCourseWidget extends HTMLElement {
 
         if (eslTimer && eslRecordBtn) {
             if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
-                // High-precision stopwatch format (e.g., "3.45s")
                 const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
                 eslTimer.innerHTML = `${elapsedSecs.toFixed(2)}<span class="text-2xl text-slate-400">s</span>`;
                 eslTimer.classList.add('text-indigo-600');
 
-                // Live Transcript sync
                 const liveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
                 if (eslTranscript && liveText) eslTranscript.innerText = liveText;
 
@@ -772,7 +967,6 @@ class THPSCourseWidget extends HTMLElement {
             } else {
                 eslTimer.classList.remove('text-indigo-600');
                 
-                // Final Transcript Sync on Stop
                 const finalLiveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
                 if (eslTranscript && finalLiveText) eslTranscript.innerText = finalLiveText;
 
@@ -785,6 +979,49 @@ class THPSCourseWidget extends HTMLElement {
                     if (eslRecordIcon) {
                         eslRecordIcon.setAttribute('data-lucide', 'mic');
                         if (window.lucide) window.lucide.createIcons({ root: eslRecordBtn });
+                    }
+                }
+            }
+        }
+
+        // 4. NEW: Sync Voice Choice Timer
+        const vcTimer = this.querySelector('.thps-vc-timer');
+        const vcRecordBtn = this.querySelector('#vc-record-btn');
+        const vcRecordIcon = this.querySelector('#vc-record-icon');
+        const vcRecordText = this.querySelector('#vc-record-text');
+
+        if (vcTimer && vcRecordBtn) {
+            if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
+                let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
+                
+                vcTimer.innerText = `${m}:${s}`;
+                vcTimer.classList.add('text-rose-500');
+
+                if (!vcRecordBtn.classList.contains('bg-rose-500')) {
+                    vcRecordBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
+                    vcRecordBtn.classList.replace('hover:bg-indigo-500', 'hover:bg-rose-400');
+                    vcRecordBtn.style.boxShadow = "0 0 15px rgba(243, 24, 73, 0.4)";
+                    if (vcRecordText) vcRecordText.innerText = "Finish";
+                    
+                    if (vcRecordIcon) {
+                        vcRecordIcon.setAttribute('data-lucide', 'square');
+                        if (window.lucide) window.lucide.createIcons({ root: vcRecordBtn });
+                    }
+                }
+            } else {
+                vcTimer.classList.remove('text-rose-500');
+
+                if (vcRecordBtn.classList.contains('bg-rose-500')) {
+                    vcRecordBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
+                    vcRecordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-indigo-500');
+                    vcRecordBtn.style.boxShadow = "0 0 15px rgba(79,70,229,0.4)";
+                    if (vcRecordText) vcRecordText.innerText = "Start Performance";
+                    
+                    if (vcRecordIcon) {
+                        vcRecordIcon.setAttribute('data-lucide', 'mic');
+                        if (window.lucide) window.lucide.createIcons({ root: vcRecordBtn });
                     }
                 }
             }
