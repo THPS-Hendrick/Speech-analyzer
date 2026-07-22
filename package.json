@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Serverless backend for Daily Mic-Check Speech-to-Text",
   "main": "api/transcribe.js",
+  "type": "module",
   "scripts": {
     "start": "node api/transcribe.js"
   },
@@ -11,6 +12,6 @@
     "@google/generative-ai": "^0.21.0"
   },
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   }
 }
