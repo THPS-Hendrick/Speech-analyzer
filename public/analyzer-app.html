@@ -16,6 +16,9 @@
     
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
     
+    <!-- ADDED: AI Coach Widget -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/thps-ai-coach.js"></script>
+    
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
@@ -59,6 +62,9 @@
 <body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
 
     <textarea id="cba-inputText" class="hidden"></textarea>
+
+    <!-- ADDED: AI Coach Web Component -->
+    <thps-ai-coach></thps-ai-coach>
 
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
 
