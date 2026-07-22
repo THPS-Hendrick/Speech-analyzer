@@ -1,7 +1,6 @@
-// api/coach.js
-import { GoogleGenerativeAI } from '@google/generative-ai';
+const { GoogleGenerativeAI } = require('@google-cloud/generative-ai');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // 1. CORS Headers (Crucial for cross-origin requests from your frontend)
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*'); // Restrict to your domain in production
@@ -53,4 +52,4 @@ ${JSON.stringify(payload, null, 2)}
         console.error("Gemini API Error:", error);
         return res.status(500).json({ error: 'Failed to generate coaching advice.' });
     }
-}
+};
