@@ -63,9 +63,6 @@
 
     <textarea id="cba-inputText" class="hidden"></textarea>
 
-    <!-- ADDED: AI Coach Web Component -->
-    <thps-ai-coach></thps-ai-coach>
-
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
 
     <div id="history-menu-drawer" class="fixed top-[0] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
@@ -344,8 +341,8 @@
                             <thps-upload-speech></thps-upload-speech>
                         </div>
 
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-whats-this></thps-whats-this>
+                        <div class="w-full md:w-[calc(50%-0.5rem)] mt-2 cursor-move relative group">
+                            <thps-ai-coach></thps-ai-coach>
                         </div>
 
                         <div class="w-full mt-2 cursor-move relative group">
