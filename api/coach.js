@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google-cloud/generative-ai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 module.exports = async function handler(req, res) {
     // 1. CORS Headers (Crucial for cross-origin requests from your frontend)
