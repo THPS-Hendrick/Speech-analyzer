@@ -1,1 +1,1072 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Analyzer App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    
+    <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/text-input.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/tangible-text.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/upload-speech.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/compare-speech.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/course-widget.js"></script>
+    <!-- ADDED: Diagnostic Course & Report Card Widgets -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/diagnostic.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/visual-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/signal-noise.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/sentence-complexity.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/simple-language.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-mumble.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
+    
+    <style>
+        /* DASHBOARD LOCK PROTECTION */
+        #thps-dashboard-grid:not(.edit-mode-active) .thps-close-btn { display: none !important; }
+        #thps-dashboard-grid:not(.edit-mode-active) .cursor-move { cursor: default !important; }
+    </style>
+</head>
+<body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
+
+    <textarea id="cba-inputText" class="hidden"></textarea>
+
+    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
+
+    <div id="history-menu-drawer" class="fixed top-[0] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Session History</h2>
+            </div>
+            <button onclick="window.closeAllMenus()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex w-full border-b border-slate-200 bg-white">
+            <button onclick="window.switchHistoryTab('list')" id="hist-tab-btn-list" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors">List</button>
+            <button onclick="window.switchHistoryTab('avg')" id="hist-tab-btn-avg" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Avg</button>
+            <button onclick="window.switchHistoryTab('best')" id="hist-tab-btn-best" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Best</button>
+            
+            <button onclick="window.spawnCompareWidget()" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-1">
+                <i data-lucide="scale" class="w-3 h-3 hidden sm:block"></i> VS
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+            <div id="hist-tab-content-list" class="block space-y-3">
+                </div>
+            <div id="hist-tab-content-avg" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
+            </div>
+            <div id="hist-tab-content-best" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="widget-menu-drawer" class="fixed top-[0] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Widget Library</h2>
+            </div>
+            <button onclick="window.closeAllMenus()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex w-full border-b border-slate-200 bg-white">
+            <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Small</button>
+            <button onclick="window.switchWidgetTab('medium')" id="tab-btn-medium" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Medium</button>
+            <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Large</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+            
+            <!-- Default hidden for visual alignment -->
+            <div id="tab-content-small" class="hidden space-y-8">
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-personal', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Personal Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-visual', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Visual Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-intangible', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Intangible Pill
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pace', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pace Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-mumble', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Mumble Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pause', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pause Pill
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-wps', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-violet-600 bg-white shadow-sm hover:border-violet-400 hover:bg-violet-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Words/Sent Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-medium" class="hidden space-y-8">
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-wpm-graph', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> WPM Graph
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-personal-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Personal Balance
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-visual-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Visual Balance
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-gauge-mumble', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Gauge
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-mumble-card', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Card
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-signal-noise', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Signal Noise
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-sentence-complexity', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Sent. Complex
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-simple-language', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Simple Lang.
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-google-benchmark', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Google 10K
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Default block for visual alignment -->
+            <div id="tab-content-large" class="block space-y-8">
+                 <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-diagnostic', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="stethoscope" class="w-4 h-4 mb-1"></i> Diagnostic Course
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-report-card', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="file-text" class="w-4 h-4 mb-1"></i> Report Card
+                        </div>
+                        
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-course-widget', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="graduation-cap" class="w-4 h-4 mb-1"></i> Courses
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-live-mic-timer', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Live Mic Timer
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-text-input', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Text Input
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-upload-speech', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Upload Speech
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Compare Speech
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-voice-graph', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Voice Graph
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-score-summary', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Score Summary
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-tangible-text', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Tangible Text
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto w-full mt-4 md:mt-8 px-2 flex flex-col items-center">
+        <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mb-6"></div>
+    </div>
+
+    <div id="celebration-panel" class="hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500">
+        <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400">Waiting for Audio...</h2>
+        <div class="flex flex-row justify-center items-center gap-8 md:gap-16">
+            <div class="flex flex-col items-center">
+                <span id="celeb-label-grade" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Final Grade</span>
+                <span id="celeb-grade" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">- / 10</span>
+            </div>
+            <div id="celeb-divider" class="w-px h-20 bg-slate-300 opacity-50"></div>
+            <div class="flex flex-col items-center">
+                <span id="celeb-label-time" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Time</span>
+                <span id="celeb-time" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
+        <div class="flex flex-col space-y-6 sm:space-y-8">
+            <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
+
+                <div id="cba-processing-panel" class="hidden score-card glass-panel p-8 rounded-2xl border-t-4 border-blue-500 shadow-md bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center transition-all duration-300">
+                    <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner">
+                        <i data-lucide="refresh-cw" class="w-8 h-8 text-blue-600 animate-spin"></i>
+                        <i data-lucide="mic" class="w-4 h-4 text-blue-800 absolute"></i>
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-slate-800 drop-shadow-sm text-center">Analyzing Audio...</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
+                </div>
+                
+                <div class="w-full">
+                    <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Tools</h2>
+                            <p class="text-xs text-slate-500 mt-1">Measure your speech.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
+                                <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
+                                <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                            </button>
+                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                                <span>History: <span id="history-count">0</span></span>
+                            </button>
+                            <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
+                                <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                                <span class="hidden sm:inline">Add Widget</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-course-widget></thps-course-widget>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-live-mic-timer></thps-live-mic-timer>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-upload-speech></thps-upload-speech>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-whats-this></thps-whats-this>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-score-summary></thps-score-summary>
+                        </div>
+
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-voice-graph title="Voice Graph"></thps-voice-graph>
+                        </div>
+                        
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-tangible-text></thps-tangible-text>
+                        </div>
+                        
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-compare-speech></thps-compare-speech>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        window.gameTimerInterval = null;
+        window.isActive = false;
+        let reportMarkdownText = "";
+
+        // ==========================================
+        // HISTORY STATE
+        // ==========================================
+        window.thps_sessionHistory = [];
+        window.thps_currentAttemptId = 1;
+
+        // ==========================================
+        // EDIT MODE (LOCK/UNLOCK) LOGIC
+        // ==========================================
+        window.thps_editMode = false; // Locked by default
+
+        window.toggleEditMode = function() {
+            window.thps_editMode = !window.thps_editMode;
+            const grid = document.getElementById('thps-dashboard-grid');
+            const btnIcon = document.getElementById('edit-mode-icon');
+            const btnText = document.getElementById('edit-mode-text');
+            const btnEl = document.getElementById('toggle-edit-mode-btn');
+
+            if (window.thps_editMode) {
+                grid.classList.add('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'unlock');
+                btnText.innerText = 'Edit Mode';
+                btnEl.classList.replace('bg-slate-100', 'bg-rose-100');
+                btnEl.classList.replace('text-slate-500', 'text-rose-600');
+                btnEl.classList.replace('border-slate-200', 'border-rose-200');
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", false);
+            } else {
+                grid.classList.remove('edit-mode-active');
+                btnIcon.setAttribute('data-lucide', 'lock');
+                btnText.innerText = 'Locked';
+                btnEl.classList.replace('bg-rose-100', 'bg-slate-100');
+                btnEl.classList.replace('text-rose-600', 'text-slate-500');
+                btnEl.classList.replace('border-rose-200', 'border-slate-200');
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Failsafe: Ensure it locks automatically on load
+        setTimeout(() => {
+            if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
+                window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+        }, 1000);
+
+        const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
+        let explanationsData = null;
+        const FALLBACK_EXPLANATIONS = {
+            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
+            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
+            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
+            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions.",
+            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
+            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words.",
+            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time.",
+            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%.",
+            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%.",
+            "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
+            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
+            "Pause %": "The percentage of time you spend silent. Aim for 10-30%.",
+            "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
+            "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
+            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 85-95% is ideal.",
+            "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
+            "Voice Var.": "In 3sec chunks, counts how varied is your speaking length & volume. Varying volume & speaking length is engaging.",
+            "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
+        };
+
+        let menuOverlayTimeout = null;
+
+        window.closeAllMenus = function() {
+            const widgetDrawer = document.getElementById('widget-menu-drawer');
+            const historyDrawer = document.getElementById('history-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+            
+            overlay.classList.add('opacity-0');
+            if(widgetDrawer) widgetDrawer.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
+            if(historyDrawer) historyDrawer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+            
+            if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+            menuOverlayTimeout = setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300); 
+        };
+
+        window.toggleWidgetMenu = function() {
+            const drawer = document.getElementById('widget-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if (drawer.classList.contains('translate-x-full')) {
+                window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+                
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
+                }, 10);
+            } else {
+                window.closeAllMenus();
+            }
+        };
+
+        window.toggleHistoryMenu = function() {
+            const drawer = document.getElementById('history-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if (drawer.classList.contains('-translate-x-full')) {
+                window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+                
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    drawer.classList.remove('-translate-x-full', 'opacity-0', 'pointer-events-none');
+                }, 10);
+            } else {
+                window.closeAllMenus();
+            }
+        };
+
+        window.switchHistoryTab = function(tabName) {
+            ['list', 'avg', 'best'].forEach(s => {
+                const btn = document.getElementById(`hist-tab-btn-${s}`);
+                const content = document.getElementById(`hist-tab-content-${s}`);
+                btn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            const activeBtn = document.getElementById(`hist-tab-btn-${tabName}`);
+            const activeContent = document.getElementById(`hist-tab-content-${tabName}`);
+            activeBtn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors";
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+        };
+
+        window.switchWidgetTab = function(size) {
+            ['small', 'medium', 'large'].forEach(s => {
+                const btn = document.getElementById(`tab-btn-${s}`);
+                const content = document.getElementById(`tab-content-${s}`);
+                btn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            const activeBtn = document.getElementById(`tab-btn-${size}`);
+            const activeContent = document.getElementById(`tab-content-${size}`);
+            activeBtn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors";
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+        };
+
+        window.toggleRecording = function() {
+            const btnText = document.getElementById('toggle-text');
+            const btnIcon = document.getElementById('toggle-icon');
+            const actionBar = document.getElementById('action-bar');
+            const timerProgress = document.getElementById('timer-progress');
+            
+            if (window.isActive) {
+                clearInterval(window.gameTimerInterval);
+                window.isActive = false;
+                if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                    actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                }
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                    window.THPS.Audio.stopRecordingProcess();
+                }
+            } else {
+                window.isActive = true;
+                if(btnText) btnText.innerText = 'TAP TO STOP';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'square');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-slate-800', 'bg-rose-600');
+                    actionBar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
+                }
+                if(timerProgress) timerProgress.style.width = '0%';
+                
+                if (window.clearAnalyzer) window.clearAnalyzer();
+                
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
+                    window.THPS.Audio.startRecordingProcess();
+                }
+                
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
+                window.gameTimerInterval = setInterval(() => {
+                    const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                    if (elapsedSecs >= 240) {
+                        clearInterval(window.gameTimerInterval);
+                        window.isActive = false;
+                        if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                        if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                        if(actionBar) {
+                            actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                            actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                        }
+                        if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                            window.THPS.Audio.stopRecordingProcess();
+                        }
+                        if (window.lucide) window.lucide.createIcons();
+                    } else {
+                        if(timerProgress) timerProgress.style.width = `${(elapsedSecs / 240) * 100}%`;
+                    }
+                }, 50);
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        window.updateCelebrationPanel = function(totalPoints, totalSecs, overrideGrade, recordedAudio, textLength) {
+            const panel = document.getElementById('celebration-panel');
+            const comment = document.getElementById('celeb-comment');
+            const gradeEl = document.getElementById('celeb-grade');
+            const timeEl = document.getElementById('celeb-time');
+
+            if (!recordedAudio && totalSecs === 0 && textLength === 0) {
+                // Return to Blank State
+                panel.className = "hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500";
+                comment.textContent = "Waiting for Audio...";
+                comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400";
+                gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
+                timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
+                document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
+                document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
+                document.getElementById('celeb-divider').className = "w-px h-20 bg-slate-300 opacity-50";
+                return;
+            }
+
+            // Set Data
+            let finalScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
+            gradeEl.textContent = overrideGrade ? "- / 10" : `${finalScore} / 10`;
+            
+            if (totalSecs > 0) {
+                let m = Math.floor(totalSecs / 60);
+                let s = Math.floor(totalSecs % 60).toString().padStart(2, '0');
+                timeEl.textContent = `${m}:${s}`;
+            } else {
+                timeEl.textContent = "-";
+            }
+
+            // Apply success styling
+            panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center transition-all duration-500 text-white";
+            gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
+            timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
+            comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm";
+            document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
+            document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
+            document.getElementById('celeb-divider').className = "w-px h-20 bg-white/40";
+
+            if (!overrideGrade) {
+                if (totalPoints >= 8.5) {
+                    comment.textContent = "Wow! Those are some nice scores!";
+                    panel.classList.add('bg-gradient-to-br', 'from-emerald-600', 'to-teal-800');
+                } else if (totalPoints >= 7) {
+                    comment.textContent = "Well said! Check out those scores";
+                    panel.classList.add('bg-gradient-to-br', 'from-blue-600', 'to-indigo-800');
+                } else {
+                    comment.textContent = "Check your scores and have another go!";
+                    panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
+                }
+            } else {
+                comment.textContent = "Cannot Score speeches under 20sec or over 90sec";
+                panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
+            }
+        }
+
+        window.analyze = function() {
+            try {
+                if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
+            } catch(e) { return; }
+            
+            if (!window.THPS.NLP.dictsLoaded) return;
+            
+            let text = "";
+            const widgetEl = document.getElementById('cba-inputText-widget');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (widgetEl && widgetEl.value.trim() !== '') text = widgetEl.value.trim();
+            else if (hiddenEl) text = hiddenEl.value.trim();
+            
+            if (!text) {
+                window.updateCelebrationPanel(0, 0, true, false, 0); 
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
+                return;
+            }
+
+            let timestamps = [];
+            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) {
+                timestamps = window.THPS.Audio.wordTimestamps;
+            }
+            
+            const nlpData = window.THPS.NLP.analyzeTranscript(text, timestamps);
+
+            const { 
+                numWords, numSentences, totalSyllables, letterCount, complexWordCount, 
+                personalCount, visualCount, simpleCounts, google10kCount, 
+                highlightedHTML, reportMarkdownText: newReportMarkdown,
+                wordTimestamps 
+            } = nlpData;
+
+            reportMarkdownText = newReportMarkdown; 
+
+            let gPct = Math.round((google10kCount / numWords) * 100);
+
+            let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
+            let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
+            let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
+            let coreSimpleScore = s5yrPct + sEslPct + sKitPct; 
+            
+            let elapsedSecs = window.THPS.Audio && window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
+            let transcribedDuration = Math.min(240, elapsedSecs);
+            
+            let mumbleScore = 0; 
+            let estimatedPauseTime = 0; 
+            let pausePercent = 0; 
+            let avgWpm = 0;
+            let activeSpeakingSecs = 0;
+
+            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
+                const periods = (text.match(/[.!?]/g) || []).length;
+                const commas = (text.match(/[,;:-]/g) || []).length;
+                
+                estimatedPauseTime = (periods * 1.3) + (commas * 0.5); 
+                
+                let minAllowedPause = transcribedDuration * 0.10;
+                let maxAllowedPause = transcribedDuration * 0.40;
+                if (estimatedPauseTime < minAllowedPause) estimatedPauseTime = minAllowedPause;
+                if (estimatedPauseTime > maxAllowedPause) estimatedPauseTime = maxAllowedPause;
+                
+                activeSpeakingSecs = transcribedDuration - estimatedPauseTime;
+                pausePercent = (estimatedPauseTime / transcribedDuration) * 100;
+                
+                avgWpm = Math.round((numWords / transcribedDuration) * 60);
+                mumbleScore = totalSyllables / activeSpeakingSecs;
+            }
+
+            let avgGrade = 0;
+            let readability = null;
+            if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
+                 readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
+                 avgGrade = readability.avgGrade;
+            } else {
+                let flesch = (0.39 * (numWords / numSentences)) + (11.8 * (totalSyllables / numWords)) - 15.59;
+                let fog = 0.4 * ((numWords / numSentences) + 100 * (complexWordCount / numWords));
+                let smog = 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291;
+                let coleman = 0.0588 * ((letterCount / numWords) * 100) - 0.296 * ((numSentences / numWords) * 100) - 15.8;
+                avgGrade = ((Math.max(0, flesch)) + (Math.max(0, fog)) + (Math.max(0, smog)) + (Math.max(0, coleman))) / 4;
+                readability = { flesch: Math.max(0, flesch), fog: Math.max(0, fog), smog: Math.max(0, smog), coleman: Math.max(0, coleman), avgGrade: avgGrade };
+            }
+
+            let personalPercent = Math.round((personalCount / numWords) * 100);
+            let visualPercent = Math.round((visualCount / numWords) * 100);
+            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+
+            let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
+            
+            try {
+                let totalPoints = 0;
+                let overrideGrade = false;
+
+                if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
+                    if (elapsedSecs < 20) overrideGrade = true; 
+                    else if (elapsedSecs < 60) totalPoints += 0.75; 
+                    else if (elapsedSecs <= 90) totalPoints += 1.0; 
+                    else overrideGrade = true;
+
+                    if (avgWpm < 100) totalPoints += 0.75; 
+                    else if (avgWpm > 150) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (mumbleScore < 3) totalPoints += 0.75; 
+                    else if (mumbleScore > 5) totalPoints += 0.25; 
+                    else totalPoints += 1;
+
+                    if (pausePercent < 10) totalPoints += 0.25; 
+                    else if (pausePercent > 30) totalPoints += 0.75; 
+                    else totalPoints += 1;
+                } else {
+                    overrideGrade = true;
+                }
+
+                if (personalPercent < 30) totalPoints += 0.25; 
+                else if (personalPercent > 60) totalPoints += 0.75; 
+                else totalPoints += 1;
+
+                if (visualPercent < 20) totalPoints += 0.25; 
+                else if (visualPercent > 50) totalPoints += 0.75; 
+                else totalPoints += 1;
+
+                if (intangiblePercent > 45) totalPoints += 0.25; 
+                else if (intangiblePercent >= 30) totalPoints += 0.75; 
+                else totalPoints += 1;
+
+                if (avgWpsFloat < 5) totalPoints += 0.75; 
+                else if (avgWpsFloat > 15) totalPoints += 0.25; 
+                else totalPoints += 1;
+
+                if (avgGrade < 5) totalPoints += 0.75; 
+                else if (avgGrade > 10) totalPoints += 0.25; 
+                else totalPoints += 1;
+
+                if (coreSimpleScore < 85) totalPoints += 0.25; 
+                else if (coreSimpleScore > 95) totalPoints += 0.75; 
+                else totalPoints += 1;
+
+                window.updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio ? window.THPS.Audio.recordedAudio : false, text.length);
+
+                // --- THE TRACKMAN BROADCAST & CACHE ---
+                const payload = { 
+                    sps: mumbleScore,
+                    wpm: avgWpm,
+                    grade: avgGrade,
+                    time: elapsedSecs,
+                    personal: personalPercent,
+                    visual: visualPercent,
+                    text: text,
+                    wordTimestamps: wordTimestamps,
+                    volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
+                    pause: pausePercent,
+                    intangible: intangiblePercent,
+                    wps: avgWpsFloat,
+                    simple: coreSimpleScore,
+                    totalPoints: totalPoints,
+                    overrideGrade: overrideGrade,
+                    recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
+                    highlightedHTML: highlightedHTML,
+                    reportMarkdownText: reportMarkdownText,
+                    numWords: numWords,
+                    numSentences: numSentences,
+                    totalSyllables: totalSyllables,
+                    google10kCount: google10kCount,
+                    simpleCounts: simpleCounts,
+                    readability: readability
+                };
+                
+                window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
+
+                // --- SAVE TO HISTORY ---
+                if (text.trim() !== '' || elapsedSecs > 0) {
+                    let existingIndex = window.thps_sessionHistory.findIndex(h => h.id === window.thps_currentAttemptId);
+                    let historyPayload = { ...payload, id: window.thps_currentAttemptId, title: 'Attempt ' + window.thps_currentAttemptId, date: new Date() };
+                    
+                    if (existingIndex >= 0) {
+                        window.thps_sessionHistory[existingIndex] = historyPayload;
+                    } else {
+                        window.thps_sessionHistory.unshift(historyPayload); // Add to beginning (most recent top)
+                    }
+                    window.updateHistoryUI();
+                }
+
+            } catch(e) { console.error("Summary Dashboard Error:", e); }
+        };
+
+        window.getMetricPoints = function(key, val) {
+            if (key === 'totalPoints') return val; 
+            if (key === 'time') {
+                if (val >= 60 && val <= 90) return 1;
+                if (val >= 20 && val < 60) return 0.75;
+                return 0;
+            }
+            if (key === 'wpm') return (val >= 100 && val <= 150) ? 1 : (val < 100 ? 0.75 : 0.25);
+            if (key === 'sps') return (val >= 3 && val <= 5) ? 1 : (val < 3 ? 0.75 : 0.25);
+            if (key === 'pause') return (val >= 10 && val <= 30) ? 1 : (val > 30 ? 0.75 : 0.25);
+            if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
+            if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
+            if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
+            if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'simple') return (val >= 85 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
+            return 0;
+        };
+
+        window.formatMetric = function(key, val) {
+            if (val === null || val === undefined) return '-';
+            if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
+            if (['totalPoints', 'sps', 'wps', 'grade'].includes(key)) return val.toFixed(1);
+            if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
+            return Math.round(val);
+        };
+
+        window.deleteHistoryAttempt = function(id) {
+            window.thps_sessionHistory = window.thps_sessionHistory.filter(h => h.id !== id);
+            window.updateHistoryUI();
+            
+            // If deleting currently viewed attempt, try viewing latest or clear screen
+            if (window.thps_lastPayload && window.thps_lastPayload.id === id) {
+                if (window.thps_sessionHistory.length > 0) {
+                    window.loadHistoryAttempt(window.thps_sessionHistory[0].id);
+                } else {
+                    window.clearAnalyzer();
+                }
+            }
+        };
+
+        window.updateHistoryUI = function() {
+            const countEl = document.getElementById('history-count');
+            const listEl = document.getElementById('hist-tab-content-list');
+            const avgEl = document.getElementById('hist-tab-content-avg');
+            const bestEl = document.getElementById('hist-tab-content-best');
+            
+            // Always show the count
+            if (countEl) {
+                countEl.innerText = window.thps_sessionHistory.length;
+            }
+
+            if (!listEl) return;
+            
+            listEl.innerHTML = '';
+            
+            if (window.thps_sessionHistory.length === 0) {
+                if (avgEl) avgEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                if (bestEl) bestEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                return;
+            }
+
+            window.thps_sessionHistory.forEach((attempt) => {
+                const isActive = (window.thps_lastPayload && window.thps_lastPayload.id === attempt.id);
+                const gradeText = attempt.overrideGrade ? '-' : (attempt.totalPoints % 1 === 0 ? attempt.totalPoints : attempt.totalPoints.toFixed(2));
+                
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border-2 cursor-pointer transition-all ${isActive ? 'border-indigo-500 bg-indigo-50 shadow-md scale-[1.02]' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'}`;
+                item.onclick = () => window.loadHistoryAttempt(attempt.id);
+                
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
+                        <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/10</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
+                        <span>Time: ${Math.floor(attempt.time / 60)}:${Math.floor(attempt.time % 60).toString().padStart(2, '0')}</span>
+                        <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+
+            // Map UI text labels to their payload keys
+            const metricsMap = [
+                { label: 'Score', key: 'totalPoints' },
+                { label: 'Time', key: 'time' },
+                { label: 'Pers', key: 'personal' },
+                { label: 'Vis', key: 'visual' },
+                { label: 'Intg', key: 'intangible' },
+                { label: 'WPM', key: 'wpm' },
+                { label: 'SPS', key: 'sps' },
+                { label: 'Pause', key: 'pause' },
+                { label: 'W/Sen', key: 'wps' },
+                { label: 'Comp', key: 'grade' },
+                { label: 'Sim%', key: 'simple' }
+            ];
+
+            let avgHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Average</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            let bestHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Best</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+
+            metricsMap.forEach(m => {
+                let sum = 0, count = 0;
+                let bestVal = null, bestPts = -1;
+
+                window.thps_sessionHistory.forEach(h => {
+                    let val = h[m.key];
+                    if (val !== undefined && val !== null && !isNaN(val)) {
+                        sum += val;
+                        count++;
+                        
+                        let pts = window.getMetricPoints(m.key, val);
+                        if (pts > bestPts) {
+                            bestPts = pts;
+                            bestVal = val;
+                        }
+                    }
+                });
+
+                let avgVal = count > 0 ? sum / count : null;
+                avgHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, avgVal)}</td></tr>`;
+                bestHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, bestVal)}</td></tr>`;
+            });
+
+            avgHtml += `</tbody></table></div>`;
+            bestHtml += `</tbody></table></div>`;
+
+            if (avgEl) avgEl.innerHTML = avgHtml;
+            if (bestEl) bestEl.innerHTML = bestHtml;
+            
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        window.loadHistoryAttempt = function(id) {
+            const attempt = window.thps_sessionHistory.find(h => h.id === id);
+            if (!attempt) return;
+            
+            const widgetEl = document.getElementById('cba-inputText-widget');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (widgetEl) widgetEl.value = attempt.text;
+            if (hiddenEl) hiddenEl.value = attempt.text;
+
+            window.updateCelebrationPanel(attempt.totalPoints, attempt.time, attempt.overrideGrade, attempt.recordedAudio, attempt.text.length);
+            
+            window.thps_lastPayload = attempt;
+            window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: attempt }));
+            window.updateHistoryUI();
+            
+            if (window.innerWidth < 640) window.closeAllMenus(); // Close drawer on mobile after selection
+        };
+
+        window.copyReportToClipboard = function() {
+            let cleanMarkdown = reportMarkdownText.trim().replace(/\n/g, '\n\n').replace(/ +/g, ' ');
+            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
+            
+            const el = document.createElement('textarea');
+            el.value = report;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        };
+
+        window.clearAnalyzer = function() {
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl) hiddenEl.value = '';
+            
+            const procPanel = document.getElementById('cba-processing-panel');
+            if (procPanel) procPanel.classList.add('hidden');
+            
+            if (window.THPS && window.THPS.Audio) {
+                window.THPS.Audio.recordedAudio = false; 
+                window.THPS.Audio.lastRecordedDuration = 0;
+                window.THPS.Audio.wordTimestamps = []; 
+                window.THPS.Audio.volumeData = [];
+            }
+            
+            // Advance attempt ID if we have a valid previous attempt
+            if (window.thps_lastPayload && (window.thps_lastPayload.text.trim() !== '' || window.thps_lastPayload.time > 0)) {
+                window.thps_currentAttemptId++;
+            }
+            
+            window.thps_lastPayload = null; // WIPE THE CACHE
+            
+            window.analyze();
+        };
+
+        window.explain = function(term) {
+            const titleEl = document.getElementById('cba-explanationTitle');
+            const contentEl = document.getElementById('cba-explanationContent');
+            if (!titleEl || !contentEl) return;
+            
+            const panel = titleEl.closest('.glass-panel');
+            if (panel) {
+                panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
+                setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
+            }
+
+            titleEl.innerText = term;
+            contentEl.classList.remove('italic', 'justify-center');
+            contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
+
+            setTimeout(() => {
+                let text = (explanationsData && explanationsData[term]) 
+                           ? explanationsData[term] 
+                           : (FALLBACK_EXPLANATIONS[term] || `Detailed explanation for "${term}" will appear here soon.`);
+                contentEl.innerHTML = text;
+            }, 150);
+        };
+
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'cba-inputText-widget') {
+                const hiddenEl = document.getElementById('cba-inputText');
+                if (hiddenEl) hiddenEl.value = e.target.value;
+            }
+        });
+        
+        async function fetchExplanations() {
+            try {
+                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
+                if (res.ok) explanationsData = await res.json();
+            } catch (e) {
+                console.warn("Using fallback explanations for 'What does this mean' panel.");
+            }
+        }
+
+        window.onload = () => {
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
+                window.THPS.NLP.loadDictionaries();
+            }
+            fetchExplanations();
+        };
+
+        window.spawnCompareWidget = function() {
+            window.closeAllMenus();
+            if (window.THPS && window.THPS.Dashboard) {
+                const dummyBtn = document.createElement('div');
+                dummyBtn.innerHTML = 'VS';
+                
+                window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', dummyBtn);
+                
+                setTimeout(() => {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+        };
+    </script>
+</body>
+</html>
