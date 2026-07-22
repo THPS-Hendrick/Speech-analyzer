@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         
         // We use gemini-1.5-flash as it is lightning-fast and perfect for text reasoning
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
         // 3. Construct the Context-Injected Prompt
         const systemPrompt = `
