@@ -1,78 +1,109 @@
 // ==========================================
-// THPS AI COACH WIDGET
-// Floating chat interface for Gemini AI Contextual Coaching
+// THPS AI COACH WIDGET (DASHBOARD WIDGET v2.0)
+// Inline Chat Widget with Wake-Up Payload Sync
 // ==========================================
 
 class ThpsAiCoach extends HTMLElement {
     constructor() {
         super();
-        this.isOpen = false;
         this.latestPayload = null;
         this.isTyping = false;
+        this.hasGreetedPayload = false;
     }
 
     connectedCallback() {
         this.render();
         this.attachListeners();
-        
-        // Listen to the main dashboard updates to secretly store the latest payload
-        window.addEventListener('thps-dashboard-update', (e) => {
-            this.latestPayload = e.detail;
-        });
 
-        // Check if there is already a payload loaded on startup
-        if (window.thps_lastPayload) {
+        // 1. Listen for live updates broadcast across the dashboard
+        this.dashboardHandler = (e) => {
+            this.latestPayload = e.detail;
+            this.wakeUpCoach();
+        };
+        window.addEventListener('thps-dashboard-update', this.dashboardHandler);
+
+        // 2. WAKE UP FUNCTION: If payload already exists in memory prior to spawning
+        if (window.thps_lastPayload && window.thps_lastPayload.text) {
             this.latestPayload = window.thps_lastPayload;
+            // Delay slightly to allow inner DOM to settle
+            setTimeout(() => this.wakeUpCoach(), 100);
         }
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('thps-dashboard-update', this.dashboardHandler);
+    }
+
+    wakeUpCoach() {
+        if (!this.latestPayload || !this.latestPayload.text) return;
+
+        const messagesArea = this.querySelector('#ai-coach-messages');
+        if (!messagesArea) return;
+
+        // Check if we already appended a wake-up notice for this specific attempt ID or text
+        if (this.hasGreetedPayload === this.latestPayload.id || this.hasGreetedPayload === this.latestPayload.text) return;
+
+        this.hasGreetedPayload = this.latestPayload.id || this.latestPayload.text;
+
+        const systemMsg = document.createElement('div');
+        systemMsg.className = 'flex justify-start';
+        systemMsg.innerHTML = `
+            <div class="max-w-[90%] bg-indigo-50 border border-indigo-200 rounded-2xl rounded-tl-sm p-3 shadow-sm">
+                <p class="text-xs font-bold text-indigo-900 flex items-center gap-1.5 mb-1">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i> Speech Data Synchronized
+                </p>
+                <p class="text-xs text-indigo-700 leading-relaxed">
+                    I've loaded your latest analysis! Ask me about your scores, mumble rating, or pacing.
+                </p>
+            </div>
+        `;
+        messagesArea.appendChild(systemMsg);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+
+        if (window.lucide) window.lucide.createIcons({ root: systemMsg });
     }
 
     render() {
         this.innerHTML = `
-            <!-- FLOATING ACTION BUTTON (FAB) -->
-            <button id="ai-coach-fab" class="fixed bottom-6 right-6 z-[100] w-14 h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-[0_4px_20px_rgba(79,70,229,0.4)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 group">
-                <i data-lucide="bot" class="w-6 h-6 pointer-events-none transition-transform group-hover:rotate-12"></i>
-            </button>
-
-            <!-- CHAT WINDOW (Hidden by default) -->
-            <div id="ai-coach-window" class="fixed bottom-24 right-6 z-[100] w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col font-sans transform scale-95 opacity-0 pointer-events-none transition-all duration-300 origin-bottom-right">
+            <div class="glass-panel p-5 rounded-2xl border-t-4 border-indigo-600 shadow-sm flex flex-col bg-white relative w-full h-[480px] transition-transform hover:-translate-y-1 hover:shadow-md group font-sans">
                 
-                <!-- Header -->
-                <div class="bg-slate-900 text-white p-4 rounded-t-2xl flex justify-between items-center shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center shadow-inner">
-                            <i data-lucide="bot" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-black tracking-wider uppercase">AI Vocal Coach</h3>
-                            <p class="text-[10px] text-indigo-300">Powered by Gemini</p>
-                        </div>
+                <!-- CLOSE BUTTON (Hides when Locked, Visible in Edit Mode) -->
+                <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
+                    <i data-lucide="x" class="w-4 h-4 pointer-events-none"></i>
+                </button>
+
+                <!-- HEADER -->
+                <div class="flex items-center gap-3 pb-3 border-b border-slate-100 shrink-0 mb-3">
+                    <div class="w-9 h-9 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-md">
+                        <i data-lucide="bot" class="w-5 h-5 pointer-events-none"></i>
                     </div>
-                    <button id="ai-coach-close" class="text-slate-400 hover:text-white p-1 transition-colors">
-                        <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
-                    </button>
+                    <div>
+                        <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">AI Vocal Coach</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Powered by Gemini AI</p>
+                    </div>
                 </div>
 
-                <!-- Messages Area -->
-                <div id="ai-coach-messages" class="flex-1 overflow-y-auto p-4 bg-slate-50 flex flex-col gap-4 custom-scrollbar">
-                    <!-- Welcome Message -->
+                <!-- MESSAGES CONTAINER -->
+                <div id="ai-coach-messages" class="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar text-xs">
+                    <!-- Default Greeting -->
                     <div class="flex justify-start">
-                        <div class="max-w-[85%] bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-3 shadow-sm">
-                            <p class="text-sm text-slate-700 leading-relaxed">Hi! I'm your AI Vocal Coach. Complete a speech exercise, then ask me how you did or how you can improve your scores!</p>
+                        <div class="max-w-[88%] bg-slate-100 border border-slate-200/60 rounded-2xl rounded-tl-sm p-3 text-slate-700 leading-relaxed">
+                            Hi! I'm your AI Vocal Coach. Record a speech or choose an attempt from History, then ask me how to improve your metrics!
                         </div>
                     </div>
                 </div>
 
-                <!-- Input Area -->
-                <div class="p-3 bg-white border-t border-slate-200 rounded-b-2xl shrink-0 flex gap-2 items-end">
-                    <textarea id="ai-coach-input" rows="1" placeholder="Ask about your performance..." class="flex-1 bg-slate-100 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 resize-none max-h-32 custom-scrollbar"></textarea>
-                    <button id="ai-coach-send" class="w-11 h-11 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i data-lucide="send" class="w-5 h-5 pointer-events-none ml-0.5"></i>
+                <!-- INPUT AREA -->
+                <div class="pt-3 border-t border-slate-100 shrink-0 flex gap-2 items-center mt-2">
+                    <input id="ai-coach-input" type="text" placeholder="Ask about your performance..." class="flex-1 bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all" />
+                    <button id="ai-coach-send" class="w-9 h-9 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center shrink-0 transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i data-lucide="send" class="w-4 h-4 pointer-events-none"></i>
                     </button>
                 </div>
             </div>
-            
+
             <style>
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -88,47 +119,31 @@ class ThpsAiCoach extends HTMLElement {
     }
 
     attachListeners() {
-        const fab = this.querySelector('#ai-coach-fab');
-        const win = this.querySelector('#ai-coach-window');
-        const closeBtn = this.querySelector('#ai-coach-close');
+        const closeBtn = this.querySelector('.thps-close-btn');
         const sendBtn = this.querySelector('#ai-coach-send');
         const inputField = this.querySelector('#ai-coach-input');
 
-        // Auto-resize textarea
-        inputField.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-            sendBtn.disabled = this.value.trim() === '';
-        });
-
-        const toggleChat = () => {
-            this.isOpen = !this.isOpen;
-            if (this.isOpen) {
-                win.classList.remove('scale-95', 'opacity-0', 'pointer-events-none');
-                win.classList.add('scale-100', 'opacity-100', 'pointer-events-auto');
-                inputField.focus();
-            } else {
-                win.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto');
-                win.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
-            }
-        };
-
-        fab.addEventListener('click', toggleChat);
-        closeBtn.addEventListener('click', toggleChat);
+        // Handle Widget Removal
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                const wrapper = this.closest('.cursor-move');
+                if (wrapper) wrapper.remove();
+                else this.remove();
+            });
+        }
 
         sendBtn.addEventListener('click', () => this.handleSend());
         inputField.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
                 this.handleSend();
             }
         });
     }
 
-    // Basic Markdown parser to make Gemini's bolding and line breaks look good
     formatMarkdown(text) {
         return text
-            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-black text-slate-900">$1</strong>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>')
             .replace(/\*(.*?)\*/g, '<em class="italic text-slate-800">$1</em>')
             .replace(/\n/g, '<br>');
     }
@@ -140,14 +155,14 @@ class ThpsAiCoach extends HTMLElement {
 
         if (role === 'user') {
             msgDiv.innerHTML = `
-                <div class="max-w-[85%] bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-3 shadow-sm">
-                    <p class="text-sm leading-relaxed">${text}</p>
+                <div class="max-w-[85%] bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-3 shadow-sm text-xs leading-relaxed">
+                    ${text}
                 </div>
             `;
         } else {
             msgDiv.innerHTML = `
-                <div class="max-w-[85%] bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 shadow-sm">
-                    <p class="text-sm text-slate-700 leading-relaxed">${this.formatMarkdown(text)}</p>
+                <div class="max-w-[88%] bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-3 shadow-sm text-xs text-slate-700 leading-relaxed">
+                    ${this.formatMarkdown(text)}
                 </div>
             `;
         }
@@ -162,10 +177,10 @@ class ThpsAiCoach extends HTMLElement {
         typingDiv.id = 'ai-typing-indicator';
         typingDiv.className = 'flex justify-start';
         typingDiv.innerHTML = `
-            <div class="bg-slate-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex gap-1 items-center h-10">
-                <div class="w-2 h-2 bg-slate-500 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-slate-500 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-slate-500 rounded-full typing-dot"></div>
+            <div class="bg-slate-100 border border-slate-200/60 rounded-2xl rounded-tl-sm px-3 py-2.5 shadow-sm flex gap-1 items-center">
+                <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
+                <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
+                <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
             </div>
         `;
         messagesArea.appendChild(typingDiv);
@@ -184,35 +199,35 @@ class ThpsAiCoach extends HTMLElement {
 
         if (!text || this.isTyping) return;
 
-        // 1. Check if we actually have data to analyze
-        if (!this.latestPayload) {
+        // Ensure we check global cache if payload wasn't caught yet
+        if (!this.latestPayload && window.thps_lastPayload) {
+            this.latestPayload = window.thps_lastPayload;
+        }
+
+        if (!this.latestPayload || !this.latestPayload.text) {
             this.appendMessage('user', text);
             inputField.value = '';
-            inputField.style.height = 'auto';
             setTimeout(() => {
-                this.appendMessage('coach', "I don't have any data yet! Please complete a speaking module first so I can analyze your vocal metrics and transcript.");
-            }, 500);
+                this.appendMessage('coach', "I don't have any speech data yet! Please record audio or select an attempt from Session History first.");
+            }, 400);
             return;
         }
 
-        // 2. Lock UI and show user message
         this.isTyping = true;
         sendBtn.disabled = true;
         inputField.disabled = true;
         
         this.appendMessage('user', text);
         inputField.value = '';
-        inputField.style.height = 'auto';
         this.showTypingIndicator();
 
-        // 3. Contact Vercel Backend
         try {
             const response = await fetch('https://mic-check-backend.vercel.app/api/coach', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: text,
-                    payload: this.latestPayload // The invisible context injection!
+                    payload: this.latestPayload
                 })
             });
 
@@ -226,7 +241,7 @@ class ThpsAiCoach extends HTMLElement {
         } catch (error) {
             console.error("Coach API Error:", error);
             this.removeTypingIndicator();
-            this.appendMessage('coach', "I'm sorry, I'm having trouble connecting to my analysis engine right now. Please try again in a moment.");
+            this.appendMessage('coach', "I'm having trouble connecting to my analysis engine. Please ensure your Vercel backend deployment is active.");
         } finally {
             this.isTyping = false;
             sendBtn.disabled = false;
