@@ -436,7 +436,7 @@
             "Pause %": "The percentage of time you spend silent. Aim for 10-30%.",
             "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
             "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
-            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 85-95% is ideal.",
+            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
             "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
             "Voice Var.": "In 3sec chunks, counts how varied is your speaking length & volume. Varying volume & speaking length is engaging.",
             "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
@@ -774,7 +774,7 @@
                 else if (avgGrade > 10) totalPoints += 0.25; 
                 else totalPoints += 1;
 
-                if (coreSimpleScore < 85) totalPoints += 0.25; 
+                if (coreSimpleScore < 80) totalPoints += 0.25; 
                 else if (coreSimpleScore > 95) totalPoints += 0.75; 
                 else totalPoints += 1;
 
@@ -842,7 +842,7 @@
             if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
             if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
             if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
-            if (key === 'simple') return (val >= 85 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
+            if (key === 'simple') return (val >= 80 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
             return 0;
         };
 
