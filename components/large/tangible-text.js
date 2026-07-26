@@ -6,9 +6,10 @@ class ThpsTangibleText extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <style>
-                .personal-word { color: #00B700; font-weight: 700; }
-                .visual-word { color: #ef4444; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
-                .overlap-word { color: #00B700; font-weight: 700; text-decoration: underline; text-decoration-color: #ef4444; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+                .personal-word { color: #3b82f6; font-weight: 700; } /* Blue */
+                .visual-word { color: #ef4444; font-weight: 700; } /* Red (no underline) */
+                .overlap-word { color: #a855f7; font-weight: 700; } /* Purple */
+                .simple-word { text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 2px; text-underline-offset: 4px; }
             </style>
             <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move">
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
@@ -20,14 +21,15 @@ class ThpsTangibleText extends HTMLElement {
                         <div class="group/tip relative z-50">
                             <span class="flex items-center gap-1 px-1.5 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded cursor-help">💡 Tip</span>
                             <div class="absolute left-0 w-56 sm:w-64 p-3 mt-1 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover/tip:opacity-100 group-hover/tip:visible transition-all duration-200 pointer-events-none font-normal normal-case tracking-normal z-50">
-                                Green text represents Personal content (a specific person doing a specific thing). Red text represents Visual content (things people can see, like colours, sizes, groups, or common objects).
+                                Blue text represents Personal content (a specific person doing a specific thing). Red text represents Visual content (things people can see, like colours, sizes, groups, or common objects). Purple text represents an overlap of both. Underlined words are found in the Simple English dictionary.
                             </div>
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs text-slate-600 font-medium">
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border border-[#00B700]"></span> Personal</div>
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-500/10 border-b border-red-500"></span> Visual (Underlined)</div>
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#00B700]/10 border-b-2 border-red-500"></span> Overlap</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-500/10 border border-blue-500"></span> Personal</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-500/10 border border-red-500"></span> Visual</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-500/10 border border-purple-500"></span> Overlap</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-0 border-b-2 border-slate-700"></span> Simple</div>
                     </div>
                 </div>
                 <div class="thps-highlighted-text w-full h-80 sm:h-96 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic">Waiting for text...</div>
@@ -41,7 +43,6 @@ class ThpsTangibleText extends HTMLElement {
         
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
 
-        // NEW: THE "WAKE-UP" CATCH-UP CHECK
         if (window.thps_lastPayload) {
             setTimeout(() => this.update(window.thps_lastPayload), 50);
         }
