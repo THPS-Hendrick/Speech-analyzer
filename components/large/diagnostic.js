@@ -17,7 +17,7 @@ class THPSDiagnostic extends HTMLElement {
         };
         this.currentRecordingLevel = null;
 
-        // NEW: Test 3 "App-Within-An-App" State Variables
+        // Test 3 "App-Within-An-App" State Variables
         this.t3Slide = 0; 
         this.t3ActiveLevel = 1;
         this.pacinoBlocks = [
@@ -178,7 +178,7 @@ class THPSDiagnostic extends HTMLElement {
             if (this.currentRecordingLevel !== null) {
                 const lvl = this.currentRecordingLevel;
 
-                // --- NEW LOGARITHMIC VOLUME EXTRACTION MATH ---
+                // --- LOGARITHMIC VOLUME EXTRACTION MATH ---
                 let linearSum = 0; 
                 let dbCount = 0;
                 if (payload.volumeData && payload.volumeData.length > 0) {
@@ -194,13 +194,14 @@ class THPSDiagnostic extends HTMLElement {
                     wpm: payload.wpm || 0,
                     sps: payload.sps || 0,
                     pause: payload.pause || 0,
-                    db: avgDb, // Store the volume!
+                    db: avgDb,
                     text: payload.text
                 };
                 
                 const statusEl = this.querySelector(`[data-ref="t3-status-${lvl}"]`);
                 if (statusEl) {
-                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Silence: ${payload.pause}% | Intensity: ${avgDb.toFixed(1)} dB`;
+                    // BUG 1 FIXED: Added .toFixed(1) to payload.pause
+                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Silence: ${Number(payload.pause).toFixed(1)}% | Intensity: ${avgDb.toFixed(1)} dB`;
                 }
                 this.currentRecordingLevel = null;
             }
@@ -285,8 +286,8 @@ class THPSDiagnostic extends HTMLElement {
         const recBtn = this.querySelector('#t3-record-btn');
         if (recBtn) {
             recBtn.innerHTML = window.isActive && this.currentRecordingLevel === this.t3ActiveLevel ? 
-                `<i class="fas fa-stop mr-1"></i> Stop Level ${this.t3ActiveLevel}` : 
-                `<i class="fas fa-mic mr-1"></i> Record Level ${this.t3ActiveLevel}`;
+                `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Level ${this.t3ActiveLevel}` : 
+                `<i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level ${this.t3ActiveLevel}`;
         }
     }
 
@@ -295,12 +296,14 @@ class THPSDiagnostic extends HTMLElement {
         if (!window.isActive) {
             this.currentRecordingLevel = level;
             window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1"></i> Stop Level ${level}`;
+            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Level ${level}`;
             btn.classList.replace('bg-indigo-600', 'bg-red-500');
+            btn.classList.replace('hover:bg-indigo-500', 'hover:bg-red-400');
         } else {
             window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1"></i> Record Level ${level}`;
+            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level ${level}`;
             btn.classList.replace('bg-red-500', 'bg-indigo-600');
+            btn.classList.replace('hover:bg-red-400', 'hover:bg-indigo-500');
         }
     }
 
@@ -311,11 +314,11 @@ class THPSDiagnostic extends HTMLElement {
         if (!window.isActive) {
             this.currentStage5Slot = slot;
             window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1"></i> Stop Recording`;
+            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Recording`;
             btn.classList.replace('bg-indigo-600', 'bg-red-500');
         } else {
             window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1"></i> Start Recording`;
+            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1 pointer-events-none"></i> Start Recording`;
             btn.classList.replace('bg-red-500', 'bg-indigo-600');
         }
     }
@@ -371,7 +374,7 @@ class THPSDiagnostic extends HTMLElement {
             nextBtn.style.display = 'none';
         } else {
             nextBtn.style.display = 'block';
-            nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
+            nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2 pointer-events-none"></i>`;
         }
     }
 
@@ -410,7 +413,7 @@ class THPSDiagnostic extends HTMLElement {
         const btn = this.querySelector('[data-ref="tts-btn"]');
         if (btn) {
             btn.classList.replace('bg-red-500', 'bg-indigo-600');
-            this.querySelector('[data-ref="tts-icon"]').className = 'fas fa-play mr-2';
+            this.querySelector('[data-ref="tts-icon"]').className = 'fas fa-play mr-2 pointer-events-none';
             this.querySelector('[data-ref="tts-label"]').innerText = 'Play Audio Script';
         }
     }
@@ -438,7 +441,7 @@ class THPSDiagnostic extends HTMLElement {
         this.isPlayingTTS = true;
         
         btn.classList.replace('bg-indigo-600', 'bg-red-500');
-        this.querySelector('[data-ref="tts-icon"]').className = 'fas fa-stop mr-2';
+        this.querySelector('[data-ref="tts-icon"]').className = 'fas fa-stop mr-2 pointer-events-none';
         this.querySelector('[data-ref="tts-label"]').innerText = 'Stop Audio';
     }
 
@@ -536,7 +539,7 @@ class THPSDiagnostic extends HTMLElement {
                     <section data-ref="page-3" class="thps-diag-page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
                         <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 2: Phantasia Mind Eye</h3>
                         <div class="bg-slate-100 p-6 rounded-xl mb-8 flex flex-col items-center">
-                            <button data-action="toggleTTS" data-ref="tts-btn" class="mb-4 px-6 py-3 rounded-full font-bold text-white bg-indigo-600 flex items-center justify-center w-full max-w-xs"><i class="fas fa-play mr-2" data-ref="tts-icon"></i><span data-ref="tts-label">Play Audio Script</span></button>
+                            <button data-action="toggleTTS" data-ref="tts-btn" class="mb-4 px-6 py-3 rounded-full font-bold text-white bg-indigo-600 flex items-center justify-center w-full max-w-xs"><i class="fas fa-play mr-2 pointer-events-none" data-ref="tts-icon"></i><span data-ref="tts-label">Play Audio Script</span></button>
                             <div data-ref="phantasia-script" class="thps-diag-scroll w-full h-48 overflow-y-auto bg-white rounded p-4 text-slate-700 text-sm leading-relaxed">
                                 <p>This test goes for about 4 minutes. This is a Phantasia Test. Phantasia means ‘to make visable images in your mind’. The Phantasia test is about whether seeing images in your mind is easy or hard for you. Speakers that struggle to see images in their mind are likely to struggle to speak easily without a script. However, speakers that are very good at creating images in their head may struggle to speak slowly or stay on topic. Imagining images effortlessly and involuntarily is called Hyper-phantasia. Struggling to see images in your mind is called Hypo-phantasia. Being unable to see images in your mind at all is called Aphantasia, and is perfectly normal. Everyone is somewhere from Aphantasia (unable to see images in their mind) to Hyper-phantasia (involuntarily sees lots of images in their mind). In this test, I need you to keep your eyes open, and try to see everything that is described. Let’s begin the Phantasia Test. All I want you to see in your mind is the colour black. 
                                 Like a room with no light in it at all. Your mind is entirely black. Now, see an apple. It's a normal Apple, about the size of your fist, in the middle of that black screen. The Apple is Red. Growing from that Red Apple, is a short brown wooden stem. The brown wooden stem is about half the size of your smallest finger. Growing from that brown stem on top of the red apple, is a small green leaf. The green leaf starts small, about the size of your finger nail. 
@@ -584,13 +587,21 @@ class THPSDiagnostic extends HTMLElement {
 
                             <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
                                 <div class="flex justify-between items-center max-w-lg mx-auto w-full mb-2">
-                                    <button data-action="t3GlideUp" class="p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm"><i class="fas fa-chevron-up w-5 h-5 pointer-events-none flex items-center justify-center"></i></button>
+                                    
+                                    <!-- BUG 2 FIXED: Adjusted Chevron styling for visibility -->
+                                    <button data-action="t3GlideUp" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
+                                        <i class="fas fa-chevron-up text-lg pointer-events-none"></i>
+                                    </button>
                                     
                                     <button id="t3-record-btn" data-action="toggleLevelRecord" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] active:scale-95 flex items-center gap-2">
                                         <i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level 1
                                     </button>
 
-                                    <button data-action="t3GlideDown" class="p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm"><i class="fas fa-chevron-down w-5 h-5 pointer-events-none flex items-center justify-center"></i></button>
+                                    <!-- BUG 2 FIXED: Adjusted Chevron styling for visibility -->
+                                    <button data-action="t3GlideDown" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
+                                        <i class="fas fa-chevron-down text-lg pointer-events-none"></i>
+                                    </button>
+
                                 </div>
                             </div>
                         </div>
@@ -606,7 +617,7 @@ class THPSDiagnostic extends HTMLElement {
                                 <div class="bg-indigo-50 border p-3 rounded mt-4 text-xs text-indigo-900 leading-relaxed"><b>Goal:</b> Speak under 100 WPM, Visual Content over 20%.</div>
                             </div>
                             <div class="flex flex-col justify-between">
-                                <button data-action="toggleVisualRecord" data-slot="A" data-ref="s5-btn-A" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2"></i> Start Recording</button>
+                                <button data-action="toggleVisualRecord" data-slot="A" data-ref="s5-btn-A" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2 pointer-events-none"></i> Start Recording</button>
                                 <div data-ref="s5-status-A" class="mt-4 p-4 border rounded bg-slate-50 text-sm font-medium text-slate-600 text-center">No execution frames logged.</div>
                             </div>
                         </div>
@@ -621,7 +632,7 @@ class THPSDiagnostic extends HTMLElement {
                                 <div class="bg-amber-50 border p-3 rounded mt-4 text-xs text-amber-900 leading-relaxed"><b>Goal:</b> Speak over 170 WPM, Visual Content over 20%.</div>
                             </div>
                             <div class="flex flex-col justify-between">
-                                <button data-action="toggleVisualRecord" data-slot="B" data-ref="s5-btn-B" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2"></i> Start Recording</button>
+                                <button data-action="toggleVisualRecord" data-slot="B" data-ref="s5-btn-B" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2 pointer-events-none"></i> Start Recording</button>
                                 <div data-ref="s5-status-B" class="mt-4 p-4 border rounded bg-slate-50 text-sm font-medium text-slate-600 text-center">No execution frames logged.</div>
                             </div>
                         </div>
