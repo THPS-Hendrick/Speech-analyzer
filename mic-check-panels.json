@@ -1,4 +1,1072 @@
 {
+  "2026-01-01": {
+    "p1": "Never use your hands",
+    "p2": "Sell us",
+    "p3": "Fast Food",
+    "p4": "Light Dark"
+  },
+  "2026-01-02": {
+    "p1": "Laugh for no reason at some point",
+    "p2": "Philosophize us",
+    "p3": "Hot Air Balloons",
+    "p4": "Hungry Full"
+  },
+  "2026-01-03": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Scare us",
+    "p3": "Leftovers",
+    "p4": "Simple Complex"
+  },
+  "2026-01-04": {
+    "p1": "Jump for joy at some point",
+    "p2": "Expose us",
+    "p3": "Traffic Jams",
+    "p4": "Wrong Right"
+  },
+  "2026-01-05": {
+    "p1": "Speak faster and faster",
+    "p2": "Roast us",
+    "p3": "Theme Parks",
+    "p4": "Morning Night"
+  },
+  "2026-01-06": {
+    "p1": "Wander off at some point",
+    "p2": "Entertain us",
+    "p3": "Conferences",
+    "p4": "Near Far"
+  },
+  "2026-01-07": {
+    "p1": "Pause for great effect",
+    "p2": "Confuse us",
+    "p3": "Lawn Mowers",
+    "p4": "Easy Hard"
+  },
+  "2026-01-08": {
+    "p1": "Act like you're trying to escape handcuffs",
+    "p2": "Rally us",
+    "p3": "Influencers",
+    "p4": "Win Lose"
+  },
+  "2026-01-09": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Educate us",
+    "p3": "Bubble-wrap",
+    "p4": "Cheap Expensive"
+  },
+  "2026-01-10": {
+    "p1": "Sing one line of a song",
+    "p2": "Scare us",
+    "p3": "Clouds",
+    "p4": "Before After"
+  },
+  "2026-01-11": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Sell us",
+    "p3": "Supermarkets",
+    "p4": "High Low"
+  },
+  "2026-01-12": {
+    "p1": "Stand on one leg",
+    "p2": "Charm us",
+    "p3": "Salad",
+    "p4": "Fast Slow"
+  },
+  "2026-01-13": {
+    "p1": "Cough loudly at some point",
+    "p2": "Traumatize us",
+    "p3": "Graphic Designers",
+    "p4": "Start Finish"
+  },
+  "2026-01-14": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Roast us",
+    "p3": "Conferences",
+    "p4": "Clean Dirty"
+  },
+  "2026-01-15": {
+    "p1": "Act like you're at a protest",
+    "p2": "Entertain us",
+    "p3": "Astronauts",
+    "p4": "Top Bottom"
+  },
+  "2026-01-16": {
+    "p1": "Act very sleepy",
+    "p2": "Philosophize us",
+    "p3": "Breakfast",
+    "p4": "Virtual Physical"
+  },
+  "2026-01-17": {
+    "p1": "Wander off at some point",
+    "p2": "Scare us",
+    "p3": "Fast Food",
+    "p4": "Chaos Order"
+  },
+  "2026-01-18": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Educate us",
+    "p3": "Cardboard Boxes",
+    "p4": "Head Heart"
+  },
+  "2026-01-19": {
+    "p1": "Collect 3 objects and use them",
+    "p2": "Debunk us",
+    "p3": "Bubble-wrap",
+    "p4": "Simple Complex"
+  },
+  "2026-01-20": {
+    "p1": "Move your hands in small circles",
+    "p2": "Rally us",
+    "p3": "Chocolate Factories",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-01-21": {
+    "p1": "Sing one line of a song",
+    "p2": "Expose us",
+    "p3": "Salad",
+    "p4": "Left Right Centre"
+  },
+  "2026-01-22": {
+    "p1": "Clap at some point",
+    "p2": "Entertain us",
+    "p3": "HR",
+    "p4": "Morning Night"
+  },
+  "2026-01-23": {
+    "p1": "Laugh for no reason",
+    "p2": "Sell us",
+    "p3": "Gravity",
+    "p4": "Fast Good Cheap"
+  },
+  "2026-01-24": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Convince us",
+    "p3": "Astronauts",
+    "p4": "Inside Outside"
+  },
+  "2026-01-25": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Comfort us",
+    "p3": "Influencers",
+    "p4": "Top Bottom"
+  },
+  "2026-01-26": {
+    "p1": "Act like the best teacher",
+    "p2": "Educate us",
+    "p3": "Books",
+    "p4": "Light Dark"
+  },
+  "2026-01-27": {
+    "p1": "Pause for great effect",
+    "p2": "Hype us",
+    "p3": "Bureaucracy",
+    "p4": "Wrong Right"
+  },
+  "2026-01-28": {
+    "p1": "Look shocked",
+    "p2": "Confuse us",
+    "p3": "Flowers",
+    "p4": "Start Finish"
+  },
+  "2026-01-29": {
+    "p1": "Act like you've been shrunk down",
+    "p2": "Entertain us",
+    "p3": "The Moon",
+    "p4": "Problem Options Solution"
+  },
+  "2026-01-30": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Rally us",
+    "p3": "Supermarkets",
+    "p4": "Short Long"
+  },
+  "2026-01-31": {
+    "p1": "Move around faster and faster",
+    "p2": "Traumatize us",
+    "p3": "Decaf Coffee",
+    "p4": "Cheap Expensive"
+  },
+  "2026-02-01": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Charm us",
+    "p3": "AI",
+    "p4": "Old New"
+  },
+  "2026-02-02": {
+    "p1": "Cough loudly",
+    "p2": "Sell us",
+    "p3": "Entrepreneurship",
+    "p4": "Hungry Full"
+  },
+  "2026-02-03": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Hype us",
+    "p3": "Sushi",
+    "p4": "Before After"
+  },
+  "2026-02-04": {
+    "p1": "Make a confusing gesture",
+    "p2": "Convince us",
+    "p3": "Online Shopping",
+    "p4": "True False"
+  },
+  "2026-02-05": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Expose us",
+    "p3": "Airline Travel",
+    "p4": "Past Present Future"
+  },
+  "2026-02-06": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Entertain us",
+    "p3": "Fast Food",
+    "p4": "Near Far"
+  },
+  "2026-02-07": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Philosophize us",
+    "p3": "Graphic Designers",
+    "p4": "Small Big"
+  },
+  "2026-02-08": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Rally us",
+    "p3": "Food Containers",
+    "p4": "Small Medium Large"
+  },
+  "2026-02-09": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Bore us",
+    "p3": "Cruise Ships",
+    "p4": "Strong Weak"
+  },
+  "2026-02-10": {
+    "p1": "Act very sleepy",
+    "p2": "Hype us",
+    "p3": "Theme Parks",
+    "p4": "Emotion Logic"
+  },
+  "2026-02-11": {
+    "p1": "Jump for joy at some point",
+    "p2": "Traumatize us",
+    "p3": "AI",
+    "p4": "One Many"
+  },
+  "2026-02-12": {
+    "p1": "Wander off at some point",
+    "p2": "Convince us",
+    "p3": "Salad",
+    "p4": "Static Dynamic"
+  },
+  "2026-02-13": {
+    "p1": "Clap at some point",
+    "p2": "Roast us",
+    "p3": "Sugary Beverages",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-02-14": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Charm us",
+    "p3": "Trains",
+    "p4": "Clean Dirty"
+  },
+  "2026-02-15": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Expose us",
+    "p3": "Entrepreneurship",
+    "p4": "Light Dark"
+  },
+  "2026-02-16": {
+    "p1": "Yell at some point",
+    "p2": "Rally us",
+    "p3": "Lawn Mowers",
+    "p4": "Hungry Full"
+  },
+  "2026-02-17": {
+    "p1": "Speak faster and faster",
+    "p2": "Educate us",
+    "p3": "Cats",
+    "p4": "Emotion Logic"
+  },
+  "2026-02-18": {
+    "p1": "Act like you're at a protest",
+    "p2": "Confuse us",
+    "p3": "Hot Air Balloons",
+    "p4": "Direct Indirect"
+  },
+  "2026-02-19": {
+    "p1": "Never use your hands",
+    "p2": "Comfort us",
+    "p3": "Pencils",
+    "p4": "Head Heart"
+  },
+  "2026-02-20": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Roast us",
+    "p3": "AI",
+    "p4": "Wrong Right"
+  },
+  "2026-02-21": {
+    "p1": "Jump for joy at some point",
+    "p2": "Entertain us",
+    "p3": "Influencers",
+    "p4": "Near Far"
+  },
+  "2026-02-22": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Traumatize us",
+    "p3": "HR",
+    "p4": "Top Bottom"
+  },
+  "2026-02-23": {
+    "p1": "Act like you're trying to escape handcuffs",
+    "p2": "Philosophize us",
+    "p3": "Camping",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-02-24": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Debunk us",
+    "p3": "Books",
+    "p4": "True False"
+  },
+  "2026-02-25": {
+    "p1": "Act like you're at a protest",
+    "p2": "Convince us",
+    "p3": "Dream Jobs",
+    "p4": "High Low"
+  },
+  "2026-02-26": {
+    "p1": "Act very sleepy",
+    "p2": "Educate us",
+    "p3": "Working from Home",
+    "p4": "Before After"
+  },
+  "2026-02-27": {
+    "p1": "Sit on the floor",
+    "p2": "Scare us",
+    "p3": "Conferences",
+    "p4": "Light Dark"
+  },
+  "2026-02-28": {
+    "p1": "Yell at some point",
+    "p2": "Sell us",
+    "p3": "Umbrellas",
+    "p4": "Public Private"
+  },
+  "2026-03-01": {
+    "p1": "Collect 3 objects and use them",
+    "p2": "Confuse us",
+    "p3": "AI",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-03-02": {
+    "p1": "Stand on one leg",
+    "p2": "Roast us",
+    "p3": "Food Containers",
+    "p4": "Short Long"
+  },
+  "2026-03-03": {
+    "p1": "Act like the best teacher",
+    "p2": "Hype us",
+    "p3": "Breakfast",
+    "p4": "Static Dynamic"
+  },
+  "2026-03-04": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Rally us",
+    "p3": "Cats",
+    "p4": "Past Present Future"
+  },
+  "2026-03-05": {
+    "p1": "Speaker quieter and quieter",
+    "p2": "Philosophize us",
+    "p3": "Escalators",
+    "p4": "Home Away"
+  },
+  "2026-03-06": {
+    "p1": "Jump for joy at some point",
+    "p2": "Traumatize us",
+    "p3": "Pigeons",
+    "p4": "Land Sea Sky"
+  },
+  "2026-03-07": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Entertain us",
+    "p3": "Cardboard Boxes",
+    "p4": "Old New"
+  },
+  "2026-03-08": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Debunk us",
+    "p3": "The Gym",
+    "p4": "Light Dark"
+  },
+  "2026-03-09": {
+    "p1": "Never use your hands",
+    "p2": "Convince us",
+    "p3": "Salad",
+    "p4": "Small Medium Large"
+  },
+  "2026-03-10": {
+    "p1": "Voice-over a commercial",
+    "p2": "Sell us",
+    "p3": "Food Containers",
+    "p4": "Genuine Fake"
+  },
+  "2026-03-11": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Educate us",
+    "p3": "Coffee",
+    "p4": "Before After"
+  },
+  "2026-03-12": {
+    "p1": "Pause for great effect",
+    "p2": "Expose us",
+    "p3": "Breakfast",
+    "p4": "Hot Cold"
+  },
+  "2026-03-13": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Confuse us",
+    "p3": "Escalators",
+    "p4": "Left Right Centre"
+  },
+  "2026-03-14": {
+    "p1": "Sing one line of a song",
+    "p2": "Comfort us",
+    "p3": "Books",
+    "p4": "Internal External"
+  },
+  "2026-03-15": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Scare us",
+    "p3": "ID",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-03-16": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Rally us",
+    "p3": "Cats",
+    "p4": "Winning Losing"
+  },
+  "2026-03-17": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Bore us",
+    "p3": "Cruise Ships",
+    "p4": "Quiet Loud"
+  },
+  "2026-03-18": {
+    "p1": "Jump for joy at some point",
+    "p2": "Charm us",
+    "p3": "Astronauts",
+    "p4": "Small Big"
+  },
+  "2026-03-19": {
+    "p1": "Act like you've been shrunk down",
+    "p2": "Philosophize us",
+    "p3": "Bakeries",
+    "p4": "Small Medium Large"
+  },
+  "2026-03-20": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Sell us",
+    "p3": "Graphic Designers",
+    "p4": "Clean Dirty"
+  },
+  "2026-03-21": {
+    "p1": "Sing one line of a song",
+    "p2": "Convince us",
+    "p3": "Clouds",
+    "p4": "Bad Better Best"
+  },
+  "2026-03-22": {
+    "p1": "Never use your hands",
+    "p2": "Educate us",
+    "p3": "Leftovers",
+    "p4": "Virtual Physical"
+  },
+  "2026-03-23": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Confuse us",
+    "p3": "Decaf Coffee",
+    "p4": "Morning Night"
+  },
+  "2026-03-24": {
+    "p1": "Speak faster and faster",
+    "p2": "Bore us",
+    "p3": "Camping",
+    "p4": "Past Present Future"
+  },
+  "2026-03-25": {
+    "p1": "Voice-over a commercial",
+    "p2": "Rally us",
+    "p3": "Umbrellas",
+    "p4": "Top Bottom"
+  },
+  "2026-03-26": {
+    "p1": "Act like the best teacher",
+    "p2": "Debunk us",
+    "p3": "Supermarkets",
+    "p4": "Public Private"
+  },
+  "2026-03-27": {
+    "p1": "Cough loudly",
+    "p2": "Roast us",
+    "p3": "Work Trips",
+    "p4": "Near Far"
+  },
+  "2026-03-28": {
+    "p1": "Jump for joy at some point",
+    "p2": "Sell us",
+    "p3": "Bubble-wrap",
+    "p4": "Chaos Order"
+  },
+  "2026-03-29": {
+    "p1": "Yell at some point",
+    "p2": "Hype us",
+    "p3": "Video Games",
+    "p4": "Problem Options Solution"
+  },
+  "2026-03-30": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Comfort us",
+    "p3": "Breakfast",
+    "p4": "Fast Slow"
+  },
+  "2026-03-31": {
+    "p1": "Play with your hair",
+    "p2": "Traumatize us",
+    "p3": "Theme Parks",
+    "p4": "Strong Weak"
+  },
+  "2026-04-01": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Charm us",
+    "p3": "Clouds",
+    "p4": "Small Medium Large"
+  },
+  "2026-04-02": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Educate us",
+    "p3": "Conferences",
+    "p4": "Short Long"
+  },
+  "2026-04-03": {
+    "p1": "Clap at some point",
+    "p2": "Debunk us",
+    "p3": "Food Containers",
+    "p4": "Internal External"
+  },
+  "2026-04-04": {
+    "p1": "Sound like A.I",
+    "p2": "Bore us",
+    "p3": "Salad",
+    "p4": "Save Spend"
+  },
+  "2026-04-05": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Convince us",
+    "p3": "Dream Jobs",
+    "p4": "Hungry Full"
+  },
+  "2026-04-06": {
+    "p1": "Check your non-existent watch",
+    "p2": "Expose us",
+    "p3": "Lawn Mowers",
+    "p4": "Virtual Physical"
+  },
+  "2026-04-07": {
+    "p1": "Act like the best teacher",
+    "p2": "Traumatize us",
+    "p3": "Influencers",
+    "p4": "Public Private"
+  },
+  "2026-04-08": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Comfort us",
+    "p3": "Pencils",
+    "p4": "Start Finish"
+  },
+  "2026-04-09": {
+    "p1": "Cough loudly",
+    "p2": "Roast us",
+    "p3": "Fast Food",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-04-10": {
+    "p1": "Make a confusing gesture",
+    "p2": "Educate us",
+    "p3": "Pigeons",
+    "p4": "Strong Weak"
+  },
+  "2026-04-11": {
+    "p1": "Act like you're at a protest",
+    "p2": "Hype us",
+    "p3": "Chocolate Factories",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-04-12": {
+    "p1": "Voice-over a commercial",
+    "p2": "Debunk us",
+    "p3": "Sushi",
+    "p4": "Morning Night"
+  },
+  "2026-04-13": {
+    "p1": "Move around faster and faster",
+    "p2": "Confuse us",
+    "p3": "AI",
+    "p4": "Too much Not Enough"
+  },
+  "2026-04-14": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Sell us",
+    "p3": "Dream Jobs",
+    "p4": "Quiet Loud"
+  },
+  "2026-04-15": {
+    "p1": "Use sarcasm at least once",
+    "p2": "Entertain us",
+    "p3": "Work Trips",
+    "p4": "Save Spend"
+  },
+  "2026-04-16": {
+    "p1": "Spin around once",
+    "p2": "Bore us",
+    "p3": "Fast Food",
+    "p4": "Genuine Fake"
+  },
+  "2026-04-17": {
+    "p1": "Stand on one leg",
+    "p2": "Rally us",
+    "p3": "Coffee",
+    "p4": "Before After"
+  },
+  "2026-04-18": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Philosophize us",
+    "p3": "Trains",
+    "p4": "Hot Cold"
+  },
+  "2026-04-19": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Comfort us",
+    "p3": "The Gym",
+    "p4": "Clean Dirty"
+  },
+  "2026-04-20": {
+    "p1": "Cough loudly",
+    "p2": "Charm us",
+    "p3": "HR",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-04-21": {
+    "p1": "Pause for great effect",
+    "p2": "Roast us",
+    "p3": "Naps",
+    "p4": "Small Medium Large"
+  },
+  "2026-04-22": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Traumatize us",
+    "p3": "Influencers",
+    "p4": "Past Present Future"
+  },
+  "2026-04-23": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Sell us",
+    "p3": "Entrepreneurship",
+    "p4": "Head Heart"
+  },
+  "2026-04-24": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Rally us",
+    "p3": "Camping",
+    "p4": "Direct Indirect"
+  },
+  "2026-04-25": {
+    "p1": "Check your non-existent watch",
+    "p2": "Bore us",
+    "p3": "Pencils",
+    "p4": "Old New"
+  },
+  "2026-04-26": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Entertain us",
+    "p3": "Video Games",
+    "p4": "Chaos Order"
+  },
+  "2026-04-27": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Comfort us",
+    "p3": "Supermarkets",
+    "p4": "Short Long"
+  },
+  "2026-04-28": {
+    "p1": "Play with your hair",
+    "p2": "Hype us",
+    "p3": "Fast Food",
+    "p4": "Easy Hard"
+  },
+  "2026-04-29": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Debunk us",
+    "p3": "Airline Travel",
+    "p4": "Before After"
+  },
+  "2026-04-30": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Confuse us",
+    "p3": "Conferences",
+    "p4": "Static Dynamic"
+  },
+  "2026-05-01": {
+    "p1": "Act like the best teacher",
+    "p2": "Charm us",
+    "p3": "Astronauts",
+    "p4": "True False"
+  },
+  "2026-05-02": {
+    "p1": "Pause for great effect",
+    "p2": "Rally us",
+    "p3": "Cats",
+    "p4": "Old New"
+  },
+  "2026-05-03": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Educate us",
+    "p3": "Bubble-wrap",
+    "p4": "Clean Dirty"
+  },
+  "2026-05-04": {
+    "p1": "Never use your hands",
+    "p2": "Expose us",
+    "p3": "Influencers",
+    "p4": "Inside Outside"
+  },
+  "2026-05-05": {
+    "p1": "Look shocked",
+    "p2": "Philosophize us",
+    "p3": "Pigeons",
+    "p4": "Left Right Centre"
+  },
+  "2026-05-06": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Traumatize us",
+    "p3": "Sugary Beverages",
+    "p4": "Past Present Future"
+  },
+  "2026-05-07": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Scare us",
+    "p3": "Pencils",
+    "p4": "Bad Better Best"
+  },
+  "2026-05-08": {
+    "p1": "Make a confusing gesture",
+    "p2": "Sell us",
+    "p3": "Naps",
+    "p4": "One Many"
+  },
+  "2026-05-09": {
+    "p1": "Check your non-existent watch",
+    "p2": "Charm us",
+    "p3": "Food Containers",
+    "p4": "Public Private"
+  },
+  "2026-05-10": {
+    "p1": "Laugh for no reason",
+    "p2": "Hype us",
+    "p3": "Chocolate Factories",
+    "p4": "Problem Options Solution"
+  },
+  "2026-05-11": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Roast us",
+    "p3": "Online Shopping",
+    "p4": "Home Away"
+  },
+  "2026-05-12": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Rally us",
+    "p3": "Leftovers",
+    "p4": "Winning Losing"
+  },
+  "2026-05-13": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Educate us",
+    "p3": "Scammers",
+    "p4": "Left Right Centre"
+  },
+  "2026-05-14": {
+    "p1": "Whisper at least 3 times",
+    "p2": "Traumatize us",
+    "p3": "HR",
+    "p4": "Land Sea Sky"
+  },
+  "2026-05-15": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Scare us",
+    "p3": "Naps",
+    "p4": "Head Heart"
+  },
+  "2026-05-16": {
+    "p1": "Wander off at some point",
+    "p2": "Entertain us",
+    "p3": "Fast Food",
+    "p4": "Together Apart"
+  },
+  "2026-05-17": {
+    "p1": "Act like the best teacher",
+    "p2": "Expose us",
+    "p3": "Breakfast",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-05-18": {
+    "p1": "Cough loudly",
+    "p2": "Philosophize us",
+    "p3": "Sugary Beverages",
+    "p4": "Morning Night"
+  },
+  "2026-05-19": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Debunk us",
+    "p3": "Airline Travel",
+    "p4": "Theory Practice"
+  },
+  "2026-05-20": {
+    "p1": "Act like you're at a protest",
+    "p2": "Charm us",
+    "p3": "Trains",
+    "p4": "Internal External"
+  },
+  "2026-05-21": {
+    "p1": "Clap at some point",
+    "p2": "Rally us",
+    "p3": "Leftovers",
+    "p4": "Input Output"
+  },
+  "2026-05-22": {
+    "p1": "Pause for great effect",
+    "p2": "Comfort us",
+    "p3": "Cardboard Boxes",
+    "p4": "Too much Not Enough"
+  },
+  "2026-05-23": {
+    "p1": "Move around faster and faster",
+    "p2": "Roast us",
+    "p3": "AI",
+    "p4": "Wrong Right"
+  },
+  "2026-05-24": {
+    "p1": "Move your hands in small circles",
+    "p2": "Scare us",
+    "p3": "Traffic Jams",
+    "p4": "Small Medium Large"
+  },
+  "2026-05-25": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Convince us",
+    "p3": "Supermarkets",
+    "p4": "Chaos Order"
+  },
+  "2026-05-26": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Bore us",
+    "p3": "Coffee",
+    "p4": "High Low"
+  },
+  "2026-05-27": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Traumatize us",
+    "p3": "Video Games",
+    "p4": "Old New"
+  },
+  "2026-05-28": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Educate us",
+    "p3": "Cruise Ships",
+    "p4": "First Second Third"
+  },
+  "2026-05-29": {
+    "p1": "Project your voice to the far side of the room",
+    "p2": "Charm us",
+    "p3": "HR",
+    "p4": "Theory Practice"
+  },
+  "2026-05-30": {
+    "p1": "Sit on the floor",
+    "p2": "Philosophize us",
+    "p3": "Socks",
+    "p4": "Win Lose"
+  },
+  "2026-05-31": {
+    "p1": "Act like you've been shrunk down",
+    "p2": "Confuse us",
+    "p3": "Entrepreneurship",
+    "p4": "True False"
+  },
+  "2026-06-01": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Debunk us",
+    "p3": "Flowers",
+    "p4": "Left Right Centre"
+  },
+  "2026-06-02": {
+    "p1": "Act like you're at a protest",
+    "p2": "Sell us",
+    "p3": "Influencers",
+    "p4": "Bad Better Best"
+  },
+  "2026-06-03": {
+    "p1": "Act very sleepy",
+    "p2": "Rally us",
+    "p3": "Sushi",
+    "p4": "Fast Slow"
+  },
+  "2026-06-04": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Scare us",
+    "p3": "Cats",
+    "p4": "Problem Options Solution"
+  },
+  "2026-06-05": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Charm us",
+    "p3": "Working from Home",
+    "p4": "Fast Good Cheap"
+  },
+  "2026-06-06": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Entertain us",
+    "p3": "Graphic Designers",
+    "p4": "Simple Complex"
+  },
+  "2026-06-07": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Expose us",
+    "p3": "Pencils",
+    "p4": "Hot Cold"
+  },
+  "2026-06-08": {
+    "p1": "Find a prop and use it",
+    "p2": "Bore us",
+    "p3": "Dream Jobs",
+    "p4": "Extreme Sensible"
+  },
+  "2026-06-09": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Entertain us",
+    "p3": "Umbrellas",
+    "p4": "Home Away"
+  },
+  "2026-06-10": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Traumatize us",
+    "p3": "Cardboard Boxes",
+    "p4": "Cheap Expensive"
+  },
+  "2026-06-11": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Sell us",
+    "p3": "Cats",
+    "p4": "Easy Hard"
+  },
+  "2026-06-12": {
+    "p1": "Play with your hair",
+    "p2": "Rally us",
+    "p3": "Coffee",
+    "p4": "Together Apart"
+  },
+  "2026-06-13": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Bore us",
+    "p3": "Theme Parks",
+    "p4": "Bad Better Best"
+  },
+  "2026-06-14": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Roast us",
+    "p3": "Clouds",
+    "p4": "High Low"
+  },
+  "2026-06-15": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Educate us",
+    "p3": "Cruise Ships",
+    "p4": "Win Lose"
+  },
+  "2026-06-16": {
+    "p1": "Check your non-existent watch",
+    "p2": "Charm us",
+    "p3": "Pencils",
+    "p4": "Internal External"
+  },
+  "2026-06-17": {
+    "p1": "Act like you're at a protest",
+    "p2": "Expose us",
+    "p3": "Airline Travel",
+    "p4": "Direct Indirect"
+  },
+  "2026-06-18": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Hype us",
+    "p3": "Food Containers",
+    "p4": "Near Far"
+  },
+  "2026-06-19": {
+    "p1": "Move around faster and faster",
+    "p2": "Debunk us",
+    "p3": "Work Trips",
+    "p4": "Too much Not Enough"
+  },
+  "2026-06-20": {
+    "p1": "Whisper at least 3 times",
+    "p2": "Entertain us",
+    "p3": "Sushi",
+    "p4": "Simple Complex"
+  },
+  "2026-06-21": {
+    "p1": "Laugh for no reason",
+    "p2": "Roast us",
+    "p3": "Sugary Beverages",
+    "p4": "Top Bottom"
+  },
+  "2026-06-22": {
+    "p1": "Act very sleepy",
+    "p2": "Bore us",
+    "p3": "Hot Air Balloons",
+    "p4": "Save Spend"
+  },
+  "2026-06-23": {
+    "p1": "Project your voice to the far side of the room",
+    "p2": "Traumatize us",
+    "p3": "Flowers",
+    "p4": "Hot Cold"
+  },
+  "2026-06-24": {
+    "p1": "Wander off at some point",
+    "p2": "Charm us",
+    "p3": "Umbrellas",
+    "p4": "High Low"
+  },
+  "2026-06-25": {
+    "p1": "Close your eyes for 5 seconds",
+    "p2": "Scare us",
+    "p3": "Cardboard Boxes",
+    "p4": "Cheap Expensive"
+  },
+  "2026-06-26": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Convince us",
+    "p3": "Supermarkets",
+    "p4": "Public Private"
+  },
+  "2026-06-27": {
+    "p1": "Never use your hands",
+    "p2": "Comfort us",
+    "p3": "AI",
+    "p4": "Easy Hard"
+  },
   "2026-06-28": {
     "p1": "Adjust a prop 3 times",
     "p2": "Educate us",
@@ -202,5 +1270,917 @@
     "p2": "Bore us",
     "p3": "Coffee",
     "p4": "First Second Third"
+  },
+  "2026-08-01": {
+    "p1": "Play with your hair",
+    "p2": "Hype us",
+    "p3": "Cardboard Boxes",
+    "p4": "Internal External"
+  },
+  "2026-08-02": {
+    "p1": "Act like you're at a protest",
+    "p2": "Confuse us",
+    "p3": "Books",
+    "p4": "Bad Better Best"
+  },
+  "2026-08-03": {
+    "p1": "Spin around once",
+    "p2": "Debunk us",
+    "p3": "Entrepreneurship",
+    "p4": "Save Spend"
+  },
+  "2026-08-04": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Traumatize us",
+    "p3": "Working from Home",
+    "p4": "Together Apart"
+  },
+  "2026-08-05": {
+    "p1": "Act very sleepy",
+    "p2": "Rally us",
+    "p3": "Hot Air Balloons",
+    "p4": "Strong Weak"
+  },
+  "2026-08-06": {
+    "p1": "Laugh for no reason",
+    "p2": "Entertain us",
+    "p3": "Pigeons",
+    "p4": "Left Right Centre"
+  },
+  "2026-08-07": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Bore us",
+    "p3": "Breakfast",
+    "p4": "Land Sea Sky"
+  },
+  "2026-08-08": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Convince us",
+    "p3": "Theme Parks",
+    "p4": "Theory Practice"
+  },
+  "2026-08-09": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Scare us",
+    "p3": "Conferences",
+    "p4": "Virtual Physical"
+  },
+  "2026-08-10": {
+    "p1": "Move around faster and faster",
+    "p2": "Charm us",
+    "p3": "Video Games",
+    "p4": "Problem Options Solution"
+  },
+  "2026-08-11": {
+    "p1": "Spin around once",
+    "p2": "Philosophize us",
+    "p3": "Online Shopping",
+    "p4": "Emotion Logic"
+  },
+  "2026-08-12": {
+    "p1": "Cough loudly",
+    "p2": "Confuse us",
+    "p3": "Escalators",
+    "p4": "Static Dynamic"
+  },
+  "2026-08-13": {
+    "p1": "Act like you're at a protest",
+    "p2": "Rally us",
+    "p3": "Books",
+    "p4": "Simple Complex"
+  },
+  "2026-08-14": {
+    "p1": "Close your eyes for 5 seconds",
+    "p2": "Entertain us",
+    "p3": "Astronauts",
+    "p4": "Bad Better Best"
+  },
+  "2026-08-15": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Convince us",
+    "p3": "Camping",
+    "p4": "Public Private"
+  },
+  "2026-08-16": {
+    "p1": "Pause for great effect",
+    "p2": "Bore us",
+    "p3": "Chocolate Factories",
+    "p4": "Small Medium Large"
+  },
+  "2026-08-17": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Comfort us",
+    "p3": "Socks",
+    "p4": "Too much Not Enough"
+  },
+  "2026-08-18": {
+    "p1": "Yell at some point",
+    "p2": "Roast us",
+    "p3": "Bureaucracy",
+    "p4": "Home Away"
+  },
+  "2026-08-19": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Philosophize us",
+    "p3": "AI",
+    "p4": "Fast Slow"
+  },
+  "2026-08-20": {
+    "p1": "Act very sleepy",
+    "p2": "Scare us",
+    "p3": "Hot Air Balloons",
+    "p4": "Morning Night"
+  },
+  "2026-08-21": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Traumatize us",
+    "p3": "Conferences",
+    "p4": "Land Sea Sky"
+  },
+  "2026-08-22": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Educate us",
+    "p3": "ID",
+    "p4": "Small Big"
+  },
+  "2026-08-23": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Charm us",
+    "p3": "The Moon",
+    "p4": "Problem Options Solution"
+  },
+  "2026-08-24": {
+    "p1": "Pause for great effect",
+    "p2": "Entertain us",
+    "p3": "Astronauts",
+    "p4": "Quiet Loud"
+  },
+  "2026-08-25": {
+    "p1": "Go find a prop and use it",
+    "p2": "Roast us",
+    "p3": "Bubble-wrap",
+    "p4": "Internal External"
+  },
+  "2026-08-26": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Philosophize us",
+    "p3": "Pigeons",
+    "p4": "Fast Good Cheap"
+  },
+  "2026-08-27": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Debunk us",
+    "p3": "Trains",
+    "p4": "Left Right Centre"
+  },
+  "2026-08-28": {
+    "p1": "Act like you're at a protest",
+    "p2": "Scare us",
+    "p3": "Cats",
+    "p4": "Short Long"
+  },
+  "2026-08-29": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Educate us",
+    "p3": "Video Games",
+    "p4": "Small Big"
+  },
+  "2026-08-30": {
+    "p1": "Sit on the floor",
+    "p2": "Bore us",
+    "p3": "Sushi",
+    "p4": "High Low"
+  },
+  "2026-08-31": {
+    "p1": "Check your non-existent watch",
+    "p2": "Rally us",
+    "p3": "Socks",
+    "p4": "Virtual Physical"
+  },
+  "2026-09-01": {
+    "p1": "Use sarcasm at least once",
+    "p2": "Entertain us",
+    "p3": "Scammers",
+    "p4": "Fast Slow"
+  },
+  "2026-09-02": {
+    "p1": "Point at nothing",
+    "p2": "Convince us",
+    "p3": "Cardboard Boxes",
+    "p4": "Home Away"
+  },
+  "2026-09-03": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Debunk us",
+    "p3": "Flowers",
+    "p4": "Save Spend"
+  },
+  "2026-09-04": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Scare us",
+    "p3": "Sugary Beverages",
+    "p4": "Light Dark"
+  },
+  "2026-09-05": {
+    "p1": "Make a confusing gesture",
+    "p2": "Confuse us",
+    "p3": "Work Trips",
+    "p4": "Small Big"
+  },
+  "2026-09-06": {
+    "p1": "Sound like A.I",
+    "p2": "Philosophize us",
+    "p3": "Theme Parks",
+    "p4": "High Low"
+  },
+  "2026-09-07": {
+    "p1": "Speak faster and faster",
+    "p2": "Expose us",
+    "p3": "Coffee",
+    "p4": "True False"
+  },
+  "2026-09-08": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Comfort us",
+    "p3": "Naps",
+    "p4": "Direct Indirect"
+  },
+  "2026-09-09": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Bore us",
+    "p3": "Clouds",
+    "p4": "One Many"
+  },
+  "2026-09-10": {
+    "p1": "Spin around once",
+    "p2": "Entertain us",
+    "p3": "Sushi",
+    "p4": "Internal External"
+  },
+  "2026-09-11": {
+    "p1": "Project your voice to the far side of the room",
+    "p2": "Roast us",
+    "p3": "Hot Air Balloons",
+    "p4": "Quiet Loud"
+  },
+  "2026-09-12": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Charm us",
+    "p3": "Lawn Mowers",
+    "p4": "Hot Cold"
+  },
+  "2026-09-13": {
+    "p1": "Pause for great effect",
+    "p2": "Debunk us",
+    "p3": "Gravity",
+    "p4": "Winning Losing"
+  },
+  "2026-09-14": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Sell us",
+    "p3": "Umbrellas",
+    "p4": "Before After"
+  },
+  "2026-09-15": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Hype us",
+    "p3": "Pigeons",
+    "p4": "Light Dark"
+  },
+  "2026-09-16": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Scare us",
+    "p3": "Pencils",
+    "p4": "Static Dynamic"
+  },
+  "2026-09-17": {
+    "p1": "Jump for joy at some point",
+    "p2": "Comfort us",
+    "p3": "Trains",
+    "p4": "Near Far"
+  },
+  "2026-09-18": {
+    "p1": "Act like you're at a protest",
+    "p2": "Convince us",
+    "p3": "The Moon",
+    "p4": "Head Heart"
+  },
+  "2026-09-19": {
+    "p1": "Wander off at some point",
+    "p2": "Roast us",
+    "p3": "Cardboard Boxes",
+    "p4": "True False"
+  },
+  "2026-09-20": {
+    "p1": "Never use your hands",
+    "p2": "Entertain us",
+    "p3": "HR",
+    "p4": "Hot Cold"
+  },
+  "2026-09-21": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Philosophize us",
+    "p3": "Escalators",
+    "p4": "Top Bottom"
+  },
+  "2026-09-22": {
+    "p1": "Act like you're trying to escape handcuffs",
+    "p2": "Charm us",
+    "p3": "Fast Food",
+    "p4": "Quiet Loud"
+  },
+  "2026-09-23": {
+    "p1": "Sound like A.I",
+    "p2": "Traumatize us",
+    "p3": "Camping",
+    "p4": "Wrong Right"
+  },
+  "2026-09-24": {
+    "p1": "Sing one line of a song",
+    "p2": "Rally us",
+    "p3": "AI",
+    "p4": "Bad Better Best"
+  },
+  "2026-09-25": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Debunk us",
+    "p3": "Scammers",
+    "p4": "Fast Good Cheap"
+  },
+  "2026-09-26": {
+    "p1": "Voice-over a commercial",
+    "p2": "Scare us",
+    "p3": "Supermarkets",
+    "p4": "Clean Dirty"
+  },
+  "2026-09-27": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Sell us",
+    "p3": "Bureaucracy",
+    "p4": "Home Away"
+  },
+  "2026-09-28": {
+    "p1": "Close your eyes for 5 seconds",
+    "p2": "Confuse us",
+    "p3": "HR",
+    "p4": "Land Sea Sky"
+  },
+  "2026-09-29": {
+    "p1": "Play with your hair",
+    "p2": "Comfort us",
+    "p3": "Cats",
+    "p4": "Direct Indirect"
+  },
+  "2026-09-30": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Expose us",
+    "p3": "Chocolate Factories",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-10-01": {
+    "p1": "Clap at some point",
+    "p2": "Bore us",
+    "p3": "Cardboard Boxes",
+    "p4": "Near Far"
+  },
+  "2026-10-02": {
+    "p1": "Move your hands in small circles",
+    "p2": "Educate us",
+    "p3": "Pencils",
+    "p4": "Too much Not Enough"
+  },
+  "2026-10-03": {
+    "p1": "Stand on one leg",
+    "p2": "Entertain us",
+    "p3": "Books",
+    "p4": "High Low"
+  },
+  "2026-10-04": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Sell us",
+    "p3": "Sugary Beverages",
+    "p4": "Winning Losing"
+  },
+  "2026-10-05": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Rally us",
+    "p3": "Breakfast",
+    "p4": "Inside Outside"
+  },
+  "2026-10-06": {
+    "p1": "Close your eyes for 5 seconds",
+    "p2": "Convince us",
+    "p3": "Gravity",
+    "p4": "Hungry Full"
+  },
+  "2026-10-07": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Charm us",
+    "p3": "Naps",
+    "p4": "Land Sea Sky"
+  },
+  "2026-10-08": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Confuse us",
+    "p3": "Dream Jobs",
+    "p4": "Old New"
+  },
+  "2026-10-09": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Roast us",
+    "p3": "Coffee",
+    "p4": "Cheap Expensive"
+  },
+  "2026-10-10": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Comfort us",
+    "p3": "Entrepreneurship",
+    "p4": "Left Right Centre"
+  },
+  "2026-10-11": {
+    "p1": "Jump for joy at some point",
+    "p2": "Entertain us",
+    "p3": "The Moon",
+    "p4": "Strong Weak"
+  },
+  "2026-10-12": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Bore us",
+    "p3": "Food Containers",
+    "p4": "Problem Options Solution"
+  },
+  "2026-10-13": {
+    "p1": "Move around faster and faster",
+    "p2": "Rally us",
+    "p3": "Breakfast",
+    "p4": "Virtual Physical"
+  },
+  "2026-10-14": {
+    "p1": "Stand on one leg",
+    "p2": "Charm us",
+    "p3": "Chocolate Factories",
+    "p4": "Hungry Full"
+  },
+  "2026-10-15": {
+    "p1": "Interrupt yourself by yelling at something once",
+    "p2": "Hype us",
+    "p3": "Naps",
+    "p4": "Chaos Order"
+  },
+  "2026-10-16": {
+    "p1": "Laugh for no reason",
+    "p2": "Convince us",
+    "p3": "Dream Jobs",
+    "p4": "One Many"
+  },
+  "2026-10-17": {
+    "p1": "Pause for great effect",
+    "p2": "Roast us",
+    "p3": "Astronauts",
+    "p4": "Save Spend"
+  },
+  "2026-10-18": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Scare us",
+    "p3": "Bakeries",
+    "p4": "Start Finish"
+  },
+  "2026-10-19": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Bore us",
+    "p3": "ID",
+    "p4": "Near Far"
+  },
+  "2026-10-20": {
+    "p1": "Use sarcasm at least once",
+    "p2": "Entertain us",
+    "p3": "Umbrellas",
+    "p4": "Small Medium Large"
+  },
+  "2026-10-21": {
+    "p1": "Act in a serious way at least 3 times",
+    "p2": "Traumatize us",
+    "p3": "Escalators",
+    "p4": "Problem Options Solution"
+  },
+  "2026-10-22": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Comfort us",
+    "p3": "Sugary Beverages",
+    "p4": "Static Dynamic"
+  },
+  "2026-10-23": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Sell us",
+    "p3": "The Gym",
+    "p4": "Public Private"
+  },
+  "2026-10-24": {
+    "p1": "Act like you're at a protest",
+    "p2": "Rally us",
+    "p3": "Books",
+    "p4": "Inside Outside"
+  },
+  "2026-10-25": {
+    "p1": "Sit on the floor",
+    "p2": "Educate us",
+    "p3": "Conferences",
+    "p4": "Cheap Expensive"
+  },
+  "2026-10-26": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Roast us",
+    "p3": "Cats",
+    "p4": "Emotion Logic"
+  },
+  "2026-10-27": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Entertain us",
+    "p3": "HR",
+    "p4": "Clean Dirty"
+  },
+  "2026-10-28": {
+    "p1": "Speak faster and faster",
+    "p2": "Philosophize us",
+    "p3": "Graphic Designers",
+    "p4": "Short Long"
+  },
+  "2026-10-29": {
+    "p1": "Act like you've been shrunk down",
+    "p2": "Comfort us",
+    "p3": "Leftovers",
+    "p4": "Strong Weak"
+  },
+  "2026-10-30": {
+    "p1": "Pat an imaginary cat",
+    "p2": "Scare us",
+    "p3": "Camping",
+    "p4": "Winning Losing"
+  },
+  "2026-10-31": {
+    "p1": "Move your hands in small circles",
+    "p2": "Charm us",
+    "p3": "Umbrellas",
+    "p4": "Win Lose"
+  },
+  "2026-11-01": {
+    "p1": "Pause for great effect",
+    "p2": "Traumatize us",
+    "p3": "The Moon",
+    "p4": "Quiet Loud"
+  },
+  "2026-11-02": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Convince us",
+    "p3": "The Gym",
+    "p4": "Chaos Order"
+  },
+  "2026-11-03": {
+    "p1": "Spin around once",
+    "p2": "Expose us",
+    "p3": "Lawn Mowers",
+    "p4": "Virtual Physical"
+  },
+  "2026-11-04": {
+    "p1": "Check your non-existent watch",
+    "p2": "Roast us",
+    "p3": "Fast Food",
+    "p4": "Emotion Logic"
+  },
+  "2026-11-05": {
+    "p1": "Look shocked",
+    "p2": "Sell us",
+    "p3": "Entrepreneurship",
+    "p4": "True False"
+  },
+  "2026-11-06": {
+    "p1": "Cough loudly",
+    "p2": "Confuse us",
+    "p3": "Graphic Designers",
+    "p4": "Short Long"
+  },
+  "2026-11-07": {
+    "p1": "Play with your hair",
+    "p2": "Charm us",
+    "p3": "Working from Home",
+    "p4": "Head Heart"
+  },
+  "2026-11-08": {
+    "p1": "Move around faster and faster",
+    "p2": "Rally us",
+    "p3": "Coffee",
+    "p4": "One Many"
+  },
+  "2026-11-09": {
+    "p1": "Make yourself wide and long 3 times",
+    "p2": "Convince us",
+    "p3": "Chocolate Factories",
+    "p4": "Morning Night"
+  },
+  "2026-11-10": {
+    "p1": "Act like you're at a protest",
+    "p2": "Entertain us",
+    "p3": "Online Shopping",
+    "p4": "Top Bottom"
+  },
+  "2026-11-11": {
+    "p1": "Never use your hands",
+    "p2": "Educate us",
+    "p3": "Pigeons",
+    "p4": "Inside Outside"
+  },
+  "2026-11-12": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Debunk us",
+    "p3": "Trains",
+    "p4": "Hungry Full"
+  },
+  "2026-11-13": {
+    "p1": "Whisper at least 3 times",
+    "p2": "Confuse us",
+    "p3": "Airline Travel",
+    "p4": "Cheap Expensive"
+  },
+  "2026-11-14": {
+    "p1": "Project your voice to the far side of the room",
+    "p2": "Comfort us",
+    "p3": "Naps",
+    "p4": "Land Sea Sky"
+  },
+  "2026-11-15": {
+    "p1": "Wander off at some point",
+    "p2": "Scare us",
+    "p3": "Cardboard Boxes",
+    "p4": "Wrong Right"
+  },
+  "2026-11-16": {
+    "p1": "Say \"oh no\" at some point",
+    "p2": "Philosophize us",
+    "p3": "Bakeries",
+    "p4": "Small Medium Large"
+  },
+  "2026-11-17": {
+    "p1": "Use your hands to illustrate your words",
+    "p2": "Entertain us",
+    "p3": "Working from Home",
+    "p4": "Extreme Extreme Sensible"
+  },
+  "2026-11-18": {
+    "p1": "Sing one line of a song",
+    "p2": "Charm us",
+    "p3": "Books",
+    "p4": "Left Right Centre"
+  },
+  "2026-11-19": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Sell us",
+    "p3": "Gravity",
+    "p4": "Together Apart"
+  },
+  "2026-11-20": {
+    "p1": "Move around faster and faster",
+    "p2": "Hype us",
+    "p3": "Influencers",
+    "p4": "True False"
+  },
+  "2026-11-21": {
+    "p1": "Act very sleepy",
+    "p2": "Debunk us",
+    "p3": "HR",
+    "p4": "Small Big"
+  },
+  "2026-11-22": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Scare us",
+    "p3": "Sugary Beverages",
+    "p4": "High Low"
+  },
+  "2026-11-23": {
+    "p1": "Clap at some point",
+    "p2": "Traumatize us",
+    "p3": "Breakfast",
+    "p4": "Public Private"
+  },
+  "2026-11-24": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Confuse us",
+    "p3": "Trains",
+    "p4": "Input Output"
+  },
+  "2026-11-25": {
+    "p1": "Collect 3 objects and use them",
+    "p2": "Roast us",
+    "p3": "Lawn Mowers",
+    "p4": "First Second Third"
+  },
+  "2026-11-26": {
+    "p1": "Act like you're at a protest",
+    "p2": "Sell us",
+    "p3": "Bakeries",
+    "p4": "Fast Good Cheap"
+  },
+  "2026-11-27": {
+    "p1": "Play with your hair",
+    "p2": "Comfort us",
+    "p3": "Sushi",
+    "p4": "Inside Outside"
+  },
+  "2026-11-28": {
+    "p1": "Voice-over a commercial",
+    "p2": "Educate us",
+    "p3": "Food Containers",
+    "p4": "Clean Dirty"
+  },
+  "2026-11-29": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Entertain us",
+    "p3": "Salad",
+    "p4": "Easy Hard"
+  },
+  "2026-11-30": {
+    "p1": "Draw a diagram while talking",
+    "p2": "Debunk us",
+    "p3": "Bubble-wrap",
+    "p4": "Quiet Loud"
+  },
+  "2026-12-01": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Hype us",
+    "p3": "The Moon",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-12-02": {
+    "p1": "Voice-over a nature documentary",
+    "p2": "Philosophize us",
+    "p3": "Socks",
+    "p4": "Win Lose"
+  },
+  "2026-12-03": {
+    "p1": "Sing one line of a song",
+    "p2": "Convince us",
+    "p3": "Traffic Jams",
+    "p4": "Input Output"
+  },
+  "2026-12-04": {
+    "p1": "Include a whisper, a pause, and a loud voice",
+    "p2": "Traumatize us",
+    "p3": "Entrepreneurship",
+    "p4": "High Low"
+  },
+  "2026-12-05": {
+    "p1": "Jump for joy at some point",
+    "p2": "Roast us",
+    "p3": "Sushi",
+    "p4": "Short Long"
+  },
+  "2026-12-06": {
+    "p1": "Pretend to step in something wet",
+    "p2": "Educate us",
+    "p3": "Bureaucracy",
+    "p4": "Virtual Physical"
+  },
+  "2026-12-07": {
+    "p1": "Adjust an object slightly 3 times",
+    "p2": "Bore us",
+    "p3": "Books",
+    "p4": "Head Heart"
+  },
+  "2026-12-08": {
+    "p1": "Check your non-existent watch",
+    "p2": "Rally us",
+    "p3": "HR",
+    "p4": "Simple Complex"
+  },
+  "2026-12-09": {
+    "p1": "Cough loudly",
+    "p2": "Sell us",
+    "p3": "Sugary Beverages",
+    "p4": "Static Dynamic"
+  },
+  "2026-12-10": {
+    "p1": "Project your voice to the far side of the room",
+    "p2": "Confuse us",
+    "p3": "Video Games",
+    "p4": "Morning Night"
+  },
+  "2026-12-11": {
+    "p1": "Act like you're trying to escape handcuffs",
+    "p2": "Hype us",
+    "p3": "Breakfast",
+    "p4": "Near Far"
+  },
+  "2026-12-12": {
+    "p1": "Speak faster and faster",
+    "p2": "Convince us",
+    "p3": "Food Containers",
+    "p4": "Easy Hard"
+  },
+  "2026-12-13": {
+    "p1": "Sit on the floor",
+    "p2": "Charm us",
+    "p3": "Pigeons",
+    "p4": "Wrong Right"
+  },
+  "2026-12-14": {
+    "p1": "Speak quieter and quieter",
+    "p2": "Traumatize us",
+    "p3": "Decaf Coffee",
+    "p4": "Short Long"
+  },
+  "2026-12-15": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Debunk us",
+    "p3": "Online Shopping",
+    "p4": "Start Finish"
+  },
+  "2026-12-16": {
+    "p1": "Spin around once",
+    "p2": "Entertain us",
+    "p3": "ID",
+    "p4": "Theory Practice"
+  },
+  "2026-12-17": {
+    "p1": "Collect 3 objects and use them",
+    "p2": "Philosophize us",
+    "p3": "Clouds",
+    "p4": "Clean Dirty"
+  },
+  "2026-12-18": {
+    "p1": "Move your hands in small circles",
+    "p2": "Bore us",
+    "p3": "Dream Jobs",
+    "p4": "Direct Indirect"
+  },
+  "2026-12-19": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Convince us",
+    "p3": "Work Trips",
+    "p4": "One Many"
+  },
+  "2026-12-20": {
+    "p1": "Act like a motivational speaker",
+    "p2": "Comfort us",
+    "p3": "Sugary Beverages",
+    "p4": "Past Present Future"
+  },
+  "2026-12-21": {
+    "p1": "Stand on one leg",
+    "p2": "Rally us",
+    "p3": "Socks",
+    "p4": "Inside Outside"
+  },
+  "2026-12-22": {
+    "p1": "Hiccup at least 3 times",
+    "p2": "Charm us",
+    "p3": "Food Containers",
+    "p4": "Easy Hard"
+  },
+  "2026-12-23": {
+    "p1": "Check your non-existent watch",
+    "p2": "Debunk us",
+    "p3": "Bakeries",
+    "p4": "Serious Sarcastic"
+  },
+  "2026-12-24": {
+    "p1": "Never use your hands",
+    "p2": "Entertain us",
+    "p3": "Breakfast",
+    "p4": "Small Big"
+  },
+  "2026-12-25": {
+    "p1": "Say \"does that make sense\" 3 times",
+    "p2": "Roast us",
+    "p3": "Clouds",
+    "p4": "Short Long"
+  },
+  "2026-12-26": {
+    "p1": "Act like you've been shrunk down",
+    "p2": "Sell us",
+    "p3": "Theme Parks",
+    "p4": "Top Bottom"
+  },
+  "2026-12-27": {
+    "p1": "Act like a knowledgeable professor",
+    "p2": "Hype us",
+    "p3": "Online Shopping",
+    "p4": "First Second Third"
+  },
+  "2026-12-28": {
+    "p1": "Act like you're trying to escape handcuffs",
+    "p2": "Convince us",
+    "p3": "Pencils",
+    "p4": "Wrong Right"
+  },
+  "2026-12-29": {
+    "p1": "Move your hands in small circles",
+    "p2": "Bore us",
+    "p3": "Sugary Beverages",
+    "p4": "Land Sea Sky"
+  },
+  "2026-12-30": {
+    "p1": "Move your eyebrows a lot",
+    "p2": "Educate us",
+    "p3": "Airline Travel",
+    "p4": "Past Present Future"
   }
 }
