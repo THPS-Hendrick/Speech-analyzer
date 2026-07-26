@@ -9,13 +9,24 @@ class THPSDiagnostic extends HTMLElement {
         
         // Track unique metrics across 5 distinct Vercel pipeline audio passes
         this.stage4AudioSlots = {
-            1: { recorded: false, wpm: 0, sps: 0, pause: 0, text: "" },
-            2: { recorded: false, wpm: 0, sps: 0, pause: 0, text: "" },
-            3: { recorded: false, wpm: 0, sps: 0, pause: 0, text: "" },
-            4: { recorded: false, wpm: 0, sps: 0, pause: 0, text: "" },
-            5: { recorded: false, wpm: 0, sps: 0, pause: 0, text: "" }
+            1: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
+            2: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
+            3: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
+            4: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
+            5: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" }
         };
         this.currentRecordingLevel = null;
+
+        // NEW: Test 3 "App-Within-An-App" State Variables
+        this.t3Slide = 0; 
+        this.t3ActiveLevel = 1;
+        this.pacinoBlocks = [
+            { level: 1, color: "purple-600", lines: ["You know, when you get old in life things get taken from you. I mean that's...part of life.", "You find out life's this game of inches"] },
+            { level: 2, color: "blue-500", lines: ["So is football. Because in either game, life or football, the margin for error is so small.", "One-half a step too late, or too early, and you don't quite make it."] },
+            { level: 3, color: "emerald-500", lines: ["But the inches we need are everywhere.", "They're in every break of the game, every minute, every second."] },
+            { level: 4, color: "orange-500", lines: ["On this team, we fight for that inch.", "On this team, we tear ourselves and everyone else around us to pieces for that inch."] },
+            { level: 5, color: "rose-600", lines: ["We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!", "Between livin' and dyin'!"] }
+        ];
 
         // Tracks values from the two Stage 5 transcription passes
         this.stage5DataSlots = {
@@ -41,24 +52,12 @@ class THPSDiagnostic extends HTMLElement {
         ];
 
         this.test5Data = [
-            { pageId: 7, title: "Test 5: Word (underlined)", name: "Underline", questions: [
-                "1. Would you invest in a <u>bakery</u>?", "2. Would you <u>invest</u> in a theme park?", "3. Would you rather <u>coffee or tea</u>?", "4. Would you rather have <u>a home</u> by the beach or in the mountains?", "5. What's your <u>dream job</u> if money didn't matter?"
-            ]},
-            { pageId: 8, title: "Test 5: Word (no underline)", name: "No Underline", questions: [
-                "1. What does the ideal Sunday look like?", "2. Would you invest in a board game?", "3. Would you invest in a fashion store?", "4. What's better: summer or winter?", "5. Would you rather lose a phone or wallet?"
-            ]},
-            { pageId: 9, title: "Test 5: Question", name: "Question", questions: [
-                "1. What does the ideal birthday look like?", "2. What's the best way to spend a rainy day?", "3. Would you invest in a jazz club?", "4. Would you invest in a rooftop bar?", "5. What's better: skydiving or scuba diving?"
-            ]},
-            { pageId: 10, title: "Test 5: Statement", name: "Statement", questions: [
-                "1. Would you rather live on a boat or bus?", "2. What's your go-to comfort food?", "3. What's your dream festival or event?", "4. Would you invest in a yoga studio?", "5. Would you invest in an indie movie?"
-            ]},
-            { pageId: 11, title: "Test 5: Clarify in 2 (Small Big)", name: "Small Big", questions: [
-                "1. What's your ideal daily routine?", "2. What makes a perfect morning?", "3. Would you invest in a chocolate factory?", "4. Could you live without the internet?", "5. What's better: unlimited travel or time?"
-            ]},
-            { pageId: 12, title: "Test 5: Clarify in 2 (opposites)", name: "Opposites", questions: [
-                "1. Would you invest in a local newspaper?", "2. What's better: famous or anonymous?", "3. Would you invest in a casino?", "4. Would you invest in a cooking school?", "5. What's better: early or fashionably late?"
-            ]}
+            { pageId: 7, title: "Test 5: Word (underlined)", name: "Underline", questions: ["1. Would you invest in a <u>bakery</u>?", "2. Would you <u>invest</u> in a theme park?", "3. Would you rather <u>coffee or tea</u>?", "4. Would you rather have <u>a home</u> by the beach or in the mountains?", "5. What's your <u>dream job</u> if money didn't matter?"] },
+            { pageId: 8, title: "Test 5: Word (no underline)", name: "No Underline", questions: ["1. What does the ideal Sunday look like?", "2. Would you invest in a board game?", "3. Would you invest in a fashion store?", "4. What's better: summer or winter?", "5. Would you rather lose a phone or wallet?"] },
+            { pageId: 9, title: "Test 5: Question", name: "Question", questions: ["1. What does the ideal birthday look like?", "2. What's the best way to spend a rainy day?", "3. Would you invest in a jazz club?", "4. Would you invest in a rooftop bar?", "5. What's better: skydiving or scuba diving?"] },
+            { pageId: 10, title: "Test 5: Statement", name: "Statement", questions: ["1. Would you rather live on a boat or bus?", "2. What's your go-to comfort food?", "3. What's your dream festival or event?", "4. Would you invest in a yoga studio?", "5. Would you invest in an indie movie?"] },
+            { pageId: 11, title: "Test 5: Clarify in 2 (Small Big)", name: "Small Big", questions: ["1. What's your ideal daily routine?", "2. What makes a perfect morning?", "3. Would you invest in a chocolate factory?", "4. Could you live without the internet?", "5. What's better: unlimited travel or time?"] },
+            { pageId: 12, title: "Test 5: Clarify in 2 (opposites)", name: "Opposites", questions: ["1. Would you invest in a local newspaper?", "2. What's better: famous or anonymous?", "3. Would you invest in a casino?", "4. Would you invest in a cooking school?", "5. What's better: early or fashionably late?"] }
         ];
     }
 
@@ -66,6 +65,7 @@ class THPSDiagnostic extends HTMLElement {
         this.render();
         this.initApp();
         this.attachListeners();
+        this.updateT3Tutorial(); // Initialize the inline state machine
     }
 
     disconnectedCallback() {
@@ -106,18 +106,9 @@ class THPSDiagnostic extends HTMLElement {
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-5">
                         <p class="font-semibold text-slate-800 mb-3">${q}</p>
                         <div class="flex flex-wrap gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" data-ref="${qId}_correct" class="t5-cb w-4 h-4 text-indigo-600 rounded">
-                                <span class="text-sm text-slate-600">Correct</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" data-ref="${qId}_nodelay" class="t5-cb w-4 h-4 text-indigo-600 rounded">
-                                <span class="text-sm text-slate-600">No Delay</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" data-ref="${qId}_voice" class="t5-cb w-4 h-4 text-indigo-600 rounded">
-                                <span class="text-sm text-slate-600">Voice Added</span>
-                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-ref="${qId}_correct" class="t5-cb w-4 h-4 text-indigo-600 rounded"><span class="text-sm text-slate-600">Correct</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-ref="${qId}_nodelay" class="t5-cb w-4 h-4 text-indigo-600 rounded"><span class="text-sm text-slate-600">No Delay</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-ref="${qId}_voice" class="t5-cb w-4 h-4 text-indigo-600 rounded"><span class="text-sm text-slate-600">Voice Added</span></label>
                         </div>
                     </div>
                 `;
@@ -129,6 +120,24 @@ class THPSDiagnostic extends HTMLElement {
 
         const dateEl = this.querySelector('[data-ref="assessmentDate"]');
         if (dateEl) dateEl.valueAsDate = new Date();
+
+        // Render the 5 Al Pacino Prompter Blocks
+        const prompterContainer = this.querySelector('#t3-scroll-viewport');
+        prompterContainer.innerHTML = this.pacinoBlocks.map((block) => `
+            <div id="t3-block-${block.level}" class="t3-prompter-block mb-6 transition-all duration-300 ${block.level === 1 ? 'opacity-100 scale-100' : 'opacity-30 scale-95'}">
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex gap-4 items-start">
+                        <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-${block.color} text-white shadow-inner">
+                            <span class="text-xl font-black">${block.level}</span>
+                        </div>
+                        <div class="flex-1 space-y-3 pt-1">
+                            ${block.lines.map(line => `<p class="text-lg font-bold text-slate-800 leading-snug">${line}</p>`).join('')}
+                        </div>
+                    </div>
+                    <div data-ref="t3-status-${block.level}" class="text-xs text-slate-400 mt-4 font-medium italic border-t pt-3">Waiting for capture step...</div>
+                </div>
+            </div>
+        `).join('');
 
         this.updateUI();
     }
@@ -143,15 +152,21 @@ class THPSDiagnostic extends HTMLElement {
             if (action === 'nextPage') this.nextPage();
             if (action === 'prevPage') this.prevPage();
             if (action === 'navTo') this.goToPage(parseInt(btn.getAttribute('data-page')));
-            if (action === 'toggleAcc') this.toggleAcc(btn.getAttribute('data-target'), btn.getAttribute('data-icon'));
             if (action === 'startTimer') this.startTimer(btn.getAttribute('data-timer'), 60);
             if (action === 'resetTimer') this.resetTimer(btn.getAttribute('data-timer'), 60);
             if (action === 'toggleTTS') this.toggleTTS();
             
             // Custom Pipeline Listeners
-            if (action === 'toggleLevelRecord') this.toggleLevelRecord(parseInt(btn.getAttribute('data-level')));
+            if (action === 'toggleLevelRecord') this.toggleLevelRecord(this.t3ActiveLevel);
             if (action === 'toggleVisualRecord') this.toggleVisualRecord(btn.getAttribute('data-slot'));
             if (action === 'compileReportCard') this.compileReportCard();
+
+            // Test 3 specific listeners
+            if (action === 't3PrevSlide') { if (this.t3Slide > 0) { this.t3Slide--; this.updateT3Tutorial(); } }
+            if (action === 't3NextSlide') { if (this.t3Slide < 5) { this.t3Slide++; this.updateT3Tutorial(); } }
+            if (action === 't3StartPrompter') this.startT3Prompter();
+            if (action === 't3GlideUp') { if (this.t3ActiveLevel > 1) { this.t3ActiveLevel--; this.updateT3Prompter(); } }
+            if (action === 't3GlideDown') { if (this.t3ActiveLevel < 5) { this.t3ActiveLevel++; this.updateT3Prompter(); } }
         });
 
         // Track global engine execution returns
@@ -162,17 +177,30 @@ class THPSDiagnostic extends HTMLElement {
             // Catch and route execution frames for Vocal Inhibition (Stage 4)
             if (this.currentRecordingLevel !== null) {
                 const lvl = this.currentRecordingLevel;
+
+                // --- NEW LOGARITHMIC VOLUME EXTRACTION MATH ---
+                let linearSum = 0; 
+                let dbCount = 0;
+                if (payload.volumeData && payload.volumeData.length > 0) {
+                    payload.volumeData.forEach(v => {
+                        linearSum += Math.pow(10, v.db / 10);
+                        dbCount++;
+                    });
+                }
+                const avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40;
+
                 this.stage4AudioSlots[lvl] = {
                     recorded: true,
                     wpm: payload.wpm || 0,
                     sps: payload.sps || 0,
                     pause: payload.pause || 0,
+                    db: avgDb, // Store the volume!
                     text: payload.text
                 };
                 
-                const statusEl = this.querySelector(`[data-ref="s4-status-${lvl}"]`);
+                const statusEl = this.querySelector(`[data-ref="t3-status-${lvl}"]`);
                 if (statusEl) {
-                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Mumble: ${payload.sps.toFixed(1)} SPS`;
+                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Silence: ${payload.pause}% | Intensity: ${avgDb.toFixed(1)} dB`;
                 }
                 this.currentRecordingLevel = null;
             }
@@ -204,8 +232,66 @@ class THPSDiagnostic extends HTMLElement {
         });
     }
 
+    // --- TEST 3 INLINE STATE MACHINE METHODS ---
+
+    updateT3Tutorial() {
+        const slides = [
+            { icon: '<i class="fas fa-volume-up text-5xl text-slate-300"></i>', text: 'This is a Vocal Inhibition test. You will record yourself presenting lines from a famous speech. The numbers next to each line indicate how intensely you need to deliver those lines in terms of speed and volume.' },
+            { icon: '<div class="w-20 h-20 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-4xl font-black shadow-inner">1</div>', text: '"1" means extremely slow and quiet. You can include lots of long 1 to 3 second pauses.<br><br><i class="text-slate-400 font-medium tracking-wide">Deadly Serious or Depressed</i>' },
+            { icon: '<div class="w-20 h-20 rounded-2xl bg-blue-500 text-white flex items-center justify-center text-4xl font-black shadow-inner">2</div>', text: '"2" means speak slowly and quietly. Whereas 1 was extreme and dramatic, a 2 is only slightly but noticeably slower or quieter than your usual speaking voice.<br><br><i class="text-slate-400 font-medium tracking-wide">Thoughtful or Sad</i>' },
+            { icon: '<div class="w-20 h-20 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-4xl font-black shadow-inner">3</div>', text: '"3" means speak normally.' },
+            { icon: '<div class="w-20 h-20 rounded-2xl bg-orange-500 text-white flex items-center justify-center text-4xl font-black shadow-inner">4</div>', text: '"4" means speak slightly but noticeably faster and louder than your normal voice.<br><br><i class="text-slate-400 font-medium tracking-wide">Frustrated or Passionate</i>' },
+            { icon: '<div class="w-20 h-20 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-4xl font-black shadow-inner">5</div>', text: '"5" means extremely fast and loud.<br><br><i class="text-slate-400 font-medium tracking-wide">Volcanic or Elated</i>' }
+        ];
+
+        this.querySelector('#t3-slide-content').innerHTML = `
+            ${slides[this.t3Slide].icon}
+            <p class="text-base md:text-lg font-bold mt-8 max-w-md leading-relaxed px-4">${slides[this.t3Slide].text}</p>
+        `;
+        this.querySelector('#t3-slide-indicator').innerText = `${this.t3Slide + 1} / 6`;
+    }
+
+    startT3Prompter() {
+        this.querySelector('#t3-tutorial-container').classList.add('hidden');
+        this.querySelector('#t3-prompter-container').classList.remove('hidden');
+        
+        // Wait for DOM to render the block height before forcing the UI update so math works!
+        requestAnimationFrame(() => this.updateT3Prompter());
+    }
+
+    updateT3Prompter() {
+        const viewport = this.querySelector('#t3-scroll-viewport');
+        const blocks = this.querySelectorAll('.t3-prompter-block');
+        
+        // Update Focus Opacity
+        blocks.forEach(block => {
+            const numId = parseInt(block.id.split('-')[2]);
+            if (numId === this.t3ActiveLevel) {
+                block.classList.add('opacity-100', 'scale-100');
+                block.classList.remove('opacity-30', 'scale-95');
+            } else {
+                block.classList.remove('opacity-100', 'scale-100');
+                block.classList.add('opacity-30', 'scale-95');
+            }
+        });
+
+        // Glide scroll position
+        const targetBlock = this.querySelector(`#t3-block-${this.t3ActiveLevel}`);
+        if (targetBlock && viewport) {
+            viewport.scrollTo({ top: targetBlock.offsetTop - 24, behavior: 'smooth' });
+        }
+
+        // Update Record Button Text
+        const recBtn = this.querySelector('#t3-record-btn');
+        if (recBtn) {
+            recBtn.innerHTML = window.isActive && this.currentRecordingLevel === this.t3ActiveLevel ? 
+                `<i class="fas fa-stop mr-1"></i> Stop Level ${this.t3ActiveLevel}` : 
+                `<i class="fas fa-mic mr-1"></i> Record Level ${this.t3ActiveLevel}`;
+        }
+    }
+
     toggleLevelRecord(level) {
-        const btn = this.querySelector(`[data-ref="s4-btn-${level}"]`);
+        const btn = this.querySelector('#t3-record-btn');
         if (!window.isActive) {
             this.currentRecordingLevel = level;
             window.toggleRecording();
@@ -217,6 +303,8 @@ class THPSDiagnostic extends HTMLElement {
             btn.classList.replace('bg-red-500', 'bg-indigo-600');
         }
     }
+
+    // --------------------------------------------------
 
     toggleVisualRecord(slot) {
         const btn = this.querySelector(`[data-ref="s5-btn-${slot}"]`);
@@ -287,18 +375,6 @@ class THPSDiagnostic extends HTMLElement {
         }
     }
 
-    toggleAcc(id, iconId) {
-        const el = this.querySelector(`[data-ref="${id}"]`);
-        const icon = this.querySelector(`[data-ref="${iconId}"]`);
-        if (el.classList.contains('hidden')) {
-            el.classList.remove('hidden');
-            icon.classList.add('rotate-90');
-        } else {
-            el.classList.add('hidden');
-            icon.classList.remove('rotate-90');
-        }
-    }
-
     formatTime(seconds) {
         const m = Math.floor(seconds / 60).toString().padStart(2, '0');
         const s = (seconds % 60).toString().padStart(2, '0');
@@ -317,9 +393,7 @@ class THPSDiagnostic extends HTMLElement {
                 time--;
                 display.innerText = this.formatTime(time);
                 if (time <= 10) display.classList.replace('text-emerald-400', 'text-red-500');
-                if (time <= 0) {
-                    clearInterval(this.activeTimers[id].interval);
-                }
+                if (time <= 0) clearInterval(this.activeTimers[id].interval);
             }, 1000)
         };
     }
@@ -381,7 +455,6 @@ class THPSDiagnostic extends HTMLElement {
 
         const phantasiaSelection = this.querySelector('input[name="vviq"]:checked')?.value || 'Phantasia';
 
-        // Aggregate round metrics for Stage 6 Repeat Counts
         const stage6Metrics = [];
         this.test5Data.forEach(block => {
             let correct = 0, noDelay = 0, voice = 0;
@@ -394,7 +467,6 @@ class THPSDiagnostic extends HTMLElement {
             stage6Metrics.push({ name: block.name, correct, noDelay, voice });
         });
 
-        // Assemble unified object state frame
         window.thps_diagnosticData = {
             client: { name: clientName, date: date, goals: goals },
             nervesScore: totalNervesScore,
@@ -404,13 +476,10 @@ class THPSDiagnostic extends HTMLElement {
             repeatCount: stage6Metrics
         };
 
-        // NEW: Broadcast the custom event so the report card can hear it
         window.dispatchEvent(new CustomEvent('thps-diagnostic-complete', { detail: window.thps_diagnosticData }));
 
-        // Command global builder shell loop to fire printing node instance
         if (window.THPS?.Dashboard?.spawnWidget) {
             window.THPS.Dashboard.spawnWidget('thps-report-card', 'w-full mt-4');
-            // Auto scroll main canvas wrapper node structure to view panel instance
             setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
         }
     }
@@ -446,18 +515,9 @@ class THPSDiagnostic extends HTMLElement {
                     <section data-ref="page-1" class="thps-diag-page thps-diag-active max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
                         <h3 class="text-2xl font-bold mb-6 text-slate-800">1. Client Information</h3>
                         <div class="space-y-5">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Client Name</label>
-                                <input type="text" data-ref="clientName" class="w-full border border-slate-300 rounded-lg p-3 outline-none" placeholder="Enter client's full name">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Date</label>
-                                <input type="date" data-ref="assessmentDate" class="w-full border border-slate-300 rounded-lg p-3 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Goals & Challenges (Max 250 characters)</label>
-                                <textarea data-ref="goalsChallenges" maxlength="250" rows="4" class="w-full border border-slate-300 rounded-lg p-3 outline-none" placeholder="Record objects and hurdles..."></textarea>
-                            </div>
+                            <div><label class="block text-sm font-semibold text-slate-700 mb-1">Client Name</label><input type="text" data-ref="clientName" class="w-full border border-slate-300 rounded-lg p-3 outline-none" placeholder="Enter client's full name"></div>
+                            <div><label class="block text-sm font-semibold text-slate-700 mb-1">Date</label><input type="date" data-ref="assessmentDate" class="w-full border border-slate-300 rounded-lg p-3 outline-none"></div>
+                            <div><label class="block text-sm font-semibold text-slate-700 mb-1">Goals & Challenges (Max 250 characters)</label><textarea data-ref="goalsChallenges" maxlength="250" rows="4" class="w-full border border-slate-300 rounded-lg p-3 outline-none" placeholder="Record objects and hurdles..."></textarea></div>
                         </div>
                     </section>
 
@@ -465,22 +525,10 @@ class THPSDiagnostic extends HTMLElement {
                     <section data-ref="page-2" class="thps-diag-page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
                         <h3 class="text-2xl font-bold mb-2 text-slate-800">0-2 'none', 3-4 'fine', 5-6 'some', 7-8 'lots', 9-10 'too much'</h3>
                         <div class="space-y-8">
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">1. How much discomfort before a big presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q1">5</span></div>
-                                <input type="range" data-ref="t1-q1" min="1" max="10" value="5" class="thps-diag-range">
-                            </div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">2. How much discomfort at start of presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q2">5</span></div>
-                                <input type="range" data-ref="t1-q2" min="1" max="10" value="5" class="thps-diag-range">
-                            </div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">3. How much discomfort communicating bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q3">5</span></div>
-                                <input type="range" data-ref="t1-q3" min="1" max="10" value="5" class="thps-diag-range">
-                            </div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">4. How much discomfort receiving bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q4">5</span></div>
-                                <input type="range" data-ref="t1-q4" min="1" max="10" value="5" class="thps-diag-range">
-                            </div>
+                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">1. How much discomfort before a big presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q1">5</span></div><input type="range" data-ref="t1-q1" min="1" max="10" value="5" class="thps-diag-range"></div>
+                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">2. How much discomfort at start of presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q2">5</span></div><input type="range" data-ref="t1-q2" min="1" max="10" value="5" class="thps-diag-range"></div>
+                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">3. How much discomfort communicating bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q3">5</span></div><input type="range" data-ref="t1-q3" min="1" max="10" value="5" class="thps-diag-range"></div>
+                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">4. How much discomfort receiving bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q4">5</span></div><input type="range" data-ref="t1-q4" min="1" max="10" value="5" class="thps-diag-range"></div>
                         </div>
                     </section>
 
@@ -490,11 +538,10 @@ class THPSDiagnostic extends HTMLElement {
                         <div class="bg-slate-100 p-6 rounded-xl mb-8 flex flex-col items-center">
                             <button data-action="toggleTTS" data-ref="tts-btn" class="mb-4 px-6 py-3 rounded-full font-bold text-white bg-indigo-600 flex items-center justify-center w-full max-w-xs"><i class="fas fa-play mr-2" data-ref="tts-icon"></i><span data-ref="tts-label">Play Audio Script</span></button>
                             <div data-ref="phantasia-script" class="thps-diag-scroll w-full h-48 overflow-y-auto bg-white rounded p-4 text-slate-700 text-sm leading-relaxed">
-                                <p>This test goes for about 4 minutes.  This is a Phantasia Test. Phantasia means ‘to make visable images in your mind’. The Phantasia test is about whether seeing images in your mind is easy or hard for you. Speakers that struggle to see images in their mind are likely to struggle to speak easily without a script. However, speakers that are very good at creating images in their head may struggle to speak slowly or stay on topic. Imagining images effortlessly and involuntarily is called Hyper-phantasia. Struggling to see images in your mind is called Hypo-phantasia. Being unable to see images in your mind at all is called Aphantasia, and is perfectly normal. Everyone is somewhere from Aphantasia (unable to see images in their mind) to Hyper-phantasia (involuntarily sees lots of images in their mind). In this test, I need you to keep your eyes open, and try to see everything that is described. Let’s begin the Phantasia Test. All I want you to see in your mind is the colour black. 
-Like a room with no light in it at all. Your mind is entirely black. Now, see an apple. It's a normal Apple, about the size of your fist, in the middle of that black screen. The Apple is Red. Growing from that Red Apple, is a short brown wooden stem. The brown wooden stem is about half the size of your smallest finger. Growing from that brown stem on top of the red apple, is a small green leaf. The green leaf starts small, about the size of your finger nail. 
-Then, the green leaf grows bigger, until it is about the size of your longest finger. See Red Apple, with brown wooden stem, with green leaf. Now, remove the Red Apple, but keep the brown wooden stem, and keep the green leaf. Only the brown stem and green leaf remain. 
-Now, replace the ordinary red apple with a diamond. The wooden stem and the green leaf are now growing from that diamond. Make the diamond the colour Red and about the size of your fist. Now, imagine cutting the red diamond into the shape of an apple. Notice the surface of the red diamond, how it is shiny, almost transparent, and now crafted into the shape of an apple. You now have a red apple-shaped diamond, with wooden stem and green leaf. Now, imagine rotating that entire object (apple-diamond, stem and leaf) together as slowly as you can. Control the spin, as slowly as you can. Notice how the surface of the red apple-diamond gives off light as it rotates slowly - like a disco-ball. And stop. Your answers to these 2 questions will determine if you are Aphantasia (cannot see images), Hypo-phantasia (struggle to see images), Phantasia (easily see images), Hyper-phantasia (effortlessly and involuntarily see images). Question one: was it difficult to see everything I described? If you saw absolutely nothing at all, then you have Aphantasia. Aphantasia is the inability to generate images in your head. If trying to see the objects in your head was a challenge or a strain, then you have Hypo-phantasia. Hypo-phantasia is a difficulty or delay with image generation in your head.  Question two: did you see more than what was described without trying to see more? If seeing everything that was described was almost effortless, then you have Phantasia. Phantasia or near-effortless and compliant image generation is what about 60% of the population has. However, if seeing what was described was effortless, and you saw more than what was described without trying, then you have Hyper-phantasia. Hyperphantasia is characterised by effortless and involuntary image generation. For example, you may not have been able to stop yourself from seeing a worm come out of the apple - or an orchard of apple trees. Select which of the 4 options best described your experience and move on to the next activity. If you didn’t understand the test, try it again. 
-</p>
+                                <p>This test goes for about 4 minutes. This is a Phantasia Test. Phantasia means ‘to make visable images in your mind’. The Phantasia test is about whether seeing images in your mind is easy or hard for you. Speakers that struggle to see images in their mind are likely to struggle to speak easily without a script. However, speakers that are very good at creating images in their head may struggle to speak slowly or stay on topic. Imagining images effortlessly and involuntarily is called Hyper-phantasia. Struggling to see images in your mind is called Hypo-phantasia. Being unable to see images in your mind at all is called Aphantasia, and is perfectly normal. Everyone is somewhere from Aphantasia (unable to see images in their mind) to Hyper-phantasia (involuntarily sees lots of images in their mind). In this test, I need you to keep your eyes open, and try to see everything that is described. Let’s begin the Phantasia Test. All I want you to see in your mind is the colour black. 
+                                Like a room with no light in it at all. Your mind is entirely black. Now, see an apple. It's a normal Apple, about the size of your fist, in the middle of that black screen. The Apple is Red. Growing from that Red Apple, is a short brown wooden stem. The brown wooden stem is about half the size of your smallest finger. Growing from that brown stem on top of the red apple, is a small green leaf. The green leaf starts small, about the size of your finger nail. 
+                                Then, the green leaf grows bigger, until it is about the size of your longest finger. See Red Apple, with brown wooden stem, with green leaf. Now, remove the Red Apple, but keep the brown wooden stem, and keep the green leaf. Only the brown stem and green leaf remain. 
+                                Now, replace the ordinary red apple with a diamond. The wooden stem and the green leaf are now growing from that diamond. Make the diamond the colour Red and about the size of your fist. Now, imagine cutting the red diamond into the shape of an apple. Notice the surface of the red diamond, how it is shiny, almost transparent, and now crafted into the shape of an apple. You now have a red apple-shaped diamond, with wooden stem and green leaf. Now, imagine rotating that entire object (apple-diamond, stem and leaf) together as slowly as you can. Control the spin, as slowly as you can. Notice how the surface of the red apple-diamond gives off light as it rotates slowly - like a disco-ball. And stop. Your answers to these 2 questions will determine if you are Aphantasia (cannot see images), Hypo-phantasia (struggle to see images), Phantasia (easily see images), Hyper-phantasia (effortlessly and involuntarily see images). Question one: was it difficult to see everything I described? If you saw absolutely nothing at all, then you have Aphantasia. Aphantasia is the inability to generate images in your head. If trying to see the objects in your head was a challenge or a strain, then you have Hypo-phantasia. Hypo-phantasia is a difficulty or delay with image generation in your head.  Question two: did you see more than what was described without trying to see more? If seeing everything that was described was almost effortless, then you have Phantasia. Phantasia or near-effortless and compliant image generation is what about 60% of the population has. However, if seeing what was described was effortless, and you saw more than what was described without trying, then you have Hyper-phantasia. Hyperphantasia is characterised by effortless and involuntary image generation. For example, you may not have been able to stop yourself from seeing a worm come out of the apple - or an orchard of apple trees. Select which of the 4 options best described your experience and move on to the next activity. If you didn’t understand the test, try it again.</p>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -505,21 +552,49 @@ Now, replace the ordinary red apple with a diamond. The wooden stem and the gree
                         </div>
                     </section>
 
-                    <!-- PAGE 4 -->
+                    <!-- PAGE 4: OVERHAULED INLINE PROMPTER APP -->
                     <section data-ref="page-4" class="thps-diag-page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
-                        <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 3: Vocal Inhibition Auto Scoring</h3>
-                        <p class="text-slate-500 mb-6">Record each level sequentially. App processes directly via Vercel pipeline logs.</p>
-                        <div class="space-y-4">
-                            ${[1,2,3,4,5].map(l => `
-                                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                    <div>
-                                        <div class="font-bold text-slate-800">Level ${l} Assessment</div>
-                                        <div data-ref="s4-status-${l}" class="text-xs text-slate-400 mt-1 italic">Waiting for capture step...</div>
-                                    </div>
-                                    <button data-action="toggleLevelRecord" data-level="${l}" data-ref="s4-btn-${l}" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs shadow-sm flex items-center"><i class="fas fa-mic mr-1"></i> Record Level ${l}</button>
-                                </div>
-                            `).join('')}
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800">Test 3: Progressive Intensity</h3>
+                        
+                        <!-- PHASE 1: TUTORIAL CAROUSEL -->
+                        <div id="t3-tutorial-container" class="relative w-full h-[500px] bg-slate-900 rounded-xl overflow-hidden flex flex-col justify-between p-6 shadow-inner">
+                            <div id="t3-slide-content" class="flex-1 text-white text-center flex flex-col justify-center items-center">
+                                <!-- JS Dynamic Injection -->
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <button data-action="t3PrevSlide" class="text-white hover:text-indigo-400 font-bold px-4 py-2">&lt; Prev</button>
+                                <span id="t3-slide-indicator" class="text-xs font-mono font-bold text-slate-400 bg-slate-800 px-3 py-1 rounded-full"></span>
+                                <button data-action="t3NextSlide" class="text-white hover:text-indigo-400 font-bold px-4 py-2">Next &gt;</button>
+                            </div>
+                            <button data-action="t3StartPrompter" class="absolute top-4 right-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-full shadow-md transition-colors active:scale-95">Skip to Test</button>
                         </div>
+
+                        <!-- PHASE 2: AL PACINO PROMPTER -->
+                        <div id="t3-prompter-container" class="hidden relative w-full h-[550px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex flex-col shadow-inner">
+                            
+                            <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
+                                <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest px-2">Voice Choice: Intensity</span>
+                            </div>
+
+                            <div id="t3-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative p-4 md:p-8 pb-32 custom-scrollbar">
+                                <!-- JS Dynamic Injection -->
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
+
+                            <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
+                                <div class="flex justify-between items-center max-w-lg mx-auto w-full mb-2">
+                                    <button data-action="t3GlideUp" class="p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm"><i class="fas fa-chevron-up w-5 h-5 pointer-events-none flex items-center justify-center"></i></button>
+                                    
+                                    <button id="t3-record-btn" data-action="toggleLevelRecord" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] active:scale-95 flex items-center gap-2">
+                                        <i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level 1
+                                    </button>
+
+                                    <button data-action="t3GlideDown" class="p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm"><i class="fas fa-chevron-down w-5 h-5 pointer-events-none flex items-center justify-center"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
                     </section>
 
                     <!-- PAGE 5 -->
