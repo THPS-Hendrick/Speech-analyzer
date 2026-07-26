@@ -463,22 +463,22 @@ class THPSDiagnostic extends HTMLElement {
 
                     <!-- PAGE 2 -->
                     <section data-ref="page-2" class="thps-diag-page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
-                        <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 1: SAMS Nerve Score</h3>
+                        <h3 class="text-2xl font-bold mb-2 text-slate-800">0-2 'none', 3-4 'fine', 5-6 'some', 7-8 'lots', 9-10 'too much'</h3>
                         <div class="space-y-8">
                             <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">1. Preparation Discomfort</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q1">5</span></div>
+                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">1. How much discomfort before a big presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q1">5</span></div>
                                 <input type="range" data-ref="t1-q1" min="1" max="10" value="5" class="thps-diag-range">
                             </div>
                             <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">2. Presentation Discomfort</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q2">5</span></div>
+                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">2. How much discomfort at start of presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q2">5</span></div>
                                 <input type="range" data-ref="t1-q2" min="1" max="10" value="5" class="thps-diag-range">
                             </div>
                             <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">3. Communicating Conflict</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q3">5</span></div>
+                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">3. How much discomfort communicating bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q3">5</span></div>
                                 <input type="range" data-ref="t1-q3" min="1" max="10" value="5" class="thps-diag-range">
                             </div>
                             <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">4. Receiving Conflict</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q4">5</span></div>
+                                <div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">4. How much discomfort receiving bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q4">5</span></div>
                                 <input type="range" data-ref="t1-q4" min="1" max="10" value="5" class="thps-diag-range">
                             </div>
                         </div>
