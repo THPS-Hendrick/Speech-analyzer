@@ -14,7 +14,7 @@ window.THPS.NLP.DICT_URLS = {
 window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "myself", "mine", "him", "himself", "her", "herself"]);
 window.THPS.NLP.visualDictPronouns = new Set();
 window.THPS.NLP.visualDictWords = new Set();
-window.THPS.NLP.simpleSet = new Set(); // UPDATED: Changed from Map to Set
+window.THPS.NLP.simpleSet = new Set(); 
 window.THPS.NLP.google10kSet = new Set();
 window.THPS.NLP.dictsLoaded = false;
 
@@ -28,9 +28,8 @@ window.THPS.NLP.loadDictionaries = async function() {
         const [simpleData, visualData] = await Promise.all([
             fetchDict(window.THPS.NLP.DICT_URLS.simple), 
             fetchDict(window.THPS.NLP.DICT_URLS.visual)
-        ]).catch(() => [[], {}]); // Fallback safely handles arrays and objects
+        ]).catch(() => [[], {}]); 
 
-        // UPDATED: Convert the flat JSON array into a highly efficient Set
         const simpleWords = Array.isArray(simpleData) ? simpleData : Object.values(simpleData).flat();
         window.THPS.NLP.simpleSet = new Set(simpleWords.map(w => String(w).toLowerCase()));
 
@@ -96,7 +95,7 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
     
     let totalSyllables = 0; let complexWordCount = 0;
     let personalCount = 0; let visualCount = 0;
-    let unifiedSimpleCount = 0; // UPDATED: Single tracker for simple words
+    let unifiedSimpleCount = 0; 
     let google10kCount = 0;
 
     let highlightedHTML = ""; let reportMarkdownText = ""; 
@@ -130,6 +129,11 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                         }
                     }
 
+                    // Checks if word is simple to apply class
+                    let isSimple = window.THPS.NLP.simpleSet.has(normal);
+                    if (!isSimple && root) isSimple = window.THPS.NLP.simpleSet.has(root);
+                    let simpleClass = isSimple ? " simple-word" : "";
+
                     let isPersonal = (inQuotes || personalCountdown > 0);
                     let isVisual = (visualCountdown > 0); 
 
@@ -144,17 +148,20 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 
                     if (/[a-zA-Z]/.test(rawText)) {
                         if (isPersonal && isVisual) {
-                            highlightedHTML += `${safePre}<span class="overlap-word">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="overlap-word${simpleClass}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}_**${rawText}**_${rawPost}`;
                             personalCount++; visualCount++;
                         } else if (isPersonal) {
-                            highlightedHTML += `${safePre}<span class="personal-word">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="personal-word${simpleClass}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}**${rawText}**${rawPost}`;
                             personalCount++;
                         } else if (isVisual) {
-                            highlightedHTML += `${safePre}<span class="visual-word">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="visual-word${simpleClass}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}_${rawText}_${rawPost}`;
                             visualCount++;
+                        } else if (isSimple) {
+                            highlightedHTML += `${safePre}<span class="simple-word">${safeText}</span>${safePost}`;
+                            reportMarkdownText += `${rawPre}${rawText}${rawPost}`;
                         } else {
                             highlightedHTML += `${safePre}${safeText}${safePost}`;
                             reportMarkdownText += `${rawPre}${rawText}${rawPost}`;
@@ -181,15 +188,22 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                 if (!window.THPS.NLP.personalPronouns.has(normal) && (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root))) {
                     visualCountdown = Math.max(visualCountdown, 4);
                 }
+                
+                let isSimple = window.THPS.NLP.simpleSet.has(normal);
+                if (!isSimple && root) isSimple = window.THPS.NLP.simpleSet.has(root);
+                let simpleClass = isSimple ? " simple-word" : "";
+
                 let isPersonal = (inQuotes || personalCountdown > 0);
                 let isVisual = (visualCountdown > 0);
                 if (personalCountdown > 0) personalCountdown--;
                 if (visualCountdown > 0) visualCountdown--;
 
                 let safeText = token.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                if (isPersonal && isVisual) { highlightedHTML += `<span class="overlap-word">${safeText}</span>`; reportMarkdownText += `_**${token}**_`; personalCount++; visualCount++; } 
-                else if (isPersonal) { highlightedHTML += `<span class="personal-word">${safeText}</span>`; reportMarkdownText += `**${token}**`; personalCount++; } 
-                else if (isVisual) { highlightedHTML += `<span class="visual-word">${safeText}</span>`; reportMarkdownText += `_${token}_`; visualCount++; } 
+                
+                if (isPersonal && isVisual) { highlightedHTML += `<span class="overlap-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `_**${token}**_`; personalCount++; visualCount++; } 
+                else if (isPersonal) { highlightedHTML += `<span class="personal-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `**${token}**`; personalCount++; } 
+                else if (isVisual) { highlightedHTML += `<span class="visual-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `_${token}_`; visualCount++; } 
+                else if (isSimple) { highlightedHTML += `<span class="simple-word">${safeText}</span>`; reportMarkdownText += token; }
                 else { highlightedHTML += safeText; reportMarkdownText += token; }
             } else {
                 let quoteMatches = (token.match(/["“”]/g) || []).length;
@@ -208,7 +222,6 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         if (cleanWord.length > 0) {
             if (window.THPS.NLP.google10kSet.has(cleanWord)) google10kCount++;
             
-            // UPDATED: Check against the new unified Set
             let isSimple = window.THPS.NLP.simpleSet.has(cleanWord);
             if (!isSimple && typeof window.nlp === 'function') {
                 try {
@@ -221,8 +234,6 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
             }
             if (isSimple) unifiedSimpleCount++;
             
-            // NEW: TAGGING THE TIMESTAMPS
-            // We find the next matching word in the timestamps array that hasn't been tagged yet
             let tsObj = wordTimestamps.find(t => t.word.toLowerCase().replace(/[^a-z']/g, '') === cleanWord && !t.tagged);
             if (tsObj) {
                 tsObj.tagged = true;
@@ -247,10 +258,10 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         complexWordCount,
         personalCount,
         visualCount,
-        unifiedSimpleCount, // UPDATED: Returning the single integer variable
+        unifiedSimpleCount, 
         google10kCount,
         highlightedHTML,
         reportMarkdownText,
-        wordTimestamps // Safely returned out of the engine
+        wordTimestamps 
     };
 };
