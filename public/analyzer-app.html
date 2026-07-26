@@ -668,7 +668,7 @@
 
             const { 
                 numWords, numSentences, totalSyllables, letterCount, complexWordCount, 
-                personalCount, visualCount, simpleCounts, google10kCount, 
+                personalCount, visualCount, unifiedSimpleCount, google10kCount, 
                 highlightedHTML, reportMarkdownText: newReportMarkdown,
                 wordTimestamps 
             } = nlpData;
@@ -677,10 +677,7 @@
 
             let gPct = Math.round((google10kCount / numWords) * 100);
 
-            let s5yrPct = Math.round((simpleCounts['5yr Old 1000'] / numWords) * 100) || 0;
-            let sEslPct = Math.round((simpleCounts['ESL 2000'] / numWords) * 100) || 0;
-            let sKitPct = Math.round((simpleCounts['Kitchen 1000'] / numWords) * 100) || 0;
-            let coreSimpleScore = s5yrPct + sEslPct + sKitPct; 
+            let coreSimpleScore = Math.round((unifiedSimpleCount / numWords) * 100) || 0;
             
             let elapsedSecs = window.THPS.Audio && window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
             let transcribedDuration = Math.min(240, elapsedSecs);
@@ -804,7 +801,7 @@
                     numSentences: numSentences,
                     totalSyllables: totalSyllables,
                     google10kCount: google10kCount,
-                    simpleCounts: simpleCounts,
+                    unifiedSimpleCount: unifiedSimpleCount,
                     readability: readability
                 };
                 
