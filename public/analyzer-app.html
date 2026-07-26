@@ -277,21 +277,6 @@
         <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mb-6"></div>
     </div>
 
-    <div id="celebration-panel" class="hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500">
-        <h2 id="celeb-comment" class="text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400">Waiting for Audio...</h2>
-        <div class="flex flex-row justify-center items-center gap-8 md:gap-16">
-            <div class="flex flex-col items-center">
-                <span id="celeb-label-grade" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Final Grade</span>
-                <span id="celeb-grade" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">- / 10</span>
-            </div>
-            <div id="celeb-divider" class="w-px h-20 bg-slate-300 opacity-50"></div>
-            <div class="flex flex-col items-center">
-                <span id="celeb-label-time" class="font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400">Time</span>
-                <span id="celeb-time" class="text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300">-</span>
-            </div>
-        </div>
-    </div>
-
     <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
         <div class="flex flex-col space-y-6 sm:space-y-8">
             <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
@@ -583,63 +568,6 @@
             if (window.lucide) window.lucide.createIcons();
         };
 
-        window.updateCelebrationPanel = function(totalPoints, totalSecs, overrideGrade, recordedAudio, textLength) {
-            const panel = document.getElementById('celebration-panel');
-            const comment = document.getElementById('celeb-comment');
-            const gradeEl = document.getElementById('celeb-grade');
-            const timeEl = document.getElementById('celeb-time');
-
-            if (!recordedAudio && totalSecs === 0 && textLength === 0) {
-                // Return to Blank State
-                panel.className = "hidden w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-sm p-8 text-center border border-slate-200 bg-slate-50 transition-all duration-500";
-                comment.textContent = "Waiting for Audio...";
-                comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm text-slate-400";
-                gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
-                timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm text-slate-300";
-                document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
-                document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-slate-400";
-                document.getElementById('celeb-divider').className = "w-px h-20 bg-slate-300 opacity-50";
-                return;
-            }
-
-            // Set Data
-            let finalScore = totalPoints % 1 === 0 ? totalPoints : totalPoints.toFixed(2);
-            gradeEl.textContent = overrideGrade ? "- / 10" : `${finalScore} / 10`;
-            
-            if (totalSecs > 0) {
-                let m = Math.floor(totalSecs / 60);
-                let s = Math.floor(totalSecs % 60).toString().padStart(2, '0');
-                timeEl.textContent = `${m}:${s}`;
-            } else {
-                timeEl.textContent = "-";
-            }
-
-            // Apply success styling
-            panel.className = "w-full max-w-4xl mx-auto mt-2 mb-10 rounded-3xl shadow-xl p-8 text-center transition-all duration-500 text-white";
-            gradeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
-            timeEl.className = "text-5xl md:text-7xl font-black drop-shadow-sm";
-            comment.className = "text-xl md:text-3xl font-black uppercase tracking-widest mb-6 drop-shadow-sm";
-            document.getElementById('celeb-label-grade').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
-            document.getElementById('celeb-label-time').className = "font-bold uppercase tracking-widest text-xs mb-1 opacity-80 text-white/90";
-            document.getElementById('celeb-divider').className = "w-px h-20 bg-white/40";
-
-            if (!overrideGrade) {
-                if (totalPoints >= 8.5) {
-                    comment.textContent = "Wow! Those are some nice scores!";
-                    panel.classList.add('bg-gradient-to-br', 'from-emerald-600', 'to-teal-800');
-                } else if (totalPoints >= 7) {
-                    comment.textContent = "Well said! Check out those scores";
-                    panel.classList.add('bg-gradient-to-br', 'from-blue-600', 'to-indigo-800');
-                } else {
-                    comment.textContent = "Check your scores and have another go!";
-                    panel.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-700');
-                }
-            } else {
-                comment.textContent = "Cannot Score speeches under 20sec or over 90sec";
-                panel.classList.add('bg-gradient-to-br', 'from-slate-600', 'to-slate-800');
-            }
-        }
-
         window.analyze = function() {
             try {
                 if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
@@ -654,7 +582,6 @@
             else if (hiddenEl) text = hiddenEl.value.trim();
             
             if (!text) {
-                window.updateCelebrationPanel(0, 0, true, false, 0); 
                 window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
                 return;
             }
@@ -774,8 +701,6 @@
                 if (coreSimpleScore < 80) totalPoints += 0.25; 
                 else if (coreSimpleScore > 95) totalPoints += 0.75; 
                 else totalPoints += 1;
-
-                window.updateCelebrationPanel(totalPoints, elapsedSecs, overrideGrade, window.THPS.Audio ? window.THPS.Audio.recordedAudio : false, text.length);
 
                 // --- THE TRACKMAN BROADCAST & CACHE ---
                 const payload = { 
@@ -966,8 +891,6 @@
             if (widgetEl) widgetEl.value = attempt.text;
             if (hiddenEl) hiddenEl.value = attempt.text;
 
-            window.updateCelebrationPanel(attempt.totalPoints, attempt.time, attempt.overrideGrade, attempt.recordedAudio, attempt.text.length);
-            
             window.thps_lastPayload = attempt;
             window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: attempt }));
             window.updateHistoryUI();
