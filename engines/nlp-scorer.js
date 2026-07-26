@@ -14,7 +14,7 @@ window.THPS.NLP.DICT_URLS = {
 window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "myself", "mine", "him", "himself", "her", "herself"]);
 window.THPS.NLP.visualDictPronouns = new Set();
 window.THPS.NLP.visualDictWords = new Set();
-window.THPS.NLP.simpleMap = new Map();
+window.THPS.NLP.simpleSet = new Set(); // UPDATED: Changed from Map to Set
 window.THPS.NLP.google10kSet = new Set();
 window.THPS.NLP.dictsLoaded = false;
 
@@ -28,16 +28,11 @@ window.THPS.NLP.loadDictionaries = async function() {
         const [simpleData, visualData] = await Promise.all([
             fetchDict(window.THPS.NLP.DICT_URLS.simple), 
             fetchDict(window.THPS.NLP.DICT_URLS.visual)
-        ]).catch(() => [{}, {}]);
+        ]).catch(() => [[], {}]); // Fallback safely handles arrays and objects
 
-        for (const [tier, words] of Object.entries(simpleData)) {
-            let t = tier.toLowerCase();
-            let finalTier = 'outside';
-            if (t.includes('5yr') || t.includes('5 yr')) finalTier = '5yr Old 1000';
-            else if (t.includes('esl')) finalTier = 'ESL 2000';
-            else if (t.includes('kitchen') || t.includes('kit')) finalTier = 'Kitchen 1000';
-            if (finalTier !== 'outside') words.forEach(w => window.THPS.NLP.simpleMap.set(w.toLowerCase(), finalTier));
-        }
+        // UPDATED: Convert the flat JSON array into a highly efficient Set
+        const simpleWords = Array.isArray(simpleData) ? simpleData : Object.values(simpleData).flat();
+        window.THPS.NLP.simpleSet = new Set(simpleWords.map(w => String(w).toLowerCase()));
 
         const getFuzzyKey = (obj, keyword) => {
             const key = Object.keys(obj).find(k => k.toLowerCase().includes(keyword));
@@ -101,7 +96,7 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
     
     let totalSyllables = 0; let complexWordCount = 0;
     let personalCount = 0; let visualCount = 0;
-    let simpleCounts = { '5yr Old 1000': 0, 'ESL 2000': 0, 'Kitchen 1000': 0, 'outside': 0 };
+    let unifiedSimpleCount = 0; // UPDATED: Single tracker for simple words
     let google10kCount = 0;
 
     let highlightedHTML = ""; let reportMarkdownText = ""; 
@@ -209,19 +204,22 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         let syl = window.THPS.NLP.countSyllables(cleanWord);
         totalSyllables += syl;
         if (syl >= 3) complexWordCount++;
+        
         if (cleanWord.length > 0) {
             if (window.THPS.NLP.google10kSet.has(cleanWord)) google10kCount++;
-            let sTier = window.THPS.NLP.simpleMap.get(cleanWord);
-            if (!sTier && typeof window.nlp === 'function') {
+            
+            // UPDATED: Check against the new unified Set
+            let isSimple = window.THPS.NLP.simpleSet.has(cleanWord);
+            if (!isSimple && typeof window.nlp === 'function') {
                 try {
                     let doc = window.nlp(cleanWord).compute('root').json();
                     if (doc.length > 0 && doc[0].terms.length > 0) {
                         let rootWord = doc[0].terms[0].root || doc[0].terms[0].normal;
-                        if (rootWord) sTier = window.THPS.NLP.simpleMap.get(rootWord);
+                        if (rootWord) isSimple = window.THPS.NLP.simpleSet.has(rootWord);
                     }
                 } catch(e) {}
             }
-            simpleCounts[sTier || 'outside']++;
+            if (isSimple) unifiedSimpleCount++;
             
             // NEW: TAGGING THE TIMESTAMPS
             // We find the next matching word in the timestamps array that hasn't been tagged yet
@@ -249,7 +247,7 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         complexWordCount,
         personalCount,
         visualCount,
-        simpleCounts,
+        unifiedSimpleCount, // UPDATED: Returning the single integer variable
         google10kCount,
         highlightedHTML,
         reportMarkdownText,
