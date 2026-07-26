@@ -404,6 +404,9 @@ class THPSDiagnostic extends HTMLElement {
             repeatCount: stage6Metrics
         };
 
+        // NEW: Broadcast the custom event so the report card can hear it
+        window.dispatchEvent(new CustomEvent('thps-diagnostic-complete', { detail: window.thps_diagnosticData }));
+
         // Command global builder shell loop to fire printing node instance
         if (window.THPS?.Dashboard?.spawnWidget) {
             window.THPS.Dashboard.spawnWidget('thps-report-card', 'w-full mt-4');
