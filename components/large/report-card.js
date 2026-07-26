@@ -1,35 +1,24 @@
 class THPSReportCard extends HTMLElement {
     constructor() {
         super();
-        this.data = window.thps_diagnosticData || {
-            client: { name: "John Doe", date: new Date().toLocaleDateString(), goals: "Wants to capture clear flow without reading script cards during professional deliveries." },
-            nervesScore: 24,
-            phantasia: "Phantasia",
-            vocalInhibition: {
-                1: { recorded: true, wpm: 75, sps: 2.1, pause: 45, text: "Sample string output level one." },
-                2: { recorded: true, wpm: 92, sps: 2.8, pause: 38, text: "Sample string output level two." },
-                3: { recorded: true, wpm: 124, sps: 4.2, pause: 21, text: "Sample string output level three." },
-                4: { recorded: true, wpm: 155, sps: 5.1, pause: 12, text: "Sample string output level four." },
-                5: { recorded: true, wpm: 182, sps: 5.9, pause: 8, text: "Sample string output level five." }
-            },
-            visualAssociation: {
-                A: { recorded: true, wpm: 98, visual: 24 },
-                B: { recorded: true, wpm: 155, visual: 19 }
-            },
-            repeatCount: [
-                { name: "Underline", correct: 4, noDelay: 3, voice: 5 },
-                { name: "No Underline", correct: 5, noDelay: 4, voice: 4 },
-                { name: "Question", correct: 3, noDelay: 2, voice: 3 },
-                { name: "Statement", correct: 5, noDelay: 5, voice: 4 },
-                { name: "Small Big", correct: 4, noDelay: 4, voice: 5 },
-                { name: "Opposites", correct: 2, noDelay: 1, voice: 2 }
-            ]
-        };
+        // Check for existing data, otherwise default to null (no dummy data)
+        this.data = window.thps_diagnosticData || null; 
     }
 
     connectedCallback() {
         this.render();
-        this.querySelector('[data-action="printPDF"]').addEventListener('click', () => window.print());
+
+        // Listen for the diagnostic widget to shout its completion
+        this.diagListener = (e) => {
+            this.data = e.detail; // Catch the new data
+            this.render();        // Rebuild the UI with real data
+        };
+        window.addEventListener('thps-diagnostic-complete', this.diagListener);
+    }
+
+    disconnectedCallback() {
+        // Clean up memory to prevent memory leaks when widget is deleted
+        if (this.diagListener) window.removeEventListener('thps-diagnostic-complete', this.diagListener);
     }
 
     getNervesPercentile(score) {
@@ -54,6 +43,20 @@ class THPSReportCard extends HTMLElement {
     }
 
     render() {
+        // THE ZERO-STATE CATCHER: If no data exists, show the waiting screen and stop rendering.
+        if (!this.data) {
+            this.innerHTML = `
+                <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
+                    <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-text text-2xl"></i>
+                    </div>
+                    <h3 class="font-black text-xl text-slate-800 tracking-tight">Awaiting Diagnostic Data</h3>
+                    <p class="text-sm text-slate-500 mt-2 max-w-md mx-auto">Please complete all 13 stages of the Diagnostic Course and click "Generate PDF Report Card" to populate this document.</p>
+                </div>
+            `;
+            return; 
+        }
+
         const nerves = this.getNervesPercentile(this.data.nervesScore);
         const phantasiaText = this.getPhantasiaInterpretation(this.data.phantasia);
         
@@ -242,6 +245,12 @@ class THPSReportCard extends HTMLElement {
 
         </div>
         `;
+
+        // Safely bind the print listener only AFTER the DOM is fully constructed!
+        const printBtn = this.querySelector('[data-action="printPDF"]');
+        if (printBtn) {
+            printBtn.addEventListener('click', () => window.print());
+        }
     }
 }
 customElements.define('thps-report-card', THPSReportCard);
