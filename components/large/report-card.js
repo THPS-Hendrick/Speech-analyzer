@@ -1,23 +1,20 @@
 class THPSReportCard extends HTMLElement {
     constructor() {
         super();
-        // Check for existing data, otherwise default to null (no dummy data)
         this.data = window.thps_diagnosticData || null; 
     }
 
     connectedCallback() {
         this.render();
 
-        // Listen for the diagnostic widget to shout its completion
         this.diagListener = (e) => {
-            this.data = e.detail; // Catch the new data
-            this.render();        // Rebuild the UI with real data
+            this.data = e.detail; 
+            this.render();        
         };
         window.addEventListener('thps-diagnostic-complete', this.diagListener);
     }
 
     disconnectedCallback() {
-        // Clean up memory to prevent memory leaks when widget is deleted
         if (this.diagListener) window.removeEventListener('thps-diagnostic-complete', this.diagListener);
     }
 
@@ -43,7 +40,6 @@ class THPSReportCard extends HTMLElement {
     }
 
     render() {
-        // THE ZERO-STATE CATCHER: If no data exists, show the waiting screen and stop rendering.
         if (!this.data) {
             this.innerHTML = `
                 <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
@@ -51,7 +47,7 @@ class THPSReportCard extends HTMLElement {
                         <i class="fas fa-file-text text-2xl"></i>
                     </div>
                     <h3 class="font-black text-xl text-slate-800 tracking-tight">Awaiting Diagnostic Data</h3>
-                    <p class="text-sm text-slate-500 mt-2 max-w-md mx-auto">Please complete all 13 stages of the Diagnostic Course and click "Generate PDF Report Card" to populate this document.</p>
+                    <p class="text-sm text-slate-500 mt-2 max-w-md mx-auto">Please complete all stages of the Diagnostic Course and click "Generate PDF Report Card" to populate this document.</p>
                 </div>
             `;
             return; 
@@ -60,9 +56,72 @@ class THPSReportCard extends HTMLElement {
         const nerves = this.getNervesPercentile(this.data.nervesScore);
         const phantasiaText = this.getPhantasiaInterpretation(this.data.phantasia);
         
-        // Arbitrary placeholder mappings for Remaining Dials as requested
         const vInhibPasses = Object.values(this.data.vocalInhibition).filter(v => v.recorded).length;
         const s5Passes = (this.data.visualAssociation.A.wpm < 100 ? 1 : 0) + (this.data.visualAssociation.B.wpm > 170 ? 1 : 0);
+
+        // --- NEW: STAGE 4 PROGRESSIVE INTENSITY MATH & HTML ---
+        const levels = [1, 2, 3, 4, 5];
+        const activeLevels = levels.filter(l => this.data.vocalInhibition[l]?.recorded);
+        
+        let maxWPM = 1; let maxPause = 1; let minDb = -40; let maxDb = -10;
+        
+        // Find maximums for chart scaling
+        if (activeLevels.length > 0) {
+            maxWPM = Math.max(150, ...activeLevels.map(l => this.data.vocalInhibition[l].wpm));
+            maxPause = Math.max(40, ...activeLevels.map(l => this.data.vocalInhibition[l].pause));
+            const activeDbs = activeLevels.map(l => this.data.vocalInhibition[l].db);
+            minDb = Math.min(-35, ...activeDbs);
+            maxDb = Math.max(-10, ...activeDbs);
+        }
+
+        // Build the 3 Bar Charts
+        let paceBars = '', pauseBars = '', dbBars = '';
+        levels.forEach(l => {
+            const slot = this.data.vocalInhibition[l];
+            if (slot && slot.recorded) {
+                const wpmHeight = Math.max(5, (slot.wpm / maxWPM) * 100);
+                const pauseHeight = Math.max(5, (slot.pause / maxPause) * 100);
+                // For DB, normalize the negative range to a positive percentage
+                const dbRange = maxDb - minDb;
+                const dbHeight = Math.max(5, ((slot.db - minDb) / (dbRange || 1)) * 100);
+
+                paceBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-indigo-500 rounded-sm rounded-b-none" style="height: ${wpmHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
+                pauseBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-emerald-500 rounded-sm rounded-b-none" style="height: ${pauseHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
+                dbBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-rose-500 rounded-sm rounded-b-none" style="height: ${dbHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
+            } else {
+                paceBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
+                pauseBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
+                dbBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
+            }
+        });
+
+        // Delta & Linearity Logic
+        let paceInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
+        let pauseInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
+        let dbInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
+
+        if (activeLevels.length >= 2) {
+            const first = this.data.vocalInhibition[activeLevels[0]];
+            const last = this.data.vocalInhibition[activeLevels[activeLevels.length - 1]];
+            
+            const wpmDelta = Math.round(last.wpm - first.wpm);
+            const pauseDelta = (last.pause - first.pause).toFixed(1);
+            const dbDelta = (last.db - first.db).toFixed(1);
+
+            let wpmDrops = 0; let dbDrops = 0;
+            for (let i = 1; i < activeLevels.length; i++) {
+                const prev = this.data.vocalInhibition[activeLevels[i-1]];
+                const curr = this.data.vocalInhibition[activeLevels[i]];
+                if (curr.wpm < prev.wpm - 10) wpmDrops++;
+                if (curr.db < prev.db - 1.5) dbDrops++;
+            }
+
+            paceInsights = `<b>Absolute Change:</b> ${wpmDelta > 0 ? '+' : ''}${wpmDelta} WPM<br><b>Linearity:</b> ${wpmDelta > 20 ? (wpmDrops === 0 ? '<span class="text-emerald-600 font-semibold">Smooth Acceleration</span>' : '<span class="text-amber-600 font-semibold">Inconsistent Steps</span>') : '<span class="text-rose-500 font-semibold">Flatlined Pace</span>'}`;
+            
+            pauseInsights = `<b>Absolute Change:</b> ${pauseDelta > 0 ? '+' : ''}${pauseDelta}%<br><b>Linearity:</b> ${pauseDelta < -10 ? '<span class="text-emerald-600 font-semibold">Successful Reduction</span>' : '<span class="text-amber-600 font-semibold">Static Silence Ratio</span>'}`;
+            
+            dbInsights = `<b>Absolute Change:</b> ${dbDelta > 0 ? '+' : ''}${dbDelta} dB<br><b>Linearity:</b> ${dbDelta > 6 ? (dbDrops === 0 ? '<span class="text-emerald-600 font-semibold">Smooth Swell</span>' : '<span class="text-amber-600 font-semibold">Erratic Intensity Drops</span>') : '<span class="text-rose-500 font-semibold">Flatlined Volume</span>'}`;
+        }
 
         this.innerHTML = `
         <style>
@@ -169,35 +228,46 @@ class THPSReportCard extends HTMLElement {
             <!-- PAGE 2 -->
             <div class="a4-page border border-slate-200 rounded-2xl mx-auto flex flex-col justify-between">
                 <div>
-                    <!-- Stage 4: Vocal Inhibition Matrix -->
+                    
+                    <!-- NEW STAGE 4: PROGRESSIVE INTENSITY ANALYSIS -->
                     <div class="mb-8">
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 4: Vocal Inhibition Stress Testing</h2>
-                        <p class="text-xs text-slate-500 mb-4 font-medium">Tracks micro acoustic variations under sequential cadence restrictions routed directly via Vercel engines.</p>
-                        <table class="w-full text-left border border-slate-200 rounded-xl overflow-hidden text-xs">
-                            <thead class="bg-slate-50 border-b border-slate-200 font-bold uppercase text-[10px] text-slate-500">
-                                <tr>
-                                    <th class="p-3">Acoustic Tier Frame</th>
-                                    <th class="p-3">Pacing Vector</th>
-                                    <th class="p-3">Mumble Density</th>
-                                    <th class="p-3">Pause Ratio</th>
-                                    <th class="p-3 text-right">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 font-medium">
-                                ${[1,2,3,4,5].map(l => {
-                                    const slot = this.data.vocalInhibition[l];
-                                    return `
-                                        <tr>
-                                            <td class="p-3 font-bold text-slate-700">Level ${l} Variant</td>
-                                            <td class="p-3">${slot?.recorded ? `${slot.wpm} WPM` : '-'}</td>
-                                            <td class="p-3">${slot?.recorded ? `${slot.sps.toFixed(1)} SPS` : '-'}</td>
-                                            <td class="p-3">${slot?.recorded ? `${slot.pause}%` : '-'}</td>
-                                            <td class="p-3 text-right">${slot?.recorded ? '<span class="text-emerald-600 font-bold">Verified</span>' : '<span class="text-slate-300">Skipped</span>'}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
+                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 4: Progressive Intensity Analysis</h2>
+                        <p class="text-xs text-slate-500 mb-4 font-medium">Evaluating the speaker's ability to exert granular, deliberate control over physiological pacing, silence allocation, and vocal intensity across a 5-step gradient.</p>
+                        
+                        <div class="grid grid-cols-3 gap-4">
+                            <!-- Pace Visualizer -->
+                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
+                                <span class="text-[10px] font-black uppercase text-indigo-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Pace (WPM)</span>
+                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
+                                    ${paceBars}
+                                </div>
+                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
+                                    ${paceInsights}
+                                </div>
+                            </div>
+                            
+                            <!-- Silence Visualizer -->
+                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
+                                <span class="text-[10px] font-black uppercase text-emerald-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Silence (%)</span>
+                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
+                                    ${pauseBars}
+                                </div>
+                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
+                                    ${pauseInsights}
+                                </div>
+                            </div>
+                            
+                            <!-- Intensity Visualizer -->
+                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
+                                <span class="text-[10px] font-black uppercase text-rose-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Intensity (dB)</span>
+                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
+                                    ${dbBars}
+                                </div>
+                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
+                                    ${dbInsights}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Stage 5: Visual Word Association Targets -->
@@ -246,11 +316,8 @@ class THPSReportCard extends HTMLElement {
         </div>
         `;
 
-        // Safely bind the print listener only AFTER the DOM is fully constructed!
         const printBtn = this.querySelector('[data-action="printPDF"]');
-        if (printBtn) {
-            printBtn.addEventListener('click', () => window.print());
-        }
+        if (printBtn) printBtn.addEventListener('click', () => window.print());
     }
 }
 customElements.define('thps-report-card', THPSReportCard);
