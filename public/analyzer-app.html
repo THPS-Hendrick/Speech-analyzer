@@ -621,21 +621,65 @@
             let activeSpeakingSecs = 0;
 
             if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                const periods = (text.match(/[.!?]/g) || []).length;
-                const commas = (text.match(/[,;:-]/g) || []).length;
-                
-                estimatedPauseTime = (periods * 1.3) + (commas * 0.5); 
-                
-                let minAllowedPause = transcribedDuration * 0.10;
-                let maxAllowedPause = transcribedDuration * 0.40;
-                if (estimatedPauseTime < minAllowedPause) estimatedPauseTime = minAllowedPause;
-                if (estimatedPauseTime > maxAllowedPause) estimatedPauseTime = maxAllowedPause;
-                
-                activeSpeakingSecs = transcribedDuration - estimatedPauseTime;
-                pausePercent = (estimatedPauseTime / transcribedDuration) * 100;
+                // --- NEW GLOBAL DYNAMIC PAUSE MATH ---
+                let totalPauseTime = 0;
+                let actualActiveSpeakingTime = 0;
+
+                if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length > 1) {
+                    const words = window.THPS.Audio.wordTimestamps;
+                    
+                    const countSyllables = (word) => {
+                        word = word.toLowerCase().replace(/[^a-z]/g, '');
+                        if (word.length <= 3) return 1;
+                        word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+                        word = word.replace(/^y/, '');
+                        const syllables = word.match(/[aeiouy]{1,2}/g);
+                        return syllables ? syllables.length : 1;
+                    };
+
+                    const firstWord = words[0];
+                    const lastWord = words[words.length - 1];
+                    const totalSpeakingTime = (lastWord.start + 1.0) - firstWord.start;
+                    
+                    let localTotalSyllables = 0;
+                    words.forEach(w => localTotalSyllables += countSyllables(w.word));
+                    
+                    const dynamicSPS = localTotalSyllables / Math.max(0.1, totalSpeakingTime);
+                    const expectedSyllableLength = 1.0 / dynamicSPS;
+
+                    totalPauseTime += firstWord.start;
+
+                    for (let i = 0; i < words.length - 1; i++) {
+                        const currWord = words[i];
+                        const nextWord = words[i+1];
+                        
+                        const sylCount = countSyllables(currWord.word);
+                        const expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
+                        
+                        const truePause = Math.max(0, nextWord.start - expectedNextStart);
+
+                        if (truePause > 0.05) {
+                            totalPauseTime += truePause;
+                        }
+                    }
+
+                    totalPauseTime += Math.max(0, transcribedDuration - lastWord.end);
+                    actualActiveSpeakingTime = Math.max(0, transcribedDuration - totalPauseTime);
+
+                } else if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length === 1) {
+                    actualActiveSpeakingTime = 1.0;
+                    totalPauseTime = Math.max(0, transcribedDuration - 1.0);
+                } else {
+                    actualActiveSpeakingTime = transcribedDuration * 0.85; 
+                    totalPauseTime = transcribedDuration * 0.15;
+                }
+
+                activeSpeakingSecs = actualActiveSpeakingTime;
+                pausePercent = (totalPauseTime / transcribedDuration) * 100;
+                pausePercent = Math.max(0, Math.min(100, pausePercent));
                 
                 avgWpm = Math.round((numWords / transcribedDuration) * 60);
-                mumbleScore = totalSyllables / activeSpeakingSecs;
+                mumbleScore = activeSpeakingSecs > 0 ? (totalSyllables / activeSpeakingSecs) : 0;
             }
 
             let avgGrade = 0;
