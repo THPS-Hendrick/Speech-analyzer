@@ -615,19 +615,23 @@
             let transcribedDuration = Math.min(240, elapsedSecs);
             
             let mumbleScore = 0; 
-            let estimatedPauseTime = 0; 
             let pausePercent = 0; 
             let avgWpm = 0;
             let activeSpeakingSecs = 0;
 
+            // NEW: Trackman Buckets for Voice Graph Rendering
+            let pauseBuckets = { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
+            let paceBuckets = { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
+
             if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                // --- NEW GLOBAL DYNAMIC PAUSE MATH ---
                 let totalPauseTime = 0;
                 let actualActiveSpeakingTime = 0;
 
                 if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length > 1) {
                     const words = window.THPS.Audio.wordTimestamps;
-                    
+                    const totalWords = words.length;
+
+                    // Standardize syllable counting
                     const countSyllables = (word) => {
                         word = word.toLowerCase().replace(/[^a-z]/g, '');
                         if (word.length <= 3) return 1;
@@ -637,49 +641,87 @@
                         return syllables ? syllables.length : 1;
                     };
 
-                    const firstWord = words[0];
-                    const lastWord = words[words.length - 1];
-                    const totalSpeakingTime = (lastWord.start + 1.0) - firstWord.start;
-                    
+                    // Step 1: Determine Total Units
                     let localTotalSyllables = 0;
                     words.forEach(w => localTotalSyllables += countSyllables(w.word));
-                    
-                    const dynamicSPS = localTotalSyllables / Math.max(0.1, totalSpeakingTime);
-                    const expectedSyllableLength = 1.0 / dynamicSPS;
+                    let totalAssumedUnits = localTotalSyllables + totalWords - 1;
 
-                    totalPauseTime += firstWord.start;
+                    // Step 2: Determine Duration (Trim dead space via artificial final word end)
+                    const firstWord = words[0];
+                    const lastWord = words[totalWords - 1];
+                    const lastWordSyllables = countSyllables(lastWord.word);
+                    const expectedLastWordEnd = lastWord.start + (lastWordSyllables * 0.35);
+                    let duration = Math.max(0.1, expectedLastWordEnd - firstWord.start);
 
-                    for (let i = 0; i < words.length - 1; i++) {
-                        const currWord = words[i];
-                        const nextWord = words[i+1];
+                    // Step 3: Determine Assumed Unit Length
+                    let assumedUnitLength = duration / totalAssumedUnits;
+
+                    // Step 4: Compare Actual Timestamp Gaps to the Elastic Grid
+                    for (let i = 0; i < totalWords - 1; i++) {
+                        let currWord = words[i];
+                        let nextWord = words[i+1];
                         
-                        const sylCount = countSyllables(currWord.word);
-                        const expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
-                        
-                        const truePause = Math.max(0, nextWord.start - expectedNextStart);
+                        // Failsafe: floor the gap at 0.01s to prevent overlapping/division-by-zero
+                        let gap = Math.max(0.01, nextWord.start - currWord.start);
 
-                        if (truePause > 0.05) {
-                            totalPauseTime += truePause;
+                        let sylCount = countSyllables(currWord.word);
+                        let expectedUnits = sylCount + 1; // Syllables + 1 pause opportunity
+                        let expectedTime = expectedUnits * assumedUnitLength;
+
+                        let syllableUnitLength = 0;
+                        let pauseUnitValue = 0;
+
+                        if (gap <= expectedTime) {
+                            // SCENARIO 1 & 2: Gap shorter/equal. Pause is false. Syllables compress.
+                            syllableUnitLength = gap / sylCount;
+                            pauseBuckets.micro++;
+                        } else {
+                            // SCENARIO 3 & 4: Gap is longer. Test the even expansion.
+                            let evenExpansion = gap / expectedUnits;
+
+                            if (evenExpansion < 0.35) {
+                                // SCENARIO 3: Pause unit falls short of 0.35. Deemed false. Syllables absorb gap.
+                                syllableUnitLength = gap / sylCount;
+                                pauseBuckets.micro++;
+                            } else {
+                                // SCENARIO 4: Cap hit. Spillover becomes True Pause.
+                                syllableUnitLength = 0.35;
+                                pauseUnitValue = gap - (sylCount * 0.35);
+                                totalPauseTime += pauseUnitValue;
+
+                                // Bucket the True Pause length
+                                if (pauseUnitValue >= 1.40) pauseBuckets.red++;
+                                else if (pauseUnitValue >= 1.05) pauseBuckets.orange++;
+                                else if (pauseUnitValue >= 0.70) pauseBuckets.green++;
+                                else if (pauseUnitValue >= 0.35) pauseBuckets.blue++;
+                            }
                         }
+
+                        // Evaluate Pace Intensity (Compare Actual Syllable Length vs Expected Unit Length)
+                        let paceRatio = syllableUnitLength / assumedUnitLength;
+                        if (paceRatio < 0.80) paceBuckets.fastest++;
+                        else if (paceRatio < 0.95) paceBuckets.fast++;
+                        else if (paceRatio <= 1.05) paceBuckets.normal++;
+                        else if (paceRatio <= 1.20) paceBuckets.slow++;
+                        else paceBuckets.slowest++;
                     }
 
-                    totalPauseTime += Math.max(0, transcribedDuration - lastWord.end);
-                    actualActiveSpeakingTime = Math.max(0, transcribedDuration - totalPauseTime);
+                    actualActiveSpeakingTime = Math.max(0, duration - totalPauseTime);
+                    activeSpeakingSecs = actualActiveSpeakingTime;
+                    pausePercent = (totalPauseTime / duration) * 100;
+                    pausePercent = Math.max(0, Math.min(100, pausePercent));
+                    avgWpm = Math.round((numWords / duration) * 60);
+                    mumbleScore = activeSpeakingSecs > 0 ? (totalSyllables / activeSpeakingSecs) : 0;
 
                 } else if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length === 1) {
                     actualActiveSpeakingTime = 1.0;
-                    totalPauseTime = Math.max(0, transcribedDuration - 1.0);
+                    activeSpeakingSecs = 1.0;
+                    pausePercent = 0;
                 } else {
                     actualActiveSpeakingTime = transcribedDuration * 0.85; 
-                    totalPauseTime = transcribedDuration * 0.15;
+                    activeSpeakingSecs = actualActiveSpeakingTime;
+                    pausePercent = 15;
                 }
-
-                activeSpeakingSecs = actualActiveSpeakingTime;
-                pausePercent = (totalPauseTime / transcribedDuration) * 100;
-                pausePercent = Math.max(0, Math.min(100, pausePercent));
-                
-                avgWpm = Math.round((numWords / transcribedDuration) * 60);
-                mumbleScore = activeSpeakingSecs > 0 ? (totalSyllables / activeSpeakingSecs) : 0;
             }
 
             let avgGrade = 0;
@@ -762,6 +804,8 @@
                     text: text,
                     wordTimestamps: wordTimestamps,
                     volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
+                    pauseBuckets: pauseBuckets, // NEW
+                    paceBuckets: paceBuckets,   // NEW
                     pause: pausePercent,
                     intangible: intangiblePercent,
                     wps: avgWpsFloat,
