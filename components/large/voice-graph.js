@@ -1,10 +1,13 @@
 class THPSVoiceGraph extends HTMLElement {
     constructor() {
         super();
-        this.innerHTML = this.getTemplate();
+        // Removed DOM manipulation from the constructor to prevent rendering crashes
     }
 
     connectedCallback() {
+        // Safely set innerHTML after the element is officially connected to the DOM
+        this.innerHTML = this.getTemplate();
+        
         if (window.lucide) window.lucide.createIcons();
         this.updateHandler = this.handleUpdate.bind(this);
         window.addEventListener('thps-dashboard-update', this.updateHandler);
