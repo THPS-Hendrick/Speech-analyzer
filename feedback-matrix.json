@@ -1,12 +1,12 @@
 {
   "Pace": {
-    "low": { "you": "A bit too slow", "try": "Aim for 110+ WPM", "why": "Keeps attention" },
+    "low": { "you": "A bit too slow", "try": "Aim for 100+ WPM", "why": "Keeps attention" },
     "high": { "you": "A bit too fast", "try": "Drop below 150 WPM", "why": "Improves clarity" },
     "perfect": { "you": "Nailed the pace", "try": "Keep this rhythm", "why": "Perfect flow" }
   },
   "Mumble": {
-    "low": { "you": "Too drawn out", "try": "Aim for 3.5+ SPS", "why": "Sounds energetic" },
-    "high": { "you": "Words blurring", "try": "Drop below 4.5 SPS", "why": "Aids enunciation" },
+    "low": { "you": "Too drawn out", "try": "Aim for 3.0+ SPS", "why": "Sounds energetic" },
+    "high": { "you": "Words blurring", "try": "Drop below 4.9 SPS", "why": "Aids enunciation" },
     "perfect": { "you": "Crisp delivery", "try": "Maintain this density", "why": "Easy to follow" }
   },
   "Pause": {
@@ -15,9 +15,9 @@
     "perfect": { "you": "Great breathing", "try": "Keep this cadence", "why": "Powerful emphasis" }
   },
   "Personal": {
-    "low": { "you": "Slightly detached", "try": "Use 30%+ 'I' or 'We'", "why": "Builds connection" },
-    "high": { "you": "Very self-focused", "try": "Balance with facts", "why": "Widens perspective" },
-    "perfect": { "you": "Highly relatable", "try": "Keep sharing stories", "why": "Builds trust" }
+    "low": { "you": "Slightly detached", "try": "Use 'I'/'he'/'she' sentences", "why": "Specific is terrific" },
+    "high": { "you": "Too many 'i'/'he'/she' words", "try": "Adding facts / concepts / takeaways", "why": "Gives audience a takeaway" },
+    "perfect": { "you": "Highly relatable", "try": "Keep sharing stories", "why": "Specific stories are powerful" }
   },
   "Visual": {
     "low": { "you": "Lacked imagery", "try": "Use colors & sizes", "why": "Paints a picture" },
