@@ -79,6 +79,99 @@
         </div>
     </main>
 
+    <!-- VIEW 3: CHALLENGE BRIEFING -->
+    <main id="view-challenge" class="px-5 w-full max-w-md mx-auto hide mt-4">
+        <!-- Back Button -->
+        <button id="btn-back-home" class="text-slate-400 flex items-center gap-1 font-bold text-sm mb-4 active:scale-95"><i data-lucide="chevron-left" class="w-4 h-4"></i> Back</button>
+        
+        <h1 class="text-2xl serif mb-6">Delivery Challenge</h1>
+        
+        <!-- Video Placeholder -->
+        <div class="w-full aspect-video bg-[#0F172A] rounded-3xl mb-6 flex items-center justify-center shadow-lg relative overflow-hidden">
+            <i data-lucide="play-circle" class="w-12 h-12 text-white/30"></i>
+            <div class="absolute bottom-4 left-4 right-4 text-center text-white/90 text-xs font-medium bg-black/40 px-3 py-2 rounded-xl backdrop-blur-md">
+                [Firebase Video Placeholder]
+            </div>
+        </div>
+
+        <!-- Split-Pill Results -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 mb-8 flex divide-x divide-slate-100">
+            <div class="flex flex-col items-center justify-center w-1/2 pr-2">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Mumble</span>
+                <div class="flex items-baseline gap-1 text-slate-700">
+                    <span class="text-3xl font-black tracking-tighter">3-5</span>
+                    <span class="text-[10px] font-bold tracking-widest text-slate-400">SPS</span>
+                </div>
+            </div>
+            <div class="flex flex-col items-center justify-center w-1/2 pl-2 relative">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Your Score</span>
+                <div id="challenge-score-display" class="flex items-baseline gap-1 text-slate-300">
+                    <span class="text-3xl font-black tracking-tighter">--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+            <button id="btn-tips" class="w-1/3 bg-white text-slate-800 border border-slate-200 shadow-[0_4px_0_0_#e2e8f0] active:shadow-none active:translate-y-[4px] rounded-2xl py-4 font-bold text-base flex flex-col items-center justify-center gap-1 transition-all"><i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500"></i> Tips</button>
+            <button id="btn-go" class="w-2/3 bg-[#1f2937] text-white shadow-[0_4px_0_0_#111827] active:shadow-none active:translate-y-[4px] rounded-2xl py-4 font-bold text-xl flex items-center justify-center gap-2 transition-all"><i data-lucide="mic" class="w-5 h-5"></i> Go!</button>
+        </div>
+    </main>
+
+    <!-- RIGHT DRAWER: TIPS -->
+    <div id="tips-drawer" class="fixed inset-y-0 right-0 w-80 bg-[#F6F4EE] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-slate-200">
+        <div class="p-5 flex justify-between items-center bg-white border-b border-slate-200">
+            <h2 class="serif text-2xl font-bold flex items-center gap-2"><i data-lucide="message-square" class="w-5 h-5 text-indigo-500"></i> Coach</h2>
+            <button id="close-tips" class="p-2 bg-slate-100 rounded-full text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="p-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                <p class="text-slate-600 leading-relaxed text-sm font-medium">This is Delivery challenge #1 <span class="font-bold text-slate-800">"You can't handle the truth"</span>.<br><br>You have 1 objective: don't mumble! That means speak between <span class="font-bold text-indigo-500">3 to 5 syllables per second</span>.<br><br>Speak clearly, not too slow, not too fast. You've got this!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEFT DRAWER: TELEPROMPTER -->
+    <div id="prompter-drawer" class="fixed inset-0 w-full h-full bg-[#F6F4EE] z-[60] transform -translate-x-full transition-transform duration-300 flex flex-col">
+        <header class="bg-[#0F172A] pt-12 pb-6 px-4 flex flex-col items-center justify-center shadow-md shrink-0">
+            <span class="text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-1">Voice Choice</span>
+            <h2 id="prompter-title" class="text-white font-bold text-base text-center">Loading...</h2>
+        </header>
+        
+        <div id="prompter-script" class="flex-1 overflow-y-auto px-5 py-8 pb-40 space-y-4 scroll-smooth">
+            <!-- Script injected via JS -->
+        </div>
+
+        <!-- Floating Prompter Nav -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-full px-3 py-3 flex items-center justify-between shadow-2xl border border-slate-100">
+            <button id="btn-prompter-up" class="w-14 h-14 bg-slate-50 text-slate-500 rounded-full flex items-center justify-center active:scale-95 transition-transform"><i data-lucide="chevron-up" class="w-7 h-7"></i></button>
+            <button id="btn-prompter-stop" class="bg-[#5C45F2] text-white px-8 py-4 rounded-full font-bold text-lg flex items-center gap-2 shadow-[0_4px_0_0_#4332B8] active:translate-y-[4px] active:shadow-none transition-all"><i data-lucide="square" class="w-5 h-5 fill-white"></i> Stop</button>
+            <button id="btn-prompter-down" class="w-14 h-14 bg-slate-50 text-slate-500 rounded-full flex items-center justify-center active:scale-95 transition-transform"><i data-lucide="chevron-down" class="w-7 h-7"></i></button>
+        </div>
+    </div>
+
+    <!-- VIEW 4: LOADING SCORES -->
+    <main id="view-loading" class="px-5 w-full h-full flex flex-col items-center justify-center absolute inset-0 z-[70] bg-[#F6F4EE] hide">
+        <i data-lucide="loader-2" class="w-12 h-12 text-[#D4AF37] animate-spin mb-4"></i>
+        <h2 class="serif text-3xl font-bold text-slate-800 animate-pulse">Processing...</h2>
+        <p class="text-slate-500 mt-2 font-medium text-sm">Analyzing delivery metrics</p>
+    </main>
+
+    <!-- VIEW 5: RESULTS -->
+    <main id="view-results" class="px-5 w-full h-full flex flex-col items-center justify-center absolute inset-0 z-[70] bg-[#F6F4EE]/95 backdrop-blur-sm hide">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl border border-slate-100 text-center w-full max-w-sm">
+            <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="check-circle-2" class="w-12 h-12"></i>
+            </div>
+            <h2 class="serif text-4xl font-bold mb-2 text-slate-800">1/1 Complete!</h2>
+            <p class="text-slate-500 mb-8 font-medium">You nailed the delivery.</p>
+            <div class="bg-yellow-50 text-[#D4AF37] font-black text-3xl py-5 rounded-2xl mb-8 border border-yellow-100">
+                +100 XP
+            </div>
+            <button id="btn-finish-challenge" class="w-full btn-chunky btn-chunky-primary rounded-2xl py-4 font-bold text-lg">Claim Reward</button>
+        </div>
+    </main>
+
     <!-- DRAWER: TROPHIES -->
     <div id="trophy-drawer" class="fixed inset-y-0 right-0 w-80 bg-[#F6F4EE] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-slate-200">
         <div class="p-5 flex justify-between items-center bg-white border-b border-slate-200">
