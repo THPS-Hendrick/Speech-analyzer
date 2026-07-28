@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THPS Member Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #F6F4EE; /* Cream background from reference image */
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        
+        /* Duolingo-style chunky buttons */
+        .btn-chunky {
+            box-shadow: 0 4px 0 0 #d1d5db;
+            transition: all 0.1s;
+        }
+        .btn-chunky:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 0 #d1d5db;
+        }
+        .btn-chunky-primary {
+            background-color: #1f2937; /* Dark slate */
+            color: white;
+            box-shadow: 0 4px 0 0 #111827;
+        }
+        .btn-chunky-primary:active { box-shadow: 0 0 0 0 #111827; transform: translateY(4px); }
+
+        /* Wreath Colors */
+        .wreath-yellow { stroke: #FBBF24; fill: #FBBF24; }
+        .wreath-green { stroke: #34D399; fill: #34D399; }
+        .wreath-blue { stroke: #60A5FA; fill: #60A5FA; }
+        .wreath-red { stroke: #F87171; fill: #F87171; }
+        .wreath-silver { stroke: #9CA3AF; fill: #9CA3AF; }
+        .wreath-gold { stroke: #D4AF37; fill: #D4AF37; } /* THPS Gold */
+
+        /* Smooth Hide/Show */
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="w-full h-screen overflow-x-hidden relative text-slate-800 pb-24">
+
+    <!-- TOP HUD -->
+    <header class="fixed top-0 left-0 w-full bg-[#F6F4EE]/90 backdrop-blur-md z-40 px-5 py-4 flex justify-between items-center border-b border-slate-200">
+        <!-- Streak -->
+        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
+            <i data-lucide="flame" class="w-5 h-5 text-orange-500 fill-orange-500"></i>
+            <span class="font-bold text-sm text-slate-700">12</span>
+        </div>
+        
+        <!-- Dynamic XP Wreath (Click to open trophies) -->
+        <div onclick="toggleDrawer()" class="flex items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+            <div class="flex flex-col items-end">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Level</span>
+                <span class="font-bold text-sm text-[#D4AF37]">10,240 XP</span>
+            </div>
+            <!-- Wreath SVG -->
+            <div class="relative w-10 h-10">
+                <svg viewBox="0 0 100 100" class="w-full h-full wreath-gold drop-shadow-sm">
+                    <!-- Left branch -->
+                    <path d="M 50,90 C 20,90 10,60 10,30 C 10,20 15,10 20,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M 10,30 Q 15,40 25,35 Q 20,25 10,30 Z" />
+                    <path d="M 12,45 Q 20,55 30,48 Q 22,38 12,45 Z" />
+                    <path d="M 18,60 Q 28,68 38,60 Q 28,50 18,60 Z" />
+                    <path d="M 28,75 Q 38,80 48,70 Q 38,60 28,75 Z" />
+                    <!-- Right branch -->
+                    <path d="M 50,90 C 80,90 90,60 90,30 C 90,20 85,10 80,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M 90,30 Q 85,40 75,35 Q 80,25 90,30 Z" />
+                    <path d="M 88,45 Q 80,55 70,48 Q 78,38 88,45 Z" />
+                    <path d="M 82,60 Q 72,68 62,60 Q 72,50 82,60 Z" />
+                    <path d="M 72,75 Q 62,80 52,70 Q 62,60 72,75 Z" />
+                </svg>
+                <!-- Initial inside Wreath -->
+                <div class="absolute inset-0 flex items-center justify-center mt-1">
+                    <span class="serif font-bold text-xl text-[#D4AF37]">H</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SPACER FOR FIXED HEADER -->
+    <div class="h-20"></div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: HOME (COURSES & DAILY) -->
+    <!-- ============================================== -->
+    <main id="view-home" class="px-5 w-full max-w-md mx-auto fade-in">
+        <h1 class="text-3xl serif mt-4 mb-6">Learn</h1>
+        
+        <!-- Daily Challenge Card -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mb-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-[#D4AF37]"></div>
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span class="text-xs font-black uppercase text-[#D4AF37] tracking-widest bg-yellow-50 px-2 py-1 rounded-md">Daily Quest</span>
+                    <h2 class="text-xl font-bold mt-2">The 60s Story</h2>
+                    <p class="text-sm text-slate-500 mt-1">Keep Words Per Sentence under 15 while sharing a personal triumph.</p>
+                </div>
+                <div class="bg-[#F6F4EE] p-2 rounded-xl flex flex-col items-center justify-center">
+                    <span class="text-[#D4AF37] font-black">+50</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">XP</span>
+                </div>
+            </div>
+            <button class="w-full btn-chunky btn-chunky-primary rounded-2xl py-4 font-bold text-lg tracking-wide">
+                Start Recording
+            </button>
+        </div>
+
+        <!-- Practice Prompts Library (Matches image_424a21.png) -->
+        <h3 class="text-lg font-bold mb-4">Practice Prompts</h3>
+        <div class="grid grid-cols-2 gap-4">
+            
+            <!-- Card 1 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                <div class="h-28 bg-[#5B7B61] flex items-center justify-center">
+                    <!-- Icon Placeholder -->
+                    <i data-lucide="mic" class="w-10 h-10 text-white/50"></i>
+                </div>
+                <div class="p-4 flex-1">
+                    <div class="flex items-center gap-1 text-slate-400 text-xs font-bold mb-2">
+                        <i data-lucide="clock" class="w-3 h-3"></i> 3 min
+                    </div>
+                    <p class="text-sm font-medium leading-tight">Mastering the pregnant pause.</p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                <div class="h-28 bg-[#8B4540] flex items-center justify-center">
+                    <i data-lucide="users" class="w-10 h-10 text-white/50"></i>
+                </div>
+                <div class="p-4 flex-1">
+                    <div class="flex items-center gap-1 text-slate-400 text-xs font-bold mb-2">
+                        <i data-lucide="clock" class="w-3 h-3"></i> 5 min
+                    </div>
+                    <p class="text-sm font-medium leading-tight">Weaving in visual storytelling.</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                <div class="h-28 bg-[#718DA2] flex items-center justify-center">
+                    <i data-lucide="book-open" class="w-10 h-10 text-white/50"></i>
+                </div>
+                <div class="p-4 flex-1">
+                    <div class="flex items-center gap-1 text-slate-400 text-xs font-bold mb-2">
+                        <i data-lucide="clock" class="w-3 h-3"></i> 2 min
+                    </div>
+                    <p class="text-sm font-medium leading-tight">Reducing academic complexity.</p>
+                </div>
+            </div>
+            
+            <!-- Card 4 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                <div class="h-28 bg-[#D4AF37] flex items-center justify-center">
+                    <i data-lucide="activity" class="w-10 h-10 text-white/50"></i>
+                </div>
+                <div class="p-4 flex-1">
+                    <div class="flex items-center gap-1 text-slate-400 text-xs font-bold mb-2">
+                        <i data-lucide="clock" class="w-3 h-3"></i> 4 min
+                    </div>
+                    <p class="text-sm font-medium leading-tight">Volume and Pace variety run.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: STATS (THE 2x2 WREATHS) -->
+    <!-- ============================================== -->
+    <main id="view-stats" class="px-5 w-full max-w-md mx-auto hide">
+        <h1 class="text-3xl serif mt-4 mb-2">Your Mastery</h1>
+        <p class="text-sm text-slate-500 mb-8">Tap a pillar to review your performance insights.</p>
+
+        <div class="grid grid-cols-2 gap-6">
+            
+            <!-- Delivery -->
+            <div onclick="openDeepDive('Delivery')" class="flex flex-col items-center justify-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform">
+                <div class="relative w-24 h-24 mb-3">
+                    <!-- Standard wreath, we can color these individually too -->
+                    <svg viewBox="0 0 100 100" class="w-full h-full wreath-green drop-shadow-sm">
+                        <path d="M 50,90 C 20,90 10,60 10,30 C 10,20 15,10 20,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 10,30 Q 15,40 25,35 Q 20,25 10,30 Z" /> <path d="M 12,45 Q 20,55 30,48 Q 22,38 12,45 Z" /> <path d="M 18,60 Q 28,68 38,60 Q 28,50 18,60 Z" /> <path d="M 28,75 Q 38,80 48,70 Q 38,60 28,75 Z" />
+                        <path d="M 50,90 C 80,90 90,60 90,30 C 90,20 85,10 80,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 90,30 Q 85,40 75,35 Q 80,25 90,30 Z" /> <path d="M 88,45 Q 80,55 70,48 Q 78,38 88,45 Z" /> <path d="M 82,60 Q 72,68 62,60 Q 72,50 82,60 Z" /> <path d="M 72,75 Q 62,80 52,70 Q 62,60 72,75 Z" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center mt-2">
+                        <span class="serif font-bold text-xl text-slate-800">82%</span>
+                    </div>
+                </div>
+                <h3 class="font-bold text-slate-700">Delivery</h3>
+            </div>
+
+            <!-- Content -->
+            <div onclick="openDeepDive('Content')" class="flex flex-col items-center justify-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform">
+                <div class="relative w-24 h-24 mb-3">
+                    <svg viewBox="0 0 100 100" class="w-full h-full wreath-blue drop-shadow-sm">
+                        <path d="M 50,90 C 20,90 10,60 10,30 C 10,20 15,10 20,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 10,30 Q 15,40 25,35 Q 20,25 10,30 Z" /> <path d="M 12,45 Q 20,55 30,48 Q 22,38 12,45 Z" /> <path d="M 18,60 Q 28,68 38,60 Q 28,50 18,60 Z" /> <path d="M 28,75 Q 38,80 48,70 Q 38,60 28,75 Z" />
+                        <path d="M 50,90 C 80,90 90,60 90,30 C 90,20 85,10 80,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 90,30 Q 85,40 75,35 Q 80,25 90,30 Z" /> <path d="M 88,45 Q 80,55 70,48 Q 78,38 88,45 Z" /> <path d="M 82,60 Q 72,68 62,60 Q 72,50 82,60 Z" /> <path d="M 72,75 Q 62,80 52,70 Q 62,60 72,75 Z" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center mt-2">
+                        <span class="serif font-bold text-xl text-slate-800">45%</span>
+                    </div>
+                </div>
+                <h3 class="font-bold text-slate-700">Content</h3>
+            </div>
+
+            <!-- Simplicity -->
+            <div onclick="openDeepDive('Simplicity')" class="flex flex-col items-center justify-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform">
+                <div class="relative w-24 h-24 mb-3">
+                    <svg viewBox="0 0 100 100" class="w-full h-full wreath-yellow drop-shadow-sm">
+                        <path d="M 50,90 C 20,90 10,60 10,30 C 10,20 15,10 20,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 10,30 Q 15,40 25,35 Q 20,25 10,30 Z" /> <path d="M 12,45 Q 20,55 30,48 Q 22,38 12,45 Z" /> <path d="M 18,60 Q 28,68 38,60 Q 28,50 18,60 Z" /> <path d="M 28,75 Q 38,80 48,70 Q 38,60 28,75 Z" />
+                        <path d="M 50,90 C 80,90 90,60 90,30 C 90,20 85,10 80,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 90,30 Q 85,40 75,35 Q 80,25 90,30 Z" /> <path d="M 88,45 Q 80,55 70,48 Q 78,38 88,45 Z" /> <path d="M 82,60 Q 72,68 62,60 Q 72,50 82,60 Z" /> <path d="M 72,75 Q 62,80 52,70 Q 62,60 72,75 Z" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center mt-2">
+                        <span class="serif font-bold text-xl text-slate-800">12%</span>
+                    </div>
+                </div>
+                <h3 class="font-bold text-slate-700">Simplicity</h3>
+            </div>
+
+            <!-- Variety -->
+            <div onclick="openDeepDive('Variety')" class="flex flex-col items-center justify-center bg-white p-6 rounded-3xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform">
+                <div class="relative w-24 h-24 mb-3">
+                    <svg viewBox="0 0 100 100" class="w-full h-full wreath-silver drop-shadow-sm">
+                        <path d="M 50,90 C 20,90 10,60 10,30 C 10,20 15,10 20,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 10,30 Q 15,40 25,35 Q 20,25 10,30 Z" /> <path d="M 12,45 Q 20,55 30,48 Q 22,38 12,45 Z" /> <path d="M 18,60 Q 28,68 38,60 Q 28,50 18,60 Z" /> <path d="M 28,75 Q 38,80 48,70 Q 38,60 28,75 Z" />
+                        <path d="M 50,90 C 80,90 90,60 90,30 C 90,20 85,10 80,10" fill="none" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 90,30 Q 85,40 75,35 Q 80,25 90,30 Z" /> <path d="M 88,45 Q 80,55 70,48 Q 78,38 88,45 Z" /> <path d="M 82,60 Q 72,68 62,60 Q 72,50 82,60 Z" /> <path d="M 72,75 Q 62,80 52,70 Q 62,60 72,75 Z" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center mt-2">
+                        <span class="serif font-bold text-xl text-slate-800">95%</span>
+                    </div>
+                </div>
+                <h3 class="font-bold text-slate-700">Variety</h3>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- DRAWER: ACHIEVEMENTS / TROPHIES -->
+    <!-- ============================================== -->
+    <div id="trophy-drawer" class="fixed inset-y-0 right-0 w-80 bg-[#F6F4EE] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-slate-200">
+        <div class="p-5 flex justify-between items-center bg-white border-b border-slate-200">
+            <h2 class="serif text-2xl font-bold">Achievements</h2>
+            <button onclick="toggleDrawer()" class="p-2 bg-slate-100 rounded-full text-slate-500 hover:text-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            
+            <!-- Achieved Trophy -->
+            <div class="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border-l-4 border-l-green-400">
+                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                    <i data-lucide="zap" class="w-6 h-6 text-green-500"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm">Speed Demon</h4>
+                    <p class="text-xs text-slate-500 mt-1">Sustain a perfect Syllable/Sec rate (3-5) for 5 consecutive speeches.</p>
+                </div>
+            </div>
+
+            <!-- Unachieved Trophy -->
+            <div class="flex gap-4 p-4 bg-slate-100/50 rounded-2xl shadow-sm border border-slate-200 opacity-60">
+                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
+                    <i data-lucide="image" class="w-6 h-6 text-slate-400"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-slate-500">The Painter</h4>
+                    <p class="text-xs text-slate-500 mt-1">Hit >40% Visual Content in a single speech lasting over 60 seconds.</p>
+                </div>
+            </div>
+
+            <!-- Unachieved Trophy -->
+            <div class="flex gap-4 p-4 bg-slate-100/50 rounded-2xl shadow-sm border border-slate-200 opacity-60">
+                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
+                    <i data-lucide="scissors" class="w-6 h-6 text-slate-400"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-slate-500">Plain English</h4>
+                    <p class="text-xs text-slate-500 mt-1">Achieve a Reading Grade under 8 and >90% Simple words.</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODAL: DEEP DIVE (Like Trump Accounts App) -->
+    <!-- ============================================== -->
+    <div id="deep-dive-modal" class="fixed inset-0 bg-[#F6F4EE] z-50 transform translate-y-full transition-transform duration-300 flex flex-col hide">
+        <div class="p-5 flex justify-between items-center bg-white border-b border-slate-200">
+            <h2 id="deep-dive-title" class="serif text-2xl font-bold">Pillar</h2>
+            <button onclick="closeDeepDive()" class="p-2 bg-slate-100 rounded-full text-slate-500 hover:text-slate-800"><i data-lucide="chevron-down" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-6 text-center">
+                <div class="w-32 h-32 mx-auto bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center justify-center mb-4">
+                     <span class="text-4xl font-black text-slate-800">114</span>
+                     <span class="text-[10px] uppercase font-bold text-slate-400 mt-1">Words / Min</span>
+                </div>
+                <h3 class="serif text-2xl font-bold mb-2">Perfectly Paced.</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">Your Delivery metrics are in the top 10% of speakers. You consistently pause to let ideas land, avoiding the dreaded mumble.</p>
+            </div>
+            <button class="w-full btn-chunky bg-white border border-slate-200 rounded-2xl py-4 font-bold text-slate-700">
+                See Full History
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- FLOATING BOTTOM NAV (Inspired by image_424a21.png) -->
+    <!-- ============================================== -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#EFECE3] px-6 py-4 rounded-full shadow-lg border border-slate-200/50 flex items-center justify-between gap-8 z-40 backdrop-blur-md">
+        <!-- Stats -->
+        <button onclick="switchTab('stats')" id="nav-stats" class="text-slate-400 hover:text-slate-800 transition-colors">
+            <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+        </button>
+        <!-- Courses/Home -->
+        <button onclick="switchTab('home')" id="nav-home" class="text-slate-800 transition-colors">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
+        </button>
+        <!-- Trophies -->
+        <button onclick="toggleDrawer()" class="text-slate-400 hover:text-slate-800 transition-colors">
+            <i data-lucide="award" class="w-6 h-6"></i>
+        </button>
+        <!-- AI Coach -->
+        <button class="text-slate-400 hover:text-indigo-600 transition-colors relative">
+            <i data-lucide="message-square" class="w-6 h-6 fill-white"></i>
+            <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[9px] font-black mt-[-1px]">AI</span>
+        </button>
+    </nav>
+
+    <!-- Overlay for Drawer -->
+    <div id="drawer-overlay" onclick="toggleDrawer()" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 hide transition-opacity"></div>
+
+    <script>
+        lucide.createIcons();
+
+        function switchTab(tab) {
+            document.getElementById('view-home').classList.add('hide');
+            document.getElementById('view-stats').classList.add('hide');
+            
+            document.getElementById('nav-home').classList.remove('text-slate-800');
+            document.getElementById('nav-home').classList.add('text-slate-400');
+            document.getElementById('nav-stats').classList.remove('text-slate-800');
+            document.getElementById('nav-stats').classList.add('text-slate-400');
+
+            document.getElementById(`view-${tab}`).classList.remove('hide');
+            document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
+            document.getElementById(`nav-${tab}`).classList.add('text-slate-800');
+        }
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('trophy-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            
+            if (drawer.classList.contains('translate-x-full')) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hide');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hide');
+            }
+        }
+
+        function openDeepDive(title) {
+            document.getElementById('deep-dive-title').innerText = title;
+            const modal = document.getElementById('deep-dive-modal');
+            modal.classList.remove('hide');
+            // Tiny delay to allow display:block to apply before animating transform
+            setTimeout(() => {
+                modal.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeDeepDive() {
+            const modal = document.getElementById('deep-dive-modal');
+            modal.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hide');
+            }, 300);
+        }
+    </script>
+</body>
+</html>
