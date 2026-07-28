@@ -1,0 +1,38 @@
+body { 
+    background-color: #F6F4EE; 
+    font-family: 'Inter', sans-serif; 
+    -webkit-tap-highlight-color: transparent;
+}
+h1, h2, h3, .serif { 
+    font-family: 'Playfair Display', serif; 
+}
+
+/* Duolingo-style chunky buttons */
+.btn-chunky {
+    box-shadow: 0 4px 0 0 #d1d5db;
+    transition: all 0.1s;
+}
+.btn-chunky:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 0 #d1d5db;
+}
+.btn-chunky-primary {
+    background-color: #1f2937;
+    color: white;
+    box-shadow: 0 4px 0 0 #111827;
+}
+.btn-chunky-primary:active { 
+    box-shadow: 0 0 0 0 #111827; 
+    transform: translateY(4px); 
+}
+
+/* Wreath Colors */
+.wreath-yellow { stroke: #FBBF24; fill: #FBBF24; }
+.wreath-green { stroke: #34D399; fill: #34D399; }
+.wreath-blue { stroke: #60A5FA; fill: #60A5FA; }
+.wreath-red { stroke: #F87171; fill: #F87171; }
+.wreath-silver { stroke: #9CA3AF; fill: #9CA3AF; }
+.wreath-gold { stroke: #D4AF37; fill: #D4AF37; }
+
+/* Utilities */
+.hide { display: none !important; }
