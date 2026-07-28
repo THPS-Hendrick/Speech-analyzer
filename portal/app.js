@@ -154,6 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+// Inject the Laurel Wreath SVG into all placeholders
+const wreathContainers = document.querySelectorAll('.wreath-container');
+wreathContainers.forEach(container => {
+    container.innerHTML = wreathSVG;
+});
+
     // Navigation Listeners
     const drawer = document.getElementById('trophy-drawer');
     const overlay = document.getElementById('drawer-overlay');
