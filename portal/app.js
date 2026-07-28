@@ -77,15 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('content.json');
             const data = await response.json();
             
-            // Render Daily Quest
-            document.getElementById('quest-title').innerText = data.dailyQuest.title;
-            document.getElementById('quest-desc').innerText = data.dailyQuest.description;
-            document.getElementById('quest-xp').innerText = "+" + data.dailyQuest.xp;
+            // Render Daily Talk
+            document.getElementById('talk-title').innerText = data.dailyTalk.title;
+            document.getElementById('talk-desc').innerText = data.dailyTalk.description;
+            document.getElementById('talk-xp').innerText = "+" + data.dailyTalk.xp;
 
             // TEST FUNCTION: Wire the "Start Recording" button to actually give XP to test the database!
             const startBtn = document.querySelector('.btn-chunky-primary');
             startBtn.addEventListener('click', async () => {
-                const newXp = userData.xp + data.dailyQuest.xp;
+                const newXp = userData.xp + data.dailyTalk.xp;
                 
                 // Update Firebase Database
                 await updateDoc(userRef, { xp: newXp }); 
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     wreathSvg.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(newXp)}`;
                 }
                 
-                alert(`Boom! +${data.dailyQuest.xp} XP added and saved to Firebase! Check your Firestore console.`);
+                alert(`Boom! +${data.dailyTalk.xp} XP added and saved to Firebase! Check your Firestore console.`);
             });
 
             // Render Prompts
