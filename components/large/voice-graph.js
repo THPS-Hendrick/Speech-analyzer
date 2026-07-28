@@ -1,483 +1,187 @@
-// ==========================================
-// THPS WIDGET: LARGE VOICE GRAPH (PHD ACOUSTICS v5.0)
-// Includes Canvas Pause Bars, Accordion Pace Runs, Percentile Voice Variance, and Dual Engines
-// ==========================================
-
-class ThpsVoiceGraph extends HTMLElement {
+class THPSVoiceGraph extends HTMLElement {
     constructor() {
         super();
-        this.pauseMode = 'dynamic'; // Default to relative speaker cadence
-        this.lastData = null; // Cache the data so we can instantly recalculate on toggle
+        // Removed DOM manipulation from the constructor to prevent rendering crashes
     }
 
     connectedCallback() {
-        this.innerHTML = `
-            <style>
-                .custom-scrollbar::-webkit-scrollbar { height: 14px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 4px solid #f8fafc; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; border: 3px solid #f8fafc; }
-            </style>
-            <div class="glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-indigo-500 shadow-sm flex flex-col bg-white relative w-full h-full transition-transform hover:-translate-y-1 hover:shadow-md group">
-                
-                <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Graph</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Variance in Pause, Voice, & Pace</p>
-                    </div>
-                    <!-- NEW: The Engine Mode Toggle -->
-                    <div class="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
-                        <button data-action="setModeDynamic" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600">Dynamic</button>
-                        <button data-action="setModeGlobal" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600">Global</button>
-                    </div>
-                </div>
-                
-                <div class="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-slate-200 bg-slate-50 pb-1 custom-scrollbar relative" id="thps-scroll-wrapper">
-                    
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none thps-vg-placeholder z-50">
-                        <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-800/80 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-700/50">Waiting for Audio...</span>
-                    </div>
-
-                    <div class="thps-sync-track relative flex flex-col" style="min-width: 100%;">
-                        
-                        <div class="thps-time-axis relative w-full h-7 border-b border-slate-700/50 bg-slate-800/90 shrink-0"></div>
-
-                        <div class="w-full h-32 md:h-40 relative shrink-0 bg-slate-900">
-                            <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
-                        </div>
-                        
-                        <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 shrink-0 overflow-hidden">
-                            <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40 z-0">
-                                <div class="w-full h-px bg-slate-300"></div>
-                                <div class="w-full h-px bg-slate-300"></div>
-                                <div class="w-full h-px bg-slate-300"></div>
-                                <div class="w-full h-px bg-slate-300"></div>
-                                <div class="w-full h-px bg-slate-300"></div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pause Var.')">Pause Var.</h4>
-                        <div class="thps-bar-container-pause flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
-                    </div>
-                    <div class="flex flex-col h-full">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Voice Var.')">Voice Var.</h4>
-                        <div class="thps-bar-container-voice flex-1 flex items-end"></div>
-                    </div>
-                    <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pace Var.')">Pace Var.</h4>
-                        <div class="thps-bar-container-pace flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        this.querySelector('.thps-close-btn').addEventListener('click', () => {
-            const wrapper = this.closest('.cursor-move');
-            if (wrapper) wrapper.remove(); 
-            else this.remove(); 
-        });
-
-        // Toggle Listeners
-        this.querySelector('[data-action="setModeDynamic"]').addEventListener('click', () => this.setMode('dynamic'));
-        this.querySelector('[data-action="setModeGlobal"]').addEventListener('click', () => this.setMode('global'));
-
-        window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
+        // Safely set innerHTML after the element is officially connected to the DOM
+        this.innerHTML = this.getTemplate();
         
+        if (window.lucide) window.lucide.createIcons();
+        this.updateHandler = this.handleUpdate.bind(this);
+        window.addEventListener('thps-dashboard-update', this.updateHandler);
+        
+        // Check for existing cache on load
         if (window.thps_lastPayload) {
-            setTimeout(() => this.update(window.thps_lastPayload), 50);
+            this.handleUpdate({ detail: window.thps_lastPayload });
         }
     }
 
-    setMode(mode) {
-        this.pauseMode = mode;
-        const dynBtn = this.querySelector('[data-action="setModeDynamic"]');
-        const globBtn = this.querySelector('[data-action="setModeGlobal"]');
+    disconnectedCallback() {
+        window.removeEventListener('thps-dashboard-update', this.updateHandler);
+    }
+
+    handleUpdate(e) {
+        const data = e.detail;
+
+        // Failsafe: if the audio hasn't generated the elastic grid buckets yet, clear the graph
+        if (!data || !data.pauseBuckets || !data.paceBuckets) {
+             this.clearGraph();
+             return;
+        }
+
+        this.renderPauseColumn(data.pauseBuckets);
+        this.renderPaceColumn(data.paceBuckets);
         
-        if (mode === 'dynamic') {
-            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
-            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
+        if (data.volumeData && data.volumeData.length > 0) {
+            this.renderVolumeColumn(data.volumeData);
         } else {
-            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
-            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
+            this.renderVolumeColumn([]); // Clear if no audio volume data exists
         }
-        
-        // Recalculate graph and all dependent maths instantly
-        if (this.lastData) this.update(this.lastData);
     }
 
-    countSyllablesLocal(word) {
-        word = word.toLowerCase().replace(/[^a-z]/g, '');
-        if (word.length <= 3) return 1;
-        word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-        word = word.replace(/^y/, '');
-        const syllables = word.match(/[aeiouy]{1,2}/g);
-        return syllables ? syllables.length : 1;
+    renderPauseColumn(pauseBuckets) {
+        // We ignore 'micro' pauses in the visual render as they are sub-perceptual
+        const total = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
+        this.updateBar('vg-pause-red', pauseBuckets.red, total);
+        this.updateBar('vg-pause-orange', pauseBuckets.orange, total);
+        this.updateBar('vg-pause-green', pauseBuckets.green, total);
+        this.updateBar('vg-pause-blue', pauseBuckets.blue, total);
     }
 
-    update(data) {
-        if (!data || !data.wordTimestamps || data.wordTimestamps.length === 0) return;
-        this.lastData = data; 
+    renderPaceColumn(paceBuckets) {
+        const total = paceBuckets.fastest + paceBuckets.fast + paceBuckets.normal + paceBuckets.slow + paceBuckets.slowest;
+        this.updateBar('vg-pace-fastest', paceBuckets.fastest, total);
+        this.updateBar('vg-pace-fast', paceBuckets.fast, total);
+        this.updateBar('vg-pace-normal', paceBuckets.normal, total);
+        this.updateBar('vg-pace-slow', paceBuckets.slow, total);
+        this.updateBar('vg-pace-slowest', paceBuckets.slowest, total);
+    }
+
+    renderVolumeColumn(volumeData) {
+        let volBuckets = { quietest: 0, quiet: 0, normal: 0, loud: 0, loudest: 0 };
         
-        this.querySelector('.thps-vg-placeholder').style.display = 'none';
-        
-        const duration = Math.max(data.time || 1, Math.ceil(data.wordTimestamps[data.wordTimestamps.length - 1].end));
-        const PIXELS_PER_SEC = 50;
-        const scrollWrapper = this.querySelector('#thps-scroll-wrapper');
-        const track = this.querySelector('.thps-sync-track');
-        
-        const trackWidth = Math.max(duration * PIXELS_PER_SEC, scrollWrapper.clientWidth);
-        track.style.width = `${trackWidth}px`;
-        
-        const canvas = this.querySelector('.thps-vg-canvas');
-        const axis = this.querySelector('.thps-time-axis');
-        const staff = this.querySelector('.thps-staff-words');
-        
-        let pauses = []; 
-        let runPaces = []; // NEW: Replaces chunkPaces
-
-        let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
-        let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
-        let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-        
-        // --- PHD MATH PHASE 1: HYBRID PAUSE & PACE (ACCORDION) ENGINE ---
-        let expectedSyllableLength = 0.250; 
-        
-        if (this.pauseMode === 'dynamic') {
-            const firstWord = data.wordTimestamps[0];
-            const lastWord = data.wordTimestamps[data.wordTimestamps.length - 1];
-            const totalSpeakingTime = (lastWord.start + 1.0) - firstWord.start;
-            
-            let totalSyllables = 0;
-            data.wordTimestamps.forEach(w => totalSyllables += this.countSyllablesLocal(w.word));
-            
-            const dynamicSPS = totalSyllables / Math.max(0.1, totalSpeakingTime);
-            expectedSyllableLength = 1.0 / dynamicSPS; 
-        }
-
-        let currentRunWords = [];
-
-        for (let i = 0; i < data.wordTimestamps.length; i++) {
-            const currWord = data.wordTimestamps[i];
-            const sylCount = this.countSyllablesLocal(currWord.word);
-            currentRunWords.push({ word: currWord, sylCount: sylCount });
-            
-            let isEndOfRun = false;
-            let expectedNextStart = 0;
-            let truePause = 0;
-            
-            if (i === data.wordTimestamps.length - 1) {
-                isEndOfRun = true;
-            } else {
-                const nextWord = data.wordTimestamps[i+1];
-                expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
-                truePause = Math.max(0, nextWord.start - expectedNextStart);
-
-                if (truePause > 0.05) { 
-                    isEndOfRun = true;
-                    // Log the Pause
-                    let pColor = '', pY = 0;
-                    if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
-                    else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
-                    else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
-                    else if (truePause <= 1.400) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; }
-                    else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; }
-
-                    pauses.push({ 
-                        start: expectedNextStart, 
-                        duration: truePause, 
-                        color: pColor, 
-                        yPct: pY 
-                    });
-                }
-            }
-
-            if (isEndOfRun) {
-                // Log the Pace (Accordion Ratio) for the completed Run
-                let ratio = 1.0;
-                let actualTime = 0;
-                let expectedTime = 0;
-                let blockWidth = sylCount * expectedSyllableLength; // Default fallback for 1-word runs
-
-                if (currentRunWords.length >= 2) {
-                    actualTime = currentRunWords[currentRunWords.length - 1].word.start - currentRunWords[0].word.start;
-                    
-                    let expectedSyllables = 0;
-                    for (let j = 0; j < currentRunWords.length - 1; j++) {
-                        expectedSyllables += currentRunWords[j].sylCount;
-                    }
-                    expectedTime = expectedSyllables * expectedSyllableLength;
-                    ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
-                    blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * expectedSyllableLength);
-                }
-
-                // Bucket the ratio
-                let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; } // Rose (Rapid Fire)
-                else if (ratio < 0.91) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; } // Amber (Brisk)
-                else if (ratio <= 1.10) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; } // Emerald (On Pace)
-                else if (ratio <= 1.30) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; } // Blue (Deliberate)
-                else { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; } // Slate (Drawn Out)
-
-                runPaces.push({
-                    start: currentRunWords[0].word.start,
-                    width: blockWidth,
-                    color: paceColor,
-                    row: paceRow
-                });
-
-                currentRunWords = []; // Reset for next run
-            }
-        }
-
-        // --- PHD MATH PHASE 2: TRUE LOGARITHMIC VOICE VARIANCE ---
-        let validChunks = [];
-        let numChunks = Math.ceil(duration / 3);
-
-        for(let c = 0; c < numChunks; c++) {
-            let chunkStart = c * 3;
-            let chunkEnd = chunkStart + 3;
-            
-            let pauseInChunk = 0;
-            pauses.forEach(p => {
-                let pEnd = p.start + p.duration;
-                if (p.start < chunkEnd && pEnd > chunkStart) {
-                    let overlapStart = Math.max(p.start, chunkStart);
-                    let overlapEnd = Math.min(pEnd, chunkEnd);
-                    pauseInChunk += (overlapEnd - overlapStart);
-                }
+        if (volumeData.length > 0) {
+            // Group raw acoustic frames into 3-second chunks
+            let chunks = {};
+            volumeData.forEach(frame => {
+                let chunkIndex = Math.floor(frame.time / 3);
+                if (!chunks[chunkIndex]) chunks[chunkIndex] = [];
+                chunks[chunkIndex].push(frame.db);
             });
 
-            let activeTime = 3 - pauseInChunk;
-            if (activeTime >= 0.2) { 
-                let linearSum = 0; let dbCount = 0;
-                if (data.volumeData && data.volumeData.length > 0) {
-                    data.volumeData.forEach(v => {
-                        if (v.time >= chunkStart && v.time < chunkEnd) {
-                            linearSum += Math.pow(10, v.db / 10);
-                            dbCount++;
-                        }
-                    });
-                }
-                let avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40; 
-                validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
+            let chunkAverages = [];
+            for (const key in chunks) {
+                let dBs = chunks[key];
+                // Logarithmic average of the chunk
+                let linearSum = 0;
+                dBs.forEach(db => linearSum += Math.pow(10, db / 10));
+                let avgDb = 10 * Math.log10(linearSum / dBs.length);
+                chunkAverages.push(avgDb);
             }
-        }
 
-        // --- PHD MATH PHASE 3: PERCENTILE SORTING & GLOBAL CLAMP ---
-        
-        validChunks.sort((a, b) => a.db - b.db);
+            // Find global baseline to measure intensity variation against
+            let globalLinearSum = 0;
+            chunkAverages.forEach(db => globalLinearSum += Math.pow(10, db / 10));
+            let globalAvgDb = 10 * Math.log10(globalLinearSum / chunkAverages.length);
 
-        let floorDb = -40;
-        let ceilingDb = -10;
-
-        if (validChunks.length > 0) {
-            let floorIndex = Math.floor(validChunks.length * 0.05); 
-            let ceilIndex = Math.floor(validChunks.length * 0.95);  
-            if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
-            
-            floorDb = validChunks[floorIndex].db;
-            ceilingDb = validChunks[ceilIndex].db;
-        }
-
-        let range = ceilingDb - floorDb;
-        if (range < 15) {
-            let midPoint = (ceilingDb + floorDb) / 2;
-            floorDb = midPoint - 7.5;
-            ceilingDb = midPoint + 7.5;
-            range = 15;
-        }
-
-        if (this.pauseMode === 'global') {
-            floorDb = -35;
-            ceilingDb = -15; 
-            range = 20;
-        }
-
-        let step = range / 5;
-        let bounds = [
-            floorDb + step,       
-            floorDb + (step * 2), 
-            floorDb + (step * 3), 
-            floorDb + (step * 4)  
-        ];
-
-        let voiceLabels = [
-            `< ${Math.round(bounds[0])}dB`,
-            `${Math.round(bounds[0])}dB`,
-            `${Math.round(bounds[1])}dB`,
-            `${Math.round(bounds[2])}dB`,
-            `> ${Math.round(bounds[3])}dB`
-        ];
-        
-        validChunks.forEach(vc => {
-            if (vc.db < bounds[0]) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
-            else if (vc.db < bounds[1]) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
-            else if (vc.db < bounds[2]) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
-            else if (vc.db < bounds[3]) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
-            else { voiceCounts.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
-        });
-
-        // --- VISUAL PAINTING 1: TIME AXIS ---
-        axis.innerHTML = '';
-        for (let i = 0; i <= duration; i++) {
-            let xPos = i * PIXELS_PER_SEC;
-            let isMajor = (i % 5 === 0);
-            
-            if (isMajor) {
-                let label = document.createElement('span');
-                label.className = 'absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold -translate-x-1/2 select-none';
-                label.style.left = `${xPos}px`;
-                label.innerText = `${i}s`;
-                axis.appendChild(label);
-            } else {
-                let tick = document.createElement('div');
-                tick.className = `absolute bottom-0 border-l border-slate-500/50 h-2`;
-                tick.style.left = `${xPos}px`;
-                axis.appendChild(tick);
-            }
-        }
-
-        // --- VISUAL PAINTING 2: CANVAS BLOCKS & PAUSE BARS ---
-        const canvasHeight = canvas.parentElement.clientHeight;
-        canvas.width = trackWidth * 2; 
-        canvas.height = canvasHeight * 2;
-        const ctx = canvas.getContext('2d');
-        ctx.scale(2, 2); 
-        
-        ctx.clearRect(0, 0, trackWidth, canvasHeight);
-        
-        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-        ctx.lineWidth = 1;
-        for(let i=0; i<duration; i+=3) {
-            let x = i * PIXELS_PER_SEC;
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
-        }
-
-        validChunks.sort((a, b) => a.start - b.start);
-        
-        validChunks.forEach(vc => {
-            let x = vc.start * PIXELS_PER_SEC;
-            let w = 3 * PIXELS_PER_SEC;
-            let h = vc.hPct * canvasHeight;
-            let y = canvasHeight - h;
-            
-            ctx.fillStyle = vc.color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = vc.color;
-            ctx.fillRect(x, y, w - 2, h); 
-            ctx.shadowBlur = 0;
-        });
-
-        pauses.forEach(p => {
-            let x = p.start * PIXELS_PER_SEC;
-            let w = p.duration * PIXELS_PER_SEC;
-            let h = canvasHeight * 0.10; 
-            let y = (p.yPct * canvasHeight) - (h / 2); 
-            
-            ctx.fillStyle = p.color;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = p.color;
-            
-            if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(x, y, w, h, 4);
-                ctx.fill();
-            } else {
-                ctx.fillRect(x, y, w, h);
-            }
-            ctx.shadowBlur = 0;
-        });
-
-        // --- VISUAL PAINTING 3: SPEECH STAFF (RUN PACE BARS & WORDS) ---
-        staff.querySelectorAll('.staff-item').forEach(el => el.remove());
-
-        runPaces.forEach(rp => {
-            const bar = document.createElement('div');
-            bar.className = 'staff-item absolute opacity-30 pointer-events-none rounded-sm z-0';
-            bar.style.backgroundColor = rp.color;
-            bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
-            bar.style.width = `${rp.width * PIXELS_PER_SEC}px`;
-            bar.style.top = `${rp.row * 20}%`;
-            bar.style.height = `20%`;
-            staff.appendChild(bar);
-        });
-
-        data.wordTimestamps.forEach((w, index) => {
-            const span = document.createElement('span');
-            span.innerText = w.word;
-            
-            const xPos = w.start * PIXELS_PER_SEC; 
-            const row = index % 5;
-            
-            let textColorCls = 'text-slate-700';
-            if (w.colorType === 'personal') textColorCls = 'text-emerald-500';
-            else if (w.colorType === 'visual') textColorCls = 'text-rose-500';
-            else if (w.colorType === 'overlap') textColorCls = 'text-fuchsia-600';
-            
-            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white ${textColorCls} font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default`;
-            span.style.left = `${xPos}px`; 
-            span.style.top = `calc(${row * 20}% + 4px)`; 
-            
-            staff.appendChild(span);
-        });
-
-        // --- VISUAL PAINTING 4: UI BAR GRAPHS ---
-        const drawHorizontalBars = (containerClass, countsObj, labels, colors) => {
-            const container = this.querySelector(containerClass);
-            container.innerHTML = '';
-            const maxVal = Math.max(...Object.values(countsObj), 1); 
-            
-            Object.keys(countsObj).forEach((key, idx) => {
-                const count = countsObj[key];
-                const widthPct = Math.max(5, (count / maxVal) * 100); 
-                container.innerHTML += `
-                    <div class="flex items-center gap-2">
-                        <span class="w-12 text-right">${labels[idx]}:</span>
-                        <div class="flex-1 h-3 bg-slate-100 rounded-sm overflow-hidden">
-                            <div class="h-full rounded-sm ${colors[idx]}" style="width: ${widthPct}%"></div>
-                        </div>
-                        <span class="w-4 font-bold text-slate-700">${count}</span>
-                    </div>
-                `;
+            // Bucket the variations
+            chunkAverages.forEach(db => {
+                let diff = db - globalAvgDb;
+                if (diff > 4) volBuckets.loudest++;
+                else if (diff > 1.5) volBuckets.loud++;
+                else if (diff > -1.5) volBuckets.normal++;
+                else if (diff > -4) volBuckets.quiet++;
+                else volBuckets.quietest++;
             });
-        };
+        }
 
-        const drawVerticalBars = (containerClass, countsObj, labels, colors) => {
-            const container = this.querySelector(containerClass);
-            container.innerHTML = `<div class="flex items-end justify-between w-full h-full pt-1 pb-1"></div>`;
-            const wrapper = container.firstElementChild;
-            const maxVal = Math.max(...Object.values(countsObj), 1); 
-            
-            Object.keys(countsObj).forEach((key, idx) => {
-                const count = countsObj[key];
-                const heightPct = Math.max(5, (count / maxVal) * 100); 
-                wrapper.innerHTML += `
-                    <div class="flex flex-col items-center justify-end gap-1 flex-1 h-full">
-                        <span class="text-[9px] font-bold text-slate-700">${count}</span>
-                        <div class="w-3 sm:w-4 h-16 bg-slate-100 rounded-sm flex flex-col justify-end overflow-hidden">
-                            <div class="w-full rounded-sm ${colors[idx]}" style="height: ${heightPct}%"></div>
-                        </div>
-                        <span class="text-[8px] text-slate-500">${labels[idx]}</span>
-                    </div>
-                `;
-            });
-        };
+        const total = volBuckets.loudest + volBuckets.loud + volBuckets.normal + volBuckets.quiet + volBuckets.quietest;
+        this.updateBar('vg-vol-loudest', volBuckets.loudest, total);
+        this.updateBar('vg-vol-loud', volBuckets.loud, total);
+        this.updateBar('vg-vol-normal', volBuckets.normal, total);
+        this.updateBar('vg-vol-quiet', volBuckets.quiet, total);
+        this.updateBar('vg-vol-quietest', volBuckets.quietest, total);
+    }
 
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['short', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
-        drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
+    updateBar(elementId, count, total) {
+        const el = this.querySelector(`#${elementId}`);
+        if (!el) return;
         
-        // NEW: Updated the Pace labels to match the Accordion Ratio Multipliers
-        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['> 1.30x', '1.10x', '1.00x', '0.90x', '< 0.75x'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        el.innerText = count > 0 ? count : '';
+        
+        if (total === 0 || count === 0) {
+            el.style.height = '0%';
+            el.style.opacity = '0.3';
+            el.style.padding = '0';
+        } else {
+            // Allocate remaining vertical space dynamically
+            const percentage = Math.max(15, (count / total) * 100);
+            el.style.height = `${percentage}%`;
+            el.style.opacity = '1';
+            el.style.padding = '2px 0';
+        }
+    }
+
+    clearGraph() {
+        const bars = this.querySelectorAll('.vg-bar');
+        bars.forEach(bar => {
+            bar.style.height = '0%';
+            bar.style.opacity = '0.3';
+            bar.innerText = '';
+        });
+    }
+
+    getTemplate() {
+        return `
+        <div class="score-card glass-panel p-4 md:p-6 rounded-2xl border-t-4 border-blue-500 shadow-sm relative overflow-hidden h-full flex flex-col min-h-[300px]">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Voice Graph</h3>
+                    <p class="text-xs text-slate-500 font-medium">Acoustic variations & intensity</p>
+                </div>
+                <button class="thps-close-btn p-1 text-slate-400 hover:text-red-500 transition-colors cursor-pointer" onclick="this.closest('.group').remove()">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <!-- GRAPH CONTAINER -->
+            <div class="flex-1 grid grid-cols-3 gap-2 sm:gap-4 h-full mt-2 pb-2">
+                
+                <!-- Silence Column -->
+                <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
+                    <div class="vg-bar w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-red"></div>
+                    <div class="vg-bar w-full bg-orange-100 rounded text-center text-xs font-bold text-orange-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-orange"></div>
+                    <div class="vg-bar w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-green"></div>
+                    <div class="vg-bar w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-blue"></div>
+                    <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Silence</div>
+                </div>
+
+                <!-- Intensity Column -->
+                <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
+                    <div class="vg-bar w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loudest"></div>
+                    <div class="vg-bar w-full bg-fuchsia-100 rounded text-center text-xs font-bold text-fuchsia-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loud"></div>
+                    <div class="vg-bar w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-normal"></div>
+                    <div class="vg-bar w-full bg-teal-100 rounded text-center text-xs font-bold text-teal-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quiet"></div>
+                    <div class="vg-bar w-full bg-cyan-100 rounded text-center text-xs font-bold text-cyan-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quietest"></div>
+                    <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Intensity</div>
+                </div>
+
+                <!-- Pace Column -->
+                <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
+                    <div class="vg-bar w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
+                    <div class="vg-bar w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
+                    <div class="vg-bar w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
+                    <div class="vg-bar w-full bg-lime-100 rounded text-center text-xs font-bold text-lime-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
+                    <div class="vg-bar w-full bg-indigo-100 rounded text-center text-xs font-bold text-indigo-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
+                    <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Pace</div>
+                </div>
+
+            </div>
+        </div>
+        `;
     }
 }
 
-customElements.define('thps-voice-graph', ThpsVoiceGraph);
+customElements.define('thps-voice-graph', THPSVoiceGraph);
