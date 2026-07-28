@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator - Tom Hendrick</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white !important; }
+            .print-shadow-none { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
+
+    <!-- CONTROL PANEL (Hidden on Print) -->
+    <div class="no-print max-w-4xl mx-auto bg-white p-6 rounded shadow mb-8 border-t-4 border-yellow-500">
+        <h2 class="text-xl font-bold mb-4">Invoice Controls</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-bold mb-1">Client Name</label>
+                <input type="text" id="clientName" value="Aradhana Gazdar" class="w-full border p-2 rounded" oninput="updateInvoice()">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-1">Client Email</label>
+                <input type="email" id="clientEmail" value="aradhana.gazdar@sa.gov.au" class="w-full border p-2 rounded" oninput="updateInvoice()">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-1">Invoice Date</label>
+                <input type="date" id="invoiceDate" class="w-full border p-2 rounded" onchange="updateInvoice()">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-1">Payment Due Date</label>
+                <input type="date" id="dueDate" class="w-full border p-2 rounded" onchange="updateInvoice()">
+            </div>
+            <div class="flex items-center mt-6">
+                <input type="checkbox" id="applyGst" checked class="w-5 h-5 mr-2" onchange="updateInvoice()">
+                <label class="text-sm font-bold">Apply 10% GST (Australia)</label>
+            </div>
+        </div>
+
+        <h3 class="font-bold border-b pb-2 mb-4 mt-6">Services</h3>
+        
+        <!-- Service 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-3 bg-gray-50 p-3 rounded border">
+            <div class="md:col-span-3">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Service 1 Name</label>
+                <input type="text" id="svcName1" value="ONE OFF COACHING" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-5">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                <input type="text" id="svcDesc1" value="Public Speaking Coaching (ad hoc)" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                <input type="number" id="svcPrice1" value="410" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                <input type="number" id="svcQty1" value="0" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-3 bg-gray-50 p-3 rounded border">
+            <div class="md:col-span-3">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Service 2 Name</label>
+                <input type="text" id="svcName2" value="ALL DAY PACKAGE" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-5">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                <input type="text" id="svcDesc2" value="6x hours committed to speech writing, coaching and recording" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                <input type="number" id="svcPrice2" value="1500" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                <input type="number" id="svcQty2" value="0" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-3 bg-gray-50 p-3 rounded border">
+            <div class="md:col-span-3">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Service 3 Name</label>
+                <input type="text" id="svcName3" value="ESL Training Study" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-5">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                <input type="text" id="svcDesc3" value="1x Session Free, 4x sessions (research)" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                <input type="number" id="svcPrice3" value="500" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                <input type="number" id="svcQty3" value="1" min="0" class="w-full border p-2 rounded text-sm" oninput="updateInvoice()">
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button onclick="window.print()" class="bg-yellow-600 text-white px-6 py-2 rounded font-bold hover:bg-yellow-700 transition">Print / Save as PDF</button>
+        </div>
+    </div>
+
+    <!-- INVOICE PAGE -->
+    <div class="max-w-4xl mx-auto bg-white p-10 rounded shadow-lg print-shadow-none" id="invoicePage">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start border-b-2 border-yellow-500 pb-6 mb-6">
+            <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
+            <div class="text-right">
+                <h1 class="text-3xl font-bold text-yellow-600">Tax Invoice</h1>
+                <p class="text-lg font-semibold mt-2" id="outTotalTop">AUD $0</p>
+            </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="grid grid-cols-2 gap-8 mb-8">
+            <!-- Provider Details -->
+            <div>
+                <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Service Provider details</h3>
+                <p class="font-bold">Tom Hendrick</p>
+                <p>+61 419 499 331</p>
+                <p>tomhendrick.com</p>
+                <p>tom@tomhendrick.com</p>
+                <p class="mt-2">ABN: 56 949 157 639</p>
+                <p>Suite 110/147 Pirie St</p>
+                <p>Adelaide SA 5000, Australia</p>
+            </div>
+
+            <!-- Customer Details -->
+            <div>
+                <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Customer Details</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <span class="font-semibold text-gray-600">Date:</span>
+                    <span class="col-span-2" id="outDate"></span>
+                    
+                    <span class="font-semibold text-gray-600">Invoice #:</span>
+                    <span class="col-span-2 font-bold" id="outInvoiceNum"></span>
+
+                    <span class="font-semibold text-gray-600">Due Date:</span>
+                    <span class="col-span-2 text-red-600 font-bold" id="outDueDate"></span>
+                    
+                    <span class="font-semibold text-gray-600 mt-2">Name:</span>
+                    <span class="col-span-2 mt-2" id="outName"></span>
+                    
+                    <span class="font-semibold text-gray-600">Email:</span>
+                    <span class="col-span-2" id="outEmail"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Table -->
+        <table class="w-full mb-8 text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100 border-b-2 border-yellow-500">
+                    <th class="py-2 px-3 w-1/4">Services</th>
+                    <th class="py-2 px-3 w-2/5">Description</th>
+                    <th class="py-2 px-3 text-center">Units</th>
+                    <th class="py-2 px-3 text-right">Rate</th>
+                    <th class="py-2 px-3 text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Service 1 -->
+                <tr class="border-b" id="row1">
+                    <td class="py-3 px-3 font-bold text-sm whitespace-pre-wrap" id="outName1"></td>
+                    <td class="py-3 px-3 text-sm text-gray-600 whitespace-pre-wrap" id="outDesc1"></td>
+                    <td class="py-3 px-3 text-center" id="outQty1">0</td>
+                    <td class="py-3 px-3 text-right" id="outPrice1">$0</td>
+                    <td class="py-3 px-3 text-right" id="outAmt1">$0</td>
+                </tr>
+                <!-- Service 2 -->
+                <tr class="border-b" id="row2">
+                    <td class="py-3 px-3 font-bold text-sm whitespace-pre-wrap" id="outName2"></td>
+                    <td class="py-3 px-3 text-sm text-gray-600 whitespace-pre-wrap" id="outDesc2"></td>
+                    <td class="py-3 px-3 text-center" id="outQty2">0</td>
+                    <td class="py-3 px-3 text-right" id="outPrice2">$0</td>
+                    <td class="py-3 px-3 text-right" id="outAmt2">$0</td>
+                </tr>
+                <!-- Service 3 -->
+                <tr class="border-b" id="row3">
+                    <td class="py-3 px-3 font-bold text-sm whitespace-pre-wrap" id="outName3"></td>
+                    <td class="py-3 px-3 text-sm text-gray-600 whitespace-pre-wrap" id="outDesc3"></td>
+                    <td class="py-3 px-3 text-center" id="outQty3">0</td>
+                    <td class="py-3 px-3 text-right" id="outPrice3">$0</td>
+                    <td class="py-3 px-3 text-right" id="outAmt3">$0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="flex justify-end mb-8">
+            <div class="w-64">
+                <div class="flex justify-between py-1 border-b" id="gstRow">
+                    <span class="font-bold text-gray-600">GST</span>
+                    <span id="outGst">$0</span>
+                </div>
+                <div class="flex justify-between py-2 border-b-4 border-yellow-500 font-bold text-xl">
+                    <span>Total:</span>
+                    <span id="outTotalBottom">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="bg-gray-50 p-6 rounded border">
+            <h3 class="font-bold text-lg mb-4 border-b pb-2">Payment Methods</h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <p class="font-bold text-gray-700">PayID:</p>
+                    <p>0419 499 331 <span class="text-gray-500">Or</span> +61 419 499 331</p>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-700">Bank Transfer:</p>
+                    <p>Tom Hendrick</p>
+                    <p>BSB: <span class="font-semibold">065 114</span></p>
+                    <p>ACC: <span class="font-semibold">1023 4373</span></p>
+                </div>
+                <div class="col-span-2">
+                    <p class="font-bold text-gray-700">SWIFT/BIC code [international]:</p>
+                    <p>CTBAAU2S</p>
+                    <p class="text-sm text-gray-500 mt-1">Branch Address: T21 North Adelaide Village<br>Shop Centre North Adelaide - SA 5006</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set today's date and due date (default +14 days) on load
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date();
+            const due = new Date();
+            due.setDate(today.getDate() + 14);
+
+            document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
+            document.getElementById('dueDate').value = due.toISOString().split('T')[0];
+            
+            updateInvoice();
+        });
+
+        function formatCurrency(amount) {
+            return "$" + amount.toLocaleString('en-AU', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function generateInvoiceNumber(name, dateStr) {
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            const datePart = dateStr ? dateStr.replace(/-/g, '') : '';
+            return `${initials}${datePart}`;
+        }
+
+        function updateInvoice() {
+            // Update Text Fields for Client info
+            const name = document.getElementById('clientName').value;
+            const email = document.getElementById('clientEmail').value;
+            const date = document.getElementById('invoiceDate').value;
+            const due = document.getElementById('dueDate').value;
+
+            document.getElementById('outName').innerText = name;
+            document.getElementById('outEmail').innerText = email;
+            document.getElementById('outDate').innerText = formatDate(date);
+            document.getElementById('outDueDate').innerText = formatDate(due);
+            document.getElementById('outInvoiceNum').innerText = generateInvoiceNumber(name, date);
+
+            let subtotal = 0;
+
+            // Loop through the 3 services dynamically
+            for (let i = 1; i <= 3; i++) {
+                const sName = document.getElementById(`svcName${i}`).value;
+                const sDesc = document.getElementById(`svcDesc${i}`).value;
+                const sPrice = parseFloat(document.getElementById(`svcPrice${i}`).value) || 0;
+                const sQty = parseInt(document.getElementById(`svcQty${i}`).value) || 0;
+
+                const sAmt = sPrice * sQty;
+                subtotal += sAmt;
+
+                // Update table cells
+                document.getElementById(`outName${i}`).innerText = sName.replace(/\\n/g, '\n'); 
+                document.getElementById(`outDesc${i}`).innerText = sDesc.replace(/\\n/g, '\n'); 
+                document.getElementById(`outPrice${i}`).innerText = formatCurrency(sPrice);
+                document.getElementById(`outQty${i}`).innerText = sQty;
+                document.getElementById(`outAmt${i}`).innerText = formatCurrency(sAmt);
+
+                // Hide row if quantity is 0
+                document.getElementById(`row${i}`).style.display = sQty > 0 ? '' : 'none';
+            }
+
+            // Calculations
+            const applyGst = document.getElementById('applyGst').checked;
+            const gst = applyGst ? subtotal * 0.10 : 0;
+            const total = subtotal + gst;
+
+            // Update Totals
+            document.getElementById('gstRow').style.display = applyGst ? 'flex' : 'none';
+            document.getElementById('outGst').innerText = formatCurrency(gst);
+            document.getElementById('outTotalTop').innerText = `AUD ${formatCurrency(total)}`;
+            document.getElementById('outTotalBottom').innerText = formatCurrency(total);
+        }
+    </script>
+</body>
+</html>
