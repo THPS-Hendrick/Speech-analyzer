@@ -1,0 +1,18 @@
+{
+  "dailyQuest": {
+    "title": "The 60s Story",
+    "description": "Keep Words Per Sentence under 15 while sharing a personal triumph.",
+    "xp": 50
+  },
+  "prompts": [
+    { "title": "Mastering the pregnant pause.", "time": "3 min", "icon": "mic", "bgColor": "#5B7B61" },
+    { "title": "Weaving in visual storytelling.", "time": "5 min", "icon": "users", "bgColor": "#8B4540" },
+    { "title": "Reducing academic complexity.", "time": "2 min", "icon": "book-open", "bgColor": "#718DA2" },
+    { "title": "Volume and Pace variety run.", "time": "4 min", "icon": "activity", "bgColor": "#D4AF37" }
+  ],
+  "trophies": [
+    { "id": "speed_demon", "title": "Speed Demon", "desc": "Sustain a perfect Syllable/Sec rate (3-5) for 5 consecutive speeches.", "icon": "zap", "achieved": true },
+    { "id": "the_painter", "title": "The Painter", "desc": "Hit >40% Visual Content in a single speech lasting over 60 seconds.", "icon": "image", "achieved": false },
+    { "id": "plain_english", "title": "Plain English", "desc": "Achieve a Reading Grade under 8 and >90% Simple words.", "icon": "scissors", "achieved": false }
+  ]
+}
