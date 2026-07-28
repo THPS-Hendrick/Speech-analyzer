@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadContentAndRender(userData, userRef) {
         try {
-            const response = await fetch('content.json');
+            const response = await fetch('content.json?v=2');
             const data = await response.json();
             
             // Render Daily Talk
