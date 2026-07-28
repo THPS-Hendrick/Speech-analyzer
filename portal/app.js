@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             console.log("Logged in as Anonymous UID:", user.uid);
-            document.getElementById('user-initial').innerText = "U"; // 'U' for User, since they are anonymous
+            document.getElementById('user-initial').innerText = "T"; // 
             
             // 2. Fetch or Create Database Profile
             const userRef = doc(db, "users", user.uid);
