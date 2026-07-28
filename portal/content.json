@@ -5,11 +5,31 @@
     "xp": 50
   },
   "prompts": [
-    { "title": "Mastering the pregnant pause.", "time": "3 min", "icon": "mic", "bgColor": "#5B7B61" },
-    { "title": "Weaving in visual storytelling.", "time": "5 min", "icon": "users", "bgColor": "#8B4540" },
-    { "title": "Reducing academic complexity.", "time": "2 min", "icon": "book-open", "bgColor": "#718DA2" },
-    { "title": "Volume and Pace variety run.", "time": "4 min", "icon": "activity", "bgColor": "#D4AF37" }
+    { "id": "truth", "title": "You can't handle the truth!", "tags": ["Delivery", "Mumble"], "xp": 100, "icon": "mic", "bgColor": "#5B7B61" },
+    { "id": "visual", "title": "Weaving in visual storytelling.", "time": "5 min", "icon": "users", "bgColor": "#8B4540" },
+    { "id": "academic", "title": "Reducing academic complexity.", "time": "2 min", "icon": "book-open", "bgColor": "#718DA2" },
+    { "id": "volume", "title": "Volume and Pace variety run.", "time": "4 min", "icon": "activity", "bgColor": "#D4AF37" }
   ],
+  "truthChallenge": {
+    "title": "Jack Nicholson - A Few Good Men",
+    "description": "One Extreme (5)... Another Extreme (1) then Recover (3)",
+    "lines": [
+      { "intensity": 5, "text": "You can't handle the truth!!" },
+      { "intensity": 1, "text": "Son, we live in a world that has walls and those walls have to be guarded by men with guns." },
+      { "intensity": 3, "text": "Whose gonna do it? You?" },
+      { "intensity": 5, "text": "You Lieutenant Wineburg?" },
+      { "intensity": 3, "text": "I have a greater responsibility than you can possibly fathom. You weep for Santiago and you curse the marines." },
+      { "intensity": 5, "text": "You have that luxury. The luxury of not knowing what I know." },
+      { "intensity": 1, "text": "That Santiago's death, while tragic" },
+      { "intensity": 5, "text": "--probably saved lives!" },
+      { "intensity": 3, "text": "And my existence, although gro-tesque and incomprehensible to you," },
+      { "intensity": 5, "text": "saves lives!!" },
+      { "intensity": 1, "text": "You don't want the truth because deep down in places you don't talk about at parties, you want me on that wall. You need me on that wall." },
+      { "intensity": 3, "text": "We use words like Honour, code, loyalty." },
+      { "intensity": 5, "text": "We use those words as the backbone of a life spent defending something." },
+      { "intensity": 1, "text": "... You use them as a punchline." }
+    ]
+  },
   "trophies": [
     { "id": "speed_demon", "title": "Speed Demon", "desc": "Sustain a perfect Syllable/Sec rate (3-5) for 5 consecutive speeches.", "icon": "zap", "achieved": true },
     { "id": "the_painter", "title": "The Painter", "desc": "Hit >40% Visual Content in a single speech lasting over 60 seconds.", "icon": "image", "achieved": false },
