@@ -22,7 +22,7 @@ let currentPrompterLine = 0;
 // Prompter State Variables
 let timerInterval;
 let elapsedMs = 0;
-const maxDurationMs = 30000; // Simulated 30-second max fill for progress bar
+const maxDurationMs = 30000; 
 let isRecording = false;
 
 function getWreathColorClass(xp) {
@@ -33,6 +33,19 @@ function getWreathColorClass(xp) {
     if (xp >= 100) return 'wreath-green';
     return 'wreath-yellow'; 
 }
+
+// Resets buttons to their default state: Green Go, White Tips, Black Next
+const resetChallengeButtons = () => {
+    const btnGo = document.getElementById('btn-go');
+    btnGo.className = 'flex-1 bg-green-500 text-white shadow-[0_4px_0_0_#16a34a] active:shadow-none active:translate-y-[4px] rounded-2xl py-3 px-1 font-bold text-sm flex flex-col items-center justify-center transition-all';
+    document.getElementById('text-go').innerText = 'Go!';
+    document.getElementById('icon-go').setAttribute('data-lucide', 'mic');
+
+    const btnNext = document.getElementById('btn-next');
+    btnNext.className = 'flex-1 bg-[#1f2937] text-white shadow-[0_4px_0_0_#111827] active:shadow-none active:translate-y-[4px] rounded-2xl py-3 px-1 font-bold text-sm flex flex-col items-center justify-center transition-all';
+    
+    if (window.lucide) window.lucide.createIcons();
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -50,8 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (userSnap.exists()) {
                 userData = userSnap.data();
+                // Patch in arrays if they don't exist for legacy testing accounts
+                if (!userData.completedChallenges) userData.completedChallenges = [];
             } else {
-                userData = { xp: 0, streak: 1, unlockedTrophies: [] };
+                userData = { xp: 0, streak: 1, unlockedTrophies: [], completedChallenges: [] };
                 await setDoc(userRef, userData);
             }
 
@@ -69,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadContentAndRender(userData, userRef) {
         try {
-            const response = await fetch('content.json?v=4'); // Cache buster bumped
+            const response = await fetch('content.json?v=5'); // Cache buster bumped
             const data = await response.json();
             
             document.getElementById('talk-title').innerText = data.dailyTalk.title;
@@ -107,6 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wire up Challenge Prompt & Reset States
             document.getElementById('prompt-truth')?.addEventListener('click', () => {
                 challengeData = data.truthChallenge;
+                challengeData.id = "truth"; // Manually inject ID for tracking
+                
                 document.getElementById('prompter-title').innerText = challengeData.title;
                 
                 // Reset Briefing UI States
@@ -114,12 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('challenge-results-area').classList.add('hide');
                 document.getElementById('challenge-score-display').innerHTML = `<span class="text-3xl font-black tracking-tighter">--</span>`;
                 
-                // Reset Button to "Go!"
-                document.getElementById('text-go').innerText = 'Go!';
-                document.getElementById('icon-go').setAttribute('data-lucide', 'mic');
-                if (window.lucide) window.lucide.createIcons();
+                resetChallengeButtons();
 
                 switchTab('challenge');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // "Next" Button logic (Simulates moving to next prompt by resetting current UI)
+            document.getElementById('btn-next').addEventListener('click', () => {
+                // In a future update, this will grab the next item from an array
+                // For now, we simulate "Next" by resetting the view so they can practice again
+                document.getElementById('challenge-video-area').classList.remove('hide');
+                document.getElementById('challenge-results-area').classList.add('hide');
+                document.getElementById('challenge-score-display').innerHTML = `<span class="text-3xl font-black tracking-tighter">--</span>`;
+                resetChallengeButtons();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
@@ -263,14 +288,35 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="text-[10px] font-bold tracking-widest text-[#34D399]">SPS</span>
                         `;
 
-                        // Change Go button to Redo
+                        // --- BUTTON STATE UPDATES (Results View) ---
+                        // Go turns Red (Redo)
+                        const btnGo = document.getElementById('btn-go');
+                        btnGo.className = 'flex-1 bg-[#E3354C] text-white shadow-[0_4px_0_0_#BE1229] active:shadow-none active:translate-y-[4px] rounded-2xl py-3 px-1 font-bold text-sm flex flex-col items-center justify-center transition-all';
                         document.getElementById('text-go').innerText = 'Redo';
                         document.getElementById('icon-go').setAttribute('data-lucide', 'rotate-ccw');
+
+                        // Next turns Green
+                        const btnNext = document.getElementById('btn-next');
+                        btnNext.className = 'flex-1 bg-green-500 text-white shadow-[0_4px_0_0_#16a34a] active:shadow-none active:translate-y-[4px] rounded-2xl py-3 px-1 font-bold text-sm flex flex-col items-center justify-center transition-all';
                         if (window.lucide) window.lucide.createIcons();
 
-                        // Add XP
-                        const newXp = userData.xp + 100; 
-                        await updateDoc(userRef, { xp: newXp }); 
+                        // --- XP DIMINISHING RETURNS ---
+                        const isCompleted = userData.completedChallenges.includes(challengeData.id);
+                        const xpToAward = isCompleted ? 10 : 100;
+                        
+                        // Update UI Reward Pill
+                        document.getElementById('reward-xp-display').innerText = `+${xpToAward} XP`;
+
+                        // Add XP and Update Array
+                        const newXp = userData.xp + xpToAward; 
+                        let updates = { xp: newXp };
+                        
+                        if (!isCompleted) {
+                            userData.completedChallenges.push(challengeData.id);
+                            updates.completedChallenges = userData.completedChallenges;
+                        }
+                        
+                        await updateDoc(userRef, updates); 
                         userData.xp = newXp; 
                         
                         document.getElementById('xp-counter').innerText = `${newXp.toLocaleString()} XP`;
