@@ -5,7 +5,7 @@
     "xp": 50
   },
   "prompts": [
-    { "id": "truth", "title": "You can't handle the truth!", "tags": ["Delivery", "Mumble"], "xp": 100, "icon": "mic", "bgColor": "#5B7B61" },
+    { "id": "truth", "title": "You can't handle the truth!", "tags": ["Delivery", "1"], "xp": 100, "icon": "mic", "bgColor": "#5B7B61" },
     { "id": "visual", "title": "Weaving in visual storytelling.", "time": "5 min", "icon": "users", "bgColor": "#8B4540" },
     { "id": "academic", "title": "Reducing academic complexity.", "time": "2 min", "icon": "book-open", "bgColor": "#718DA2" },
     { "id": "volume", "title": "Volume and Pace variety run.", "time": "4 min", "icon": "activity", "bgColor": "#D4AF37" }
