@@ -27,12 +27,12 @@ h1, h2, h3, .serif {
 }
 
 /* Wreath Colors */
-.wreath-yellow { stroke: #FBBF24; fill: #FBBF24; }
-.wreath-green { stroke: #34D399; fill: #34D399; }
-.wreath-blue { stroke: #60A5FA; fill: #60A5FA; }
-.wreath-red { stroke: #F87171; fill: #F87171; }
-.wreath-silver { stroke: #9CA3AF; fill: #9CA3AF; }
-.wreath-gold { stroke: #D4AF37; fill: #D4AF37; }
+.wreath-yellow { fill: #FBBF24; }
+.wreath-green { fill: #34D399; }
+.wreath-blue { fill: #60A5FA; }
+.wreath-red { fill: #F87171; }
+.wreath-silver { fill: #9CA3AF; }
+.wreath-gold { fill: #D4AF37; }
 
 /* Utilities */
 .hide { display: none !important; }
