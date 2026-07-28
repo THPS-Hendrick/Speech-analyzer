@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userSnap.exists()) {
                 userData = userSnap.data();
             } else {
-                // Brand new user! Create their starting stats
+                // Brand new user! Create their starting stats in Firestore
                 userData = {
                     xp: 0,
                     streak: 1,
@@ -57,9 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('xp-counter').innerText = `${userData.xp.toLocaleString()} XP`;
             document.getElementById('streak-counter').innerText = userData.streak;
 
-            // Change Laurel Wreath color dynamically
+            // Change Laurel Wreath color dynamically based on loaded XP
             const wreathSvg = document.querySelector('svg.drop-shadow-sm');
-            wreathSvg.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(userData.xp)}`;
+            if (wreathSvg) {
+                wreathSvg.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(userData.xp)}`;
+            }
 
             // 4. Fetch the UI Content (JSON) and cross-reference with Database
             loadContentAndRender(userData, userRef);
@@ -84,15 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const startBtn = document.querySelector('.btn-chunky-primary');
             startBtn.addEventListener('click', async () => {
                 const newXp = userData.xp + data.dailyQuest.xp;
-                await updateDoc(userRef, { xp: newXp }); // Save to Firebase
-                userData.xp = newXp; // Update local memory
+                
+                // Update Firebase Database
+                await updateDoc(userRef, { xp: newXp }); 
+                
+                // Update local memory
+                userData.xp = newXp; 
                 
                 // Update UI instantly
                 document.getElementById('xp-counter').innerText = `${newXp.toLocaleString()} XP`;
                 const wreathSvg = document.querySelector('svg.drop-shadow-sm');
-                wreathSvg.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(newXp)}`;
+                if (wreathSvg) {
+                    wreathSvg.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(newXp)}`;
+                }
                 
-                alert(`Boom! +${data.dailyQuest.xp} XP added and saved to Firebase!`);
+                alert(`Boom! +${data.dailyQuest.xp} XP added and saved to Firebase! Check your Firestore console.`);
             });
 
             // Render Prompts
@@ -114,14 +122,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
 
-            // Render Trophies (Cross-referencing Firebase!)
-            const trophiesContainer =Awesome news! Getting Firebase provisioned and ready to go is a massive milestone. 
+            // Render Trophies (Cross-referencing Firebase profile with JSON file!)
+            const trophiesContainer = document.getElementById('trophies-container');
+            trophiesContainer.innerHTML = ''; 
+            
+            data.trophies.forEach(t => {
+                // If the user's database array contains this trophy's ID, it is unlocked
+                const isUnlocked = userData.unlockedTrophies.includes(t.id);
+                
+                const opacity = isUnlocked ? 'opacity-100' : 'opacity-60 bg-slate-100/50';
+                const border = isUnlocked ? 'border-l-4 border-l-green-400 bg-white' : 'border border-slate-200';
+                const iconBg = isUnlocked ? 'bg-green-100 text-green-500' : 'bg-slate-200 text-slate-400';
+                
+                trophiesContainer.innerHTML += `
+                    <div class="flex gap-4 p-4 rounded-2xl shadow-sm ${border} ${opacity}">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${iconBg}">
+                            <i data-lucide="${t.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm ${!isUnlocked ? 'text-slate-500' : ''}">${t.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1">${t.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
 
-Since I don't have our previous project roadmap in front of me, I want to make sure we're perfectly aligned before we start writing code. Typically, right after the database is set up, the next phase tackles one of these core areas:
+            if (window.lucide) window.lucide.createIcons(); // Initialize loaded icons
+        } catch (error) {
+            console.error("Failed to load content.json", error);
+        }
+    }
 
-*   **Database Integration:** Writing the CRUD (Create, Read, Update, Delete) operations to connect your frontend (React, Flutter, etc.) to Firebase.
-*   **Authentication:** Locking things down and managing user sign-ups/logins with Firebase Auth.
-*   **Security Rules:** Securing your Firestore or Realtime Database endpoints so only authorized users can read or write data.
-*   **Real-time Listeners:** Hooking up subscriptions so your app's UI updates automatically the second your database changes.
+    // Navigation Listeners
+    const drawer = document.getElementById('trophy-drawer');
+    const overlay = document.getElementById('drawer-overlay');
 
-To make sure we hit the ground running, what exactly is on the docket for our Phase 3? Tell me what we're building or configuring next, and we'll dive right in!
+    const toggleDrawer = () => {
+        drawer.classList.toggle('translate-x-full');
+        overlay.classList.toggle('hide');
+    };
+
+    document.getElementById('trigger-drawer').addEventListener('click', toggleDrawer);
+    document.getElementById('nav-trophies').addEventListener('click', toggleDrawer);
+    document.getElementById('close-drawer').addEventListener('click', toggleDrawer);
+    overlay.addEventListener('click', toggleDrawer);
+
+    const switchTab = (tab) => {
+        document.getElementById('view-home').classList.add('hide');
+        document.getElementById('view-stats').classList.add('hide');
+        document.getElementById('nav-home').classList.replace('text-slate-800', 'text-slate-400');
+        document.getElementById('nav-stats').classList.replace('text-slate-800', 'text-slate-400');
+
+        document.getElementById(`view-${tab}`).classList.remove('hide');
+        document.getElementById(`nav-${tab}`).classList.replace('text-slate-400', 'text-slate-800');
+    };
+
+    document.getElementById('nav-home').addEventListener('click', () => switchTab('home'));
+    document.getElementById('nav-stats').addEventListener('click', () => switchTab('stats'));
+});
