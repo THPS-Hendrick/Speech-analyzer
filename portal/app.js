@@ -16,9 +16,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Global State
 let challengeData = null;
 let currentPrompterLine = 0;
+
+// Prompter State Variables
+let timerInterval;
+let elapsedMs = 0;
+const maxDurationMs = 30000; // Simulated 30-second max fill for progress bar
+let isRecording = false;
 
 function getWreathColorClass(xp) {
     if (xp >= 10000) return 'wreath-gold';
@@ -31,7 +36,6 @@ function getWreathColorClass(xp) {
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Inject the Laurel Wreath SVGs
     document.querySelectorAll('.wreath-container').forEach(container => {
         container.innerHTML = wreathSVG;
     });
@@ -65,15 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadContentAndRender(userData, userRef) {
         try {
-            const response = await fetch('content.json?v=3'); // Cache buster bumped
+            const response = await fetch('content.json?v=4'); // Cache buster bumped
             const data = await response.json();
             
-            // Render Daily Talk
             document.getElementById('talk-title').innerText = data.dailyTalk.title;
             document.getElementById('talk-desc').innerText = data.dailyTalk.description;
             document.getElementById('talk-xp').innerText = "+" + data.dailyTalk.xp;
 
-            // Render Prompts with new Tags & XP logic
             const promptsContainer = document.getElementById('prompts-container');
             promptsContainer.innerHTML = ''; 
             
@@ -96,18 +98,29 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${metaHtml}
                         </div>
                         <div class="p-4 flex-1 flex items-center">
-                            <p class="text-sm font-bold leading-tight text-slate-700">${prompt.title}</p>
+                            <p class="text-sm font-medium leading-tight text-slate-800">${prompt.title}</p>
                         </div>
                     </div>
                 `;
             });
 
-            // Wire up the new Challenge Prompt
+            // Wire up Challenge Prompt & Reset States
             document.getElementById('prompt-truth')?.addEventListener('click', () => {
                 challengeData = data.truthChallenge;
                 document.getElementById('prompter-title').innerText = challengeData.title;
+                
+                // Reset Briefing UI States
+                document.getElementById('challenge-video-area').classList.remove('hide');
+                document.getElementById('challenge-results-area').classList.add('hide');
+                document.getElementById('challenge-score-display').innerHTML = `<span class="text-3xl font-black tracking-tighter">--</span>`;
+                
+                // Reset Button to "Go!"
+                document.getElementById('text-go').innerText = 'Go!';
+                document.getElementById('icon-go').setAttribute('data-lucide', 'mic');
+                if (window.lucide) window.lucide.createIcons();
+
                 switchTab('challenge');
-                window.scrollTo(0,0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             // Render Trophies
@@ -135,15 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) window.lucide.createIcons();
 
             // --- TELEPROMPTER LOGIC ---
-            
             const renderPrompterScript = () => {
                 const container = document.getElementById('prompter-script');
                 container.innerHTML = '';
                 
                 challengeData.lines.forEach((line, index) => {
                     const isActive = index === currentPrompterLine;
-                    
-                    // Exact colors mapped from screenshot
                     const colors = {
                         1: { pill: "bg-[#CAB4F4]", activePill: "bg-[#B08DF0]", border: "border-[#B08DF0]" },
                         3: { pill: "bg-[#A7E6CE]", activePill: "bg-[#71D6B4]", border: "border-[#71D6B4]" },
@@ -169,6 +179,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             };
 
+            const resetPrompterToReady = () => {
+                clearInterval(timerInterval);
+                elapsedMs = 0;
+                isRecording = false;
+                document.getElementById('prompter-progress').style.width = '0%';
+                
+                const actionBtn = document.getElementById('btn-prompter-action');
+                actionBtn.className = 'bg-green-500 text-white px-8 py-3 rounded-full font-bold text-lg flex items-center gap-2 active:scale-95 transition-all shadow-md';
+                document.getElementById('text-prompter-action').innerText = 'Start';
+                
+                const iconContainer = document.getElementById('icon-prompter-action');
+                iconContainer.setAttribute('data-lucide', 'play');
+                if (window.lucide) window.lucide.createIcons();
+                
+                currentPrompterLine = 0;
+                renderPrompterScript();
+            };
+
             document.getElementById('btn-prompter-down').addEventListener('click', () => {
                 if (currentPrompterLine < challengeData.lines.length - 1) {
                     currentPrompterLine++;
@@ -183,45 +211,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // Open Prompter Drawer
             document.getElementById('btn-go').addEventListener('click', () => {
-                currentPrompterLine = 0;
-                renderPrompterScript();
+                resetPrompterToReady();
                 document.getElementById('prompter-drawer').classList.remove('-translate-x-full');
             });
 
-            // --- THE PROCESSING & RESULTS FLOW ---
-            
-            document.getElementById('btn-prompter-stop').addEventListener('click', () => {
-                document.getElementById('prompter-drawer').classList.add('-translate-x-full'); // Hide prompter
-                document.getElementById('view-loading').classList.remove('hide'); // Show loader
-                
-                // Simulate backend NLP processing delay
-                setTimeout(async () => {
-                    document.getElementById('view-loading').classList.add('hide'); // Hide loader
-                    
-                    // Update Pill with Green Winning Score
-                    document.getElementById('challenge-score-display').innerHTML = `
-                        <span class="text-3xl font-black tracking-tighter text-[#34D399]">4.2</span>
-                        <span class="text-[10px] font-bold tracking-widest text-[#34D399]">SPS</span>
-                    `;
-
-                    // Update XP
-                    const newXp = userData.xp + 100; 
-                    await updateDoc(userRef, { xp: newXp }); 
-                    userData.xp = newXp; 
-                    
-                    document.getElementById('xp-counter').innerText = `${newXp.toLocaleString()} XP`;
-                    const topWreath = document.querySelector('header .wreath-container svg');
-                    if (topWreath) topWreath.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(newXp)}`;
-                    
-                    document.getElementById('view-results').classList.remove('hide'); // Show grand reveal
-                }, 3000); 
+            // Close/Abandon Prompter Drawer
+            document.getElementById('btn-close-prompter').addEventListener('click', () => {
+                resetPrompterToReady();
+                document.getElementById('prompter-drawer').classList.add('-translate-x-full');
             });
 
-            document.getElementById('btn-finish-challenge').addEventListener('click', () => {
-                document.getElementById('view-results').classList.add('hide');
-                document.getElementById('challenge-score-display').innerHTML = `<span class="text-3xl font-black tracking-tighter">--</span>`; // Reset pill
-                switchTab('home');
+            // Start/Stop Timer Logic
+            document.getElementById('btn-prompter-action').addEventListener('click', () => {
+                if (!isRecording) {
+                    // Turn to Red Stop state
+                    isRecording = true;
+                    const actionBtn = document.getElementById('btn-prompter-action');
+                    actionBtn.className = 'bg-[#E3354C] text-white px-8 py-3 rounded-full font-bold text-lg flex items-center gap-2 active:scale-95 transition-all shadow-md';
+                    document.getElementById('text-prompter-action').innerText = 'Stop';
+                    
+                    document.getElementById('icon-prompter-action').setAttribute('data-lucide', 'square');
+                    if (window.lucide) window.lucide.createIcons();
+
+                    const startTime = Date.now();
+                    timerInterval = setInterval(() => {
+                        elapsedMs = Date.now() - startTime;
+                        let percentage = (elapsedMs / maxDurationMs) * 100;
+                        if (percentage > 100) percentage = 100;
+                        document.getElementById('prompter-progress').style.width = `${percentage}%`;
+                    }, 100);
+
+                } else {
+                    // User Hit Stop - Process Flow
+                    resetPrompterToReady();
+                    document.getElementById('prompter-drawer').classList.add('-translate-x-full'); 
+                    document.getElementById('view-loading').classList.remove('hide'); 
+                    
+                    // Simulate processing
+                    setTimeout(async () => {
+                        document.getElementById('view-loading').classList.add('hide'); 
+                        
+                        // Switch inline area to Results
+                        document.getElementById('challenge-video-area').classList.add('hide');
+                        document.getElementById('challenge-results-area').classList.remove('hide');
+
+                        // Update Pill with Score
+                        document.getElementById('challenge-score-display').innerHTML = `
+                            <span class="text-3xl font-black tracking-tighter text-[#34D399]">4.2</span>
+                            <span class="text-[10px] font-bold tracking-widest text-[#34D399]">SPS</span>
+                        `;
+
+                        // Change Go button to Redo
+                        document.getElementById('text-go').innerText = 'Redo';
+                        document.getElementById('icon-go').setAttribute('data-lucide', 'rotate-ccw');
+                        if (window.lucide) window.lucide.createIcons();
+
+                        // Add XP
+                        const newXp = userData.xp + 100; 
+                        await updateDoc(userRef, { xp: newXp }); 
+                        userData.xp = newXp; 
+                        
+                        document.getElementById('xp-counter').innerText = `${newXp.toLocaleString()} XP`;
+                        const topWreath = document.querySelector('header .wreath-container svg');
+                        if (topWreath) topWreath.className.baseVal = `w-full h-full drop-shadow-sm ${getWreathColorClass(newXp)}`;
+                        
+                    }, 3000); 
+                }
             });
 
         } catch (error) {
