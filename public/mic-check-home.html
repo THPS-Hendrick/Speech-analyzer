@@ -49,7 +49,7 @@
 
     <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
         
-        <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-0">
             <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
                 <div class="w-full h-full min-h-[3rem] bg-[#AA0000] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#AA0000]">
                     <span class="text-[11px] font-black uppercase tracking-widest text-white">Want unlimited Mic-Checks?</span>
@@ -63,7 +63,7 @@
                 <div class="w-full h-full min-h-[3rem] bg-[#047857] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#047857]">
                     <span class="text-[11px] font-black uppercase tracking-widest text-white">or $90 per year!</span>
                 </div>
-                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab8]">
                     <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Games, Courses, Discounts & More!</span>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                 </button>
             </div>
         </div>
-        <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-0">
             <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
                 <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
                     <span class="text-[11px] font-black uppercase tracking-widest text-[#AA0000]">Mic-Check Copyright <span id="copyright-year"></span></span>
@@ -101,7 +101,7 @@
                 <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
                     <span class="text-[11px] font-black uppercase tracking-widest text-[#047857]">All rights reserved</span>
                 </div>
-                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab8]">
                     <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Card game available now!</span>
                 </div>
             </div>
@@ -153,7 +153,7 @@
 
         <div class="w-full flex-grow perspective group mb-1">
             <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
-                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300"></div>
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-0"></div>
                 </div>
         </div>
 
@@ -166,7 +166,7 @@
         <button onclick="toggleLegalOverlay()" id="legal-btn" class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
             Legal
         </button>
-        <button onclick="resetGame()" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+        <button onclick="resetGame()" class="px-6 py-2 bg-slate-0 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
             Reset
         </button>
     </div>
@@ -253,7 +253,7 @@
         const p4TipsContent = [
             "<strong>Pace:</strong> Aim for 100-150 words per minute. If you speak faster, you risk overwhelming the listener. Slower, and you lose their attention.",
             "<strong>Mumble:</strong> Syllables per second (SPS). Keep it between 3.0 and 5.0. Open your mouth wider to hit those hard consonants.",
-            "<strong>Pause:</strong> Aim for 10-30% pause time. Silence is powerful—use it to let your audience digest your points.",
+            "<strong>Pause:</strong> Aim for 10-35% pause time. Silence is powerful—use it to let your audience digest your points.",
             "<strong>Personal:</strong> Use 'I', 'Me', 'He', "She", etc to talk about a specific person. Aim for 30-60% personal content.",
             "<strong>Visual:</strong> Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.",
             "<strong>Abstract:</strong> Don't get lost in the clouds. Keep complex, theoretical concepts to a minimum (10-30%).",
