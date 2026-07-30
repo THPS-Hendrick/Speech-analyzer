@@ -11,7 +11,7 @@
   },
   "Pause": {
     "low": { "you": "Barely breathed", "try": "Pause 15%+ of time", "why": "Lets ideas sink in" },
-    "high": { "you": "Long silences", "try": "Keep pauses under 30%", "why": "Maintains momentum" },
+    "high": { "you": "Long silences", "try": "Keep pauses under 35%", "why": "Maintains momentum" },
     "perfect": { "you": "Great breathing", "try": "Keep this cadence", "why": "Powerful emphasis" }
   },
   "Personal": {
