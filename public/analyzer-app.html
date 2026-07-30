@@ -414,7 +414,7 @@
             "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
             "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
             "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
-            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 30%+ Visual descriptions.",
+            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 20%+ Visual descriptions.",
             "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
             "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words.",
             "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time.",
@@ -422,7 +422,7 @@
             "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%.",
             "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
             "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
-            "Pause %": "The percentage of time you spend silent. Aim for 10-30%.",
+            "Pause %": "The percentage of time you spend silent. Aim for 10-35%.",
             "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
             "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
             "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
@@ -762,7 +762,7 @@
                     else totalPoints += 1;
 
                     if (pausePercent < 10) totalPoints += 0.25; 
-                    else if (pausePercent > 30) totalPoints += 0.75; 
+                    else if (pausePercent > 35) totalPoints += 0.75; 
                     else totalPoints += 1;
                 } else {
                     overrideGrade = true;
@@ -850,7 +850,7 @@
             }
             if (key === 'wpm') return (val >= 100 && val <= 150) ? 1 : (val < 100 ? 0.75 : 0.25);
             if (key === 'sps') return (val >= 3 && val <= 5) ? 1 : (val < 3 ? 0.75 : 0.25);
-            if (key === 'pause') return (val >= 10 && val <= 30) ? 1 : (val > 30 ? 0.75 : 0.25);
+            if (key === 'pause') return (val >= 10 && val <= 35) ? 1 : (val > 35 ? 0.75 : 0.25);
             if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
             if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
             if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
