@@ -2,1091 +2,1093 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speech Analyzer App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Mic-Check: Logic Engine (V24.1 - Master Dashboard)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-engine-headless.js"></script>
+    
     <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    
-    <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/thps-ai-coach.js"></script>   
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/text-input.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/tangible-text.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-graph.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-timeline.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/upload-speech.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/compare-speech.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/course-widget.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/diagnostic.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/edit-mode.js"></script>
-    
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/visual-balance.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/signal-noise.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/sentence-complexity.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/simple-language.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
 
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-mumble.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
-    
     <style>
-        /* DASHBOARD LOCK PROTECTION */
-        #thps-dashboard-grid:not(.edit-mode-active) .thps-close-btn { display: none !important; }
-        #thps-dashboard-grid:not(.edit-mode-active) .cursor-move { cursor: default !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: transparent; 
+        }
+
+        .perspective { perspective: 1200px; }
+        
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .flip-active { transform: rotateX(180deg); }
+
+        .face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .face-front { background-color: #ffffff; border: 1px solid #e2e8f0; }
+        .face-back { transform: rotateX(180deg); background-color: #f8fafc; border: 1px solid #cbd5e1; }
     </style>
 </head>
-<body class="w-full mx-auto min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
+<body class="flex flex-col items-center justify-center min-h-screen">
 
-    <textarea id="cba-inputText" class="hidden"></textarea>
-
-    <!-- UI OVERLAYS -->
-    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
-
-    <!-- NEW: ANALYZING AUDIO OVERLAY -->
-    <div id="cba-processing-panel" class="hidden fixed inset-0 z-[10000] bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-center px-4 transition-all duration-300">
-        <div class="score-card glass-panel p-8 rounded-2xl border-t-4 border-blue-500 shadow-2xl bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center max-w-lg w-full">
-            <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner">
-                <i data-lucide="refresh-cw" class="w-8 h-8 text-blue-600 animate-spin"></i>
-                <i data-lucide="mic" class="w-4 h-4 text-blue-800 absolute"></i>
-            </div>
-            <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-slate-800 drop-shadow-sm text-center">Analyzing Audio...</h2>
-            <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
-        </div>
-    </div>
-
-    <!-- DRAWERS -->
-    <div id="history-menu-drawer" class="fixed top-[0] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
-        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
-                    <i data-lucide="history" class="w-4 h-4"></i>
+    <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
+        
+        <!-- HUB OVERLAY START -->
+        <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] bg-[#AA0000] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#AA0000]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Want unlimited Mic-Checks?</span>
                 </div>
-                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Session History</h2>
+                <div class="w-full h-full min-h-[3rem] bg-[#9333EA] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#9333EA]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Become a member today!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#2563EB] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#2563EB]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">Only $9 per month</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#047857] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#047857]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white">or $90 per year!</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Games, Courses, Discounts & More!</span>
+                </div>
             </div>
-            <button onclick="window.closeAllMenus()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-
-        <div class="flex w-full border-b border-slate-200 bg-white">
-            <button onclick="window.switchHistoryTab('list')" id="hist-tab-btn-list" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors">List</button>
-            <button onclick="window.switchHistoryTab('avg')" id="hist-tab-btn-avg" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Avg</button>
-            <button onclick="window.switchHistoryTab('best')" id="hist-tab-btn-best" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Best</button>
             
-            <button onclick="window.spawnCompareWidget()" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-1">
-                <i data-lucide="scale" class="w-3 h-3 hidden sm:block"></i> VS
-            </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-            <div id="hist-tab-content-list" class="block space-y-3">
+            <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-4 mb-1 p-5">
+                <div class="flex w-full justify-between items-center px-2">
+                    <div class="flex flex-col items-start text-left">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Monthly Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$9</span>
+                        <span class="text-[9px] font-medium text-slate-400">(Cancel anytime)</span>
+                    </div>
+                    <div class="w-[1px] h-12 bg-slate-200"></div>
+                    <div class="flex flex-col items-end text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Annual Plan</span>
+                        <span class="text-2xl font-black text-slate-800">AUD$90</span>
+                        <span class="text-[9px] font-black text-amber-500">(Most popular)</span>
+                    </div>
                 </div>
-            <div id="hist-tab-content-avg" class="hidden">
-                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
-            </div>
-            <div id="hist-tab-content-best" class="hidden">
-                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
+                <button onclick="window.location.href='https://tomhendrick.com/members'" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest text-[11px] rounded-[0.85rem] shadow-md transition-all active:scale-95 mt-2">
+                    Get Unlimited Mic-Checks
+                </button>
             </div>
         </div>
-    </div>
+        <!-- HUB OVERLAY END -->
 
-    <div id="widget-menu-drawer" class="fixed top-[0] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
-        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+        <!-- LEGAL OVERLAY START -->
+        <div id="legal-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
+            <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#AA0000]">Mic-Check Copyright <span id="copyright-year"></span></span>
                 </div>
-                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Widget Library</h2>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#9333EA]">is owned & exclusively licensed by:</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#2563EB]">Talent Academy Pty Ltd & Tom Hendrick</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-white rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-slate-200">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-[#047857]">All rights reserved</span>
+                </div>
+                <div class="w-full h-full min-h-[3rem] bg-[#F4B532] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#eab308]">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-slate-900">Card game available now!</span>
+                </div>
             </div>
-            <button onclick="window.closeAllMenus()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-
-        <div class="flex w-full border-b border-slate-200 bg-white">
-            <button onclick="window.switchWidgetTab('small')" id="tab-btn-small" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Small</button>
-            <button onclick="window.switchWidgetTab('medium')" id="tab-btn-medium" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Medium</button>
-            <button onclick="window.switchWidgetTab('large')" id="tab-btn-large" class="flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors">Large</button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
             
-            <!-- Default hidden for visual alignment -->
-            <div id="tab-content-small" class="hidden space-y-8">
-               <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                      <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-intangible', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Intangible Pill
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pace', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pace Pill
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-mumble', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Mumble Pill
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-pause', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Pause Pill
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-wps', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-violet-600 bg-white shadow-sm hover:border-violet-400 hover:bg-violet-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Words/Sent Pill
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-grade', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Comp Grade Pill
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-content-medium" class="hidden space-y-8">
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-wpm-graph', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-amber-600 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> WPM Graph
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-personal-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Personal Balance
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-visual-balance', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Visual Balance
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-gauge-mumble', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Gauge
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-mumble-card', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Mumble Card
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-ai-coach', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="bot" class="w-4 h-4 mb-1"></i> AI Vocal Coach
-                        </div>
-                    </div>
-                </div>
-                 <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-signal-noise', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Signal Noise
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-sentence-complexity', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Sent. Complex
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-simple-language', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Simple Lang.
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-google-benchmark', 'w-full md:w-[calc(50%-0.5rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-600 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Google 10K
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Default block for visual alignment -->
-            <div id="tab-content-large" class="block space-y-8">
-                 <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-diagnostic', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="stethoscope" class="w-4 h-4 mb-1"></i> Diagnostic Course
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-report-card', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="file-text" class="w-4 h-4 mb-1"></i> Report Card
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-course-widget', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="graduation-cap" class="w-4 h-4 mb-1"></i> Courses
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-live-mic-timer', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Live Mic Timer
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-text-input', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Text Input
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-upload-speech', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Upload Speech
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> DELIVERY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-voice-graph', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Voice Graph
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-voice-timeline', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Voice Timeline
-                        </div>
-                    </div>
-                </div>
-                 <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-score-summary', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Score Summary
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-tangible-text', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Tangible Text
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Compare Speech
-                        </div>
-                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-edit-mode', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
-                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Edit Mode
-                        </div>
-                    </div>
-                </div>
+            <div class="w-full flex-grow rounded-[1.25rem] bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-6 mb-1 p-6">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5bQi-Ani7eWjmKDT44EshxHMyolXHeiklREPCJkC3sQ&s=10" alt="Talent Academy" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
+                <div class="w-1/2 h-[1px] bg-slate-200"></div>
+                <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick" class="max-h-[80px] w-auto object-contain drop-shadow-sm" />
             </div>
         </div>
-    </div>
+        <!-- LEGAL OVERLAY END -->
 
-    <div class="max-w-4xl mx-auto w-full mt-4 md:mt-8 px-2 flex flex-col items-center">
-        <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mb-6"></div>
-    </div>
+        <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3 perspective" style="height: 55%;">
+            
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(1)">
+                <div id="bar-1" class="flipper">
+                    <div id="p1-front" class="face face-front"></div>
+                    <div id="p1-back" class="face face-back"></div>
+                </div>
+            </div>
 
-    <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
-        <div class="flex flex-col space-y-6 sm:space-y-8">
-            <div id="cba-resultsContainer" class="flex flex-col space-y-6 sm:space-y-8 mt-4">
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(2)">
+                <div id="bar-2" class="flipper">
+                    <div id="p2-front" class="face face-front"></div>
+                    <div id="p2-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(3)">
+                <div id="bar-3" class="flipper">
+                    <div id="p3-front" class="face face-front"></div>
+                    <div id="p3-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(4)">
+                <div id="bar-4" class="flipper">
+                    <div id="p4-front" class="face face-front"></div>
+                    <div id="p4-back" class="face face-back"></div>
+                </div>
+            </div>
+
+            <div class="w-full h-full min-h-[3rem] cursor-pointer group" onclick="toggleFlip(5)">
+                <div id="bar-5" class="flipper">
+                    <div id="p5-front" class="face face-front overflow-hidden"></div>
+                    <div id="p5-back" class="face face-back"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-full flex-grow perspective group mb-1">
+            <div id="bar-6" class="flipper rounded-[1.25rem] shadow-inner transition-transform duration-700">
                 
-                <div class="w-full">
-                    <div class="flex justify-between items-end mb-4 border-b border-slate-200 pb-3">
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Tools</h2>
-                            <p class="text-xs text-slate-500 mt-1">Measure your speech.</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200">
-                                <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
-                                <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
-                            </button>
-                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200">
-                                <i data-lucide="history" class="w-4 h-4"></i>
-                                <span>History: <span id="history-count">0</span></span>
-                            </button>
-                            <button onclick="window.toggleWidgetMenu()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group">
-                                <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
-                                <span class="hidden sm:inline">Add Widget</span>
-                            </button>
-                        </div>
+                <div id="p6-front" class="face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300"></div>
+
+                <div id="p6-back" class="face face-back bg-[#111827] border-gray-800 rounded-[1.25rem]">
+                    <video id="camera-feed" autoplay playsinline muted class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 z-0"></video>
+                    
+                    <div id="camera-trigger-area" onclick="toggleCamera();" class="absolute inset-0 z-10 cursor-pointer"></div>
+                    
+                    <div id="camera-status-container" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-gray-500 flex flex-col items-center z-20 transition-opacity duration-500">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                        <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>
                     </div>
 
-                    <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
+                    <button onclick="toggleFlip(6);" class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors z-30 p-1 cursor-pointer">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                    </button>
 
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-course-widget></thps-course-widget>
-                        </div>
+                    <div id="p6-camera-grade-overlay" class="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none opacity-0 transition-opacity duration-300"></div>
 
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-live-mic></thps-live-mic>
-                        </div>
-                        
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-score-summary></thps-score-summary>
-                        </div>
-
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-voice-graph title="Voice Graph"></thps-voice-graph>
-                        </div>
-     
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-voice-timeline title="Voice Timeline"></thps-voice-graph>
-                        </div>
-                        
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-tangible-text></thps-tangible-text>
-                        </div>
-                        
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-edit-mode></thps-edit-mode>
-                        </div>
-                    </div>
+                    <div id="countdown-overlay-back" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white text-5xl font-black opacity-0 transition-opacity duration-200 drop-shadow-2xl z-40 tracking-widest uppercase text-center leading-tight"></div>
                 </div>
 
             </div>
         </div>
+
+    </div>
+
+    <div class="mt-8 flex gap-4">
+        <button onclick="toggleHubOverlay()" id="hub-btn" class="px-6 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-500 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95 flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub
+        </button>
+        <button onclick="toggleLegalOverlay()" id="legal-btn" class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            Legal
+        </button>
+        <button onclick="resetGame()" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full shadow-sm transition-all active:scale-95">
+            Reset
+        </button>
     </div>
 
     <script>
-        lucide.createIcons();
+        // --- GLOBAL VARIABLES ---
+        let globalShortDate = "";
         
-        window.gameTimerInterval = null;
-        window.isActive = false;
-        let reportMarkdownText = "";
-
-        // ==========================================
-        // HISTORY STATE
-        // ==========================================
-        window.thps_sessionHistory = [];
-        window.thps_currentAttemptId = 1;
-
-        // ==========================================
-        // EDIT MODE (LOCK/UNLOCK) LOGIC
-        // ==========================================
-        window.thps_editMode = false; // Locked by default
-
-        window.toggleEditMode = function() {
-            window.thps_editMode = !window.thps_editMode;
-            const grid = document.getElementById('thps-dashboard-grid');
-            const btnIcon = document.getElementById('edit-mode-icon');
-            const btnText = document.getElementById('edit-mode-text');
-            const btnEl = document.getElementById('toggle-edit-mode-btn');
-
-            if (window.thps_editMode) {
-                grid.classList.add('edit-mode-active');
-                btnIcon.setAttribute('data-lucide', 'unlock');
-                btnText.innerText = 'Edit Mode';
-                btnEl.classList.replace('bg-slate-100', 'bg-rose-100');
-                btnEl.classList.replace('text-slate-500', 'text-rose-600');
-                btnEl.classList.replace('border-slate-200', 'border-rose-200');
-                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", false);
-            } else {
-                grid.classList.remove('edit-mode-active');
-                btnIcon.setAttribute('data-lucide', 'lock');
-                btnText.innerText = 'Locked';
-                btnEl.classList.replace('bg-rose-100', 'bg-slate-100');
-                btnEl.classList.replace('text-rose-600', 'text-slate-500');
-                btnEl.classList.replace('border-rose-200', 'border-slate-200');
-                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", true);
-            }
-            if (window.lucide) window.lucide.createIcons();
+        // --- STATE ENGINE & COLORS ---
+        const col = {
+            p1: 'bg-[#AA0000]', textP1: 'text-[#AA0000]', borderP1: 'border-[#AA0000]',
+            p2: 'bg-[#9333EA]', textP2: 'text-[#9333EA]', borderP2: 'border-[#9333EA]',
+            p3: 'bg-[#2563EB]', textP3: 'text-[#2563EB]', borderP3: 'border-[#2563EB]',
+            p4: 'bg-[#047857]', textP4: 'text-[#047857]', borderP4: 'border-[#047857]',
+            p5: 'bg-[#F4B532]', textP5: 'text-[#F4B532]', borderP5: 'border-[#F4B532]',
+            w: 'bg-white', textW: 'text-white', borderW: 'border-slate-200',
+            b: 'bg-slate-900', textB: 'text-slate-800'
         };
 
-        // Failsafe: Ensure it locks automatically on load
-        setTimeout(() => {
-            if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
-                window.THPS.Dashboard.sortableInstance.option("disabled", true);
-            }
-        }, 1000);
-
-        const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
-        let explanationsData = null;
-        const FALLBACK_EXPLANATIONS = {
-            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
-            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
-            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 20%+ Visual descriptions.",
-            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
-            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words.",
-            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time.",
-            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%.",
-            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%.",
-            "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
-            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
-            "Pause %": "The percentage of time you spend silent. Aim for 10-35%.",
-            "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
-            "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
-            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
-            "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
-            "Voice Var.": "In 3sec chunks, counts how varied is your speaking volume. Varying volume is engaging.",
-            "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
-        };
-
-        let menuOverlayTimeout = null;
-
-        window.closeAllMenus = function() {
-            const widgetDrawer = document.getElementById('widget-menu-drawer');
-            const historyDrawer = document.getElementById('history-menu-drawer');
-            const overlay = document.getElementById('widget-menu-overlay');
-            
-            overlay.classList.add('opacity-0');
-            if(widgetDrawer) widgetDrawer.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
-            if(historyDrawer) historyDrawer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
-            
-            if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
-            menuOverlayTimeout = setTimeout(() => {
-                overlay.classList.add('hidden');
-            }, 300); 
-        };
-
-        window.toggleWidgetMenu = function() {
-            const drawer = document.getElementById('widget-menu-drawer');
-            const overlay = document.getElementById('widget-menu-overlay');
-
-            if (drawer.classList.contains('translate-x-full')) {
-                window.closeAllMenus();
-                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
-                
-                overlay.classList.remove('hidden');
-                setTimeout(() => {
-                    overlay.classList.remove('opacity-0');
-                    drawer.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
-                }, 10);
-            } else {
-                window.closeAllMenus();
-            }
-        };
-
-        window.toggleHistoryMenu = function() {
-            const drawer = document.getElementById('history-menu-drawer');
-            const overlay = document.getElementById('widget-menu-overlay');
-
-            if (drawer.classList.contains('-translate-x-full')) {
-                window.closeAllMenus();
-                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
-                
-                overlay.classList.remove('hidden');
-                setTimeout(() => {
-                    overlay.classList.remove('opacity-0');
-                    drawer.classList.remove('-translate-x-full', 'opacity-0', 'pointer-events-none');
-                }, 10);
-            } else {
-                window.closeAllMenus();
-            }
-        };
-
-        window.switchHistoryTab = function(tabName) {
-            ['list', 'avg', 'best'].forEach(s => {
-                const btn = document.getElementById(`hist-tab-btn-${s}`);
-                const content = document.getElementById(`hist-tab-content-${s}`);
-                btn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
-                content.classList.add('hidden');
-                content.classList.remove('block');
-            });
-            const activeBtn = document.getElementById(`hist-tab-btn-${tabName}`);
-            const activeContent = document.getElementById(`hist-tab-content-${tabName}`);
-            activeBtn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors";
-            activeContent.classList.remove('hidden');
-            activeContent.classList.add('block');
-        };
-
-        window.switchWidgetTab = function(size) {
-            ['small', 'medium', 'large'].forEach(s => {
-                const btn = document.getElementById(`tab-btn-${s}`);
-                const content = document.getElementById(`tab-content-${s}`);
-                btn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
-                content.classList.add('hidden');
-                content.classList.remove('block');
-            });
-            const activeBtn = document.getElementById(`tab-btn-${size}`);
-            const activeContent = document.getElementById(`tab-content-${size}`);
-            activeBtn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors";
-            activeContent.classList.remove('hidden');
-            activeContent.classList.add('block');
-        };
-
-        window.toggleRecording = function() {
-            const btnText = document.getElementById('toggle-text');
-            const btnIcon = document.getElementById('toggle-icon');
-            const actionBar = document.getElementById('action-bar');
-            const timerProgress = document.getElementById('timer-progress');
-            
-            if (window.isActive) {
-                clearInterval(window.gameTimerInterval);
-                window.isActive = false;
-                if(btnText) btnText.innerText = 'TAP TO START RECORDING';
-                if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
-                if(actionBar) {
-                    actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
-                    actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-                }
-                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
-                    window.THPS.Audio.stopRecordingProcess();
-                }
-            } else {
-                window.isActive = true;
-                if(btnText) btnText.innerText = 'TAP TO STOP';
-                if(btnIcon) btnIcon.setAttribute('data-lucide', 'square');
-                if(actionBar) {
-                    actionBar.classList.replace('bg-slate-800', 'bg-rose-600');
-                    actionBar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
-                }
-                if(timerProgress) timerProgress.style.width = '0%';
-                
-                if (window.clearAnalyzer) window.clearAnalyzer();
-                
-                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
-                    window.THPS.Audio.startRecordingProcess();
-                }
-                
-                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
-                window.gameTimerInterval = setInterval(() => {
-                    const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
-                    if (elapsedSecs >= 240) {
-                        clearInterval(window.gameTimerInterval);
-                        window.isActive = false;
-                        if(btnText) btnText.innerText = 'TAP TO START RECORDING';
-                        if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
-                        if(actionBar) {
-                            actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
-                            actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
-                        }
-                        if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
-                            window.THPS.Audio.stopRecordingProcess();
-                        }
-                        if (window.lucide) window.lucide.createIcons();
-                    } else {
-                        if(timerProgress) timerProgress.style.width = `${(elapsedSecs / 240) * 100}%`;
-                    }
-                }, 50);
-            }
-            if (window.lucide) window.lucide.createIcons();
-        };
-
-        window.analyze = function() {
-            try {
-                if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
-            } catch(e) { return; }
-            
-            if (!window.THPS.NLP.dictsLoaded) return;
-            
-            let text = "";
-            const widgetEl = document.getElementById('cba-inputText-widget');
-            const hiddenEl = document.getElementById('cba-inputText');
-            if (widgetEl && widgetEl.value.trim() !== '') text = widgetEl.value.trim();
-            else if (hiddenEl) text = hiddenEl.value.trim();
-            
-            if (!text) {
-                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
-                return;
-            }
-
-            let timestamps = [];
-            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) {
-                timestamps = window.THPS.Audio.wordTimestamps;
-            }
-            
-            const nlpData = window.THPS.NLP.analyzeTranscript(text, timestamps);
-
-            const { 
-                numWords, numSentences, totalSyllables, letterCount, complexWordCount, 
-                personalCount, visualCount, unifiedSimpleCount, google10kCount, 
-                highlightedHTML, reportMarkdownText: newReportMarkdown,
-                wordTimestamps 
-            } = nlpData;
-
-            reportMarkdownText = newReportMarkdown; 
-
-            let gPct = Math.round((google10kCount / numWords) * 100);
-
-            let coreSimpleScore = Math.round((unifiedSimpleCount / numWords) * 100) || 0;
-            
-            let elapsedSecs = window.THPS.Audio && window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
-            let transcribedDuration = Math.min(240, elapsedSecs);
-            
-            let mumbleScore = 0; 
-            let pausePercent = 0; 
-            let avgWpm = 0;
-            let activeSpeakingSecs = 0;
-
-            // NEW: Trackman Buckets for Voice Graph Rendering
-            let pauseBuckets = { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
-            let paceBuckets = { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
-
-            if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                let totalPauseTime = 0;
-                let actualActiveSpeakingTime = 0;
-
-                if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length > 1) {
-                    const words = window.THPS.Audio.wordTimestamps;
-                    const totalWords = words.length;
-
-                    // Standardize syllable counting
-                    const countSyllables = (word) => {
-                        word = word.toLowerCase().replace(/[^a-z]/g, '');
-                        if (word.length <= 3) return 1;
-                        word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-                        word = word.replace(/^y/, '');
-                        const syllables = word.match(/[aeiouy]{1,2}/g);
-                        return syllables ? syllables.length : 1;
-                    };
-
-                    // Step 1: Determine Total Units
-                    let localTotalSyllables = 0;
-                    words.forEach(w => localTotalSyllables += countSyllables(w.word));
-                    let totalAssumedUnits = localTotalSyllables + totalWords - 1;
-
-                    // Step 2: Determine Duration (Trim dead space via artificial final word end)
-                    const firstWord = words[0];
-                    const lastWord = words[totalWords - 1];
-                    const lastWordSyllables = countSyllables(lastWord.word);
-                    const expectedLastWordEnd = lastWord.start + (lastWordSyllables * 0.35);
-                    let duration = Math.max(0.1, expectedLastWordEnd - firstWord.start);
-
-                    // Step 3: Determine Assumed Unit Length
-                    let assumedUnitLength = duration / totalAssumedUnits;
-
-                    // Step 4: Compare Actual Timestamp Gaps to the Elastic Grid
-                    for (let i = 0; i < totalWords - 1; i++) {
-                        let currWord = words[i];
-                        let nextWord = words[i+1];
-                        
-                        // Failsafe: floor the gap at 0.01s to prevent overlapping/division-by-zero
-                        let gap = Math.max(0.01, nextWord.start - currWord.start);
-
-                        let sylCount = countSyllables(currWord.word);
-                        let expectedUnits = sylCount + 1; // Syllables + 1 pause opportunity
-                        let expectedTime = expectedUnits * assumedUnitLength;
-
-                        let syllableUnitLength = 0;
-                        let pauseUnitValue = 0;
-
-                        if (gap <= expectedTime) {
-                            // SCENARIO 1 & 2: Gap shorter/equal. Pause is false. Syllables compress.
-                            syllableUnitLength = gap / sylCount;
-                            pauseBuckets.micro++;
-                        } else {
-                            // SCENARIO 3 & 4: Gap is longer. Test the even expansion.
-                            let evenExpansion = gap / expectedUnits;
-
-                            if (evenExpansion < 0.35) {
-                                // SCENARIO 3: Pause unit falls short of 0.35. Deemed false. Syllables absorb gap.
-                                syllableUnitLength = gap / sylCount;
-                                pauseBuckets.micro++;
-                            } else {
-                                // SCENARIO 4: Cap hit. Spillover becomes True Pause.
-                                syllableUnitLength = 0.35;
-                                pauseUnitValue = gap - (sylCount * 0.35);
-
-                                if (pauseUnitValue >= 0.35) {
-                                    totalPauseTime += pauseUnitValue; // ONLY add to score if 350ms+
-
-                                    // Bucket the True Pause length
-                                    if (pauseUnitValue >= 1.40) pauseBuckets.red++;
-                                    else if (pauseUnitValue >= 1.05) pauseBuckets.orange++;
-                                    else if (pauseUnitValue >= 0.70) pauseBuckets.green++;
-                                    else pauseBuckets.blue++; // catches everything between 0.35 and 0.70
-                                } else {
-                                    // Sub-350ms spillover. Count as a visual micro-pause, but do NOT add to score.
-                                    pauseBuckets.micro++;
-                                }
-                            }
-                        }
-
-                        // Evaluate Pace Intensity (Compare Actual Syllable Length vs Expected Unit Length)
-                        let paceRatio = syllableUnitLength / assumedUnitLength;
-                        if (paceRatio < 0.80) paceBuckets.fastest++;
-                        else if (paceRatio < 0.95) paceBuckets.fast++;
-                        else if (paceRatio <= 1.05) paceBuckets.normal++;
-                        else if (paceRatio <= 1.20) paceBuckets.slow++;
-                        else paceBuckets.slowest++;
-                    }
-
-                    actualActiveSpeakingTime = Math.max(0, duration - totalPauseTime);
-                    activeSpeakingSecs = actualActiveSpeakingTime;
-                    pausePercent = (totalPauseTime / duration) * 100;
-                    pausePercent = Math.max(0, Math.min(100, pausePercent));
-                    avgWpm = Math.round((numWords / duration) * 60);
-                    mumbleScore = activeSpeakingSecs > 0 ? (totalSyllables / activeSpeakingSecs) : 0;
-
-                } else if (window.THPS.Audio.wordTimestamps && window.THPS.Audio.wordTimestamps.length === 1) {
-                    actualActiveSpeakingTime = 1.0;
-                    activeSpeakingSecs = 1.0;
-                    pausePercent = 0;
-                } else {
-                    actualActiveSpeakingTime = transcribedDuration * 0.85; 
-                    activeSpeakingSecs = actualActiveSpeakingTime;
-                    pausePercent = 15;
-                }
-            }
-
-            let avgGrade = 0;
-            let readability = null;
-            if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
-                 readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
-                 avgGrade = readability.avgGrade;
-            } else {
-                let flesch = (0.39 * (numWords / numSentences)) + (11.8 * (totalSyllables / numWords)) - 15.59;
-                let fog = 0.4 * ((numWords / numSentences) + 100 * (complexWordCount / numWords));
-                let smog = 1.0430 * Math.sqrt(complexWordCount * (30 / numSentences)) + 3.1291;
-                let coleman = 0.0588 * ((letterCount / numWords) * 100) - 0.296 * ((numSentences / numWords) * 100) - 15.8;
-                avgGrade = ((Math.max(0, flesch)) + (Math.max(0, fog)) + (Math.max(0, smog)) + (Math.max(0, coleman))) / 4;
-                readability = { flesch: Math.max(0, flesch), fog: Math.max(0, fog), smog: Math.max(0, smog), coleman: Math.max(0, coleman), avgGrade: avgGrade };
-            }
-
-            let personalPercent = Math.round((personalCount / numWords) * 100);
-            let visualPercent = Math.round((visualCount / numWords) * 100);
-            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
-
-            let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
-            
-            try {
-                let totalPoints = 0;
-                let overrideGrade = false;
-
-                if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    if (elapsedSecs < 20) overrideGrade = true; 
-                    else if (elapsedSecs < 60) totalPoints += 0.75; 
-                    else if (elapsedSecs <= 90) totalPoints += 1.0; 
-                    else overrideGrade = true;
-
-                    if (avgWpm < 100) totalPoints += 0.75; 
-                    else if (avgWpm > 150) totalPoints += 0.25; 
-                    else totalPoints += 1;
-
-                    if (mumbleScore < 3) totalPoints += 0.75; 
-                    else if (mumbleScore > 5) totalPoints += 0.25; 
-                    else totalPoints += 1;
-
-                    if (pausePercent < 10) totalPoints += 0.25; 
-                    else if (pausePercent > 35) totalPoints += 0.75; 
-                    else totalPoints += 1;
-                } else {
-                    overrideGrade = true;
-                }
-
-                if (personalPercent < 30) totalPoints += 0.25; 
-                else if (personalPercent > 60) totalPoints += 0.75; 
-                else totalPoints += 1;
-
-                if (visualPercent < 20) totalPoints += 0.25; 
-                else if (visualPercent > 50) totalPoints += 0.75; 
-                else totalPoints += 1;
-
-                if (intangiblePercent > 45) totalPoints += 0.25; 
-                else if (intangiblePercent >= 30) totalPoints += 0.75; 
-                else totalPoints += 1;
-
-                if (avgWpsFloat < 5) totalPoints += 0.75; 
-                else if (avgWpsFloat > 15) totalPoints += 0.25; 
-                else totalPoints += 1;
-
-                if (avgGrade < 5) totalPoints += 0.75; 
-                else if (avgGrade > 10) totalPoints += 0.25; 
-                else totalPoints += 1;
-
-                if (coreSimpleScore < 80) totalPoints += 0.25; 
-                else if (coreSimpleScore > 95) totalPoints += 0.75; 
-                else totalPoints += 1;
-
-                // --- THE TRACKMAN BROADCAST & CACHE ---
-                const payload = { 
-                    sps: mumbleScore,
-                    wpm: avgWpm,
-                    grade: avgGrade,
-                    time: elapsedSecs,
-                    personal: personalPercent,
-                    visual: visualPercent,
-                    text: text,
-                    wordTimestamps: wordTimestamps,
-                    volumeData: (window.THPS && window.THPS.Audio && window.THPS.Audio.volumeData) ? window.THPS.Audio.volumeData : [],
-                    pauseBuckets: pauseBuckets, // NEW
-                    paceBuckets: paceBuckets,   // NEW
-                    pause: pausePercent,
-                    intangible: intangiblePercent,
-                    wps: avgWpsFloat,
-                    simple: coreSimpleScore,
-                    totalPoints: totalPoints,
-                    overrideGrade: overrideGrade,
-                    recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
-                    highlightedHTML: highlightedHTML,
-                    reportMarkdownText: reportMarkdownText,
-                    numWords: numWords,
-                    numSentences: numSentences,
-                    totalSyllables: totalSyllables,
-                    google10kCount: google10kCount,
-                    unifiedSimpleCount: unifiedSimpleCount,
-                    readability: readability
-                };
-                
-                window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
-                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
-
-                // --- SAVE TO HISTORY ---
-                if (text.trim() !== '' || elapsedSecs > 0) {
-                    let existingIndex = window.thps_sessionHistory.findIndex(h => h.id === window.thps_currentAttemptId);
-                    let historyPayload = { ...payload, id: window.thps_currentAttemptId, title: 'Attempt ' + window.thps_currentAttemptId, date: new Date() };
-                    
-                    if (existingIndex >= 0) {
-                        window.thps_sessionHistory[existingIndex] = historyPayload;
-                    } else {
-                        window.thps_sessionHistory.unshift(historyPayload); // Add to beginning (most recent top)
-                    }
-                    window.updateHistoryUI();
-                }
-
-            } catch(e) { console.error("Summary Dashboard Error:", e); }
-        };
-
-        window.getMetricPoints = function(key, val) {
-            if (key === 'totalPoints') return val; 
-            if (key === 'time') {
-                if (val >= 60 && val <= 90) return 1;
-                if (val >= 20 && val < 60) return 0.75;
-                return 0;
-            }
-            if (key === 'wpm') return (val >= 100 && val <= 150) ? 1 : (val < 100 ? 0.75 : 0.25);
-            if (key === 'sps') return (val >= 3 && val <= 5) ? 1 : (val < 3 ? 0.75 : 0.25);
-            if (key === 'pause') return (val >= 10 && val <= 35) ? 1 : (val > 35 ? 0.75 : 0.25);
-            if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
-            if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
-            if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
-            if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
-            if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
-            if (key === 'simple') return (val >= 80 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
-            return 0;
-        };
-
-        window.formatMetric = function(key, val) {
-            if (val === null || val === undefined) return '-';
-            if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
-            if (['totalPoints', 'sps', 'wps', 'grade'].includes(key)) return val.toFixed(1);
-            if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
-            return Math.round(val);
-        };
-
-        window.deleteHistoryAttempt = function(id) {
-            window.thps_sessionHistory = window.thps_sessionHistory.filter(h => h.id !== id);
-            window.updateHistoryUI();
-            
-            // If deleting currently viewed attempt, try viewing latest or clear screen
-            if (window.thps_lastPayload && window.thps_lastPayload.id === id) {
-                if (window.thps_sessionHistory.length > 0) {
-                    window.loadHistoryAttempt(window.thps_sessionHistory[0].id);
-                } else {
-                    window.clearAnalyzer();
-                }
-            }
-        };
-
-        window.updateHistoryUI = function() {
-            const countEl = document.getElementById('history-count');
-            const listEl = document.getElementById('hist-tab-content-list');
-            const avgEl = document.getElementById('hist-tab-content-avg');
-            const bestEl = document.getElementById('hist-tab-content-best');
-            
-            // Always show the count
-            if (countEl) {
-                countEl.innerText = window.thps_sessionHistory.length;
-            }
-
-            if (!listEl) return;
-            
-            listEl.innerHTML = '';
-            
-            if (window.thps_sessionHistory.length === 0) {
-                if (avgEl) avgEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
-                if (bestEl) bestEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
-                return;
-            }
-
-            window.thps_sessionHistory.forEach((attempt) => {
-                const isActive = (window.thps_lastPayload && window.thps_lastPayload.id === attempt.id);
-                const gradeText = attempt.overrideGrade ? '-' : (attempt.totalPoints % 1 === 0 ? attempt.totalPoints : attempt.totalPoints.toFixed(2));
-                
-                const item = document.createElement('div');
-                item.className = `p-4 rounded-xl border-2 cursor-pointer transition-all ${isActive ? 'border-indigo-500 bg-indigo-50 shadow-md scale-[1.02]' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'}`;
-                item.onclick = () => window.loadHistoryAttempt(attempt.id);
-                
-                item.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
-                        <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/10</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
-                        <span>Time: ${Math.floor(attempt.time / 60)}:${Math.floor(attempt.time % 60).toString().padStart(2, '0')}</span>
-                        <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-                listEl.appendChild(item);
-            });
-
-            // Map UI text labels to their payload keys
-            const metricsMap = [
-                { label: 'Score', key: 'totalPoints' },
-                { label: 'Time', key: 'time' },
-                { label: 'Pers', key: 'personal' },
-                { label: 'Vis', key: 'visual' },
-                { label: 'Intg', key: 'intangible' },
-                { label: 'WPM', key: 'wpm' },
-                { label: 'SPS', key: 'sps' },
-                { label: 'Pause', key: 'pause' },
-                { label: 'W/Sen', key: 'wps' },
-                { label: 'Comp', key: 'grade' },
-                { label: 'Sim%', key: 'simple' }
-            ];
-
-            let avgHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Average</th></tr></thead><tbody class="divide-y divide-slate-100">`;
-            let bestHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Best</th></tr></thead><tbody class="divide-y divide-slate-100">`;
-
-            metricsMap.forEach(m => {
-                let sum = 0, count = 0;
-                let bestVal = null, bestPts = -1;
-
-                window.thps_sessionHistory.forEach(h => {
-                    let val = h[m.key];
-                    if (val !== undefined && val !== null && !isNaN(val)) {
-                        sum += val;
-                        count++;
-                        
-                        let pts = window.getMetricPoints(m.key, val);
-                        if (pts > bestPts) {
-                            bestPts = pts;
-                            bestVal = val;
-                        }
-                    }
-                });
-
-                let avgVal = count > 0 ? sum / count : null;
-                avgHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, avgVal)}</td></tr>`;
-                bestHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, bestVal)}</td></tr>`;
-            });
-
-            avgHtml += `</tbody></table></div>`;
-            bestHtml += `</tbody></table></div>`;
-
-            if (avgEl) avgEl.innerHTML = avgHtml;
-            if (bestEl) bestEl.innerHTML = bestHtml;
-            
-            if (window.lucide) window.lucide.createIcons();
-        };
-
-        window.loadHistoryAttempt = function(id) {
-            const attempt = window.thps_sessionHistory.find(h => h.id === id);
-            if (!attempt) return;
-            
-            const widgetEl = document.getElementById('cba-inputText-widget');
-            const hiddenEl = document.getElementById('cba-inputText');
-            if (widgetEl) widgetEl.value = attempt.text;
-            if (hiddenEl) hiddenEl.value = attempt.text;
-
-            window.thps_lastPayload = attempt;
-            window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: attempt }));
-            window.updateHistoryUI();
-            
-            if (window.innerWidth < 640) window.closeAllMenus(); // Close drawer on mobile after selection
-        };
-
-        window.copyReportToClipboard = function() {
-            let cleanMarkdown = reportMarkdownText.trim().replace(/\n/g, '\n\n').replace(/ +/g, ' ');
-            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
-            
-            const el = document.createElement('textarea');
-            el.value = report;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-        };
-
-        window.clearAnalyzer = function() {
-            const hiddenEl = document.getElementById('cba-inputText');
-            if (hiddenEl) hiddenEl.value = '';
-            
-            const procPanel = document.getElementById('cba-processing-panel');
-            if (procPanel) procPanel.classList.add('hidden');
-            
-            if (window.THPS && window.THPS.Audio) {
-                window.THPS.Audio.recordedAudio = false; 
-                window.THPS.Audio.lastRecordedDuration = 0;
-                window.THPS.Audio.wordTimestamps = []; 
-                window.THPS.Audio.volumeData = [];
-            }
-            
-            // Advance attempt ID if we have a valid previous attempt
-            if (window.thps_lastPayload && (window.thps_lastPayload.text.trim() !== '' || window.thps_lastPayload.time > 0)) {
-                window.thps_currentAttemptId++;
-            }
-            
-            window.thps_lastPayload = null; // WIPE THE CACHE
-            
-            window.analyze();
-        };
-
-        window.explain = function(term) {
-            const titleEl = document.getElementById('cba-explanationTitle');
-            const contentEl = document.getElementById('cba-explanationContent');
-            if (!titleEl || !contentEl) return;
-            
-            const panel = titleEl.closest('.glass-panel');
-            if (panel) {
-                panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
-                setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
-            }
-
-            titleEl.innerText = term;
-            contentEl.classList.remove('italic', 'justify-center');
-            contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
-
-            setTimeout(() => {
-                let text = (explanationsData && explanationsData[term]) 
-                           ? explanationsData[term] 
-                           : (FALLBACK_EXPLANATIONS[term] || `Detailed explanation for "${term}" will appear here soon.`);
-                contentEl.innerHTML = text;
-            }, 150);
-        };
-
-        document.addEventListener('input', (e) => {
-            if (e.target.id === 'cba-inputText-widget') {
-                const hiddenEl = document.getElementById('cba-inputText');
-                if (hiddenEl) hiddenEl.value = e.target.value;
-            }
-        });
+        let phase = 'MENU'; 
+        let activeMenuTopic = 'LOGO'; 
+        let currentMenuPage = 1;
+
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let achievedStarStatus = 'empty'; 
+        const maxDurationSeconds = 80; 
         
-        async function fetchExplanations() {
-            try {
-                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
-                if (res.ok) explanationsData = await res.json();
-            } catch (e) {
-                console.warn("Using fallback explanations for 'What does this mean' panel.");
+        let selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' };
+        
+        let sideBLevel = 0; 
+        let currentCategory = ''; 
+        let currentSubNum = 0; 
+
+        let isStarting = false; 
+        let cameraStream = null; 
+        let isCameraOn = false;
+        let isCameraLoading = false; 
+
+        let feedbackMatrix = {};
+        let drillData = {}; 
+
+        // --- OVERLAY LOGIC ---
+        let isLegalOpen = false;
+        let isHubOpen = false;
+
+        function toggleLegalOverlay() {
+            if (isHubOpen) toggleHubOverlay(); // Close Hub if it's open
+            
+            isLegalOpen = !isLegalOpen;
+            const overlay = document.getElementById('legal-overlay');
+            const btn = document.getElementById('legal-btn');
+            
+            // Dynamically insert current year
+            const yearSpan = document.getElementById('copyright-year');
+            if (yearSpan) yearSpan.innerText = new Date().getFullYear();
+
+            if (isLegalOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-100', 'bg-slate-800');
+                btn.classList.replace('text-slate-600', 'text-white');
+                btn.innerText = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-slate-100');
+                btn.classList.replace('text-white', 'text-slate-600');
+                btn.innerText = "LEGAL";
             }
         }
 
-        window.onload = () => {
-            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
-                window.THPS.NLP.loadDictionaries();
+        function toggleHubOverlay() {
+            if (isLegalOpen) toggleLegalOverlay(); // Close Legal if it's open
+            
+            isHubOpen = !isHubOpen;
+            const overlay = document.getElementById('hub-overlay');
+            const btn = document.getElementById('hub-btn');
+
+            if (isHubOpen) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-white', 'bg-slate-800');
+                btn.classList.replace('text-slate-500', 'text-white');
+                btn.innerHTML = "CLOSE";
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                btn.classList.replace('bg-slate-800', 'bg-white');
+                btn.classList.replace('text-white', 'text-slate-500');
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Hub`;
             }
-            fetchExplanations();
+        }
+
+        // --- P6 DYNAMIC EXPLAINER CONTENT ---
+        const p3ScoringContent = [
+            "<strong>1. Delivery (Pace, Mumble, Pause):</strong><br>Scores your speed, clarity, and pacing. Green is ideal, Yellow needs adjustment, Red means you are speaking too fast, too slow, or not enunciating.",
+            "<strong>2. Content (Personal, Visual, Abstract):</strong><br>Scores the balance of your story. A perfect score blends personal anecdotes, visual imagery, and abstract concepts evenly.",
+            "<strong>3. Clarity (Word Avg, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Use shorter sentences and common English words to hit Green thresholds.",
+            "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20s or over 80s is disqualified so don't chicken out or ramble on!",
+            "<strong>5. Stars & Final Grade:</strong><br> All 10 sub-scores combine into a Final Grade out of 10. The Star rating reflects the difficulty level you completed."
+        ];
+
+        const p4TipsContent = [
+            "<strong>Pace:</strong> Aim for 100-150 words per minute. If you speak faster, you risk overwhelming the listener. Slower, and you lose their attention.",
+            "<strong>Mumble:</strong> Syllables per second (SPS). Keep it between 3.0 and 5.0 Open your mouth wider to hit those hard consonants.",
+            "<strong>Pause:</strong> Aim for 10-35% pause time. Silence is powerful—use it to let your audience digest your points.",
+            "<strong>Personal:</strong> Use 'I', 'Me', 'He', 'She', etc to talk about a specific person. Aim for 30-60% personal content.",
+            "<strong>Visual:</strong> Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.",
+            "<strong>Abstract:</strong> Don't get lost in the clouds. Keep complex, theoretical concepts to a minimum (10-30%).",
+            "<strong>Word Avg:</strong> Short sentences punch harder. Aim for 7 to 14 words per sentence. Edit out the fluff.",
+            "<strong>Eng 10K:</strong> Use simple, recognizable words. Over 80% of your speech should be from the 10,000 most common English words.",
+            "<strong>Pop:</strong> Readability grade level. Aim for a 5th to 10th-grade reading level to maximize mass-market appeal.",
+            "<strong>Time:</strong> Don't ramble! The goal is exactly 60 seconds. Going under 20s or over 80s will penalize your grade."
+        ];
+
+        function changeMenuPage(direction, event, maxPages) {
+            if (event) event.stopPropagation(); 
+            currentMenuPage += direction;
+            if (currentMenuPage < 1) currentMenuPage = maxPages;
+            if (currentMenuPage > maxPages) currentMenuPage = 1;
+            renderP6Front();
+        }
+
+        // --- RESULTS PHASE INTERACTION LOGIC ---
+        function revertP6ToDefault(event) {
+            if (event) event.stopPropagation();
+            
+            const bar6 = document.getElementById('bar-6');
+            if (bar6 && bar6.classList.contains('flip-active')) {
+                const infoIcon = bar6.querySelector('.face-back button');
+                if (infoIcon) {
+                    infoIcon.classList.add('animate-bounce');
+                    setTimeout(() => infoIcon.classList.remove('animate-bounce'), 1000);
+                }
+            } else {
+                activeMenuTopic = 'RESULTS_DEFAULT';
+                renderP6Front();
+            }
+        }
+
+        function handleMetricClick(category, subNum, event) {
+            if (event) event.stopPropagation();
+            
+            const bar6 = document.getElementById('bar-6');
+            const isCameraShowing = bar6 && bar6.classList.contains('flip-active');
+
+            currentCategory = category;
+            currentSubNum = subNum;
+
+            if (isCameraShowing) {
+                sideBLevel = 3;
+                renderSideB();
+                for (let i = 1; i <= 5; i++) {
+                    const bar = document.getElementById(`bar-${i}`);
+                    if (bar) bar.classList.add('flip-active');
+                }
+            } else {
+                activeMenuTopic = 'FEEDBACK_CARD';
+                renderP6Front(); 
+            }
+        }
+
+        // --- DYNAMIC P6 RENDERER ---
+        function renderP6Front() {
+            const p6f = document.getElementById('p6-front');
+            if (!p6f) return;
+
+            const cameraIcon = `<button onclick="toggleFlip(6); event.stopPropagation();" class="absolute top-3 right-3 text-white/50 hover:text-white transition-colors z-20 p-1 cursor-pointer"><i data-lucide="video" class="w-4 h-4"></i></button>`;
+            const cameraIconDark = cameraIcon.replace('text-white/50 hover:text-white', 'text-slate-400 hover:text-blue-600');
+
+            if (activeMenuTopic === 'LOGO') {
+                p6f.className = `face face-front ${col.p1} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIcon}
+                    <div class="flex flex-col items-center justify-center text-center leading-none" style="font-family: 'Permanent Marker', cursive;">
+                        <span class="text-4xl uppercase text-white tracking-widest drop-shadow-sm mb-1">Daily</span>
+                        <span class="text-[2.1rem] uppercase text-white tracking-widest drop-shadow-sm mb-4">Mic-Check</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-white uppercase tracking-widest">${globalShortDate}</span>
+                `;
+            } 
+            else if (activeMenuTopic === 'P1') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIconDark}
+                    <h3 class="text-[11px] font-black uppercase text-[#AA0000] tracking-widest mb-2">What is Mic-Check?</h3>
+                    <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">
+                        Mic-check is a public speaking game by pro speakers for... not so pro speakers. A "mic-check" is when people say silly things to test a microphone. This daily game improves your speaking skills without pressure, using random topics & powerful analytics. Click <strong class="text-[#AA0000]">START</strong> to "check" it out!
+                    </p>
+                `;
+            }
+            else if (activeMenuTopic === 'P2') {
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-center items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIconDark}
+                    <h3 class="text-[11px] font-black uppercase text-[#9333EA] tracking-widest mb-2">How to Play:</h3>
+                    <ol class="text-[10px] text-slate-600 space-y-1.5 font-medium pl-3 pr-2 list-decimal leading-tight">
+                        <li>Select stars to increase speech difficulty.</li>
+                        <li>Flip this panel to use Camera.</li>
+                        <li>Press start to play.</li>
+                        <li>Press stop to see scores & stats.</li>
+                    </ol>
+                `;
+            }
+            else if (activeMenuTopic === 'P3' || activeMenuTopic === 'P4') {
+                const maxP = activeMenuTopic === 'P3' ? 5 : 10;
+                const title = activeMenuTopic === 'P3' ? "Scoring" : "Tips";
+                const titleCol = activeMenuTopic === 'P3' ? "text-[#2563EB]" : "text-[#047857]";
+                const contentText = activeMenuTopic === 'P3' ? p3ScoringContent[currentMenuPage - 1] : p4TipsContent[currentMenuPage - 1];
+
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-between items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIconDark}
+                    <div class="w-full flex-1 flex flex-col items-start pr-4">
+                        <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${title}</h3>
+                        <p class="text-[10px] text-slate-600 font-medium leading-relaxed">${contentText}</p>
+                    </div>
+                    
+                    <div class="w-full flex items-center justify-between mt-auto border-t border-slate-200 pt-3 shrink-0">
+                        <button onclick="changeMenuPage(-1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <span class="text-[9px] font-bold text-slate-400 tracking-widest">${currentMenuPage} / ${maxP}</span>
+                        <button onclick="changeMenuPage(1, event, ${maxP})" class="p-1 hover:bg-slate-200 rounded text-slate-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+            }
+            else if (activeMenuTopic === 'RESULTS_DEFAULT') {
+                let p6ResultHeader = "";
+                let p6ResultSub = "";
+                if (!window.lastAchievedTimeValid) {
+                    p6ResultHeader = "Check your"; p6ResultSub = "Time";
+                } else if (window.lastAchievedGradeFloat < 8.0) {
+                    p6ResultHeader = "Check your"; p6ResultSub = "Scores";
+                } else if (window.lastAchievedGradeFloat < 10.0) {
+                    p6ResultHeader = "Check"; p6ResultSub = "You Out!";
+                } else {
+                    p6ResultHeader = "Perfect"; p6ResultSub = "Mic-Check";
+                }
+
+                p6f.className = `face face-front ${window.lastAchievedBg} !border-gray-800 rounded-[1.25rem] p-5 flex flex-col justify-center items-center transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIcon}
+                    <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[2.5rem] font-black tracking-tighter text-white drop-shadow-md pointer-events-none whitespace-nowrap flex items-baseline justify-center">
+                        ${window.lastAchievedGrade}<span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${window.lastAchievedLevel}</span>
+                    </div>
+                    
+                    <div class="flex flex-col items-center justify-center text-center leading-none mt-8" style="font-family: 'Permanent Marker', cursive;">
+                        <span class="text-[1.75rem] uppercase text-white tracking-widest drop-shadow-sm mb-2">${p6ResultHeader}</span>
+                        <span class="text-[2.2rem] uppercase text-white tracking-widest drop-shadow-sm mb-6">${p6ResultSub}</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white/80 uppercase tracking-widest">Reset & Try Again</span>
+                `;
+            }
+            else if (activeMenuTopic === 'FEEDBACK_CARD') {
+                const data = drillData[currentCategory][currentSubNum];
+                let activeColor = 'text-slate-800';
+                if (currentCategory === 'Delivery') activeColor = col.textP2;
+                else if (currentCategory === 'Content') activeColor = col.textP3;
+                else if (currentCategory === 'Clarity') activeColor = col.textP4;
+                
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-start items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    <button onclick="revertP6ToDefault(event)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-800 transition-colors p-1 cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <h3 class="text-[11px] font-black uppercase ${activeColor} tracking-widest mb-3">${data.name}</h3>
+                    <div class="space-y-3 w-full pr-1 overflow-y-auto max-h-[170px]">
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">You:</strong> ${data.you}</p>
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Why:</strong> ${data.why}</p>
+                        <p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Try:</strong> ${data.try}</p>
+                    </div>
+                `;
+            }
+
+            if (!document.getElementById('countdown-overlay-front')) {
+                p6f.insertAdjacentHTML('beforeend', `<div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>`);
+            }
+            
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- SVGs ---
+        function createStar(type, size = 20, extraClass = "") {
+            if (type === 'empty') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            if (type === 'half') return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon><polygon fill="currentColor" points="12 2 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+            return `<svg class="${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
+        const playSVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        const stopSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
+
+        // --- DATA DICTIONARIES ---
+        let b1 = "Yell at some point!";
+        let b2 = "Bore us about";
+        let b3 = "Cardboard boxes, with";
+        let b4 = "Private + Public examples.";
+
+        const matrix = {
+            1: { A: "Today's Mic-Check is...", get B() { return b1; }, colorA: col.textW, colorB: col.textP1, bgA: col.p1, bgB: col.w, starA: createStar('empty', 18, col.textW), starB: createStar('filled', 18, col.textP5) },
+            2: { A: "Talk About", get B() { return b2; }, colorA: col.textB, colorB: col.textP2, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) },
+            3: { A: "Anything, with", get B() { return b3; }, colorA: col.textB, colorB: col.textP3, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }, 
+            4: { A: "any examples.", get B() { return b4; }, colorA: col.textB, colorB: col.textP4, bgA: col.w, bgB: col.w, starA: createStar('empty', 18, 'text-slate-300'), starB: createStar('filled', 18, col.textP5) }
         };
 
-        window.spawnCompareWidget = function() {
-            window.closeAllMenus();
-            if (window.THPS && window.THPS.Dashboard) {
-                const dummyBtn = document.createElement('div');
-                dummyBtn.innerHTML = 'VS';
+        // --- MATH & NLP BRIDGE ---
+        function formatTime(seconds) {
+            const rnd = Math.round(seconds);
+            const m = Math.floor(rnd / 60);
+            const s = rnd % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function getTimeGradeAndStar(sec) {
+            if (sec >= 60 && sec <= 80) return { grade: "1/1", num: 1, star: "filled", count: 5 };
+            if (sec >= 20 && sec < 60) return { grade: "0.5/1", num: 0.5, star: "half", count: 3 };
+            return { grade: "0/1", num: 0, star: "empty", count: 1 };
+        }
+
+        function getLevelCount() {
+            let count = 0;
+            if (selections[1] === 'B') count++;
+            if (selections[2] === 'B') count++;
+            if (selections[3] === 'B') count++;
+            if (selections[4] === 'B') count++;
+            return count;
+        }
+
+        function updateLevelDisplay() {
+            const count = getLevelCount();
+            const fillPercent = (count / 4) * 100;
+            
+            const fillDiv = document.getElementById('p5-fill');
+            if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
+            
+            const levelNum = document.getElementById('p5-level-num');
+            if (levelNum) levelNum.innerText = `PLAY LEVEL ${count + 1}`;
+        }
+
+        function scoreMetric(raw, bounds1, bounds05_low, bounds05_high) {
+            if (raw >= bounds1[0] && raw <= bounds1[1]) return { points: 1, state: 'perfect' };
+            if (bounds05_low && raw >= bounds05_low[0] && raw <= bounds05_low[1]) return { points: 0.5, state: 'low' };
+            if (bounds05_high && raw >= bounds05_high[0] && raw <= bounds05_high[1]) return { points: 0.5, state: 'high' };
+            return { points: 0, state: raw < bounds1[0] ? 'low' : 'high' };
+        }
+
+        function getStarFromScore(score) {
+            if (score >= 2.5) return 'filled';
+            if (score >= 1.5) return 'half';
+            return 'empty';
+        }
+
+        // NEW: Ingests the Master Analyzer payload
+        function buildDynamicDrillData(masterData, elapsedSecs) {
+            const words = Math.max(1, masterData.numWords || 0);
+            
+            // The game no longer estimates logic - it simply pulls it from the universal math payload
+            const wpm = masterData.wpm || 0;
+            const pausePct = Math.round(masterData.pausePercent || 0);
+            const sps = (masterData.mumbleScore || 0).toFixed(1);
+            
+            const perPct = Math.round(((masterData.personalCount || 0) / words) * 100);
+            const visPct = Math.round(((masterData.visualCount || 0) / words) * 100);
+            const absPct = Math.max(0, 100 - perPct - visPct);
+            const wps = Math.round(words / Math.max(1, masterData.numSentences || 1));
+            const engPct = Math.round(((masterData.google10kCount || 0) / words) * 100);
+            
+            const grade = window.THPS.NLP.calculateReadabilityMetrics(
+                words, 
+                masterData.numSentences || 1, 
+                masterData.totalSyllables || 0, 
+                masterData.letterCount || 0, 
+                masterData.complexWordCount || 0
+            ).avgGrade;
+            
+            let popVal = 0;
+            if (grade <= 5) popVal = 95 + (5 - grade)*1; 
+            else if (grade <= 10) popVal = 95 - ((grade - 5) * 7.8);
+            else if (grade <= 15) popVal = 56 - ((grade - 10) * 8.2);
+            else popVal = Math.max(1, 15 - ((grade - 15) * 2.8));
+            popVal = Math.round(Math.min(99, popVal));
+
+            // Traffic Light thresholds (Unique to the game)
+            let scPace = scoreMetric(wpm, [100, 150], [89, 99], [151, 171]);
+            let scMumb = scoreMetric(parseFloat(sps), [3.0, 4.9], [2.5, 2.9], [5.0, 5.5]);
+            let scPaus = scoreMetric(pausePct, [10, 30], [5, 9], [31, 36]);
+            let scPers = scoreMetric(perPct, [30, 60], [20, 29], [61, 70]);
+            let scVis = scoreMetric(visPct, [25, 50], [15, 24], [51, 60]);
+            let scAbs = scoreMetric(absPct, [10, 30], [0, 9], [31, 40]);
+            let scSig = scoreMetric(wps, [6, 15], [3, 5], [16, 18]);
+            let scEng = scoreMetric(engPct, [80, 95], [75, 79], [96, 100]);
+            let scPop = scoreMetric(grade, [5, 10], [3, 4.99], [10.01, 12]);
+
+            const sumDel = scPace.points + scMumb.points + scPaus.points;
+            const sumCon = scPers.points + scVis.points + scAbs.points;
+            const sumCla = scSig.points + scEng.points + scPop.points;
+
+            const safeFb = (cat, state) => feedbackMatrix[cat] ? feedbackMatrix[cat][state] : { you: "-", try: "-", why: "-" };
+            const getCol = (pts) => pts === 1 ? 'text-emerald-500' : (pts === 0.5 ? 'text-amber-500' : 'text-rose-500');
+
+            drillData = {
+                Delivery: { 
+                    score: sumDel, star: getStarFromScore(sumDel),
+                    2: { name: "Pace", val: `${wpm}`, color: getCol(scPace.points), ...safeFb('Pace', scPace.state) }, 
+                    3: { name: "Mumble", val: `${sps}`, color: getCol(scMumb.points), ...safeFb('Mumble', scMumb.state) }, 
+                    4: { name: "Pause", val: `${pausePct}%`, color: getCol(scPaus.points), ...safeFb('Pause', scPaus.state) } 
+                },
+                Content: { 
+                    score: sumCon, star: getStarFromScore(sumCon),
+                    2: { name: "Personal", val: `${perPct}%`, color: getCol(scPers.points), ...safeFb('Personal', scPers.state) }, 
+                    3: { name: "Visual", val: `${visPct}%`, color: getCol(scVis.points), ...safeFb('Visual', scVis.state) }, 
+                    4: { name: "Abstract", val: `${absPct}%`, color: getCol(scAbs.points), ...safeFb('Abstract', scAbs.state) } 
+                },
+                Clarity: { 
+                    score: sumCla, star: getStarFromScore(sumCla),
+                    2: { name: "Word Avg", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 
+                    3: { name: "Eng 10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 
+                    4: { name: "Pop", val: `~${popVal}%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } 
+                },
+                FinalGrade: sumDel + sumCon + sumCla 
+            };
+
+            // Time uses raw elapsed seconds, not trueDuration, to ensure the UI clock matches the score clock
+            let timeYou = elapsedSecs < 20 ? "Less than 20 sec" : (elapsedSecs < 60 ? "20 to 59s" : (elapsedSecs <= 80 ? "60 to 80s" : "More than 80s"));
+            let timeWhy = elapsedSecs < 20 ? "Score invalid" : (elapsedSecs < 60 ? "Score of 0.5 / 1" : (elapsedSecs <= 80 ? "Score of +1" : "Score invalid"));
+            let timeTry = (elapsedSecs >= 60 && elapsedSecs <= 80) ? "You nailed it!" : "Speaking for 60-80s";
+
+            drillData.Extras = {
+                1: { name: "Time", val: formatTime(elapsedSecs), you: timeYou, why: timeWhy, try: timeTry },
+                2: { name: "Date", val: globalShortDate, you: "Should play Daily Mic-Check again tomorrow!", why: "Because every day is a new challenge!", try: "Become a member for more speaking challenges, courses & tools!" }
+            };
+        }
+
+        // --- UI GENERATOR (Side A) ---
+        function renderPhase() {
+            if (phase === 'MENU' || phase === 'START') {
+                if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
                 
-                window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', dummyBtn);
-                
-                setTimeout(() => {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                }, 100);
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) {
+                    camOverlay.classList.add('opacity-0');
+                    camOverlay.innerHTML = '';
+                }
             }
-        };
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`bar-${i}`);
+                if (el) el.classList.remove('flip-active');
+            }
+
+            if (phase === 'MENU') {
+                const menuData = {
+                    1: { title: "What is Mic-Check?", bg: col.p1, text: col.textW },
+                    2: { title: "How to Play", bg: col.p2, text: col.textW },
+                    3: { title: "Scoring", bg: col.p3, text: col.textW },
+                    4: { title: "Tips", bg: col.p4, text: col.textW }
+                };
+
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${menuData[i].bg}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-center text-center"><span class="text-[12px] font-black uppercase tracking-widest ${menuData[i].text}">${menuData[i].title}</span></div>`;
+                }
+
+                document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900">START</span></div>`;
+                
+                renderP6Front();
+            }
+            else if (phase === 'START') {
+                for (let i = 1; i <= 4; i++) {
+                    const matrixData = matrix[i];
+                    document.getElementById(`p${i}-front`).className = `face face-front ${matrixData.bgA}`;
+                    document.getElementById(`p${i}-back`).className = `face face-back ${matrixData.bgB}`;
+
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorA}">${matrixData.A}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starA}</span>`;
+                    
+                    document.getElementById(`p${i}-back`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest leading-tight"><strong class="${matrixData.colorB}">${matrixData.B}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none transition-transform group-hover:scale-110">${matrixData.starB}</span>`;
+                }
+
+                if(selections[1] === 'B') document.getElementById('bar-1').classList.add('flip-active');
+                if(selections[2] === 'B') document.getElementById('bar-2').classList.add('flip-active');
+                if(selections[3] === 'B') document.getElementById('bar-3').classList.add('flip-active');
+                if(selections[4] === 'B') document.getElementById('bar-4').classList.add('flip-active');
+
+                const fillP = (getLevelCount() / 4) * 100;
+                
+                document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
+                    <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)">
+                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span>
+                    </div>`;
+                document.getElementById('p5-back').className = 'face face-back';
+                document.getElementById('p5-back').innerHTML = ''; 
+                
+                activeMenuTopic = 'LOGO';
+                renderP6Front();
+            } 
+            
+            else if (phase === 'RECORDING') {
+                for (let i = 1; i <= 4; i++) {
+                    const chosenText = selections[i] === 'A' ? matrix[i].A : matrix[i].B;
+                    const chosenColor = selections[i] === 'A' ? matrix[i].colorA : matrix[i].colorB;
+                    const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
+                    const chosenBg = selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB;
+                    
+                    document.getElementById(`p${i}-front`).className = `face face-front ${chosenBg}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10">
+                            <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
+                        </div>
+                        <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                }
+
+                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
+                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
+                            ${stopSVG}
+                        </div>
+                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    </div>`;
+            }
+
+            else if (phase === 'PROCESSING') {
+                const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5];
+                const txt = [col.textW, col.textW, col.textW, col.textW, col.textW];
+                
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`p${i}-front`).className = `face face-front ${bgs[i-1]}`;
+                    document.getElementById(`p${i}-front`).innerHTML = `
+                        <div class="w-full h-full flex items-center justify-start pl-5 pr-10 animate-pulse font-bold uppercase tracking-widest text-[13px] ${txt[i-1]}">
+                            Checking Scores
+                        </div>`;
+                }
+            }
+
+            else if (phase === 'RESULTS') {
+                const timeData = getTimeGradeAndStar(timerSeconds);
+                const totalScore = ((drillData.FinalGrade || 0) + timeData.num).toFixed(1);
+                
+                let timeColor = 'text-rose-500';
+                if (timerSeconds < 20 || timerSeconds > 80) timeColor = 'text-slate-400 line-through';
+                else if (timerSeconds >= 20 && timerSeconds < 60) timeColor = 'text-amber-500';
+                else if (timerSeconds >= 60 && timerSeconds <= 80) timeColor = 'text-emerald-500';
+
+                let gradeBg = 'bg-blue-500';
+                if (totalScore >= 8.0 && totalScore < 10.0) gradeBg = 'bg-emerald-500';
+                else if (totalScore >= 10.0) gradeBg = 'bg-[#F4B532]';
+
+                const levelChosen = getLevelCount() + 1;
+
+                const third = (label, val, colorClass, cat, subNum) => `
+                    <div onclick="handleMetricClick('${cat}', ${subNum}, event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">${label}</span>
+                        <span class="text-sm font-black ${colorClass} leading-none mt-1 pointer-events-none">${val}</span>
+                    </div>`;
+
+                document.getElementById('p1-front').className = `face face-front ${col.p1} hover:brightness-110 transition-colors cursor-pointer`;
+                document.getElementById('p1-front').innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center" onclick="revertP6ToDefault(event)">
+                        <span class="text-2xl uppercase text-white tracking-widest drop-shadow-sm mt-1" style="font-family: 'Permanent Marker', cursive;">Daily Mic-Check</span>
+                    </div>`;
+
+                document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Pace", drillData.Delivery[2].val, drillData.Delivery[2].color, "Delivery", 2)}${third("Mumble", drillData.Delivery[3].val, drillData.Delivery[3].color, "Delivery", 3)}${third("Pause", drillData.Delivery[4].val, drillData.Delivery[4].color, "Delivery", 4)}</div>`;
+
+                document.getElementById('p3-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
+
+                document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Word Avg", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
+
+                document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p5-front').innerHTML = `
+                    <div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">
+                        ${third("Time", drillData.Extras[1].val, timeColor, "Extras", 1)}
+                        ${third("Date", globalShortDate, "text-slate-600", "Extras", 2)}
+                        <div onclick="revertP6ToDefault(event)" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">Grade</span>
+                            <span class="text-sm font-black text-slate-800 leading-none mt-1 pointer-events-none">${totalScore}/10</span>
+                        </div>
+                    </div>`;
+
+                // Set up the Camera-Side Grade Overlay
+                let transBg = gradeBg === 'bg-[#F4B532]' ? 'bg-[#F4B532]/80' : gradeBg + '/80';
+                const camOverlay = document.getElementById('p6-camera-grade-overlay');
+                if (camOverlay) {
+                    camOverlay.innerHTML = `
+                        <div class="${transBg} px-5 py-1.5 rounded-2xl backdrop-blur-sm shadow-xl flex items-baseline justify-center border border-white/20 whitespace-nowrap">
+                            <span class="text-[2.5rem] font-black tracking-tighter text-white leading-none">${totalScore}</span>
+                            <span class="text-xl font-bold text-white ml-2 leading-none whitespace-nowrap">/ Level ${levelChosen}</span>
+                        </div>`;
+                    camOverlay.classList.remove('opacity-0');
+                }
+
+                // Update Globals for P6 Shape-Shifter
+                window.lastAchievedGrade = totalScore;
+                window.lastAchievedGradeFloat = parseFloat(totalScore);
+                window.lastAchievedTimeValid = (timerSeconds >= 20 && timerSeconds <= 80);
+                window.lastAchievedLevel = levelChosen;
+                window.lastAchievedBg = gradeBg;
+                
+                activeMenuTopic = 'RESULTS_DEFAULT';
+                renderP6Front(); 
+            }
+        }
+
+        // --- UI GENERATOR (Side B - Feedback Cards) ---
+        function renderSideB() {
+            const p5 = document.getElementById('p5-back');
+            const data = drillData[currentCategory][currentSubNum];
+            
+            let activeColor = col.textB;
+            if (currentCategory === 'Delivery') activeColor = col.textP2;
+            else if (currentCategory === 'Content') activeColor = col.textP3;
+            else if (currentCategory === 'Clarity') activeColor = col.textP4;
+
+            document.getElementById('p1-back').className = `face face-back ${col.w} ${col.borderW}`;
+            document.getElementById('p1-back').innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="text-[13px] font-black uppercase tracking-widest ${activeColor}">${data.name}</span></div>`;
+            
+            ['p2-back', 'p3-back', 'p4-back'].forEach(id => document.getElementById(id).className = `face face-back ${col.w} ${col.borderW}`);
+            
+            document.getElementById('p2-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">You:</strong> ${data.you}</span></div>`;
+            document.getElementById('p3-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Why:</strong> ${data.why}</span></div>`;
+            document.getElementById('p4-back').innerHTML = `<div class="w-full h-full flex items-center justify-start pl-6 pr-6"><span class="text-[10px] font-medium leading-tight text-slate-600"><strong class="uppercase text-[9px] text-slate-400 block">Try:</strong> ${data.try}</span></div>`;
+            
+            p5.className = `face face-back bg-slate-100 border border-slate-200 cursor-pointer hover:bg-slate-200 transition-colors`;
+            p5.innerHTML = `<div class="w-full h-full flex items-center justify-center gap-2" onclick="toggleFlip(5)"><i data-lucide="chevron-left" class="w-4 h-4 text-slate-600"></i><span class="text-[11px] font-black uppercase text-slate-600 tracking-widest">Back to Grid</span></div>`;
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- CORE NAVIGATION ---
+        function toggleFlip(panelNum) {
+            if (phase === 'RECORDING' || phase === 'PROCESSING') return;
+            
+            if (panelNum === 6) {
+                const bar6 = document.getElementById('bar-6');
+                if (bar6) bar6.classList.toggle('flip-active');
+                if (bar6 && !bar6.classList.contains('flip-active') && isCameraOn) toggleCamera();
+                return; 
+            }
+
+            if (phase === 'MENU') {
+                if (panelNum >= 1 && panelNum <= 4) {
+                    activeMenuTopic = 'P' + panelNum;
+                    currentMenuPage = 1;
+                    renderP6Front();
+                } else if (panelNum === 5) {
+                    phase = 'START';
+                    renderPhase();
+                }
+                return;
+            }
+
+            if (phase === 'START') {
+                if (panelNum === 5) return; 
+                const bar = document.getElementById(`bar-${panelNum}`);
+                if (bar) bar.classList.toggle('flip-active');
+                selections[panelNum] = bar.classList.contains('flip-active') ? 'B' : 'A';
+                updateLevelDisplay(); 
+            } 
+            
+            else if (phase === 'RESULTS') {
+                // Return from Feedback Cards
+                if (sideBLevel === 3 && panelNum === 5) {
+                    sideBLevel = 0;
+                    for (let i = 1; i <= 5; i++) {
+                        const bar = document.getElementById(`bar-${i}`);
+                        if (bar) bar.classList.remove('flip-active');
+                    }
+                }
+            }
+        }
+
+        async function handleActionClick(event) {
+            if (event) event.stopPropagation();
+
+            if (phase === 'START') {
+                if (isStarting) return; 
+                isStarting = true;
+
+                if (window.THPS && window.THPS.Audio) {
+                    const micSuccess = await window.THPS.Audio.startRecordingProcess();
+                    if (!micSuccess) {
+                        alert("Microphone access is required to proceed.");
+                        isStarting = false;
+                        resetGame();
+                        return;
+                    }
+                }
+
+                const overlayFront = document.getElementById('countdown-overlay-front');
+                const overlayBack = document.getElementById('countdown-overlay-back');
+                
+                if (overlayFront) overlayFront.classList.remove('opacity-0');
+                if (overlayBack) overlayBack.classList.remove('opacity-0');
+                
+                const steps = ["3", "2", "1", "Mic-Check!"];
+                for (let i = 0; i < steps.length; i++) {
+                    if (overlayFront) overlayFront.innerText = steps[i];
+                    if (overlayBack) overlayBack.innerText = steps[i];
+                    await new Promise(r => setTimeout(r, 800));
+                }
+                
+                if (overlayFront) overlayFront.classList.add('opacity-0');
+                if (overlayBack) overlayBack.classList.add('opacity-0'); 
+                
+                isStarting = false; 
+
+                phase = 'RECORDING';
+                achievedStarStatus = 'empty'; 
+                renderPhase(); 
+                timerSeconds = 0;
+
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    let progressPercent = Math.min((timerSeconds / maxDurationSeconds) * 100, 100);
+                    
+                    const tProg = document.getElementById('timer-progress');
+                    const s1 = document.getElementById('star-1');
+                    const s2 = document.getElementById('star-2');
+                    
+                    if (tProg) tProg.style.width = progressPercent + '%';
+                    
+                    if (progressPercent >= 25 && s1) s1.classList.replace('text-slate-600', 'text-amber-400');
+                    if (progressPercent >= 75 && s2) s2.classList.replace('text-slate-600', 'text-amber-400');
+
+                    if (timerSeconds >= maxDurationSeconds) {
+                        handleActionClick(null);
+                    }
+                }, 1000);
+            } 
+            else if (phase === 'RECORDING') {
+                phase = 'PROCESSING';
+                clearInterval(timerInterval);
+                renderPhase(); 
+
+                if (!isCameraOn) {
+                    const statusContainer = document.getElementById('camera-status-container');
+                    if (statusContainer) {
+                        statusContainer.innerHTML = `
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                            <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
+                    }
+                }
+
+                if (window.THPS && window.THPS.Audio) {
+                    const audioData = await window.THPS.Audio.stopRecordingProcess();
+                    
+                    if (window.THPS.NLP && audioData.transcript) {
+                        // NEW: Request the Universal Payload from the Master Analyzer
+                        const masterData = window.THPS.NLP.analyzeSpeech(
+                            audioData.transcript, 
+                            audioData.timestamps || [], 
+                            window.THPS.Audio.volumeData || [], 
+                            audioData.duration
+                        );
+                        buildDynamicDrillData(masterData, audioData.duration);
+                    } else {
+                        // Safe Empty Payload
+                        buildDynamicDrillData({
+                            numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
+                            google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
+                            wpm: 0, pausePercent: 0, mumbleScore: 0
+                        }, audioData.duration || 0);
+                    }
+                    
+                    window.testTranscript = audioData.transcript || "No words captured.";
+                }
+
+                phase = 'RESULTS';
+                sideBLevel = 0;
+                renderPhase();
+            }
+        }
+
+        function resetGame() {
+            if (isLegalOpen) toggleLegalOverlay(); // Closes the legal screen if open!
+            if (isHubOpen) toggleHubOverlay();     // Closes the hub screen if open!
+            
+            phase = 'MENU';
+            activeMenuTopic = 'LOGO';
+            currentMenuPage = 1;
+            clearInterval(timerInterval);
+            selections = { 1: 'A', 2: 'A', 3: 'A', 4: 'A' }; 
+            sideBLevel = 0;
+            
+            initApp(); 
+            
+            if (!isCameraOn) {
+                const statusContainer = document.getElementById('camera-status-container');
+                if (statusContainer) {
+                    statusContainer.classList.remove('opacity-0');
+                    statusContainer.innerHTML = `
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                        <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
+                }
+            }
+        }
+
+        // --- ASYNC INIT & CAMERA ---
+        async function toggleCamera() {
+            if (phase === 'RECORDING' || phase === 'PROCESSING' || isStarting || isCameraLoading) return;
+
+            const videoEl = document.getElementById('camera-feed');
+            const statusContainer = document.getElementById('camera-status-container');
+            const statusText = document.getElementById('camera-status');
+
+            isCameraLoading = true;
+
+            if (isCameraOn) {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                }
+                videoEl.srcObject = null;
+                videoEl.classList.replace('opacity-100', 'opacity-0');
+                
+                statusContainer.classList.remove('opacity-0');
+                statusContainer.innerHTML = `
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                    <span id="camera-status" class="text-[12px] font-bold uppercase tracking-widest mt-2">CAMERA OFF</span>`;
+                
+                isCameraOn = false;
+                cameraStream = null;
+            } else {
+                statusText.innerHTML = 'STARTING...';
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    videoEl.srcObject = cameraStream;
+                    videoEl.classList.replace('opacity-0', 'opacity-100');
+                    
+                    statusContainer.classList.add('opacity-0');
+                    isCameraOn = true;
+                } catch (err) {
+                    console.error("Camera access denied or failed.", err);
+                    statusText.innerHTML = '<span class="text-red-500">BLOCKED</span>';
+                }
+            }
+            isCameraLoading = false;
+        }
+
+        async function initApp() {
+            const d = new Date();
+            globalShortDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`p${i}-front`);
+                if(el) {
+                    el.className = `face face-front ${col.w} border-slate-200`;
+                    el.innerHTML = `<div class="w-full h-full flex items-center justify-center animate-pulse font-bold uppercase tracking-widest text-[11px] text-slate-400">Loading...</div>`;
+                }
+            }
+
+            try {
+                const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
+                const data = await response.json();
+
+                const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit' };
+                const todayAdelaide = new Intl.DateTimeFormat('en-CA', options).format(new Date());
+
+                if (data[todayAdelaide]) {
+                    b1 = data[todayAdelaide].p1;
+                    b2 = `${data[todayAdelaide].p2} about`; 
+                    b3 = `${data[todayAdelaide].p3}, with`; 
+                    b4 = `${data[todayAdelaide].p4} examples.`;
+                }
+                
+                const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json');
+                feedbackMatrix = await fbRes.json();
+                
+                if (window.THPS && window.THPS.NLP) {
+                    await window.THPS.NLP.loadDictionaries();
+                }
+
+            } catch (error) {
+                console.warn("Failed to load some dependencies. Using fallbacks.", error);
+            }
+
+            renderPhase();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // Init
+        initApp();
     </script>
 </body>
 </html>
