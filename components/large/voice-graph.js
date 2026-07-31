@@ -42,12 +42,13 @@ class THPSVoiceGraph extends HTMLElement {
     }
 
     renderPauseColumn(pauseBuckets) {
-        // We ignore 'micro' pauses in the visual render as they are sub-perceptual
-        const total = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
+        // Micro pauses are now rendered as the 5th tier
+        const total = pauseBuckets.micro + pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
         this.updateBar('vg-pause-red', pauseBuckets.red, total);
         this.updateBar('vg-pause-orange', pauseBuckets.orange, total);
         this.updateBar('vg-pause-green', pauseBuckets.green, total);
         this.updateBar('vg-pause-blue', pauseBuckets.blue, total);
+        this.updateBar('vg-pause-micro', pauseBuckets.micro, total);
     }
 
     renderPaceColumn(paceBuckets) {
@@ -155,6 +156,7 @@ class THPSVoiceGraph extends HTMLElement {
                     <div class="vg-bar w-full bg-orange-100 rounded text-center text-xs font-bold text-orange-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-orange"></div>
                     <div class="vg-bar w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-green"></div>
                     <div class="vg-bar w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-blue"></div>
+                    <div class="vg-bar w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-500 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-micro"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Silence</div>
                 </div>
 
