@@ -472,7 +472,7 @@ class ThpsVoiceTimeline extends HTMLElement {
             });
         };
 
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['short', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
         drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
         
         // NEW: Updated the Pace labels to match the Accordion Ratio Multipliers
@@ -480,4 +480,4 @@ class ThpsVoiceTimeline extends HTMLElement {
     }
 }
 
-                          customElements.define('thps-voice-timeline', ThpsVoiceTimeline);
+customElements.define('thps-voice-timeline', ThpsVoiceTimeline);
