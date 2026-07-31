@@ -546,22 +546,28 @@
             return 'empty';
         }
 
-        function buildDynamicDrillData(nlpData, elapsedSecs) {
-            const words = Math.max(1, nlpData.numWords);
-            const activeSecs = Math.max(1, elapsedSecs);
-            const wpm = Math.round((words / activeSecs) * 60);
-            const periods = (nlpData.reportMarkdownText.match(/[.!?]/g) || []).length;
-            const commas = (nlpData.reportMarkdownText.match(/[,;:-]/g) || []).length;
-            let estPauseSecs = (periods * 1.3) + (commas * 0.5);
-            estPauseSecs = Math.max(activeSecs * 0.05, Math.min(activeSecs * 0.45, estPauseSecs)); 
-            const pausePct = Math.round((estPauseSecs / activeSecs) * 100);
-            const sps = (nlpData.totalSyllables / Math.max(1, activeSecs - estPauseSecs)).toFixed(1);
-            const perPct = Math.round((nlpData.personalCount / words) * 100);
-            const visPct = Math.round((nlpData.visualCount / words) * 100);
+        // NEW: Ingests the Master Analyzer payload
+        function buildDynamicDrillData(masterData, elapsedSecs) {
+            const words = Math.max(1, masterData.numWords || 0);
+            
+            // The game no longer estimates logic - it simply pulls it from the universal math payload
+            const wpm = masterData.wpm || 0;
+            const pausePct = Math.round(masterData.pausePercent || 0);
+            const sps = (masterData.mumbleScore || 0).toFixed(1);
+            
+            const perPct = Math.round(((masterData.personalCount || 0) / words) * 100);
+            const visPct = Math.round(((masterData.visualCount || 0) / words) * 100);
             const absPct = Math.max(0, 100 - perPct - visPct);
-            const wps = Math.round(words / Math.max(1, nlpData.numSentences));
-            const engPct = Math.round((nlpData.google10kCount / words) * 100);
-            const grade = window.THPS.NLP.calculateReadabilityMetrics(words, nlpData.numSentences, nlpData.totalSyllables, nlpData.letterCount, nlpData.complexWordCount).avgGrade;
+            const wps = Math.round(words / Math.max(1, masterData.numSentences || 1));
+            const engPct = Math.round(((masterData.google10kCount || 0) / words) * 100);
+            
+            const grade = window.THPS.NLP.calculateReadabilityMetrics(
+                words, 
+                masterData.numSentences || 1, 
+                masterData.totalSyllables || 0, 
+                masterData.letterCount || 0, 
+                masterData.complexWordCount || 0
+            ).avgGrade;
             
             let popVal = 0;
             if (grade <= 5) popVal = 95 + (5 - grade)*1; 
@@ -570,6 +576,7 @@
             else popVal = Math.max(1, 15 - ((grade - 15) * 2.8));
             popVal = Math.round(Math.min(99, popVal));
 
+            // Traffic Light thresholds (Unique to the game)
             let scPace = scoreMetric(wpm, [100, 150], [89, 99], [151, 171]);
             let scMumb = scoreMetric(parseFloat(sps), [3.0, 4.9], [2.5, 2.9], [5.0, 5.5]);
             let scPaus = scoreMetric(pausePct, [10, 30], [5, 9], [31, 36]);
@@ -609,6 +616,7 @@
                 FinalGrade: sumDel + sumCon + sumCla 
             };
 
+            // Time uses raw elapsed seconds, not trueDuration, to ensure the UI clock matches the score clock
             let timeYou = elapsedSecs < 20 ? "Less than 20 sec" : (elapsedSecs < 60 ? "20 to 59s" : (elapsedSecs <= 80 ? "60 to 80s" : "More than 80s"));
             let timeWhy = elapsedSecs < 20 ? "Score invalid" : (elapsedSecs < 60 ? "Score of 0.5 / 1" : (elapsedSecs <= 80 ? "Score of +1" : "Score invalid"));
             let timeTry = (elapsedSecs >= 60 && elapsedSecs <= 80) ? "You nailed it!" : "Speaking for 60-80s";
@@ -947,10 +955,21 @@
                     const audioData = await window.THPS.Audio.stopRecordingProcess();
                     
                     if (window.THPS.NLP && audioData.transcript) {
-                        const nlpData = window.THPS.NLP.analyzeTranscript(audioData.transcript, audioData.timestamps || []);
-                        buildDynamicDrillData(nlpData, audioData.duration);
+                        // NEW: Request the Universal Payload from the Master Analyzer
+                        const masterData = window.THPS.NLP.analyzeSpeech(
+                            audioData.transcript, 
+                            audioData.timestamps || [], 
+                            window.THPS.Audio.volumeData || [], 
+                            audioData.duration
+                        );
+                        buildDynamicDrillData(masterData, audioData.duration);
                     } else {
-                        buildDynamicDrillData({numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, google10kCount: 0, numSentences: 0, reportMarkdownText: ""}, audioData.duration || 0);
+                        // Safe Empty Payload
+                        buildDynamicDrillData({
+                            numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
+                            google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
+                            wpm: 0, pausePercent: 0, mumbleScore: 0
+                        }, audioData.duration || 0);
                     }
                     
                     window.testTranscript = audioData.transcript || "No words captured.";
