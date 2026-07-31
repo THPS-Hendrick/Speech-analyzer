@@ -264,4 +264,120 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         reportMarkdownText,
         wordTimestamps 
     };
+    // ==========================================
+// THPS MASTER ANALYZER & MATH ENGINE
+// Centralizes all acoustic and text math into a single payload
+// ==========================================
+
+// Global Syllable Counter
+window.THPS.NLP.countSyllables = function(word) {
+    let w = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (w.length <= 3) return 1;
+    w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '');
+    const syl = w.match(/[aeiouy]{1,2}/g);
+    return syl ? syl.length : 1;
+};
+
+// Master Analyzer: Processes Text, Timestamps, and Volume
+window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSecs) {
+    
+    // 1. Process standard text-based NLP
+    const nlpData = this.analyzeTranscript(text, timestamps); 
+    
+    // 2. Initialize universal acoustic metrics
+    let acousticData = {
+        wpm: 0, 
+        mumbleScore: 0, 
+        pausePercent: 0, 
+        activeSpeakingSecs: 0,
+        pauseBuckets: { micro: 0, blue: 0, green: 0, orange: 0, red: 0 },
+        paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
+        volumeData: volumeData || [] // Passed through for apps that need it
+    };
+
+    let duration = Math.min(240, elapsedSecs || 0);
+
+    // 3. Process the Acoustic Elastic Grid (With 350ms Exclusion Rule)
+    if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
+        let totalPauseTime = 0;
+        
+        let localTotalSyllables = 0;
+        timestamps.forEach(w => localTotalSyllables += this.countSyllables(w.word));
+        let totalAssumedUnits = localTotalSyllables + timestamps.length - 1;
+
+        const firstWord = timestamps[0];
+        const lastWord = timestamps[timestamps.length - 1];
+        const lastWordSyllables = this.countSyllables(lastWord.word);
+        const expectedLastWordEnd = lastWord.start + (lastWordSyllables * 0.35);
+        duration = Math.max(0.1, expectedLastWordEnd - firstWord.start);
+
+        let assumedUnitLength = duration / totalAssumedUnits;
+
+        for (let i = 0; i < timestamps.length - 1; i++) {
+            let currWord = timestamps[i];
+            let nextWord = timestamps[i+1];
+            
+            let gap = Math.max(0.01, nextWord.start - currWord.start);
+
+            let sylCount = this.countSyllables(currWord.word);
+            let expectedUnits = sylCount + 1;
+            let expectedTime = expectedUnits * assumedUnitLength;
+
+            let syllableUnitLength = 0;
+            let pauseUnitValue = 0;
+
+            if (gap <= expectedTime) {
+                // Gap is shorter. No pause.
+                syllableUnitLength = gap / sylCount;
+                acousticData.pauseBuckets.micro++;
+            } else {
+                // Gap is longer. Test spillover.
+                let evenExpansion = gap / expectedUnits;
+
+                if (evenExpansion < 0.35) {
+                    syllableUnitLength = gap / sylCount;
+                    acousticData.pauseBuckets.micro++;
+                } else {
+                    syllableUnitLength = 0.35;
+                    pauseUnitValue = gap - (sylCount * 0.35);
+
+                    // 350ms BRIGHT LINE TEST
+                    if (pauseUnitValue >= 0.35) {
+                        totalPauseTime += pauseUnitValue; // Added to score
+                        
+                        if (pauseUnitValue >= 1.40) acousticData.pauseBuckets.red++;
+                        else if (pauseUnitValue >= 1.05) acousticData.pauseBuckets.orange++;
+                        else if (pauseUnitValue >= 0.70) acousticData.pauseBuckets.green++;
+                        else acousticData.pauseBuckets.blue++;
+                    } else {
+                        acousticData.pauseBuckets.micro++; // Ignored for score
+                    }
+                }
+            }
+
+            // Pace Intensity
+            let paceRatio = syllableUnitLength / assumedUnitLength;
+            if (paceRatio < 0.80) acousticData.paceBuckets.fastest++;
+            else if (paceRatio < 0.95) acousticData.paceBuckets.fast++;
+            else if (paceRatio <= 1.05) acousticData.paceBuckets.normal++;
+            else if (paceRatio <= 1.20) acousticData.paceBuckets.slow++;
+            else acousticData.paceBuckets.slowest++;
+        }
+
+        acousticData.activeSpeakingSecs = Math.max(0, duration - totalPauseTime);
+        acousticData.pausePercent = Math.max(0, Math.min(100, (totalPauseTime / duration) * 100));
+        acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
+        acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
+
+    } else if (timestamps && timestamps.length === 1) {
+        acousticData.activeSpeakingSecs = 1.0;
+        acousticData.pausePercent = 0;
+    } else {
+        acousticData.activeSpeakingSecs = duration * 0.85;
+        acousticData.pausePercent = 15;
+    }
+
+    // 4. Return the massive unified payload
+    return { ...nlpData, ...acousticData, trueDuration: duration };
+};
 };
