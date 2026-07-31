@@ -561,13 +561,16 @@
             const wps = Math.round(words / Math.max(1, masterData.numSentences || 1));
             const engPct = Math.round(((masterData.google10kCount || 0) / words) * 100);
             
-            const grade = window.THPS.NLP.calculateReadabilityMetrics(
-                words, 
-                masterData.numSentences || 1, 
-                masterData.totalSyllables || 0, 
-                masterData.letterCount || 0, 
-                masterData.complexWordCount || 0
-            ).avgGrade;
+            let grade = 0;
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
+                grade = window.THPS.NLP.calculateReadabilityMetrics(
+                    words, 
+                    masterData.numSentences || 1, 
+                    masterData.totalSyllables || 0, 
+                    masterData.letterCount || 0, 
+                    masterData.complexWordCount || 0
+                ).avgGrade;
+            }
             
             let popVal = 0;
             if (grade <= 5) popVal = 95 + (5 - grade)*1; 
@@ -954,30 +957,44 @@
                 if (window.THPS && window.THPS.Audio) {
                     const audioData = await window.THPS.Audio.stopRecordingProcess();
                     
-                    if (window.THPS.NLP && audioData.transcript) {
-                        // NEW: Request the Universal Payload from the Master Analyzer
-                        const masterData = window.THPS.NLP.analyzeSpeech(
-                            audioData.transcript, 
-                            audioData.timestamps || [], 
-                            window.THPS.Audio.volumeData || [], 
-                            audioData.duration
-                        );
-                        buildDynamicDrillData(masterData, audioData.duration);
-                    } else {
-                        // Safe Empty Payload
+                    try {
+                        if (window.THPS.NLP && audioData.transcript) {
+                            // Request the Universal Payload from the Master Analyzer
+                            const masterData = window.THPS.NLP.analyzeSpeech(
+                                audioData.transcript, 
+                                audioData.timestamps || [], 
+                                window.THPS.Audio.volumeData || [], 
+                                audioData.duration
+                            );
+                            buildDynamicDrillData(masterData, audioData.duration);
+                        } else {
+                            throw new Error("No transcript found or NLP engine missing.");
+                        }
+                    } catch (error) {
+                        console.warn("Processing failed, applying strict zero fallback.", error);
+                        // Safe Empty Payload with strict zeroes
                         buildDynamicDrillData({
                             numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
                             google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
                             wpm: 0, pausePercent: 0, mumbleScore: 0
                         }, audioData.duration || 0);
+                    } finally {
+                        window.testTranscript = audioData.transcript || "No words captured.";
+                        phase = 'RESULTS';
+                        sideBLevel = 0;
+                        renderPhase();
                     }
-                    
-                    window.testTranscript = audioData.transcript || "No words captured.";
+                } else {
+                    // Fallback if window.THPS.Audio is not available at all
+                    buildDynamicDrillData({
+                        numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
+                        google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
+                        wpm: 0, pausePercent: 0, mumbleScore: 0
+                    }, 0);
+                    phase = 'RESULTS';
+                    sideBLevel = 0;
+                    renderPhase();
                 }
-
-                phase = 'RESULTS';
-                sideBLevel = 0;
-                renderPhase();
             }
         }
 
