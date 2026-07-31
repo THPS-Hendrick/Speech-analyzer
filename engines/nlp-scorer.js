@@ -264,13 +264,15 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         reportMarkdownText,
         wordTimestamps 
     };
-    // ==========================================
+};
+ // ==========================================
 // THPS MASTER ANALYZER & MATH ENGINE
 // Centralizes all acoustic and text math into a single payload
 // ==========================================
 
-// Global Syllable Counter
+// Global Syllable Counter (Type-Safe)
 window.THPS.NLP.countSyllables = function(word) {
+    if (!word || typeof word !== 'string') return 1; // Guard against STT token errors
     let w = word.toLowerCase().replace(/[^a-z]/g, '');
     if (w.length <= 3) return 1;
     w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '');
@@ -281,8 +283,8 @@ window.THPS.NLP.countSyllables = function(word) {
 // Master Analyzer: Processes Text, Timestamps, and Volume
 window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSecs) {
     
-    // 1. Process standard text-based NLP
-    const nlpData = this.analyzeTranscript(text, timestamps); 
+    // 1. Process standard text-based NLP using explicit namespace
+    const nlpData = window.THPS.NLP.analyzeTranscript(text, timestamps); 
     
     // 2. Initialize universal acoustic metrics
     let acousticData = {
@@ -302,12 +304,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         let totalPauseTime = 0;
         
         let localTotalSyllables = 0;
-        timestamps.forEach(w => localTotalSyllables += this.countSyllables(w.word));
+        timestamps.forEach(w => localTotalSyllables += window.THPS.NLP.countSyllables(w.word));
         let totalAssumedUnits = localTotalSyllables + timestamps.length - 1;
 
         const firstWord = timestamps[0];
         const lastWord = timestamps[timestamps.length - 1];
-        const lastWordSyllables = this.countSyllables(lastWord.word);
+        const lastWordSyllables = window.THPS.NLP.countSyllables(lastWord.word);
         const expectedLastWordEnd = lastWord.start + (lastWordSyllables * 0.35);
         duration = Math.max(0.1, expectedLastWordEnd - firstWord.start);
 
@@ -319,7 +321,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             
             let gap = Math.max(0.01, nextWord.start - currWord.start);
 
-            let sylCount = this.countSyllables(currWord.word);
+            let sylCount = window.THPS.NLP.countSyllables(currWord.word);
             let expectedUnits = sylCount + 1;
             let expectedTime = expectedUnits * assumedUnitLength;
 
@@ -373,11 +375,11 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.activeSpeakingSecs = 1.0;
         acousticData.pausePercent = 0;
     } else {
-        acousticData.activeSpeakingSecs = duration * 0.85;
-        acousticData.pausePercent = 15;
+        // STRICT ZERO FALLBACKS
+        acousticData.activeSpeakingSecs = 0;
+        acousticData.pausePercent = 0;
     }
 
     // 4. Return the massive unified payload
     return { ...nlpData, ...acousticData, trueDuration: duration };
-};
 };
