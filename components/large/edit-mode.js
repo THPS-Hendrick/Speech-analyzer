@@ -7,6 +7,7 @@ class ThpsEditMode extends HTMLElement {
         this.virtualSentences = [];
         this.virtualWords = [];
         this.syllableGroups = [];
+        this.repeatGroups = []; // NEW: Stores repeat word data
         this.currentMode = "edit-speech"; // Default mode
         this.isEditing = false; // Toggle state for the editor
         this.lastDataPayload = null;
@@ -70,6 +71,7 @@ class ThpsEditMode extends HTMLElement {
                             <option value="edit-speech">Edit Speech</option>
                             <option value="long-short">Words / Sentence</option>
                             <option value="syllables">Syllables / Word</option>
+                            <option value="repeat">Repeated Words</option>
                         </select>
 
                         <!-- Filters Dropdown -->
@@ -202,6 +204,7 @@ class ThpsEditMode extends HTMLElement {
         if (!data.text || data.text.trim() === '') {
             this.virtualSentences = [];
             this.syllableGroups = [];
+            this.repeatGroups = [];
             this.renderDOM();
             return;
         }
@@ -239,6 +242,34 @@ class ThpsEditMode extends HTMLElement {
                     syllables: sylCount,
                     uniqueCount: syllableMap[sylCount].size,
                     words: Array.from(syllableMap[sylCount]).sort() 
+                };
+            });
+
+        // NEW: Process Repeat Mode
+        let wordCounts = {};
+        allWords.forEach(word => {
+            const cleanWord = word.toLowerCase().replace(/[^a-z']/g, ''); // Keep letters and apostrophes
+            if (cleanWord) {
+                wordCounts[cleanWord] = (wordCounts[cleanWord] || 0) + 1;
+            }
+        });
+
+        let repeatMap = {};
+        for (const [word, count] of Object.entries(wordCounts)) {
+            const repeats = count - 1; // 1st instance doesn't count as a repeat
+            if (repeats >= 1) {
+                if (!repeatMap[repeats]) repeatMap[repeats] = [];
+                repeatMap[repeats].push(word);
+            }
+        }
+
+        this.repeatGroups = Object.keys(repeatMap)
+            .map(Number)
+            .sort((a, b) => b - a) // Sort left column from largest to smallest
+            .map(repeatCount => {
+                return {
+                    repeats: repeatCount,
+                    words: repeatMap[repeatCount].sort() // Sort right column alphabetically
                 };
             });
 
@@ -315,6 +346,34 @@ class ThpsEditMode extends HTMLElement {
                 `;
             });
         } 
+        else if (this.currentMode === "repeat") {
+            // Contextual header for Repeat Mode
+            const headerText = this.repeatGroups.length === 0 
+                ? "No repeated words found" 
+                : "These are words you said more than once";
+                
+            htmlOutput += `
+                <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">${headerText}</span>
+                </div>
+            `;
+
+            if (this.repeatGroups.length > 0) {
+                this.repeatGroups.forEach(group => {
+                    let gutterClass = group.repeats >= 3 ? "metric-highlight" : "text-slate-400";
+                    htmlOutput += `
+                        <div class="github-line">
+                            <div class="github-gutter ${gutterClass}" title="Repeated ${group.repeats} times">
+                                ${group.repeats}
+                            </div>
+                            <div class="github-content leading-relaxed">
+                                ${group.words.join(', ')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
         else {
             // Sentence Mode (Long-Short)
             let displayArray = [...this.virtualSentences];
