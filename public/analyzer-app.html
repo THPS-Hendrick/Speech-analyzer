@@ -682,13 +682,19 @@
                                 // SCENARIO 4: Cap hit. Spillover becomes True Pause.
                                 syllableUnitLength = 0.35;
                                 pauseUnitValue = gap - (sylCount * 0.35);
-                                totalPauseTime += pauseUnitValue;
 
-                                // Bucket the True Pause length
-                                if (pauseUnitValue >= 1.40) pauseBuckets.red++;
-                                else if (pauseUnitValue >= 1.05) pauseBuckets.orange++;
-                                else if (pauseUnitValue >= 0.70) pauseBuckets.green++;
-                                else if (pauseUnitValue >= 0.35) pauseBuckets.blue++;
+                                if (pauseUnitValue >= 0.35) {
+                                    totalPauseTime += pauseUnitValue; // ONLY add to score if 350ms+
+
+                                    // Bucket the True Pause length
+                                    if (pauseUnitValue >= 1.40) pauseBuckets.red++;
+                                    else if (pauseUnitValue >= 1.05) pauseBuckets.orange++;
+                                    else if (pauseUnitValue >= 0.70) pauseBuckets.green++;
+                                    else pauseBuckets.blue++; // catches everything between 0.35 and 0.70
+                                } else {
+                                    // Sub-350ms spillover. Count as a visual micro-pause, but do NOT add to score.
+                                    pauseBuckets.micro++;
+                                }
                             }
                         }
 
