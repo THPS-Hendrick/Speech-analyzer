@@ -19,12 +19,33 @@ class ThpsEditMode extends HTMLElement {
                 .github-content { flex-grow: 1; padding: 0.25rem 0; color: #334155; }
                 .metric-highlight { color: #ef4444; font-weight: bold; } 
                 
-                /* Filter Styles */
+                /* FILTER STYLES: CSS Specificity Override */
                 .personal-word, .visual-word, .overlap-word, .simple-word { transition: all 0.2s; }
-                .show-personal .personal-word { color: #3b82f6; font-weight: 700; background: #eff6ff; border-radius: 2px; }
-                .show-visual .visual-word { color: #ef4444; font-weight: 700; background: #fef2f2; border-radius: 2px; }
-                .show-overlap .overlap-word { color: #a855f7; font-weight: 700; background: #faf5ff; border-radius: 2px; }
-                .show-simple .simple-word { text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+                
+                #cba-wrapper .glass-panel:not(.show-personal) .personal-word { 
+                    color: inherit; 
+                    font-weight: inherit; 
+                    background-color: transparent; 
+                    padding: 0; 
+                }
+                
+                #cba-wrapper .glass-panel:not(.show-visual) .visual-word { 
+                    color: inherit; 
+                    font-weight: inherit; 
+                    background-color: transparent; 
+                    padding: 0; 
+                }
+                
+                #cba-wrapper .glass-panel:not(.show-overlap) .overlap-word { 
+                    color: inherit; 
+                    font-weight: inherit; 
+                    background-color: transparent; 
+                    padding: 0; 
+                }
+                
+                #cba-wrapper .glass-panel:not(.show-simple) .simple-word { 
+                    text-decoration: none; 
+                }
                 
                 /* Editor Styles */
                 .thps-editor-box { outline: none; padding: 1rem; min-height: 100%; white-space: pre-wrap; line-height: 1.8; }
@@ -266,7 +287,7 @@ class ThpsEditMode extends HTMLElement {
         let htmlOutput = '<div class="py-2 relative">';
 
         if (this.currentMode === "edit-speech") {
-            // Edit Mode renders static header (not sticky) followed by HTML
+            // Edit Mode renders static header followed by HTML
             htmlOutput += `
                 <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-between items-center rounded-t-lg">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-2">Speech Text</span>
@@ -303,10 +324,21 @@ class ThpsEditMode extends HTMLElement {
                 let gutterValue = this.currentMode === "long-short" ? item.wordCount : item.originalIndex;
                 let gutterClass = (this.currentMode === "long-short" && item.wordCount >= 15) ? "metric-highlight" : "text-slate-400";
                 
+                // NEW FOR STEP 4: We inject the original HTML string into the re-ordered sentences to retain highlights in Long-Short mode!
+                // We use a quick regex match to pull the highlighted sentence from the payload based on the plain text.
+                let sentenceHTML = item.text;
+                if (this.lastDataPayload.highlightedHTML) {
+                    const cleanItemText = item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex chars
+                    // Create a flexible regex that allows HTML tags between words
+                    const flexibleRegexStr = cleanItemText.split(/\s+/).join('(?:\\s|<[^>]*>)+');
+                    const match = this.lastDataPayload.highlightedHTML.match(new RegExp(flexibleRegexStr, 'i'));
+                    if (match) sentenceHTML = match[0];
+                }
+                
                 htmlOutput += `
                     <div class="github-line">
                         <div class="github-gutter ${gutterClass}">${gutterValue}</div>
-                        <div class="github-content">${item.text}</div>
+                        <div class="github-content">${sentenceHTML}</div>
                     </div>
                 `;
             });
