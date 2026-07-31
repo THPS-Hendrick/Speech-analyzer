@@ -7,14 +7,14 @@ class ThpsEditMode extends HTMLElement {
         this.virtualSentences = [];
         this.virtualWords = [];
         this.syllableGroups = [];
-        this.currentMode = "chronological"; 
+        this.currentMode = "edit-speech"; // Default mode
+        this.isEditing = false; // Toggle state for the editor
         this.lastDataPayload = null;
 
         this.innerHTML = `
             <style>
                 .github-line { display: flex; font-size: 0.875rem; line-height: 1.5; border-bottom: 1px solid transparent; transition: background-color 0.15s; }
                 .github-line:hover { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-                /* Widen gutter to 4rem to fit bracketed numbers */
                 .github-gutter { width: 4rem; flex-shrink: 0; padding: 0.25rem 0.5rem; text-align: right; color: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; user-select: none; border-right: 1px solid #e2e8f0; margin-right: 1rem; align-items: flex-start; display: flex; justify-content: flex-end; }
                 .github-content { flex-grow: 1; padding: 0.25rem 0; color: #334155; }
                 .metric-highlight { color: #ef4444; font-weight: bold; } 
@@ -31,7 +31,8 @@ class ThpsEditMode extends HTMLElement {
                 .thps-editor-box:focus { background-color: #f8fafc; }
             </style>
             
-            <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move">
+            <!-- Default wrapper classes added for ON state -->
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move show-personal show-visual show-overlap show-simple">
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
@@ -45,22 +46,21 @@ class ThpsEditMode extends HTMLElement {
                     <div class="flex flex-wrap items-center gap-2">
                         <!-- Modes Dropdown -->
                         <select id="edit-mode-select" class="text-xs bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 outline-none hover:bg-slate-100 cursor-pointer font-bold">
-                            <option value="chronological">Chronological (Off)</option>
+                            <option value="edit-speech">Edit Speech</option>
                             <option value="long-short">Words / Sentence</option>
                             <option value="syllables">Syllables / Word</option>
-                            <option value="edit-speech">✏️ Edit Speech</option>
                         </select>
 
                         <!-- Filters Dropdown -->
-                        <div class="group/filters relative">
+                        <div class="group/filters relative" id="filters-dropdown-container">
                             <button class="text-xs font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-500 rounded-lg px-3 py-1 outline-none hover:bg-slate-50 shadow-sm flex items-center gap-1 cursor-pointer">
                                 Filters <i data-lucide="chevron-down" class="w-3 h-3"></i>
                             </button>
                             <div class="absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-xl opacity-0 invisible group-hover/filters:opacity-100 group-hover/filters:visible transition-all duration-200 z-50 p-2 flex flex-col gap-2">
-                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-blue-600"><input type="checkbox" class="filter-toggle" value="show-personal"> Personal</label>
-                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-red-600"><input type="checkbox" class="filter-toggle" value="show-visual"> Visual</label>
-                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-purple-600"><input type="checkbox" class="filter-toggle" value="show-overlap"> Overlap</label>
-                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-slate-900"><input type="checkbox" class="filter-toggle" value="show-simple"> Simple</label>
+                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-blue-600"><input type="checkbox" class="filter-toggle" value="show-personal" checked> Personal</label>
+                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-red-600"><input type="checkbox" class="filter-toggle" value="show-visual" checked> Visual</label>
+                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-purple-600"><input type="checkbox" class="filter-toggle" value="show-overlap" checked> Overlap</label>
+                                <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer hover:text-slate-900"><input type="checkbox" class="filter-toggle" value="show-simple" checked> Simple</label>
                             </div>
                         </div>
 
@@ -97,27 +97,50 @@ class ThpsEditMode extends HTMLElement {
 
         // Setup Mode Change Event
         this.querySelector('#edit-mode-select').addEventListener('change', (e) => {
-            const oldMode = this.currentMode;
             this.currentMode = e.target.value;
-            
-            if (oldMode === 'edit-speech' && this.currentMode !== 'edit-speech') {
-                this.syncToEngine();
-            } else {
-                this.renderDOM();
-            }
+            this.renderDOM();
         });
 
         // Setup Filter Toggles
         this.querySelectorAll('.filter-toggle').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
-                this.classList.toggle(e.target.value, e.target.checked);
+                // Find the main glass-panel wrapper and toggle the specific class
+                const wrapper = this.querySelector('.glass-panel');
+                wrapper.classList.toggle(e.target.value, e.target.checked);
             });
         });
 
         // Lazy-Load sync for Count Dropdown
         this.querySelector('.group\\/counts').addEventListener('mouseenter', () => {
-            if (this.currentMode === 'edit-speech') {
+            if (this.currentMode === 'edit-speech' && this.isEditing) {
                 this.syncToEngine(true); // Silent sync
+            }
+        });
+
+        // Delegate Click Event for the dynamic "Edit (off/on)" button
+        this.querySelector('.thps-edit-content').addEventListener('click', (e) => {
+            const btn = e.target.closest('.toggle-edit-btn');
+            if (btn) {
+                if (this.isEditing) {
+                    // Exiting Edit Mode
+                    this.isEditing = false;
+                    this.syncToEngine(); 
+                } else {
+                    // Entering Edit Mode
+                    this.isEditing = true;
+                    this.renderDOM();
+                }
+            }
+        });
+
+        // Delegate Paste Event to strip HTML when editing
+        this.querySelector('.thps-edit-content').addEventListener('paste', (e) => {
+            if (!this.isEditing) return;
+            const editorBox = e.target.closest('.thps-editor-box');
+            if (editorBox) {
+                e.preventDefault();
+                const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
             }
         });
         
@@ -144,6 +167,9 @@ class ThpsEditMode extends HTMLElement {
     }
 
     processData(data) {
+        // SAFETY: Do not overwrite the user's text if an external update triggers while typing.
+        if (this.isEditing && !this.ignoreNextUpdate) return; 
+
         if (this.ignoreNextUpdate) {
             this.updateStatsPanel(data);
             this.ignoreNextUpdate = false;
@@ -159,7 +185,7 @@ class ThpsEditMode extends HTMLElement {
             return;
         }
 
-        // Parse Sentences
+        // Parse Sentences using plain text so sort matches word count
         const rawSentences = data.text.match(/[^.!?]+[.!?]*/g) || [data.text];
         this.virtualSentences = rawSentences.map((sentence, index) => {
             const cleanText = sentence.trim();
@@ -218,32 +244,42 @@ class ThpsEditMode extends HTMLElement {
 
     renderDOM() {
         const container = this.querySelector('.thps-edit-content');
+        const modeSelect = this.querySelector('#edit-mode-select');
+        const filtersBtn = this.querySelector('#filters-dropdown-container');
         
+        // Apply UI Locks if editing
+        if (this.isEditing) {
+            modeSelect.disabled = true;
+            modeSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            filtersBtn.classList.add('pointer-events-none', 'opacity-50');
+        } else {
+            modeSelect.disabled = false;
+            modeSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+            filtersBtn.classList.remove('pointer-events-none', 'opacity-50');
+        }
+
         if (!this.lastDataPayload || !this.lastDataPayload.text) {
             container.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-sm mt-10">Waiting for text...</div>`;
             return;
         }
 
-        let htmlOutput = '<div class="py-2">';
+        let htmlOutput = '<div class="py-2 relative">';
 
         if (this.currentMode === "edit-speech") {
-            htmlOutput = `
-                <div class="thps-editor-box" contenteditable="true" spellcheck="false">
+            // Edit Mode renders static header (not sticky) followed by HTML
+            htmlOutput += `
+                <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-between items-center rounded-t-lg">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-2">Speech Text</span>
+                    <button class="toggle-edit-btn text-xs font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm ${this.isEditing ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
+                        ${this.isEditing ? 'Edit (on)' : 'Edit (off)'}
+                    </button>
+                </div>
+                <div class="thps-editor-box px-2" ${this.isEditing ? 'contenteditable="true"' : ''} spellcheck="false">
                     ${this.lastDataPayload.highlightedHTML || this.lastDataPayload.text}
                 </div>
             `;
-            container.innerHTML = htmlOutput;
-
-            const editorBox = container.querySelector('.thps-editor-box');
-            editorBox.addEventListener('paste', (e) => {
-                e.preventDefault();
-                const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-                document.execCommand('insertText', false, text);
-            });
-            return;
         } 
-        
-        if (this.currentMode === "syllables") {
+        else if (this.currentMode === "syllables") {
             this.syllableGroups.forEach(group => {
                 let gutterClass = group.syllables >= 4 ? "metric-highlight" : "text-slate-400";
                 htmlOutput += `
@@ -259,6 +295,7 @@ class ThpsEditMode extends HTMLElement {
             });
         } 
         else {
+            // Sentence Mode (Long-Short)
             let displayArray = [...this.virtualSentences];
             if (this.currentMode === "long-short") displayArray.sort((a, b) => b.wordCount - a.wordCount);
             
