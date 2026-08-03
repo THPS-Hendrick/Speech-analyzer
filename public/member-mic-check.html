@@ -192,7 +192,7 @@
                         stat.classList.replace('text-amber-700', 'text-green-700');
                         stat.classList.replace('bg-amber-100', 'bg-green-100');
                         stat.classList.remove('animate-pulse');
-                        setTimeout(() => stat.classList.add('hidden'), 00);
+                        setTimeout(() => stat.classList.add('hidden'), 0); // FIXED: Changed 00 to 0
                     }
                 });
             } catch (error) {
@@ -272,7 +272,10 @@
                     let stars = 0; let score = 0.0; let scoreColor = 'text-slate-400';
                     
                    if (data) { 
-                      stars = data.stars; score = data.score; 
+                      // FIXED: Enforced fallback parsing to prevent fatal undefined/null errors
+                      stars = data.stars || 0; 
+                      score = (data.score !== undefined && data.score !== null) ? parseFloat(data.score) : 0.0; 
+                      
                       if (score === 10) { goldenCount++; scoreColor = 'text-yellow-400 drop-shadow-md font-black'; } 
                       else if (score >= 8.0) { totalStars += stars; scoreColor = 'text-green-500'; } 
                       else if (score >= 7) { scoreColor = 'text-orange-500'; } 
@@ -294,7 +297,6 @@
             document.getElementById('golden-count').innerText = goldenCount;
             if (window.lucide) window.lucide.createIcons();
 
-// --- NEW CODE: SCROLL TO TODAY ---
             setTimeout(() => {
                 const container = document.getElementById('grid-scroll-container');
                 const todayBtn = document.getElementById('btn-today');
