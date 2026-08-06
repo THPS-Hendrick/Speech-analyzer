@@ -192,7 +192,7 @@
                         stat.classList.replace('text-amber-700', 'text-green-700');
                         stat.classList.replace('bg-amber-100', 'bg-green-100');
                         stat.classList.remove('animate-pulse');
-                        setTimeout(() => stat.classList.add('hidden'), 0); // FIXED: Changed 00 to 0
+                        setTimeout(() => stat.classList.add('hidden'), 0);
                     }
                 });
             } catch (error) {
@@ -272,7 +272,6 @@
                     let stars = 0; let score = 0.0; let scoreColor = 'text-slate-400';
                     
                    if (data) { 
-                      // FIXED: Enforced fallback parsing to prevent fatal undefined/null errors
                       stars = data.stars || 0; 
                       score = (data.score !== undefined && data.score !== null) ? parseFloat(data.score) : 0.0; 
                       
@@ -301,13 +300,12 @@
                 const container = document.getElementById('grid-scroll-container');
                 const todayBtn = document.getElementById('btn-today');
                 if (container && todayBtn) {
-                    // Centers today's button in the view
                     container.scrollTo({
                         top: todayBtn.offsetTop - (container.clientHeight / 2) + (todayBtn.clientHeight / 2),
                         behavior: 'smooth'
                     });
                 }
-            }, 100); // 100ms delay ensures the DOM has finished painting the grid
+            }, 100); 
         };
 
         window.openGameView = function(dateStr) {
@@ -317,7 +315,6 @@
             document.getElementById('view-game').classList.add('flex');
             window.scrollTo(0, 0);
             
-            // Format the target date for the game UI
             const [yyyy, mm, dd] = dateStr.split('-');
             globalShortDate = `${dd}/${mm}/${yyyy.substring(2)}`;
             
@@ -332,7 +329,6 @@
             const overlay = document.getElementById('legal-overlay');
             const btn = document.getElementById('legal-btn');
             
-            // Dynamically insert current year
             const yearSpan = document.getElementById('copyright-year');
             if (yearSpan) yearSpan.innerText = new Date().getFullYear();
 
@@ -361,7 +357,6 @@
             if (window.renderMenuGrid) window.renderMenuGrid(); 
             window.scrollTo(0, 0);
             
-            // Kill camera if active to save battery
             if (isCameraOn) toggleCamera();
         };
 
@@ -480,7 +475,6 @@
                 p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-start items-start transition-colors duration-300`;
                 p6f.innerHTML = `<button onclick="revertP6ToDefault(event)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-800 transition-colors p-1 cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button><h3 class="text-[11px] font-black uppercase ${activeColor} tracking-widest mb-3">${data.name}</h3><div class="space-y-3 w-full pr-1 overflow-y-auto max-h-[170px]"><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">You:</strong> ${data.you}</p><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Why:</strong> ${data.why}</p><p class="text-[10px] text-slate-600 leading-tight"><strong class="uppercase text-[9px] tracking-widest block mb-0.5 text-slate-400">Try:</strong> ${data.try}</p></div>`;
             }
-            if (!document.getElementById('countdown-overlay-front')) { p6f.insertAdjacentHTML('beforeend', `<div id="countdown-overlay-front" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-50/95 backdrop-blur-sm text-slate-800 text-5xl font-black opacity-0 transition-opacity duration-200 z-30 tracking-widest uppercase text-center leading-tight"></div>`); }
             if (window.lucide) window.lucide.createIcons();
         }
 
@@ -512,7 +506,7 @@
             const fillDiv = document.getElementById('p5-fill');
             if (fillDiv) fillDiv.style.width = `${(count / 4) * 100}%`;
             const levelNum = document.getElementById('p5-level-num');
-            if (levelNum) levelNum.innerText = `PLAY LEVEL ${count + 1}`;
+            if (levelNum) levelNum.innerText = `SELECT LEVEL ${count + 1}?`; // UPDATED UX TEXT
         }
         function scoreMetric(raw, bounds1, bounds05_low, bounds05_high) {
             if (raw >= bounds1[0] && raw <= bounds1[1]) return { points: 1, state: 'perfect' };
@@ -522,11 +516,9 @@
         }
         function getStarFromScore(score) { if (score >= 2.5) return 'filled'; if (score >= 1.5) return 'half'; return 'empty'; }
 
-        // NEW: Ingests the Master Analyzer payload
         function buildDynamicDrillData(masterData, elapsedSecs) {
             const words = Math.max(1, masterData.numWords || 0);
             
-            // The game no longer estimates logic - it simply pulls it from the universal math payload
             const wpm = masterData.wpm || 0;
             const pausePct = Math.round(masterData.pausePercent || 0);
             const sps = (masterData.mumbleScore || 0).toFixed(1);
@@ -586,6 +578,7 @@
                 const camOverlay = document.getElementById('p6-camera-grade-overlay');
                 if (camOverlay) { camOverlay.classList.add('opacity-0'); camOverlay.innerHTML = ''; }
             }
+            // Always unflip panels on transition unless specific phase setup re-flips them
             for (let i = 1; i <= 5; i++) { const el = document.getElementById(`bar-${i}`); if (el) el.classList.remove('flip-active'); }
 
             if (phase === 'MENU') {
@@ -613,8 +606,14 @@
                 
                 const fillP = (getLevelCount() / 4) * 100;
                 document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
-                document.getElementById('p5-front').innerHTML = `<div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div><div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)"><span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span></div>`;
-                document.getElementById('p5-back').className = 'face face-back'; document.getElementById('p5-back').innerHTML = ''; 
+                
+                // UPDATED: "SELECT LEVEL X?" 
+                document.getElementById('p5-front').innerHTML = `<div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div><div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)"><span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">SELECT LEVEL ${getLevelCount() + 1}?</span></div>`;
+                
+                // PRELOAD ARMED STATE ON THE BACK
+                document.getElementById('p5-back').className = `face face-back ${col.b} text-white`; 
+                document.getElementById('p5-back').innerHTML = `<div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto"><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${playSVG}</div></div>`;
+                
                 activeMenuTopic = 'LOGO'; renderP6Front();
             } 
             else if (phase === 'RECORDING') {
@@ -624,9 +623,17 @@
                     const chosenStar = selections[i] === 'A' ? matrix[i].starA : matrix[i].starB;
                     document.getElementById(`p${i}-front`).className = `face face-front ${selections[i] === 'A' ? matrix[i].bgA : matrix[i].bgB}`;
                     document.getElementById(`p${i}-front`).innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-10"><span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span></div><span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                    
+                    // Re-apply flips for context panels so they stay correct
+                    if(selections[i] === 'B') document.getElementById(`bar-${i}`).classList.add('flip-active');
                 }
-                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
-                document.getElementById('p5-front').innerHTML = `<div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div><div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center"><div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${stopSVG}</div><div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div></div>`;
+                
+                // Keep panel 5 flipped so we can see the recording UI on its back
+                document.getElementById('bar-5').classList.add('flip-active');
+
+                // Active recording timer loaded dynamically onto the BACK of panel 5
+                document.getElementById('p5-back').className = `face face-back ${col.b} text-white`;
+                document.getElementById('p5-back').innerHTML = `<div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div><div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center"><div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${stopSVG}</div><div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div></div>`;
             }
             else if (phase === 'PROCESSING') {
                 const bgs = [col.p1, col.p2, col.p3, col.p4, col.p5], txt = [col.textW, col.textW, col.textW, col.textW, col.textW];
@@ -675,8 +682,6 @@
                 window.lastAchievedLevel = levelChosen;
                 window.lastAchievedBg = gradeBg;
                 
-                // === THE BRIDGE: SAVE TO FIREBASE ===
-                // Includes protection against saving failed 0-score recordings
                 if (window.dbSaveScore && window.thps_currentPlayDate && window.lastAchievedTimeValid && drillData.FinalGrade > 0) {
                     window.dbSaveScore(window.thps_currentPlayDate, levelChosen, window.lastAchievedGradeFloat);
                 }
@@ -717,7 +722,13 @@
                 else if (panelNum === 5) { phase = 'START'; renderPhase(); }
                 return;
             }
-            if (phase === 'START') {
+            if (phase === 'START' || phase === 'ARMED') {
+                // If they interact with prompts while armed, revert safety catch
+                if (phase === 'ARMED' && panelNum >= 1 && panelNum <= 4) {
+                    phase = 'START';
+                    document.getElementById('bar-5').classList.remove('flip-active');
+                }
+
                 if (panelNum === 5) return; 
                 const bar = document.getElementById(`bar-${panelNum}`);
                 if (bar) bar.classList.toggle('flip-active');
@@ -734,27 +745,20 @@
 
         async function handleActionClick(event) {
             if (event) event.stopPropagation();
+
             if (phase === 'START') {
+                // ARM Phase: Flips the panel to reveal the Play button
+                phase = 'ARMED';
+                document.getElementById('bar-5').classList.add('flip-active');
+            } 
+            else if (phase === 'ARMED') {
+                // INSTANT RECORD: No visual countdown
                 if (isStarting) return; isStarting = true;
                 if (window.THPS && window.THPS.Audio) {
                     const micSuccess = await window.THPS.Audio.startRecordingProcess();
                     if (!micSuccess) { alert("Microphone access is required to proceed."); isStarting = false; resetGame(window.thps_currentPlayDate); return; }
                 }
 
-                const overlayFront = document.getElementById('countdown-overlay-front');
-                const overlayBack = document.getElementById('countdown-overlay-back');
-                if (overlayFront) overlayFront.classList.remove('opacity-0');
-                if (overlayBack) overlayBack.classList.remove('opacity-0');
-                
-                const steps = ["3", "2", "1", "Mic-Check!"];
-                for (let i = 0; i < steps.length; i++) {
-                    if (overlayFront) overlayFront.innerText = steps[i];
-                    if (overlayBack) overlayBack.innerText = steps[i];
-                    await new Promise(r => setTimeout(r, 800));
-                }
-                
-                if (overlayFront) overlayFront.classList.add('opacity-0');
-                if (overlayBack) overlayBack.classList.add('opacity-0'); 
                 isStarting = false; phase = 'RECORDING'; renderPhase(); timerSeconds = 0;
 
                 timerInterval = setInterval(() => {
@@ -857,7 +861,6 @@
                 const response = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-panels.json');
                 const data = await response.json();
 
-                // Load specifically for the Historic Date passed from the Hub
                 if (data[targetDateStr]) {
                     b1 = data[targetDateStr].p1; b2 = `${data[targetDateStr].p2} about`; 
                     b3 = `${data[targetDateStr].p3}, with`; b4 = `${data[targetDateStr].p4} examples.`;
