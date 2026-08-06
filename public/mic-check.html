@@ -530,7 +530,7 @@
             if (fillDiv) fillDiv.style.width = `${fillPercent}%`;
             
             const levelNum = document.getElementById('p5-level-num');
-            if (levelNum) levelNum.innerText = `PLAY LEVEL ${count + 1}`;
+            if (levelNum) levelNum.innerText = `SELECT LEVEL ${count + 1}?`; // UPDATED UX TEXT
         }
 
         function scoreMetric(raw, bounds1, bounds05_low, bounds05_high) {
@@ -692,13 +692,25 @@
                 const fillP = (getLevelCount() / 4) * 100;
                 
                 document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
+                
+                // UPDATED: "SELECT LEVEL X?" 
                 document.getElementById('p5-front').innerHTML = `
                     <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
                     <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)">
-                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">PLAY LEVEL ${getLevelCount() + 1}</span>
+                        <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">SELECT LEVEL ${getLevelCount() + 1}?</span>
                     </div>`;
-                document.getElementById('p5-back').className = 'face face-back';
-                document.getElementById('p5-back').innerHTML = ''; 
+                
+                // PRELOAD ARMED STATE ON THE BACK
+                document.getElementById('p5-back').className = `face face-back ${col.b} text-white`; 
+                document.getElementById('p5-back').innerHTML = `
+                    <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
+                    <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
+                        <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">
+                            ${playSVG}
+                        </div>
+                        <div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div>
+                    </div>`;
                 
                 activeMenuTopic = 'LOGO';
                 renderP6Front();
@@ -717,10 +729,17 @@
                             <span class="text-[13px] font-bold uppercase tracking-widest"><strong class="${chosenColor}">${chosenText}</strong></span>
                         </div>
                         <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
+                        
+                    // Re-apply flips for context panels so they stay correct
+                    if(selections[i] === 'B') document.getElementById(`bar-${i}`).classList.add('flip-active');
                 }
 
-                document.getElementById('p5-front').className = `face face-front ${col.b} text-white`;
-                document.getElementById('p5-front').innerHTML = `
+                // Keep panel 5 flipped so we can see the recording UI on its back
+                document.getElementById('bar-5').classList.add('flip-active');
+
+                // Active recording timer loaded dynamically onto the BACK of panel 5
+                document.getElementById('p5-back').className = `face face-back ${col.b} text-white`;
+                document.getElementById('p5-back').innerHTML = `
                     <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
                     <div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center">
                         <div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div>
@@ -862,7 +881,13 @@
                 return;
             }
 
-            if (phase === 'START') {
+            if (phase === 'START' || phase === 'ARMED') {
+                // If they interact with prompts while armed, revert safety catch
+                if (phase === 'ARMED' && panelNum >= 1 && panelNum <= 4) {
+                    phase = 'START';
+                    document.getElementById('bar-5').classList.remove('flip-active');
+                }
+
                 if (panelNum === 5) return; 
                 const bar = document.getElementById(`bar-${panelNum}`);
                 if (bar) bar.classList.toggle('flip-active');
@@ -886,39 +911,26 @@
             if (event) event.stopPropagation();
 
             if (phase === 'START') {
-                if (isStarting) return; 
-                isStarting = true;
-
+                // ARM Phase: Flips the panel to reveal the Play button
+                phase = 'ARMED';
+                document.getElementById('bar-5').classList.add('flip-active');
+            } 
+            else if (phase === 'ARMED') {
+                // INSTANT RECORD: No visual countdown
+                if (isStarting) return; isStarting = true;
+                
                 if (window.THPS && window.THPS.Audio) {
                     const micSuccess = await window.THPS.Audio.startRecordingProcess();
-                    if (!micSuccess) {
-                        alert("Microphone access is required to proceed.");
-                        isStarting = false;
-                        resetGame();
-                        return;
+                    if (!micSuccess) { 
+                        alert("Microphone access is required to proceed."); 
+                        isStarting = false; 
+                        resetGame(); 
+                        return; 
                     }
                 }
 
-                const overlayFront = document.getElementById('countdown-overlay-front');
-                const overlayBack = document.getElementById('countdown-overlay-back');
-                
-                if (overlayFront) overlayFront.classList.remove('opacity-0');
-                if (overlayBack) overlayBack.classList.remove('opacity-0');
-                
-                const steps = ["3", "2", "1", "Mic-Check!"];
-                for (let i = 0; i < steps.length; i++) {
-                    if (overlayFront) overlayFront.innerText = steps[i];
-                    if (overlayBack) overlayBack.innerText = steps[i];
-                    await new Promise(r => setTimeout(r, 800));
-                }
-                
-                if (overlayFront) overlayFront.classList.add('opacity-0');
-                if (overlayBack) overlayBack.classList.add('opacity-0'); 
-                
                 isStarting = false; 
-
-                phase = 'RECORDING';
-                achievedStarStatus = 'empty'; 
+                phase = 'RECORDING'; 
                 renderPhase(); 
                 timerSeconds = 0;
 
