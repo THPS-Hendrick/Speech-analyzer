@@ -610,9 +610,9 @@
                 // UPDATED: "SELECT LEVEL X?" 
                 document.getElementById('p5-front').innerHTML = `<div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div><div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)"><span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">SELECT LEVEL ${getLevelCount() + 1}?</span></div>`;
                 
-                // PRELOAD ARMED STATE ON THE BACK
-                document.getElementById('p5-back').className = `face face-back ${col.b} text-white`; 
-                document.getElementById('p5-back').innerHTML = `<div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto"><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${playSVG}</div></div>`;
+               // PRELOAD ARMED STATE ON THE BACK
+document.getElementById('p5-back').className = `face face-back ${col.b} text-white`; 
+document.getElementById('p5-back').innerHTML = `<div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div><div class="relative w-full h-full z-10 pointer-events-none flex items-center justify-center"><div id="star-1" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 25%; transform: translate(-50%, -50%);">${createStar('half', 20)}</div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer p-2.5 bg-white/10 hover:bg-white/25 rounded-full backdrop-blur-sm transition-all border border-white/10" onclick="handleActionClick(event)">${playSVG}</div><div id="star-2" class="absolute top-1/2 text-slate-600 transition-colors duration-300" style="left: 75%; transform: translate(-50%, -50%);">${createStar('filled', 20)}</div></div>`;
                 
                 activeMenuTopic = 'LOGO'; renderP6Front();
             } 
