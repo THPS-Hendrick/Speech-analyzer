@@ -15,6 +15,10 @@ class THPSCourseWidget extends HTMLElement {
         // Voice Choice Specific State
         this.vcActiveSpeechIndex = 0;
         this.vcLineIndex = 0;
+
+        // Say What You See Specific State
+        this.swysLevel = 1;
+        this.swysImageIndex = 0;
     }
 
     connectedCallback() {
@@ -56,6 +60,11 @@ class THPSCourseWidget extends HTMLElement {
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/voice-choices/voice-choices.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Voice Choice: Intensity</span>
                         <i data-lucide="sliders" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
+                    </button>
+                    <!-- SAY WHAT YOU SEE COURSE -->
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/say-what-you-see.json">
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Say What You See</span>
+                        <i data-lucide="image" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
                 </div>
             </div>
@@ -100,6 +109,11 @@ class THPSCourseWidget extends HTMLElement {
             } else if (this.courseData.mode === 'voice-choice') {
                 this.currentStep = 'vc-menu';
                 this.renderVoiceChoiceMenu();
+            } else if (this.courseData.mode === 'say-what-you-see') {
+                this.currentStep = 'swys-main';
+                this.swysLevel = 1; // Reset state on load
+                this.swysImageIndex = 0; // Reset state on load
+                this.renderSayWhatYouSee();
             } else {
                 this.currentStep = 1; 
                 this.renderCourseUI();
@@ -168,7 +182,7 @@ class THPSCourseWidget extends HTMLElement {
     renderVoiceChoicePrompter() {
         const speech = this.courseData.speeches[this.vcActiveSpeechIndex];
         
-        // NEW: Updated Color Palette
+        // Updated Color Palette
         const getStyle = (intensity) => {
             switch(parseInt(intensity)) {
                 case 0: return { bg: 'bg-slate-200', text: 'text-slate-600', ring: 'ring-slate-200' };
@@ -183,7 +197,6 @@ class THPSCourseWidget extends HTMLElement {
 
         const linesHTML = speech.lines.map((line, index) => {
             const style = getStyle(line.intensity);
-            // NEW: Removed the 'grayscale' class from the inactive state
             return `
                 <div class="vc-line-wrapper py-3 w-full" id="vc-line-${index}">
                     <div class="vc-line-content flex gap-4 p-4 rounded-2xl border-2 border-transparent transition-all duration-300 ${index === this.vcLineIndex ? 'opacity-100 bg-white shadow-sm ring-1 ' + style.ring : 'opacity-40'}">
@@ -213,12 +226,11 @@ class THPSCourseWidget extends HTMLElement {
                 </div>
 
                 <!-- GLIDING PROMPTER AREA -->
-                <!-- NEW: Added 'min-h-0' to force flexbox to respect the boundary -->
                 <div class="flex-1 relative flex flex-col min-h-0">
                     
                     <!-- Scroll Viewport -->
                     <div id="vc-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative px-4 md:px-12 py-10">
-                        <div class="max-w-2xl mx-auto flex flex-col pb-48"> <!-- Extra padding bottom so last line can hit top -->
+                        <div class="max-w-2xl mx-auto flex flex-col pb-48"> 
                             ${linesHTML}
                         </div>
                     </div>
@@ -265,11 +277,9 @@ class THPSCourseWidget extends HTMLElement {
             // Update visual styles (opacity and highlight)
             lines.forEach((line, idx) => {
                 if (idx === this.vcLineIndex) {
-                    // NEW: Removed grayscale
                     line.classList.remove('opacity-40');
                     line.classList.add('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
                 } else {
-                    // NEW: Removed grayscale
                     line.classList.add('opacity-40');
                     line.classList.remove('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
                 }
@@ -278,7 +288,6 @@ class THPSCourseWidget extends HTMLElement {
             // Smooth glide to the wrapper
             const targetWrapper = this.querySelector(`#vc-line-${this.vcLineIndex}`);
             if (targetWrapper && viewport) {
-                // Scroll the wrapper to the top of the viewport (with a small padding buffer)
                 viewport.scrollTo({
                     top: targetWrapper.offsetTop - 40,
                     behavior: 'smooth'
@@ -348,7 +357,6 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="text-lg font-black text-slate-700 group-hover:text-blue-600 mb-1 pointer-events-none">Glide</span>
                         <span class="text-xs font-bold text-slate-400 pointer-events-none">L, R, Y, W</span>
                     </button>
-                    <!-- NEW ADVANCED OPTION -->
                     <button class="thps-esl-cat-btn group bg-white border-2 border-slate-200 hover:border-violet-400 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all shadow-sm active:scale-95" data-cat="advanced">
                         <span class="text-lg font-black text-slate-700 group-hover:text-violet-600 mb-1 pointer-events-none">Advanced</span>
                         <span class="text-xs font-bold text-slate-400 pointer-events-none">Complex Clusters</span>
@@ -600,6 +608,105 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     // ==========================================
+    // SAY WHAT YOU SEE UI
+    // ==========================================
+    renderSayWhatYouSee() {
+        const getMaskClass = (level) => {
+            if (level === 1) return "w-0 opacity-0";
+            if (level === 2) return "w-1/2 opacity-100";
+            return "w-full opacity-100";
+        };
+
+        const currentImage = this.courseData.images[this.swysImageIndex];
+        const currentInstruction = this.courseData.instructions[this.swysLevel];
+
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
+                <!-- EXIT BUTTON -->
+                <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
+                    Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
+                </button>
+
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-6 mt-4 text-center">${this.courseData.title}</h2>
+
+                <div class="flex-1 flex flex-col md:flex-row gap-6 items-center justify-center mb-6 w-full max-w-4xl mx-auto px-4">
+                    
+                    <!-- LEFT COLUMN: Image & Mask -->
+                    <div class="relative w-full max-w-[500px] aspect-video bg-slate-200 rounded-xl overflow-hidden cursor-pointer shadow-md group border border-slate-200 shrink-0" id="swys-image-btn" title="Click to shuffle image">
+                        <img src="${currentImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" id="swys-img-el">
+                        
+                        <!-- The Dynamic Black Mask -->
+                        <div id="swys-mask-el" class="absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none ${getMaskClass(this.swysLevel)}"></div>
+                        
+                        <!-- Hover Overlay -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-black/10">
+                            <span class="bg-slate-900/80 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wider backdrop-blur-md">Click to Shuffle</span>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Controls -->
+                    <div class="flex flex-col w-full max-w-[300px] gap-4 shrink-0">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Difficulty Level</label>
+                            <select id="swys-level-select" class="w-full p-3.5 rounded-xl border-2 border-slate-200 shadow-sm font-bold text-slate-700 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors cursor-pointer">
+                                <option value="1" ${this.swysLevel === 1 ? 'selected' : ''}>Level 1: Full Image</option>
+                                <option value="2" ${this.swysLevel === 2 ? 'selected' : ''}>Level 2: Half Hidden</option>
+                                <option value="3" ${this.swysLevel === 3 ? 'selected' : ''}>Level 3: Fully Hidden</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border-2 border-slate-200 shadow-sm min-h-[6rem] flex items-center justify-center text-center">
+                            <p id="swys-instruction-text" class="text-sm font-bold text-slate-600 leading-relaxed">${currentInstruction}</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BOTTOM PANEL: Live Mic Timer -->
+                <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
+                    <div id="swys-progress" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                    
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;">
+                        <i data-lucide="star-half" id="swys-star-25" class="w-5 h-5 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;">
+                        <i data-lucide="star" id="swys-star-75" class="w-5 h-5 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    
+                    <button id="swys-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
+                        <i data-lucide="play" id="swys-record-icon" class="w-5 h-5 pointer-events-none transition-transform ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        // Event Listeners
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+            this.courseData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
+        this.querySelector('#swys-image-btn').addEventListener('click', () => {
+            this.swysImageIndex = (this.swysImageIndex + 1) % this.courseData.images.length;
+            this.querySelector('#swys-img-el').src = this.courseData.images[this.swysImageIndex];
+        });
+
+        this.querySelector('#swys-level-select').addEventListener('change', (e) => {
+            this.swysLevel = parseInt(e.target.value);
+            this.querySelector('#swys-instruction-text').innerText = this.courseData.instructions[this.swysLevel];
+            this.querySelector('#swys-mask-el').className = `absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none ${getMaskClass(this.swysLevel)}`;
+        });
+
+        this.querySelector('#swys-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        });
+    }
+
+    // ==========================================
     // LINEAR COURSE UI SCREEN
     // ==========================================
     renderCourseUI() {
@@ -804,7 +911,7 @@ class THPSCourseWidget extends HTMLElement {
         if (!this.courseData || this.currentStep === 0) return;
         
         // Bypass grading metrics if inside independent Arcade, ESL, or Voice Choice modes
-        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter') return;
+        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter' || this.currentStep === 'swys-main') return;
 
         const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
@@ -983,7 +1090,7 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 4. NEW: Sync Voice Choice Timer
+        // 4. Sync Voice Choice Timer
         const vcTimer = this.querySelector('.thps-vc-timer');
         const vcRecordBtn = this.querySelector('#vc-record-btn');
         const vcRecordIcon = this.querySelector('#vc-record-icon');
@@ -1022,6 +1129,42 @@ class THPSCourseWidget extends HTMLElement {
                         vcRecordIcon.setAttribute('data-lucide', 'mic');
                         if (window.lucide) window.lucide.createIcons({ root: vcRecordBtn });
                     }
+                }
+            }
+        }
+
+        // 5. Sync Say What You See Timer
+        const swysProgress = this.querySelector('#swys-progress');
+        const swysBtn = this.querySelector('#swys-record-btn');
+        const swysIcon = this.querySelector('#swys-record-icon');
+        const swysStar25 = this.querySelector('#swys-star-25');
+        const swysStar75 = this.querySelector('#swys-star-75');
+        
+        if (swysProgress && swysBtn && swysIcon) {
+            if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                
+                // Using 80s scale: 20s (25%) and 60s (75%)
+                const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
+                swysProgress.style.width = `${fillPct}%`;
+                
+                if (elapsedSecs >= 20 && swysStar25) swysStar25.className = "w-5 h-5 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)] transition-all";
+                if (elapsedSecs >= 60 && swysStar75) swysStar75.className = "w-5 h-5 text-amber-400 fill-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)] transition-all";
+                
+                if (swysIcon.getAttribute('data-lucide') !== 'square') {
+                    swysIcon.setAttribute('data-lucide', 'square');
+                    swysIcon.classList.remove('ml-1'); // Remove play button offset
+                    if (window.lucide) window.lucide.createIcons({ root: swysBtn });
+                }
+            } else {
+                swysProgress.style.width = `0%`; 
+                if (swysStar25) swysStar25.className = "w-5 h-5 text-slate-400/50 transition-colors";
+                if (swysStar75) swysStar75.className = "w-5 h-5 text-slate-400/50 transition-colors";
+                
+                if (swysIcon.getAttribute('data-lucide') !== 'play') {
+                    swysIcon.setAttribute('data-lucide', 'play');
+                    swysIcon.classList.add('ml-1'); // Add play button offset
+                    if (window.lucide) window.lucide.createIcons({ root: swysBtn });
                 }
             }
         }
