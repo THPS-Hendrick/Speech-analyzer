@@ -632,16 +632,19 @@ class THPSCourseWidget extends HTMLElement {
                     
                     <!-- LEFT COLUMN: Image & Mask -->
                     <!-- Negative margins (-mx-5, -ml-6) pull the image flush to the container boundaries -->
-                    <div class="relative w-full md:flex-1 aspect-video bg-slate-200 rounded-none md:rounded-r-2xl overflow-hidden cursor-pointer shadow-md group shrink-0 -mx-5 sm:-mx-6 md:mx-0 md:-ml-6" id="swys-image-btn" title="Click to shuffle image">
+                    <div class="relative w-full md:flex-1 aspect-video bg-slate-200 rounded-none md:rounded-r-2xl overflow-hidden shadow-md group shrink-0 -mx-5 sm:-mx-6 md:mx-0 md:-ml-6">
                         <img src="${currentImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" id="swys-img-el">
                         
                         <!-- The Dynamic Black Mask -->
-                        <div id="swys-mask-el" class="absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none ${getMaskClass(this.swysLevel)}"></div>
+                        <div id="swys-mask-el" class="absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none z-10 ${getMaskClass(this.swysLevel)}"></div>
                         
-                        <!-- Hover Overlay -->
-                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-black/10">
-                            <span class="bg-slate-900/80 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wider backdrop-blur-md">Click to Shuffle</span>
-                        </div>
+                        <!-- Navigation Chevrons -->
+                        <button id="swys-prev-img" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900/90 text-white p-2 rounded-full backdrop-blur-md transition-all z-20 active:scale-90 shadow-md">
+                            <i data-lucide="chevron-left" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i>
+                        </button>
+                        <button id="swys-next-img" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900/90 text-white p-2 rounded-full backdrop-blur-md transition-all z-20 active:scale-90 shadow-md">
+                            <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i>
+                        </button>
                     </div>
 
                     <!-- RIGHT COLUMN: Controls -->
@@ -690,7 +693,13 @@ class THPSCourseWidget extends HTMLElement {
             this.renderCourseSelector();
         });
 
-        this.querySelector('#swys-image-btn').addEventListener('click', () => {
+        this.querySelector('#swys-prev-img').addEventListener('click', () => {
+            const len = this.courseData.images.length;
+            this.swysImageIndex = (this.swysImageIndex - 1 + len) % len;
+            this.querySelector('#swys-img-el').src = this.courseData.images[this.swysImageIndex];
+        });
+
+        this.querySelector('#swys-next-img').addEventListener('click', () => {
             this.swysImageIndex = (this.swysImageIndex + 1) % this.courseData.images.length;
             this.querySelector('#swys-img-el').src = this.courseData.images[this.swysImageIndex];
         });
@@ -698,7 +707,7 @@ class THPSCourseWidget extends HTMLElement {
         this.querySelector('#swys-level-select').addEventListener('change', (e) => {
             this.swysLevel = parseInt(e.target.value);
             this.querySelector('#swys-instruction-text').innerText = this.courseData.instructions[this.swysLevel];
-            this.querySelector('#swys-mask-el').className = `absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none ${getMaskClass(this.swysLevel)}`;
+            this.querySelector('#swys-mask-el').className = `absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none z-10 ${getMaskClass(this.swysLevel)}`;
         });
 
         this.querySelector('#swys-record-btn').addEventListener('click', () => {
