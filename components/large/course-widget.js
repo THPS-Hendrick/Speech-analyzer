@@ -627,12 +627,12 @@ class THPSCourseWidget extends HTMLElement {
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
-                <h2 class="text-2xl font-black text-slate-800 tracking-tight mb-6 mt-4 text-center">${this.courseData.title}</h2>
-
-                <div class="flex-1 flex flex-col md:flex-row gap-6 items-center justify-center mb-6 w-full max-w-4xl mx-auto px-4">
+                <!-- Header removed. mt-12 added to flex container to clear the Exit button -->
+                <div class="flex-1 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-center mb-6 mt-12 w-full max-w-5xl mx-auto">
                     
                     <!-- LEFT COLUMN: Image & Mask -->
-                    <div class="relative w-full max-w-[500px] aspect-video bg-slate-200 rounded-xl overflow-hidden cursor-pointer shadow-md group border border-slate-200 shrink-0" id="swys-image-btn" title="Click to shuffle image">
+                    <!-- Negative margins (-mx-5, -ml-6) pull the image flush to the container boundaries -->
+                    <div class="relative w-full md:flex-1 aspect-video bg-slate-200 rounded-none md:rounded-r-2xl overflow-hidden cursor-pointer shadow-md group shrink-0 -mx-5 sm:-mx-6 md:mx-0 md:-ml-6" id="swys-image-btn" title="Click to shuffle image">
                         <img src="${currentImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" id="swys-img-el">
                         
                         <!-- The Dynamic Black Mask -->
@@ -645,7 +645,7 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
 
                     <!-- RIGHT COLUMN: Controls -->
-                    <div class="flex flex-col w-full max-w-[300px] gap-4 shrink-0">
+                    <div class="flex flex-col w-full max-w-[300px] gap-4 shrink-0 px-4 md:px-0">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Difficulty Level</label>
                             <select id="swys-level-select" class="w-full p-3.5 rounded-xl border-2 border-slate-200 shadow-sm font-bold text-slate-700 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors cursor-pointer">
