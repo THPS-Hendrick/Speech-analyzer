@@ -1,0 +1,21 @@
+{
+  "title": "Say What You See",
+  "mode": "say-what-you-see",
+  "instructions": {
+    "1": "Visually describe what you see until the second star.",
+    "2": "Describe the image visually; after the first star describe what you imagine in the blank space.",
+    "3": "Visually describe your memory of the image and imagine what is outside the image."
+  },
+  "images": [
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_1.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_2.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_3.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_4.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_5.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_6.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_7.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_8.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_9.png",
+    "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_10.png"
+  ]
+}
