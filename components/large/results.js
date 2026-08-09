@@ -6,23 +6,39 @@ class THPSResultsWidget extends HTMLElement {
     }
 
     connectedCallback() {
-        // If spawned visibly via the menu, pull the active payload immediately
         if (!this.isPhantom) {
-            this.data = window.THPS?.NLP?.currentPayload || null;
+            // 1. Check for existing data on spawn (covers both caching variables)
+            this.data = window.thps_lastPayload || window.THPS?.NLP?.currentPayload || null; 
+            
+            // 2. Listen for live analysis updates so the widget doesn't stay stuck on "No Data"
+            this.updateListener = (e) => {
+                this.data = e.detail; 
+                this.render();        
+            };
+            window.addEventListener('thps-dashboard-update', this.updateListener);
+            
             this.render();
         }
     }
 
-    // This allows the phantom generator to inject specific historical data
+    disconnectedCallback() {
+        // Clean up the listener when the widget is deleted from the dashboard
+        if (this.updateListener) {
+            window.removeEventListener('thps-dashboard-update', this.updateListener);
+        }
+    }
+
+    // This allows the phantom generator to inject specific historical data silently
     injectDataAndRender(payload) {
         this.data = payload;
         this.render();
     }
 
     render() {
+        // If spawned visibly on the dashboard with no data yet
         if (!this.data && !this.isPhantom) {
             this.innerHTML = `
-                <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
+                <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans h-full flex flex-col items-center justify-center">
                     <h3 class="font-black text-xl text-slate-800 tracking-tight">No Data Found</h3>
                     <p class="text-sm text-slate-500 mt-2">Please run an analysis to populate this widget.</p>
                 </div>
@@ -30,80 +46,103 @@ class THPSResultsWidget extends HTMLElement {
             return;
         }
 
-        // The A4 constraints ensure it looks perfect whether viewed on-screen or exported via html2pdf
+        // The A4 constraints ensure it scales perfectly for the html2pdf engine
         this.innerHTML = `
         <style>
-            .pdf-a4-container { width: 210mm; min-height: 297mm; background: white; padding: 20mm; box-sizing: border-box; font-family: 'Inter', sans-serif; color: #1e293b; }
+            .pdf-a4-container { 
+                width: 210mm; 
+                min-height: 297mm; 
+                background: white; 
+                padding: 15mm; 
+                box-sizing: border-box; 
+                font-family: 'Inter', -apple-system, sans-serif; 
+                color: #1e293b; 
+                overflow: hidden; 
+            }
+            .pdf-a4-container thps-score-summary, 
+            .pdf-a4-container thps-voice-graph, 
+            .pdf-a4-container thps-tangible-text {
+                display: block; 
+                width: 100%;
+            }
         </style>
 
         ${!this.isPhantom ? `
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-4 px-2">
             <h2 class="text-lg font-black uppercase text-slate-800 tracking-widest">Comprehensive Results</h2>
-            <button onclick="this.closest('thps-results').triggerSingleDownload()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors">
-                Download PDF
+            <button onclick="this.closest('thps-results').triggerSingleDownload()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors flex items-center gap-2 shadow-sm">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Download PDF
             </button>
         </div>` : ''}
 
-        <div id="pdf-export-target" class="pdf-a4-container mx-auto border border-slate-200 shadow-sm rounded-xl">
-            
-            <div class="border-b-2 border-slate-900 pb-4 mb-6">
-                <h1 class="text-3xl font-black tracking-tight text-slate-900">THPS ANALYSIS RESULTS</h1>
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">Acoustic & Semantic Breakdown</p>
-            </div>
-
-            <!-- SCORE SUMMARY REPLICA -->
-            <div class="mb-8">
-                <h3 class="text-sm font-black uppercase tracking-wider text-slate-900 mb-3">Score Summary</h3>
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Words Per Minute</div>
-                        <div class="text-2xl font-black text-indigo-600">${this.data?.wpm || 0}</div>
-                    </div>
-                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pause Ratio</div>
-                        <div class="text-2xl font-black text-emerald-600">${this.data?.pausePercent || 0}%</div>
-                    </div>
-                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Mumble Score</div>
-                        <div class="text-2xl font-black text-rose-600">${this.data?.mumbleScore?.toFixed(1) || 0}</div>
-                    </div>
+        <div class="overflow-x-auto w-full styled-scrollbar pb-4">
+            <div id="pdf-export-target" class="pdf-a4-container mx-auto border border-slate-200 shadow-sm rounded-xl bg-slate-50 relative shrink-0">
+                
+                <div class="border-b-2 border-slate-900 pb-4 mb-6 mt-2">
+                    <h1 class="text-3xl font-black tracking-tight text-slate-900">THPS ANALYSIS RESULTS</h1>
+                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mt-1">Acoustic & Semantic Breakdown</p>
                 </div>
-            </div>
 
-            <!-- VOICE GRAPH REPLICA -->
-            <div class="mb-8">
-                <h3 class="text-sm font-black uppercase tracking-wider text-slate-900 mb-3">Acoustic Cadence Graph</h3>
-                <div class="w-full h-40 bg-slate-900 rounded-xl border border-slate-200 flex items-center justify-center">
-                    <span class="text-slate-500 text-xs">[Voice Graph Canvas Rendered Here]</span>
+                <!-- WE NEST THE ACTUAL WIDGETS HERE -->
+                <!-- pointer-events-none prevents users from accidentally clicking the nested elements during a live PDF generation -->
+                <div class="mb-6 pointer-events-none">
+                    <thps-score-summary id="nested-score-summary"></thps-score-summary>
                 </div>
-            </div>
-
-            <!-- TANGIBLE TEXT REPLICA -->
-            <div class="mb-8">
-                <h3 class="text-sm font-black uppercase tracking-wider text-slate-900 mb-3">Tangible Text Map</h3>
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed">
-                    ${this.data?.reportMarkdownText || "No transcript available."}
+                
+                <div class="mb-6 pointer-events-none">
+                    <thps-voice-graph id="nested-voice-graph"></thps-voice-graph>
                 </div>
+                
+                <div class="mb-6 pointer-events-none">
+                    <thps-tangible-text id="nested-tangible-text"></thps-tangible-text>
+                </div>
+                
             </div>
-            
         </div>
         `;
         
-        this.drawCanvases();
+        if (window.lucide && !this.isPhantom) window.lucide.createIcons();
+        
+        // Push the data down into the nested child widgets
+        this.injectDataToChildren();
     }
 
-    drawCanvases() {
-        // Logic to draw the voice graph peaks using this.data.volumeData
+    injectDataToChildren() {
+        if (!this.data) return;
+
+        // Grab the specific child widgets sitting inside this wrapper
+        const summaryWidget = this.querySelector('#nested-score-summary');
+        const graphWidget = this.querySelector('#nested-voice-graph');
+        const textWidget = this.querySelector('#nested-tangible-text');
+
+        // Manually force the historical data into them and trigger their render methods natively
+        const forceUpdate = (widget) => {
+            if (widget) {
+                widget.data = this.data; 
+                if (typeof widget.render === 'function') {
+                    widget.render();
+                }
+            }
+        };
+
+        // A tiny 50ms delay ensures the custom elements are registered/connected in the DOM before we call render()
+        setTimeout(() => {
+            forceUpdate(summaryWidget);
+            forceUpdate(graphWidget);
+            forceUpdate(textWidget);
+        }, 50);
     }
 
     // Triggered by the visible widget's own download button
     triggerSingleDownload() {
         const element = this.querySelector('#pdf-export-target');
+        const attemptName = this.data?.title ? this.data.title.replace(/\s+/g, '_') : 'Result';
+        
         const opt = {
             margin:       0,
-            filename:     'THPS_Analysis_Result.pdf',
+            filename:     `THPS_${attemptName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(element).save();
@@ -115,7 +154,7 @@ class THPSResultsWidget extends HTMLElement {
         const opt = {
             margin:       0,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         // Outputs a raw Blob instead of forcing a save
