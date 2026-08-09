@@ -10,6 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     
+    <!-- NEW DOWNLOAD & PDF DEPENDENCIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
     <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
@@ -29,6 +34,9 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/diagnostic.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/edit-mode.js"></script>
+    
+    <!-- NEW: RESULTS WIDGET (Spawnable & used headlessly for PDFs) -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/results.js"></script>
     
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
@@ -74,6 +82,18 @@
             <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
         </div>
     </div>
+    
+    <!-- NEW: MASS DOWNLOAD CONFIRMATION MODAL -->
+    <div id="download-confirm-modal" class="hidden fixed inset-0 z-[10001] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-4 transition-all duration-300">
+        <div class="bg-white p-5 rounded-2xl shadow-xl max-w-[280px] w-full text-center">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Mass Download</h3>
+            <p id="download-confirm-text" class="text-xs text-slate-500 mb-5 font-medium leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button onclick="window.closeDownloadModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors">No</button>
+                <button id="btn-confirm-download" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-sm">Yes</button>
+            </div>
+        </div>
+    </div>
 
     <!-- DRAWERS -->
     <div id="history-menu-drawer" class="fixed top-[0] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
@@ -100,8 +120,33 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-            <div id="hist-tab-content-list" class="block space-y-3">
+            <div id="hist-tab-content-list" class="block">
+                
+                <!-- NEW: MASTER BUTTON PANEL -->
+                <div class="w-full flex items-center justify-end gap-2 pb-3 mb-3 border-b border-slate-200">
+                    <!-- Data (JSON) Download -->
+                    <button onclick="window.handleHistoryDownload('json')" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer" title="Download Data">
+                        <i data-lucide="file-json" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <!-- PDF Download -->
+                    <button onclick="window.handleHistoryDownload('pdf')" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Download PDF">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </button>
+                
+                    <div class="w-px h-5 bg-slate-300 mx-1"></div> <!-- Divider -->
+                
+                    <!-- ALL Toggle -->
+                    <button id="btn-history-all" onclick="window.toggleAllPrimer()" class="px-3 py-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        <span>All</span>
+                    </button>
                 </div>
+                
+                <!-- Dynamic Entry List -->
+                <div id="hist-tab-items-list" class="space-y-3"></div>
+            </div>
+            
             <div id="hist-tab-content-avg" class="hidden">
                 <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
             </div>
@@ -249,6 +294,9 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
                         </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-results', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Results Report
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -360,6 +408,7 @@
         // ==========================================
         window.thps_sessionHistory = [];
         window.thps_currentAttemptId = 1;
+        window.isHistoryAllPrimed = false; // MASS DOWNLOAD STATE
 
         // ==========================================
         // EDIT MODE (LOCK/UNLOCK) LOGIC
@@ -393,7 +442,6 @@
             if (window.lucide) window.lucide.createIcons();
         };
 
-        // Failsafe: Ensure it locks automatically on load
         setTimeout(() => {
             if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
                 window.THPS.Dashboard.sortableInstance.option("disabled", true);
@@ -426,6 +474,8 @@
         let menuOverlayTimeout = null;
 
         window.closeAllMenus = function() {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             const widgetDrawer = document.getElementById('widget-menu-drawer');
             const historyDrawer = document.getElementById('history-menu-drawer');
             const overlay = document.getElementById('widget-menu-overlay');
@@ -477,6 +527,8 @@
         };
 
         window.switchHistoryTab = function(tabName) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             ['list', 'avg', 'best'].forEach(s => {
                 const btn = document.getElementById(`hist-tab-btn-${s}`);
                 const content = document.getElementById(`hist-tab-content-${s}`);
@@ -505,6 +557,127 @@
             activeContent.classList.remove('hidden');
             activeContent.classList.add('block');
         };
+
+        // ==========================================
+        // MASS DOWNLOAD & PDF EXPORT LOGIC
+        // ==========================================
+        
+        window.toggleAllPrimer = function() {
+            window.isHistoryAllPrimed = !window.isHistoryAllPrimed;
+            const btn = document.getElementById('btn-history-all');
+            
+            if (window.isHistoryAllPrimed) {
+                btn.classList.replace('text-slate-500', 'text-blue-600');
+                btn.classList.replace('bg-white', 'bg-blue-50');
+                btn.classList.replace('border-slate-200', 'border-blue-200');
+            } else {
+                window.unprimeHistoryAll();
+            }
+        };
+
+        window.unprimeHistoryAll = function() {
+            window.isHistoryAllPrimed = false;
+            const btn = document.getElementById('btn-history-all');
+            if (btn) {
+                btn.classList.replace('text-blue-600', 'text-slate-500');
+                btn.classList.replace('bg-blue-50', 'bg-white');
+                btn.classList.replace('border-blue-200', 'border-slate-200');
+            }
+        };
+
+        window.handleHistoryDownload = function(type) {
+            const savedAttempts = window.thps_sessionHistory || [];
+            const totalEntries = savedAttempts.length;
+            
+            if (window.isHistoryAllPrimed && totalEntries > 1) {
+                // Mass Download Route
+                const estSeconds = totalEntries * (type === 'pdf' ? 1.5 : 0.1); 
+                document.getElementById('download-confirm-text').innerHTML = `Download <strong>${totalEntries} files</strong>?<br>(Estimated ${Math.ceil(estSeconds)} seconds)`;
+                
+                document.getElementById('btn-confirm-download').onclick = () => {
+                    window.closeDownloadModal();
+                    window.executeMassDownload(type, savedAttempts);
+                };
+                
+                document.getElementById('download-confirm-modal').classList.remove('hidden');
+            } else {
+                // Single Download Route
+                const activePayload = window.thps_lastPayload;
+                if (!activePayload) return alert("Please select an entry first.");
+                
+                if (type === 'json') {
+                    const blob = new Blob([JSON.stringify(activePayload, null, 2)], {type: "application/json"});
+                    saveAs(blob, `THPS_${activePayload.title ? activePayload.title.replace(/\s+/g, '_') : 'Attempt'}.json`);
+                } else if (type === 'pdf') {
+                    window.generatePhantomPDF(activePayload, true);
+                }
+            }
+        };
+
+        window.closeDownloadModal = function() {
+            document.getElementById('download-confirm-modal').classList.add('hidden');
+        };
+
+        window.generatePhantomPDF = async function(payload, saveImmediately = false) {
+            const ghostDiv = document.createElement('div');
+            ghostDiv.style.position = 'absolute';
+            ghostDiv.style.left = '-9999px';
+            ghostDiv.style.width = '210mm'; 
+            document.body.appendChild(ghostDiv);
+
+            const ghostWidget = document.createElement('thps-results');
+            ghostWidget.setAttribute('phantom', 'true');
+            ghostDiv.appendChild(ghostWidget);
+            
+            // Allow the custom element to be upgraded and connected
+            await new Promise(resolve => setTimeout(resolve, 50)); 
+            
+            if (typeof ghostWidget.injectDataAndRender === 'function') {
+                ghostWidget.injectDataAndRender(payload);
+            }
+
+            // Give the canvases time to paint their graphs before snapping
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            let result;
+            if (saveImmediately) {
+                if (typeof ghostWidget.triggerSingleDownload === 'function') {
+                    ghostWidget.triggerSingleDownload();
+                }
+            } else {
+                if (typeof ghostWidget.generatePDFBlob === 'function') {
+                    result = await ghostWidget.generatePDFBlob();
+                }
+            }
+            
+            document.body.removeChild(ghostDiv);
+            return result;
+        };
+
+        window.executeMassDownload = async function(type, attemptsArray) {
+            const zip = new JSZip();
+            
+            for (let i = 0; i < attemptsArray.length; i++) {
+                const payload = attemptsArray[i];
+                const attemptName = payload.title ? payload.title.replace(/\s+/g, '_') : `Attempt_${i+1}`;
+                
+                if (type === 'json') {
+                    zip.file(`THPS_${attemptName}.json`, JSON.stringify(payload, null, 2));
+                } else if (type === 'pdf') {
+                    const pdfBlob = await window.generatePhantomPDF(payload, false); 
+                    if (pdfBlob) zip.file(`THPS_${attemptName}.pdf`, pdfBlob);
+                }
+            }
+            
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, `THPS_Session_Data.zip`);
+                window.unprimeHistoryAll(); 
+            });
+        };
+
+        // ==========================================
+        // ACTIVE RECORDING & ANALYSIS LOGIC
+        // ==========================================
 
         window.toggleRecording = function() {
             const btnText = document.getElementById('toggle-text');
@@ -785,7 +958,7 @@
 
         window.updateHistoryUI = function() {
             const countEl = document.getElementById('history-count');
-            const listEl = document.getElementById('hist-tab-content-list');
+            const listEl = document.getElementById('hist-tab-items-list');
             const avgEl = document.getElementById('hist-tab-content-avg');
             const bestEl = document.getElementById('hist-tab-content-best');
             
@@ -876,6 +1049,8 @@
         };
 
         window.loadHistoryAttempt = function(id) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             const attempt = window.thps_sessionHistory.find(h => h.id === id);
             if (!attempt) return;
             
