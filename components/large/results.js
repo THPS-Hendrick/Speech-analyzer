@@ -124,21 +124,28 @@ class THPSResultsWidget extends HTMLElement {
         const graphWidget = this.querySelector('#nested-voice-graph');
         const textWidget = this.querySelector('#nested-tangible-text');
 
+        // The "Bilingual" Update Function
         const forceUpdate = (widget) => {
             if (widget) {
+                // 1. For widgets that use the standard render() method
                 widget.data = this.data; 
                 if (typeof widget.render === 'function') {
                     widget.render();
                 }
+                
+                // 2. For widgets that use an update(data) method (like Tangible Text)
+                if (typeof widget.update === 'function') {
+                    widget.update(this.data);
+                }
             }
         };
 
-        // Delay ensures the custom elements are registered/connected in the DOM before we call render()
+        // Delay extended to 100ms to safely overwrite internal widget initializations
         setTimeout(() => {
             forceUpdate(summaryWidget);
             forceUpdate(graphWidget);
             forceUpdate(textWidget);
-        }, 50);
+        }, 100);
     }
 
     triggerSingleDownload() {
