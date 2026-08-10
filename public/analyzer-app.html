@@ -48,6 +48,10 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
 
+    <!-- NEW MEDIUM WIDGETS -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/timer-med.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/upload-med.js"></script>
+
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
@@ -221,6 +225,19 @@
             </div>
 
             <div id="tab-content-medium" class="hidden space-y-8">
+                <!-- NEW TOOLS CATEGORY FOR MEDIUM TIMERS AND UPLOADS -->
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> TOOLS <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-timer-med', 'w-full md:w-[calc(50%-0.75rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="clock" class="w-4 h-4 mb-1"></i> Mic Timer
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-upload-speech-med', 'w-full md:w-[calc(50%-0.75rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="upload-cloud" class="w-4 h-4 mb-1"></i> Upload Speech
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -364,14 +381,19 @@
                         </div>
                     </div>
 
+                    <!-- DEFAULT DASHBOARD WIDGET LOADOUT -->
                     <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
 
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-course-widget></thps-course-widget>
                         </div>
 
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-live-mic-timer></thps-live-mic-timer>
+                        <div class="w-full md:w-[calc(50%-0.75rem)] mt-2 cursor-move relative group">
+                            <thps-timer-med></thps-timer-med>
+                        </div>
+
+                        <div class="w-full md:w-[calc(50%-0.75rem)] mt-2 cursor-move relative group">
+                            <thps-upload-speech-med></thps-upload-speech-med>
                         </div>
                         
                         <div class="w-full mt-2 cursor-move relative group">
