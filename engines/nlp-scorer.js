@@ -129,10 +129,9 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                         }
                     }
 
-                    // Checks if word is simple to apply class
                     let isSimple = window.THPS.NLP.simpleSet.has(normal);
                     if (!isSimple && root) isSimple = window.THPS.NLP.simpleSet.has(root);
-                    let simpleClass = isSimple ? " simple-word" : "";
+                    let simpleTailwind = isSimple ? " underline decoration-2 underline-offset-4" : "";
 
                     let isPersonal = (inQuotes || personalCountdown > 0);
                     let isVisual = (visualCountdown > 0); 
@@ -148,19 +147,19 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 
                     if (/[a-zA-Z]/.test(rawText)) {
                         if (isPersonal && isVisual) {
-                            highlightedHTML += `${safePre}<span class="overlap-word${simpleClass}">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="text-purple-500 font-bold${simpleTailwind}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}_**${rawText}**_${rawPost}`;
                             personalCount++; visualCount++;
                         } else if (isPersonal) {
-                            highlightedHTML += `${safePre}<span class="personal-word${simpleClass}">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="text-blue-500 font-bold${simpleTailwind}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}**${rawText}**${rawPost}`;
                             personalCount++;
                         } else if (isVisual) {
-                            highlightedHTML += `${safePre}<span class="visual-word${simpleClass}">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="text-red-500 font-bold${simpleTailwind}">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}_${rawText}_${rawPost}`;
                             visualCount++;
                         } else if (isSimple) {
-                            highlightedHTML += `${safePre}<span class="simple-word">${safeText}</span>${safePost}`;
+                            highlightedHTML += `${safePre}<span class="underline decoration-2 underline-offset-4">${safeText}</span>${safePost}`;
                             reportMarkdownText += `${rawPre}${rawText}${rawPost}`;
                         } else {
                             highlightedHTML += `${safePre}${safeText}${safePost}`;
@@ -191,7 +190,7 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                 
                 let isSimple = window.THPS.NLP.simpleSet.has(normal);
                 if (!isSimple && root) isSimple = window.THPS.NLP.simpleSet.has(root);
-                let simpleClass = isSimple ? " simple-word" : "";
+                let simpleTailwind = isSimple ? " underline decoration-2 underline-offset-4" : "";
 
                 let isPersonal = (inQuotes || personalCountdown > 0);
                 let isVisual = (visualCountdown > 0);
@@ -200,10 +199,10 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 
                 let safeText = token.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 
-                if (isPersonal && isVisual) { highlightedHTML += `<span class="overlap-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `_**${token}**_`; personalCount++; visualCount++; } 
-                else if (isPersonal) { highlightedHTML += `<span class="personal-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `**${token}**`; personalCount++; } 
-                else if (isVisual) { highlightedHTML += `<span class="visual-word${simpleClass}">${safeText}</span>`; reportMarkdownText += `_${token}_`; visualCount++; } 
-                else if (isSimple) { highlightedHTML += `<span class="simple-word">${safeText}</span>`; reportMarkdownText += token; }
+                if (isPersonal && isVisual) { highlightedHTML += `<span class="text-purple-500 font-bold${simpleTailwind}">${safeText}</span>`; reportMarkdownText += `_**${token}**_`; personalCount++; visualCount++; } 
+                else if (isPersonal) { highlightedHTML += `<span class="text-blue-500 font-bold${simpleTailwind}">${safeText}</span>`; reportMarkdownText += `**${token}**`; personalCount++; } 
+                else if (isVisual) { highlightedHTML += `<span class="text-red-500 font-bold${simpleTailwind}">${safeText}</span>`; reportMarkdownText += `_${token}_`; visualCount++; } 
+                else if (isSimple) { highlightedHTML += `<span class="underline decoration-2 underline-offset-4">${safeText}</span>`; reportMarkdownText += token; }
                 else { highlightedHTML += safeText; reportMarkdownText += token; }
             } else {
                 let quoteMatches = (token.match(/["“”]/g) || []).length;
@@ -265,7 +264,8 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         wordTimestamps 
     };
 };
- // ==========================================
+
+// ==========================================
 // THPS MASTER ANALYZER & MATH ENGINE
 // Centralizes all acoustic and text math into a single payload
 // ==========================================
