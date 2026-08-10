@@ -5,17 +5,11 @@
 class ThpsTangibleText extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-            <style>
-                .personal-word { color: #3b82f6; font-weight: 700; } /* Blue */
-                .visual-word { color: #ef4444; font-weight: 700; } /* Red (no underline) */
-                .overlap-word { color: #a855f7; font-weight: 700; } /* Purple */
-                .simple-word { text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-            </style>
-            <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move">
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl shadow-sm relative w-full h-full group cursor-move flex flex-col">
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-3 border-slate-100 gap-2 pr-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-3 border-slate-100 gap-2 pr-6 shrink-0">
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-bold text-slate-700">Tangible Text Map</h3>
                         <div class="group/tip relative z-50">
@@ -32,7 +26,7 @@ class ThpsTangibleText extends HTMLElement {
                         <div class="flex items-center gap-1.5"><span class="w-3 h-0 border-b-2 border-slate-700"></span> Simple</div>
                     </div>
                 </div>
-                <div class="thps-highlighted-text w-full h-80 sm:h-96 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic">Waiting for text...</div>
+                <div class="thps-highlighted-text w-full h-80 sm:h-96 p-3 sm:p-4 rounded-xl border border-slate-200 bg-white overflow-y-auto text-slate-400 leading-relaxed text-sm sm:text-base italic flex-1">Waiting for text...</div>
             </div>
         `;
         
@@ -41,10 +35,20 @@ class ThpsTangibleText extends HTMLElement {
             if (wrapper) wrapper.remove(); else this.remove();
         });
         
-        window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
+        // Properly bind and store the listener so we can cleanly remove it later
+        this.updateHandler = (e) => this.update(e.detail);
+        window.addEventListener('thps-dashboard-update', this.updateHandler);
 
+        // Instant initialization if payload exists (no more setTimeout races)
         if (window.thps_lastPayload) {
-            setTimeout(() => this.update(window.thps_lastPayload), 50);
+            this.update(window.thps_lastPayload);
+        }
+    }
+
+    disconnectedCallback() {
+        // Plug the memory leak: removes the listener when the widget is deleted
+        if (this.updateHandler) {
+            window.removeEventListener('thps-dashboard-update', this.updateHandler);
         }
     }
 
