@@ -1,3 +1,12 @@
+This is a perfect upgrade. Replacing the static title with an interactive date navigator makes the "Mic-Check Daily" course vastly more powerful. It essentially turns the widget into a historical archive where users can look back at past daily challenges or jump around freely!
+
+To achieve this, I updated the logic in `fetchMicCheckDaily` to store the **entire** JSON payload and generate a sorted list of all available dates. I then built a smart header that features left/right arrows for step-by-step navigation, alongside a clickable central button that houses a native `<select>` dropdown so users can instantly "jump" to any date in the dataset.
+
+Here is your fully updated `course-widget.js` file with the interactive date navigation baked right in!
+
+### `course-widget.js`
+
+```javascript
 class THPSCourseWidget extends HTMLElement {
     constructor() {
         super();
@@ -6,7 +15,11 @@ class THPSCourseWidget extends HTMLElement {
         this.courseData = null;
         this.evaluations = {}; // The CourseRecordBook
         this.prompts = null;
-        this.micCheckData = null; // New state for daily prompts
+        
+        // Mic-Check Daily Specific State
+        this.micCheckFullData = null;
+        this.micCheckDates = [];
+        this.micCheckCurrentDateIndex = 0;
         
         // ESL Specific State
         this.eslCategory = null;
@@ -101,7 +114,7 @@ class THPSCourseWidget extends HTMLElement {
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
                 <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
-                <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Loading Today's Challenge...</p>
+                <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Loading Daily Prompts...</p>
             </div>
         `;
         if (window.lucide) window.lucide.createIcons({ root: this });
@@ -111,6 +124,12 @@ class THPSCourseWidget extends HTMLElement {
             if (!res.ok) throw new Error("Network response was not ok");
             const data = await res.json();
             
+            // Store full data and chronologically sort all available dates
+            this.micCheckFullData = data;
+            this.micCheckDates = Object.keys(data).sort();
+            
+            if (this.micCheckDates.length === 0) throw new Error("No dates available in JSON");
+
             // Format today's date to YYYY-MM-DD local time
             const now = new Date();
             const year = now.getFullYear();
@@ -118,20 +137,14 @@ class THPSCourseWidget extends HTMLElement {
             const day = String(now.getDate()).padStart(2, '0');
             const todayStr = `${year}-${month}-${day}`;
             
-            let todaysPrompts = data[todayStr];
+            let index = this.micCheckDates.indexOf(todayStr);
 
             // Intelligent Fallback: If today's date isn't found, grab the most recent date available
-            if (!todaysPrompts) {
-                const availableDates = Object.keys(data).sort();
-                if (availableDates.length > 0) {
-                    const latestDate = availableDates[availableDates.length - 1];
-                    todaysPrompts = data[latestDate];
-                } else {
-                    throw new Error("No dates available in JSON");
-                }
+            if (index === -1) {
+                index = this.micCheckDates.length - 1; 
             }
             
-            this.micCheckData = todaysPrompts;
+            this.micCheckCurrentDateIndex = index;
             this.currentStep = 'mic-check';
             this.renderMicCheckUI();
             
@@ -150,6 +163,9 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     renderMicCheckUI() {
+        const activeDate = this.micCheckDates[this.micCheckCurrentDateIndex];
+        const activePrompts = this.micCheckFullData[activeDate];
+
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
                 <!-- MINI EXIT BUTTON -->
@@ -157,9 +173,27 @@ class THPSCourseWidget extends HTMLElement {
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
-                <div class="text-center mb-4 mt-2">
-                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Mic-Check Daily</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Today's 4-Part Challenge</p>
+                <!-- INTERACTIVE DATE NAVIGATION HEADER -->
+                <div class="flex items-center justify-center gap-3 mb-5 mt-3">
+                    <button id="mic-check-prev" class="p-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full transition-colors active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed" ${this.micCheckCurrentDateIndex === 0 ? 'disabled' : ''}>
+                        <i data-lucide="chevron-left" class="w-5 h-5 pointer-events-none"></i>
+                    </button>
+                    
+                    <div class="relative flex items-center justify-center gap-2 bg-white border-2 border-slate-200 px-4 py-2 rounded-xl shadow-sm cursor-pointer hover:border-indigo-400 transition-colors group min-w-[170px]">
+                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-500 pointer-events-none"></i>
+                        <!-- Native Dropdown for "Jump to Date" functionality -->
+                        <select id="mic-check-date-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" title="Jump to Date">
+                            ${this.micCheckDates.map((dateStr, idx) => `
+                                <option value="${idx}" ${idx === this.micCheckCurrentDateIndex ? 'selected' : ''}>${dateStr}</option>
+                            `).join('')}
+                        </select>
+                        <span class="text-sm font-black text-slate-700 pointer-events-none tracking-wide">${activeDate}</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 group-hover:text-indigo-500 pointer-events-none"></i>
+                    </div>
+
+                    <button id="mic-check-next" class="p-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full transition-colors active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed" ${this.micCheckCurrentDateIndex === this.micCheckDates.length - 1 ? 'disabled' : ''}>
+                        <i data-lucide="chevron-right" class="w-5 h-5 pointer-events-none"></i>
+                    </button>
                 </div>
 
                 <!-- FOUR RESPONSIVE PROMPT FIELDS -->
@@ -168,30 +202,29 @@ class THPSCourseWidget extends HTMLElement {
                     <!-- Challenge Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2 left-4">Challenge</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.challenge}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.challenge}</span>
                     </div>
 
                     <!-- Sponsor Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2 left-4">Sponsor</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.sponsor}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.sponsor}</span>
                     </div>
 
                     <!-- Script Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2 left-4">Script</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.script}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.script}</span>
                     </div>
 
                     <!-- Mic Check Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest absolute top-2 left-4">Mic Check</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.micCheck}</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.micCheck}</span>
                     </div>
                 </div>
 
                 <!-- SLEEK ARCADE TIMER BAR PANEL -->
-                <!-- We reuse the Arcade IDs here so the syncLoop drives the timer natively! -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
@@ -211,16 +244,52 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         
-        this.querySelector('.thps-exit-course').addEventListener('click', () => {
-            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
-            this.micCheckData = null;
-            this.currentStep = 0;
-            this.renderCourseSelector();
-        });
+        // Navigation & Interaction Listeners
+        const exitBtn = this.querySelector('.thps-exit-course');
+        if (exitBtn) {
+            exitBtn.addEventListener('click', () => {
+                if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+                this.micCheckFullData = null;
+                this.micCheckDates = [];
+                this.currentStep = 0;
+                this.renderCourseSelector();
+            });
+        }
 
-        this.querySelector('#arcade-record-btn').addEventListener('click', () => {
-            if (typeof window.toggleRecording === 'function') window.toggleRecording();
-        });
+        const prevBtn = this.querySelector('#mic-check-prev');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (this.micCheckCurrentDateIndex > 0) {
+                    this.micCheckCurrentDateIndex--;
+                    this.renderMicCheckUI();
+                }
+            });
+        }
+
+        const nextBtn = this.querySelector('#mic-check-next');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (this.micCheckCurrentDateIndex < this.micCheckDates.length - 1) {
+                    this.micCheckCurrentDateIndex++;
+                    this.renderMicCheckUI();
+                }
+            });
+        }
+
+        const dateSelect = this.querySelector('#mic-check-date-select');
+        if (dateSelect) {
+            dateSelect.addEventListener('change', (e) => {
+                this.micCheckCurrentDateIndex = parseInt(e.target.value);
+                this.renderMicCheckUI();
+            });
+        }
+
+        const recordBtn = this.querySelector('#arcade-record-btn');
+        if (recordBtn) {
+            recordBtn.addEventListener('click', () => {
+                if (typeof window.toggleRecording === 'function') window.toggleRecording();
+            });
+        }
     }
 
     // ==========================================
@@ -1059,7 +1128,7 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     processPayload(e) {
-        if (!this.courseData && !this.micCheckData || this.currentStep === 0) return;
+        if (!this.courseData && !this.micCheckFullData || this.currentStep === 0) return;
         
         // Bypass grading metrics if inside independent Arcade, ESL, Voice Choice, or Mic Check modes
         if (this.currentStep === 'arcade' || this.currentStep === 'mic-check' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter' || this.currentStep === 'swys-main') return;
@@ -1160,7 +1229,6 @@ class THPSCourseWidget extends HTMLElement {
         }
 
         // 2. Sync Independent Arcade Mode & Mic-Check Timer Elements
-        // Because we cleverly reused the same HTML IDs, this loop syncs both!
         const arcadeProgress = this.querySelector('#arcade-progress');
         const arcadeBtn = this.querySelector('#arcade-record-btn');
         const arcadeIcon = this.querySelector('#arcade-record-icon');
@@ -1324,3 +1392,5 @@ class THPSCourseWidget extends HTMLElement {
 }
 
 customElements.define('thps-course-widget', THPSCourseWidget);
+
+```
