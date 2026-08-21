@@ -6,6 +6,7 @@ class THPSCourseWidget extends HTMLElement {
         this.courseData = null;
         this.evaluations = {}; // The CourseRecordBook
         this.prompts = null;
+        this.micCheckData = null; // New state for daily prompts
         
         // ESL Specific State
         this.eslCategory = null;
@@ -46,6 +47,11 @@ class THPSCourseWidget extends HTMLElement {
                 <p class="text-slate-500 text-sm mb-8 text-center max-w-sm">Select a module to begin your training and analysis.</p>
                 
                 <div class="grid grid-cols-1 gap-4 w-full max-w-md">
+                    <!-- NEW MIC-CHECK DAILY COURSE -->
+                    <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="mic-check-daily">
+                        <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Mic-Check Daily</span>
+                        <i data-lucide="calendar" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
+                    </button>
                     <!-- ESL LEVEL 1 BUTTON -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/esl-level-1/esl-level-1.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">ESL Level 1: Pronunciation</span>
@@ -56,7 +62,7 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
                         <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
-                    <!-- NEW VOICE CHOICE COURSE -->
+                    <!-- VOICE CHOICE COURSE -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/voice-choices/voice-choices.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Voice Choice: Intensity</span>
                         <i data-lucide="sliders" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
@@ -79,11 +85,147 @@ class THPSCourseWidget extends HTMLElement {
         btns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const url = e.currentTarget.getAttribute('data-url');
-                this.fetchCourse(url);
+                if (url === 'mic-check-daily') {
+                    this.fetchMicCheckDaily();
+                } else {
+                    this.fetchCourse(url);
+                }
             });
         });
     }
 
+    // ==========================================
+    // MIC-CHECK DAILY COURSE LOGIC
+    // ==========================================
+    async fetchMicCheckDaily() {
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
+                <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
+                <p class="text-slate-500 font-bold tracking-widest uppercase text-xs animate-pulse">Loading Today's Challenge...</p>
+            </div>
+        `;
+        if (window.lucide) window.lucide.createIcons({ root: this });
+
+        try {
+            const res = await fetch(`https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/mic-check-daily.json?t=${Date.now()}`);
+            if (!res.ok) throw new Error("Network response was not ok");
+            const data = await res.json();
+            
+            // Format today's date to YYYY-MM-DD local time
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+            
+            let todaysPrompts = data[todayStr];
+
+            // Intelligent Fallback: If today's date isn't found, grab the most recent date available
+            if (!todaysPrompts) {
+                const availableDates = Object.keys(data).sort();
+                if (availableDates.length > 0) {
+                    const latestDate = availableDates[availableDates.length - 1];
+                    todaysPrompts = data[latestDate];
+                } else {
+                    throw new Error("No dates available in JSON");
+                }
+            }
+            
+            this.micCheckData = todaysPrompts;
+            this.currentStep = 'mic-check';
+            this.renderMicCheckUI();
+            
+        } catch (e) {
+            console.error("Mic-Check Fetch Error:", e);
+            this.innerHTML = `
+                <div class="relative w-full h-[650px] bg-rose-50 border border-rose-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
+                    <i data-lucide="alert-triangle" class="w-10 h-10 text-rose-600 mb-4"></i>
+                    <h3 class="text-lg font-bold text-rose-800 mb-2">Failed to load daily prompts</h3>
+                    <button class="thps-back-btn mt-4 bg-white border border-rose-200 text-rose-600 px-6 py-2 rounded-lg font-bold text-sm hover:bg-rose-100 transition-colors">Go Back</button>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons({ root: this });
+            this.querySelector('.thps-back-btn').addEventListener('click', () => this.renderCourseSelector());
+        }
+    }
+
+    renderMicCheckUI() {
+        this.innerHTML = `
+            <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
+                <!-- MINI EXIT BUTTON -->
+                <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
+                    Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
+                </button>
+
+                <div class="text-center mb-4 mt-2">
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Mic-Check Daily</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Today's 4-Part Challenge</p>
+                </div>
+
+                <!-- FOUR RESPONSIVE PROMPT FIELDS -->
+                <div class="flex-1 flex flex-col gap-2.5 max-w-lg mx-auto w-full mb-4 justify-center">
+                    
+                    <!-- Challenge Prompt -->
+                    <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
+                        <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2 left-4">Challenge</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.challenge}</span>
+                    </div>
+
+                    <!-- Sponsor Prompt -->
+                    <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
+                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2 left-4">Sponsor</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.sponsor}</span>
+                    </div>
+
+                    <!-- Script Prompt -->
+                    <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
+                        <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2 left-4">Script</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.script}</span>
+                    </div>
+
+                    <!-- Mic Check Prompt -->
+                    <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
+                        <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest absolute top-2 left-4">Mic Check</span>
+                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${this.micCheckData.micCheck}</span>
+                    </div>
+                </div>
+
+                <!-- SLEEK ARCADE TIMER BAR PANEL -->
+                <!-- We reuse the Arcade IDs here so the syncLoop drives the timer natively! -->
+                <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
+                    <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                    
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;" title="20 Second Milestone">
+                        <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;" title="60 Second Target Goal">
+                        <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
+                    </div>
+                    
+                    <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
+                        <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (window.lucide) window.lucide.createIcons({ root: this });
+        
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+            this.micCheckData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
+        this.querySelector('#arcade-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        });
+    }
+
+    // ==========================================
+    // COURSE DATA FETCH LOGIC (Standard Courses)
+    // ==========================================
     async fetchCourse(url) {
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
@@ -917,10 +1059,10 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     processPayload(e) {
-        if (!this.courseData || this.currentStep === 0) return;
+        if (!this.courseData && !this.micCheckData || this.currentStep === 0) return;
         
-        // Bypass grading metrics if inside independent Arcade, ESL, or Voice Choice modes
-        if (this.currentStep === 'arcade' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter' || this.currentStep === 'swys-main') return;
+        // Bypass grading metrics if inside independent Arcade, ESL, Voice Choice, or Mic Check modes
+        if (this.currentStep === 'arcade' || this.currentStep === 'mic-check' || this.currentStep === 'esl-menu' || this.currentStep === 'esl-drill' || this.currentStep === 'vc-menu' || this.currentStep === 'vc-prompter' || this.currentStep === 'swys-main') return;
 
         const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
@@ -1017,7 +1159,8 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 2. Sync Independent Arcade Mode Timer Elements
+        // 2. Sync Independent Arcade Mode & Mic-Check Timer Elements
+        // Because we cleverly reused the same HTML IDs, this loop syncs both!
         const arcadeProgress = this.querySelector('#arcade-progress');
         const arcadeBtn = this.querySelector('#arcade-record-btn');
         const arcadeIcon = this.querySelector('#arcade-record-icon');
