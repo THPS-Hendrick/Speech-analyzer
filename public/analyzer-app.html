@@ -476,24 +476,23 @@
 
         const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
         
-        // --- NEW: Attach to global window object ---
         window.explanationsData = null;
         window.FALLBACK_EXPLANATIONS = {
-            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
-            "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
-            "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
-            "Content": "Measures the substance of your speech. Aim for 30%+ Personal examples and 20%+ Visual descriptions.",
-            "Delivery": "Measures how you sound. Aim for 100-150 Words Per Minute, 3 to 5 Syllables/sec (to avoid mumbling), and pause for at least 400 milliseconds often.",
-            "Simplicity": "Measures how easy your speech is to understand. Keep your average sentence between 5 to 15 words.",
-            "Personal": "Measures storytelling and personal examples. Best speakers talk about a specific person doing specific things about 30-60% of the time.",
-            "Visual": "Measures words that paint a picture (objects, colors, sizes). Aim for 20-50%.",
-            "Intangible": "Content that is not Personal or Visual (abstract concepts and filler). Aim for under 30%.",
-            "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
-            "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
-            "Pause %": "The percentage of time you spend silent. Aim for 10-35%.",
-            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 9.0s.",
-            "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
-            "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
+            "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Metrics in the green zone award 10 points. Yellow/Red zones award pro-rated points. The total makes up your Grade out of 100.",
+            "Green Score": "Counts how many of the 9 metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10.",
+            "Grade": "Your final score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).",
+            "Content": "Measures the substance of your speech. Aim for 30-60% Personal and 20-50% Visual.",
+            "Delivery": "Measures how you sound. Aim for 100-150 Words/min, 3.5-4.5 Syllables/sec, and 15-35% Pause time.",
+            "Simplicity": "Measures how easy your speech is to understand. Keep Runtime between 3.0-6.0s.",
+            "Personal": "Measures storytelling. Aim for 30-60% content about specific people doing specific things.",
+            "Visual": "Measures sensory words that paint a picture. Aim for 20-50%.",
+            "Intangible": "Measures abstract concepts and filler. Keep it between 10-30%.",
+            "Words/min": "Your speaking pace. The sweet spot is 100-150 words per minute.",
+            "Syllable/sec": "Our 'Mumble Meter'. The green zone is 3.5 to 4.5 syllables per second.",
+            "Pause %": "The percentage of time you spend silent. Aim for 15-35%.",
+            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 6.0s.",
+            "Comp. Grade": "The reading grade level of your speech. A grade of 5.0 to 10.0 is perfect.",
+            "Simple %": "The percentage of your words within the 10,000 most common English words. Aim for 80-90%.",
             "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
             "Voice Var.": "In 3sec chunks, counts how varied is your speaking volume. Varying volume is engaging.",
             "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
@@ -765,6 +764,38 @@
             if (window.lucide) window.lucide.createIcons();
         };
 
+        // NEW: Interpolation Math Engine
+        window.getMetricPoints = function(key, val) {
+            const limits = {
+                personal: [10, 30, 60, 80],
+                visual: [10, 20, 50, 60],
+                intangible: [5, 10, 30, 50],
+                wpm: [85, 100, 150, 170],
+                sps: [3.0, 3.5, 4.5, 5.0],
+                pause: [9, 15, 35, 41],
+                runtime: [2.0, 3.0, 6.0, 9.0],
+                grade: [4.0, 5.0, 10.0, 12.0],
+                simple: [70, 80, 90, 96]
+            };
+            
+            if (!limits[key] || val === undefined || val === null) return 0;
+            let [minOuter, minGreen, maxGreen, maxOuter] = limits[key];
+            
+            // Inside Green
+            if (val >= minGreen && val <= maxGreen) return 10;
+            // Outside limits
+            if (val <= minOuter || val >= maxOuter) return 0;
+            
+            // Pro-rated zones
+            if (val > minOuter && val < minGreen) {
+                return ((val - minOuter) / (minGreen - minOuter)) * 10;
+            }
+            if (val > maxGreen && val < maxOuter) {
+                return (1 - ((val - maxGreen) / (maxOuter - maxGreen))) * 10;
+            }
+            return 0;
+        };
+
         window.analyze = function() {
             try {
                 if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
@@ -797,12 +828,10 @@
                 elapsedSecs = window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
             }
             
-            // --- NEW: FETCH FROM THE MASTER ANALYZER ---
             let masterData = {};
             if (typeof window.THPS.NLP.analyzeSpeech === 'function') {
                 masterData = window.THPS.NLP.analyzeSpeech(text, timestamps, volumeData, elapsedSecs);
             } else {
-                // Fallback just in case the backend engine update hasn't propagated
                 console.warn("analyzeSpeech not found, falling back to analyzeTranscript");
                 masterData = window.THPS.NLP.analyzeTranscript(text, timestamps);
             }
@@ -843,61 +872,40 @@
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
-            // ==========================================
-            // NEW RUNTIME LOGIC
-            // ==========================================
             let meaningfulPauses = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
             let runtimeFloat = masterData.activeSpeakingSecs > 0 ? (masterData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
             
             try {
                 let totalPoints = 0;
+                let greenCount = 0;
                 let overrideGrade = false;
 
-                if (window.THPS.Audio && window.THPS.Audio.recordedAudio && elapsedSecs > 0) {
-                    if (elapsedSecs < 20) overrideGrade = true; 
-                    else if (elapsedSecs < 60) totalPoints += 0.75; 
-                    else if (elapsedSecs <= 90) totalPoints += 1.0; 
-                    else overrideGrade = true;
-
-                    if (avgWpm < 100) totalPoints += 0.75; 
-                    else if (avgWpm > 150) totalPoints += 0.25; 
-                    else totalPoints += 1;
-
-                    if (mumbleScore < 3) totalPoints += 0.75; 
-                    else if (mumbleScore > 5) totalPoints += 0.25; 
-                    else totalPoints += 1;
-
-                    if (pausePercent < 10) totalPoints += 0.25; 
-                    else if (pausePercent > 35) totalPoints += 0.75; 
-                    else totalPoints += 1;
-                } else {
+                if (!window.THPS.Audio || !window.THPS.Audio.recordedAudio || elapsedSecs === 0) {
                     overrideGrade = true;
                 }
 
-                if (personalPercent < 30) totalPoints += 0.25; 
-                else if (personalPercent > 60) totalPoints += 0.75; 
-                else totalPoints += 1;
+                // New Sliding Scale Scoring Engine
+                const scoreKeys = [
+                    {k: 'personal', v: personalPercent}, 
+                    {k: 'visual', v: visualPercent}, 
+                    {k: 'intangible', v: intangiblePercent}, 
+                    {k: 'wpm', v: avgWpm}, 
+                    {k: 'sps', v: mumbleScore}, 
+                    {k: 'pause', v: pausePercent}, 
+                    {k: 'runtime', v: runtimeFloat}, 
+                    {k: 'grade', v: avgGrade}, 
+                    {k: 'simple', v: coreSimpleScore}
+                ];
 
-                if (visualPercent < 20) totalPoints += 0.25; 
-                else if (visualPercent > 50) totalPoints += 0.75; 
-                else totalPoints += 1;
+                scoreKeys.forEach(metric => {
+                    let pts = window.getMetricPoints(metric.k, metric.v);
+                    totalPoints += pts;
+                    if (pts === 10) greenCount++;
+                });
 
-                if (intangiblePercent > 45) totalPoints += 0.25; 
-                else if (intangiblePercent >= 30) totalPoints += 0.75; 
-                else totalPoints += 1;
-
-                // NEW RUNTIME SCORING
-                if (runtimeFloat >= 3.0 && runtimeFloat <= 9.0) totalPoints += 1; 
-                else if ((runtimeFloat > 9.0 && runtimeFloat <= 15.0) || (runtimeFloat >= 1.5 && runtimeFloat < 3.0)) totalPoints += 0.75; 
-                else totalPoints += 0.25;
-
-                if (avgGrade < 5) totalPoints += 0.75; 
-                else if (avgGrade > 10) totalPoints += 0.25; 
-                else totalPoints += 1;
-
-                if (coreSimpleScore < 80) totalPoints += 0.25; 
-                else if (coreSimpleScore > 95) totalPoints += 0.75; 
-                else totalPoints += 1;
+                // Calculate the final 10-point bonus (Green Score)
+                let greenScore = (greenCount === 9) ? 10 : greenCount;
+                totalPoints += greenScore;
 
                 // --- THE TRACKMAN BROADCAST & CACHE ---
                 const payload = { 
@@ -917,6 +925,7 @@
                     runtime: runtimeFloat,
                     simple: coreSimpleScore,
                     totalPoints: totalPoints,
+                    greenScore: greenScore,
                     overrideGrade: overrideGrade,
                     recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
                     highlightedHTML: highlightedHTML,
@@ -946,29 +955,6 @@
                 }
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
-        };
-
-        window.getMetricPoints = function(key, val) {
-            if (key === 'totalPoints') return val; 
-            if (key === 'time') {
-                if (val >= 60 && val <= 90) return 1;
-                if (val >= 20 && val < 60) return 0.75;
-                return 0;
-            }
-            if (key === 'wpm') return (val >= 100 && val <= 150) ? 1 : (val < 100 ? 0.75 : 0.25);
-            if (key === 'sps') return (val >= 3 && val <= 5) ? 1 : (val < 3 ? 0.75 : 0.25);
-            if (key === 'pause') return (val >= 10 && val <= 35) ? 1 : (val > 35 ? 0.75 : 0.25);
-            if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
-            if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
-            if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
-            if (key === 'runtime') {
-                if (val >= 3.0 && val <= 9.0) return 1;
-                if ((val > 9.0 && val <= 15.0) || (val >= 1.5 && val < 3.0)) return 0.75;
-                return 0.25;
-            }
-            if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
-            if (key === 'simple') return (val >= 80 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
-            return 0;
         };
 
         window.formatMetric = function(key, val) {
@@ -1017,7 +1003,7 @@
 
             window.thps_sessionHistory.forEach((attempt) => {
                 const isActive = (window.thps_lastPayload && window.thps_lastPayload.id === attempt.id);
-                const gradeText = attempt.overrideGrade ? '-' : (attempt.totalPoints % 1 === 0 ? attempt.totalPoints : attempt.totalPoints.toFixed(2));
+                const gradeText = attempt.overrideGrade ? '-' : attempt.totalPoints.toFixed(1);
                 
                 const item = document.createElement('div');
                 item.className = `p-4 rounded-xl border-2 cursor-pointer transition-all ${isActive ? 'border-indigo-500 bg-indigo-50 shadow-md scale-[1.02]' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'}`;
@@ -1026,10 +1012,10 @@
                 item.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
-                        <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/10</span>
+                        <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/100</span>
                     </div>
                     <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
-                        <span>Time: ${Math.floor(attempt.time / 60)}:${Math.floor(attempt.time % 60).toString().padStart(2, '0')}</span>
+                        <span>Greens: ${attempt.greenScore || 0}/10</span>
                         <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>
                 `;
@@ -1039,7 +1025,7 @@
             // Map UI text labels to their payload keys
             const metricsMap = [
                 { label: 'Score', key: 'totalPoints' },
-                { label: 'Time', key: 'time' },
+                { label: 'Greens', key: 'greenScore' },
                 { label: 'Pers', key: 'personal' },
                 { label: 'Vis', key: 'visual' },
                 { label: 'Intg', key: 'intangible' },
@@ -1060,18 +1046,12 @@
 
                 window.thps_sessionHistory.forEach(h => {
                     let val = h[m.key];
-                    
-                    // LEGACY FALLBACK: Calculate runtime on the fly if missing from old saves
-                    if (m.key === 'runtime' && val === undefined) {
-                        let mp = (h.pauseBuckets?.blue || 0) + (h.pauseBuckets?.green || 0) + (h.pauseBuckets?.orange || 0) + (h.pauseBuckets?.red || 0);
-                        val = h.activeSpeakingSecs ? (h.activeSpeakingSecs / (mp + 1)) : 0;
-                    }
 
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
                         count++;
                         
-                        let pts = window.getMetricPoints(m.key, val);
+                        let pts = (m.key === 'totalPoints' || m.key === 'greenScore') ? val : window.getMetricPoints(m.key, val);
                         if (pts > bestPts) {
                             bestPts = pts;
                             bestVal = val;
@@ -1147,7 +1127,6 @@
             window.analyze();
         };
 
-        // --- UPDATED EXPLAIN FUNCTION ---
         window.explain = function(term) {
             const titleEl = document.getElementById('cba-explanationTitle');
             const contentEl = document.getElementById('cba-explanationContent');
@@ -1164,7 +1143,6 @@
             contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
 
             setTimeout(() => {
-                // Ensure we explicitly reference the global window object here as well
                 let text = (window.explanationsData && window.explanationsData[term]) 
                            ? window.explanationsData[term] 
                            : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] 
@@ -1181,7 +1159,6 @@
             }
         });
         
-        // --- UPDATED FETCH FUNCTION ---
         async function fetchExplanations() {
             try {
                 const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
