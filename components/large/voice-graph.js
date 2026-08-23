@@ -4,7 +4,6 @@ class THPSVoiceGraph extends HTMLElement {
     }
 
     connectedCallback() {
-        // Safely set innerHTML after the element is officially connected to the DOM
         this.innerHTML = this.getTemplate();
         
         // Interactive Explainer Logic (Event Delegation)
@@ -16,7 +15,7 @@ class THPSVoiceGraph extends HTMLElement {
                 const bar = e.target.closest('.vg-bar');
                 if (bar && bar.dataset.desc) {
                     explainer.innerText = bar.dataset.desc;
-                    explainer.classList.add('text-blue-600'); // Highlight the text to show interaction
+                    explainer.classList.add('text-blue-600');
                     explainer.classList.remove('text-slate-500');
                 }
             });
@@ -26,7 +25,6 @@ class THPSVoiceGraph extends HTMLElement {
         this.updateHandler = this.handleUpdate.bind(this);
         window.addEventListener('thps-dashboard-update', this.updateHandler);
         
-        // Check for existing cache on load
         if (window.thps_lastPayload) {
             this.handleUpdate({ detail: window.thps_lastPayload });
         }
@@ -39,7 +37,6 @@ class THPSVoiceGraph extends HTMLElement {
     handleUpdate(e) {
         const data = e.detail;
 
-        // Failsafe: if the audio hasn't generated the elastic grid buckets yet, clear the graph
         if (!data || !data.pauseBuckets || !data.paceBuckets) {
              this.clearGraph();
              return;
@@ -48,10 +45,10 @@ class THPSVoiceGraph extends HTMLElement {
         this.renderPauseColumn(data.pauseBuckets);
         this.renderPaceColumn(data.paceBuckets);
         
-        if (data.volumeData && data.volumeData.length > 0) {
-            this.renderVolumeColumn(data.volumeData);
+        if (data.volumeBuckets) {
+            this.renderVolumeColumn(data.volumeBuckets);
         } else {
-            this.renderVolumeColumn([]); // Clear if no audio volume data exists
+            this.clearVolumeColumn();
         }
     }
 
@@ -73,50 +70,25 @@ class THPSVoiceGraph extends HTMLElement {
         this.updateBar('vg-pace-slowest', paceBuckets.slowest, total);
     }
 
-    renderVolumeColumn(volumeData) {
-        let volBuckets = { quietest: 0, quiet: 0, normal: 0, loud: 0, loudest: 0 };
-        
-        if (volumeData.length > 0) {
-            // Group raw acoustic frames into 3-second chunks
-            let chunks = {};
-            volumeData.forEach(frame => {
-                let chunkIndex = Math.floor(frame.time / 3);
-                if (!chunks[chunkIndex]) chunks[chunkIndex] = [];
-                chunks[chunkIndex].push(frame.db);
-            });
+    // NEW: Directly maps the master percentile clamp volume buckets
+    renderVolumeColumn(volumeBuckets) {
+        const total = volumeBuckets.vHigh + volumeBuckets.high + volumeBuckets.norm + volumeBuckets.low + volumeBuckets.vLow;
+        this.updateBar('vg-vol-loudest', volumeBuckets.vHigh, total);
+        this.updateBar('vg-vol-loud', volumeBuckets.high, total);
+        this.updateBar('vg-vol-normal', volumeBuckets.norm, total);
+        this.updateBar('vg-vol-quiet', volumeBuckets.low, total);
+        this.updateBar('vg-vol-quietest', volumeBuckets.vLow, total);
+    }
 
-            let chunkAverages = [];
-            for (const key in chunks) {
-                let dBs = chunks[key];
-                // Logarithmic average of the chunk
-                let linearSum = 0;
-                dBs.forEach(db => linearSum += Math.pow(10, db / 10));
-                let avgDb = 10 * Math.log10(linearSum / dBs.length);
-                chunkAverages.push(avgDb);
+    clearVolumeColumn() {
+        ['vg-vol-loudest', 'vg-vol-loud', 'vg-vol-normal', 'vg-vol-quiet', 'vg-vol-quietest'].forEach(id => {
+            const el = this.querySelector(`#${id}`);
+            if (el) {
+                el.style.height = '0%';
+                el.style.opacity = '0.3';
+                el.innerText = '';
             }
-
-            // Find global baseline to measure intensity variation against
-            let globalLinearSum = 0;
-            chunkAverages.forEach(db => globalLinearSum += Math.pow(10, db / 10));
-            let globalAvgDb = 10 * Math.log10(globalLinearSum / chunkAverages.length);
-
-            // Bucket the variations
-            chunkAverages.forEach(db => {
-                let diff = db - globalAvgDb;
-                if (diff > 4) volBuckets.loudest++;
-                else if (diff > 1.5) volBuckets.loud++;
-                else if (diff > -1.5) volBuckets.normal++;
-                else if (diff > -4) volBuckets.quiet++;
-                else volBuckets.quietest++;
-            });
-        }
-
-        const total = volBuckets.loudest + volBuckets.loud + volBuckets.normal + volBuckets.quiet + volBuckets.quietest;
-        this.updateBar('vg-vol-loudest', volBuckets.loudest, total);
-        this.updateBar('vg-vol-loud', volBuckets.loud, total);
-        this.updateBar('vg-vol-normal', volBuckets.normal, total);
-        this.updateBar('vg-vol-quiet', volBuckets.quiet, total);
-        this.updateBar('vg-vol-quietest', volBuckets.quietest, total);
+        });
     }
 
     updateBar(elementId, count, total) {
@@ -130,7 +102,6 @@ class THPSVoiceGraph extends HTMLElement {
             el.style.opacity = '0.3';
             el.style.padding = '0';
         } else {
-            // Allocate remaining vertical space dynamically
             const percentage = Math.max(15, (count / total) * 100);
             el.style.height = `${percentage}%`;
             el.style.opacity = '1';
@@ -154,7 +125,6 @@ class THPSVoiceGraph extends HTMLElement {
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
             
-            <!-- GRAPH CONTAINER -->
             <div class="flex-1 grid grid-cols-3 gap-2 sm:gap-4 h-full mt-2 pb-2" id="vg-interactive-grid">
                 
                 <!-- Pause Var Column -->
@@ -169,11 +139,11 @@ class THPSVoiceGraph extends HTMLElement {
 
                 <!-- Voice Var Column -->
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
-                    <div data-desc="4.0+ dB above your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loudest"></div>
-                    <div data-desc="1.4 to 4.0 dB above your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-fuchsia-100 rounded text-center text-xs font-bold text-fuchsia-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loud"></div>
-                    <div data-desc="Your avg volume" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-normal"></div>
-                    <div data-desc="1.4 to 4.0 dB below your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-teal-100 rounded text-center text-xs font-bold text-teal-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quiet"></div>
-                    <div data-desc="4.0+ dB below your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-cyan-100 rounded text-center text-xs font-bold text-cyan-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quietest"></div>
+                    <div data-desc="Loudest volume peaks" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loudest"></div>
+                    <div data-desc="Loud variations" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loud"></div>
+                    <div data-desc="Your median volume" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-normal"></div>
+                    <div data-desc="Quiet variations" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quiet"></div>
+                    <div data-desc="Quietest whispers" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quietest"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Voice Var</div>
                 </div>
 
@@ -181,14 +151,13 @@ class THPSVoiceGraph extends HTMLElement {
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
                     <div data-desc="words 20%+ faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
                     <div data-desc="words 5-20% faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
-                    <div data-desc="words at your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
-                    <div data-desc="words 5-20% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-lime-100 rounded text-center text-xs font-bold text-lime-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
-                    <div data-desc="words 20%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-indigo-100 rounded text-center text-xs font-bold text-indigo-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
+                    <div data-desc="words at your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
+                    <div data-desc="words 5-20% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
+                    <div data-desc="words 20%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Pace Var</div>
                 </div>
             </div>
             
-            <!-- EXPLAINER TEXT FIELD -->
             <div class="mt-4 pt-3 border-t border-slate-100 text-center">
                 <p id="vg-explainer-text" class="text-xs font-medium text-slate-500 transition-colors duration-300">Your pause, pace & volume variation.</p>
             </div>
