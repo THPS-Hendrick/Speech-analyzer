@@ -1,13 +1,6 @@
-// ==========================================
-// THPS WIDGET: LARGE VOICE Timeline (PHD ACOUSTICS v5.0)
-// Includes Canvas Pause Bars, Accordion Pace Runs, Percentile Voice Variance, and Dual Engines
-// ==========================================
-
 class ThpsVoiceTimeline extends HTMLElement {
     constructor() {
         super();
-        this.pauseMode = 'dynamic'; // Default to relative speaker cadence
-        this.lastData = null; // Cache the data so we can instantly recalculate on toggle
     }
 
     connectedCallback() {
@@ -27,12 +20,7 @@ class ThpsVoiceTimeline extends HTMLElement {
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Timeline</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Variance in Pause, Voice, & Pace</p>
-                    </div>
-                    <!-- NEW: The Engine Mode Toggle -->
-                    <div class="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
-                        <button data-action="setModeDynamic" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600">Dynamic</button>
-                        <button data-action="setModeGlobal" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600">Global</button>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Trackman Acoustic Telemetry</p>
                     </div>
                 </div>
                 
@@ -43,10 +31,9 @@ class ThpsVoiceTimeline extends HTMLElement {
                     </div>
 
                     <div class="thps-sync-track relative flex flex-col" style="min-width: 100%;">
-                        
                         <div class="thps-time-axis relative w-full h-7 border-b border-slate-700/50 bg-slate-800/90 shrink-0"></div>
 
-                        <div class="w-full h-32 md:h-40 relative shrink-0 bg-slate-900">
+                        <div class="w-full h-32 md:h-40 relative shrink-0 bg-slate-900 cursor-crosshair" id="thps-canvas-container">
                             <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
                         </div>
                         
@@ -59,10 +46,10 @@ class ThpsVoiceTimeline extends HTMLElement {
                                 <div class="w-full h-px bg-slate-300"></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
+                <!-- GRAPHS -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                     <div class="flex flex-col">
                         <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pause Var.')">Pause Var.</h4>
@@ -77,6 +64,17 @@ class ThpsVoiceTimeline extends HTMLElement {
                         <div class="thps-bar-container-pace flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                 </div>
+
+                <!-- NEW: TELEMETRY INSPECTOR -->
+                <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col w-full h-[100px]">
+                    <div class="w-full h-full bg-slate-800 rounded-xl p-3 flex flex-col justify-center relative overflow-hidden shadow-inner">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 absolute top-2 left-3">Telemetry Inspector</span>
+                        <div id="timeline-telemetry-content" class="text-xs font-mono text-slate-300 mt-4 leading-relaxed flex flex-wrap gap-x-4 gap-y-1">
+                            <span class="animate-pulse">Click a word or pause bar above to view Trackman acoustic data.</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         `;
 
@@ -86,10 +84,6 @@ class ThpsVoiceTimeline extends HTMLElement {
             else this.remove(); 
         });
 
-        // Toggle Listeners
-        this.querySelector('[data-action="setModeDynamic"]').addEventListener('click', () => this.setMode('dynamic'));
-        this.querySelector('[data-action="setModeGlobal"]').addEventListener('click', () => this.setMode('global'));
-
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
         
         if (window.thps_lastPayload) {
@@ -97,35 +91,46 @@ class ThpsVoiceTimeline extends HTMLElement {
         }
     }
 
-    setMode(mode) {
-        this.pauseMode = mode;
-        const dynBtn = this.querySelector('[data-action="setModeDynamic"]');
-        const globBtn = this.querySelector('[data-action="setModeGlobal"]');
-        
-        if (mode === 'dynamic') {
-            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
-            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
-        } else {
-            globBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all bg-white shadow-sm text-indigo-600';
-            dynBtn.className = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all text-slate-400 hover:text-slate-600';
-        }
-        
-        // Recalculate Timeline and all dependent maths instantly
-        if (this.lastData) this.update(this.lastData);
+    formatTimeCode(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        const ms = Math.floor((seconds % 1) * 100);
+        return `00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
     }
 
-    countSyllablesLocal(word) {
-        word = word.toLowerCase().replace(/[^a-z]/g, '');
-        if (word.length <= 3) return 1;
-        word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-        word = word.replace(/^y/, '');
-        const syllables = word.match(/[aeiouy]{1,2}/g);
-        return syllables ? syllables.length : 1;
+    showWordTelemetry(word, start, t) {
+        if (!t) return;
+        const container = this.querySelector('#timeline-telemetry-content');
+        container.innerHTML = `
+            <span class="text-white bg-indigo-500/30 px-1 rounded">Word: "${word}"</span>
+            <span><strong class="text-slate-400">Start:</strong> ${this.formatTimeCode(start)}</span>
+            <span><strong class="text-slate-400">Syllables:</strong> ${t.sylCount}</span>
+            <span><strong class="text-slate-400">Expected Dur:</strong> ${t.expectedDurationMs}ms</span>
+            <span><strong class="text-slate-400">Actual Dur:</strong> ${t.actualDurationMs}ms</span>
+            <span><strong class="text-slate-400">Pause Opp:</strong> ${t.pauseOpp ? `<span class="text-emerald-400">True (${t.pauseOppMs}ms)</span>` : `<span class="text-rose-400">False (${t.pauseOppMs}ms)</span>`}</span>
+            <span><strong class="text-slate-400">Accordion Syl:</strong> ${t.accordionSyllableMs}ms x ${t.sylCount}</span>
+        `;
+    }
+
+    showPauseTelemetry(pause) {
+        const container = this.querySelector('#timeline-telemetry-content');
+        let category = "Unknown";
+        if (pause.duration <= 0.700) category = "Short (Blue)";
+        else if (pause.duration <= 1.050) category = "Normal (Green)";
+        else if (pause.duration <= 1.400) category = "Long (Yellow)";
+        else category = "Very Long (Red)";
+
+        container.innerHTML = `
+            <span class="text-white bg-slate-600 px-1 rounded">Event: Pause</span>
+            <span><strong class="text-slate-400">Start:</strong> ${this.formatTimeCode(pause.start)}</span>
+            <span><strong class="text-slate-400">Duration:</strong> ${Math.round(pause.duration * 1000)}ms</span>
+            <span><strong class="text-slate-400">Category:</strong> <span style="color:${pause.color}">${category}</span></span>
+            <span><strong class="text-slate-400">Pause Opp:</strong> <span class="text-emerald-400">True (≥ 350ms)</span></span>
+        `;
     }
 
     update(data) {
         if (!data || !data.wordTimestamps || data.wordTimestamps.length === 0) return;
-        this.lastData = data; 
         
         this.querySelector('.thps-vg-placeholder').style.display = 'none';
         
@@ -138,193 +143,32 @@ class ThpsVoiceTimeline extends HTMLElement {
         track.style.width = `${trackWidth}px`;
         
         const canvas = this.querySelector('.thps-vg-canvas');
+        const canvasContainer = this.querySelector('#thps-canvas-container');
         const axis = this.querySelector('.thps-time-axis');
         const staff = this.querySelector('.thps-staff-words');
         
-        let pauses = []; 
-        let runPaces = []; // NEW: Replaces chunkPaces
+        // 1. Fetching Global Maths from Payload
+        const pauseEvents = data.pauseEvents || [];
+        const runPaces = data.runPaces || [];
+        const pauseCounts = data.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
+        const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
+        const paceCounts = data.paceBuckets || { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
+        const validChunks = data.volumeChunks || [];
 
-        let pauseCounts = { vShort: 0, short: 0, norm: 0, long: 0, vLong: 0 };
-        let paceCounts = { vSlow: 0, slow: 0, norm: 0, fast: 0, vFast: 0 };
-        let voiceCounts = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-        
-        // --- PHD MATH PHASE 1: HYBRID PAUSE & PACE (ACCORDION) ENGINE ---
-        let expectedSyllableLength = 0.250; 
-        
-        if (this.pauseMode === 'dynamic') {
-            const firstWord = data.wordTimestamps[0];
-            const lastWord = data.wordTimestamps[data.wordTimestamps.length - 1];
-            const totalSpeakingTime = (lastWord.start + 1.0) - firstWord.start;
-            
-            let totalSyllables = 0;
-            data.wordTimestamps.forEach(w => totalSyllables += this.countSyllablesLocal(w.word));
-            
-            const dynamicSPS = totalSyllables / Math.max(0.1, totalSpeakingTime);
-            expectedSyllableLength = 1.0 / dynamicSPS; 
-        }
+        // Add Canvas Click Listener for Pauses
+        canvas.onclick = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            // Calculate scale based on actual rendered width vs CSS width
+            const scaleX = canvas.width / (rect.width * 2); // *2 because we scaled the context
+            const clickX = (e.clientX - rect.left) * scaleX; 
+            const clickTime = clickX / PIXELS_PER_SEC;
 
-        let currentRunWords = [];
-
-        for (let i = 0; i < data.wordTimestamps.length; i++) {
-            const currWord = data.wordTimestamps[i];
-            const sylCount = this.countSyllablesLocal(currWord.word);
-            currentRunWords.push({ word: currWord, sylCount: sylCount });
-            
-            let isEndOfRun = false;
-            let expectedNextStart = 0;
-            let truePause = 0;
-            
-            if (i === data.wordTimestamps.length - 1) {
-                isEndOfRun = true;
-            } else {
-                const nextWord = data.wordTimestamps[i+1];
-                expectedNextStart = currWord.start + (sylCount * expectedSyllableLength);
-                truePause = Math.max(0, nextWord.start - expectedNextStart);
-
-                if (truePause > 0.05) { 
-                    isEndOfRun = true;
-                    // Log the Pause
-                    let pColor = '', pY = 0;
-                    if (truePause <= 0.350) { pauseCounts.vShort++; pColor = '#cbd5e1'; pY = 0.15; }
-                    else if (truePause <= 0.700) { pauseCounts.short++; pColor = '#60a5fa'; pY = 0.35; }
-                    else if (truePause <= 1.050) { pauseCounts.norm++; pColor = '#10b981'; pY = 0.50; }
-                    else if (truePause <= 1.400) { pauseCounts.long++; pColor = '#fbbf24'; pY = 0.65; }
-                    else { pauseCounts.vLong++; pColor = '#f43f5e'; pY = 0.85; }
-
-                    pauses.push({ 
-                        start: expectedNextStart, 
-                        duration: truePause, 
-                        color: pColor, 
-                        yPct: pY 
-                    });
-                }
+            // Find if a pause was clicked
+            const clickedPause = pauseEvents.find(p => clickTime >= p.start && clickTime <= p.start + p.duration);
+            if (clickedPause) {
+                this.showPauseTelemetry(clickedPause);
             }
-
-            if (isEndOfRun) {
-                // Log the Pace (Accordion Ratio) for the completed Run
-                let ratio = 1.0;
-                let actualTime = 0;
-                let expectedTime = 0;
-                let blockWidth = sylCount * expectedSyllableLength; // Default fallback for 1-word runs
-
-                if (currentRunWords.length >= 2) {
-                    actualTime = currentRunWords[currentRunWords.length - 1].word.start - currentRunWords[0].word.start;
-                    
-                    let expectedSyllables = 0;
-                    for (let j = 0; j < currentRunWords.length - 1; j++) {
-                        expectedSyllables += currentRunWords[j].sylCount;
-                    }
-                    expectedTime = expectedSyllables * expectedSyllableLength;
-                    ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
-                    blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * expectedSyllableLength);
-                }
-
-                // Bucket the ratio
-                let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceCounts.vFast++; paceColor = '#f43f5e'; paceRow = 4; } // Rose (Rapid Fire)
-                else if (ratio < 0.91) { paceCounts.fast++; paceColor = '#fbbf24'; paceRow = 3; } // Amber (Brisk)
-                else if (ratio <= 1.10) { paceCounts.norm++; paceColor = '#10b981'; paceRow = 2; } // Emerald (On Pace)
-                else if (ratio <= 1.30) { paceCounts.slow++; paceColor = '#60a5fa'; paceRow = 1; } // Blue (Deliberate)
-                else { paceCounts.vSlow++; paceColor = '#cbd5e1'; paceRow = 0; } // Slate (Drawn Out)
-
-                runPaces.push({
-                    start: currentRunWords[0].word.start,
-                    width: blockWidth,
-                    color: paceColor,
-                    row: paceRow
-                });
-
-                currentRunWords = []; // Reset for next run
-            }
-        }
-
-        // --- PHD MATH PHASE 2: TRUE LOGARITHMIC VOICE VARIANCE ---
-        let validChunks = [];
-        let numChunks = Math.ceil(duration / 3);
-
-        for(let c = 0; c < numChunks; c++) {
-            let chunkStart = c * 3;
-            let chunkEnd = chunkStart + 3;
-            
-            let pauseInChunk = 0;
-            pauses.forEach(p => {
-                let pEnd = p.start + p.duration;
-                if (p.start < chunkEnd && pEnd > chunkStart) {
-                    let overlapStart = Math.max(p.start, chunkStart);
-                    let overlapEnd = Math.min(pEnd, chunkEnd);
-                    pauseInChunk += (overlapEnd - overlapStart);
-                }
-            });
-
-            let activeTime = 3 - pauseInChunk;
-            if (activeTime >= 0.2) { 
-                let linearSum = 0; let dbCount = 0;
-                if (data.volumeData && data.volumeData.length > 0) {
-                    data.volumeData.forEach(v => {
-                        if (v.time >= chunkStart && v.time < chunkEnd) {
-                            linearSum += Math.pow(10, v.db / 10);
-                            dbCount++;
-                        }
-                    });
-                }
-                let avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40; 
-                validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
-            }
-        }
-
-        // --- PHD MATH PHASE 3: PERCENTILE SORTING & GLOBAL CLAMP ---
-        
-        validChunks.sort((a, b) => a.db - b.db);
-
-        let floorDb = -40;
-        let ceilingDb = -10;
-
-        if (validChunks.length > 0) {
-            let floorIndex = Math.floor(validChunks.length * 0.05); 
-            let ceilIndex = Math.floor(validChunks.length * 0.95);  
-            if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
-            
-            floorDb = validChunks[floorIndex].db;
-            ceilingDb = validChunks[ceilIndex].db;
-        }
-
-        let range = ceilingDb - floorDb;
-        if (range < 15) {
-            let midPoint = (ceilingDb + floorDb) / 2;
-            floorDb = midPoint - 7.5;
-            ceilingDb = midPoint + 7.5;
-            range = 15;
-        }
-
-        if (this.pauseMode === 'global') {
-            floorDb = -35;
-            ceilingDb = -15; 
-            range = 20;
-        }
-
-        let step = range / 5;
-        let bounds = [
-            floorDb + step,       
-            floorDb + (step * 2), 
-            floorDb + (step * 3), 
-            floorDb + (step * 4)  
-        ];
-
-        let voiceLabels = [
-            `< ${Math.round(bounds[0])}dB`,
-            `${Math.round(bounds[0])}dB`,
-            `${Math.round(bounds[1])}dB`,
-            `${Math.round(bounds[2])}dB`,
-            `> ${Math.round(bounds[3])}dB`
-        ];
-        
-        validChunks.forEach(vc => {
-            if (vc.db < bounds[0]) { voiceCounts.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
-            else if (vc.db < bounds[1]) { voiceCounts.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
-            else if (vc.db < bounds[2]) { voiceCounts.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
-            else if (vc.db < bounds[3]) { voiceCounts.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
-            else { voiceCounts.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
-        });
+        };
 
         // --- VISUAL PAINTING 1: TIME AXIS ---
         axis.innerHTML = '';
@@ -347,7 +191,7 @@ class ThpsVoiceTimeline extends HTMLElement {
         }
 
         // --- VISUAL PAINTING 2: CANVAS BLOCKS & PAUSE BARS ---
-        const canvasHeight = canvas.parentElement.clientHeight;
+        const canvasHeight = canvasContainer.clientHeight;
         canvas.width = trackWidth * 2; 
         canvas.height = canvasHeight * 2;
         const ctx = canvas.getContext('2d');
@@ -362,8 +206,6 @@ class ThpsVoiceTimeline extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
         }
 
-        validChunks.sort((a, b) => a.start - b.start);
-        
         validChunks.forEach(vc => {
             let x = vc.start * PIXELS_PER_SEC;
             let w = 3 * PIXELS_PER_SEC;
@@ -377,7 +219,8 @@ class ThpsVoiceTimeline extends HTMLElement {
             ctx.shadowBlur = 0;
         });
 
-        pauses.forEach(p => {
+        // Draw Pauses over 350ms only
+        pauseEvents.forEach(p => {
             let x = p.start * PIXELS_PER_SEC;
             let w = p.duration * PIXELS_PER_SEC;
             let h = canvasHeight * 0.10; 
@@ -423,9 +266,12 @@ class ThpsVoiceTimeline extends HTMLElement {
             else if (w.colorType === 'visual') textColorCls = 'text-rose-500';
             else if (w.colorType === 'overlap') textColorCls = 'text-fuchsia-600';
             
-            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white ${textColorCls} font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-default`;
+            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white ${textColorCls} font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-pointer`;
             span.style.left = `${xPos}px`; 
             span.style.top = `calc(${row * 20}% + 4px)`; 
+            
+            // Interaction Hook
+            span.onclick = () => this.showWordTelemetry(w.word, w.start, w.telemetry);
             
             staff.appendChild(span);
         });
@@ -466,17 +312,15 @@ class ThpsVoiceTimeline extends HTMLElement {
                         <div class="w-3 sm:w-4 h-16 bg-slate-100 rounded-sm flex flex-col justify-end overflow-hidden">
                             <div class="w-full rounded-sm ${colors[idx]}" style="height: ${heightPct}%"></div>
                         </div>
-                        <span class="text-[8px] text-slate-500">${labels[idx]}</span>
+                        <span class="text-[8px] text-slate-500">${labels[idx] || ''}</span>
                     </div>
                 `;
             });
         };
 
         drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
-        drawVerticalBars('.thps-bar-container-voice', voiceCounts, voiceLabels, ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
-        
-        // NEW: Updated the Pace labels to match the Accordion Ratio Multipliers
-        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['> 1.30x', '1.10x', '1.00x', '0.90x', '< 0.75x'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        drawVerticalBars('.thps-bar-container-voice', voiceCounts, data.volumeLabels || [], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
+        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['Fastest', 'Fast', 'Normal', 'Slow', 'Slowest'], ['bg-rose-500', 'bg-amber-400', 'bg-slate-300', 'bg-lime-400', 'bg-indigo-500']);
     }
 }
 
