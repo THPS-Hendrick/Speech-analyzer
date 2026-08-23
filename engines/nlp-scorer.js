@@ -286,7 +286,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
         volumeData: volumeData || [],
         
-        // --- NEW: TIMELINE TELEMETRY BUCKETS ---
         pauseEvents: [], 
         runPaces: [], 
         volumeBuckets: { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
@@ -299,7 +298,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     // 3. Process the Acoustic Elastic Grid
     if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
         let totalPauseTime = 0;
-        let currentRunWords = []; // NEW: Array to collect words inside an accordion block
+        let currentRunWords = []; 
         
         let localTotalSyllables = 0;
         timestamps.forEach(w => localTotalSyllables += window.THPS.NLP.countSyllables(w.word));
@@ -325,7 +324,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
             let syllableUnitLength = 0;
             let pauseUnitValue = 0;
-            let isPauseOpp = false; // NEW: Telemetry hook
+            let isPauseOpp = false; 
             
             currentRunWords.push({ word: currWord, sylCount: sylCount });
 
@@ -344,7 +343,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
                     if (pauseUnitValue >= 0.35) {
                         totalPauseTime += pauseUnitValue; 
-                        isPauseOpp = true; // NEW: Triggers pause telemetry state
+                        isPauseOpp = true; 
                         
                         let pColor = '', pY = 0;
                         if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#f43f5e'; pY = 0.85; }
@@ -352,7 +351,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                         else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.green++; pColor = '#10b981'; pY = 0.50; }
                         else { acousticData.pauseBuckets.blue++; pColor = '#60a5fa'; pY = 0.35; }
                         
-                        // NEW: Generate canvas event for Timeline
                         let expectedNextStart = currWord.start + (sylCount * 0.35); 
                         acousticData.pauseEvents.push({ start: expectedNextStart, duration: pauseUnitValue, color: pColor, yPct: pY });
                     } else {
@@ -368,7 +366,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             else if (paceRatio <= 1.20) acousticData.paceBuckets.slow++;
             else acousticData.paceBuckets.slowest++;
 
-            // --- NEW: INJECT WORD TELEMETRY DIRECTLY INTO JSON ---
             currWord.telemetry = {
                 sylCount: sylCount,
                 expectedDurationMs: Math.round((sylCount * assumedUnitLength) * 1000),
@@ -378,7 +375,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 accordionSyllableMs: Math.round(syllableUnitLength * 1000)
             };
 
-            // --- NEW: DETERMINE RUNS FOR PACE TIMELINE CANVAS ---
             if (isPauseOpp || i === timestamps.length - 2) {
                 let ratio = 1.0;
                 let blockWidth = sylCount * assumedUnitLength; 
@@ -404,7 +400,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             }
         }
         
-        // Ensure last word gets default telemetry to prevent crashes
         let lastWordObj = timestamps[timestamps.length - 1];
         let lastWordSyl = window.THPS.NLP.countSyllables(lastWordObj.word);
         lastWordObj.telemetry = {
@@ -435,7 +430,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     }
 
     // ==========================================
-    // 4. PERCENTILE CLAMP VOLUME ENGINE (NEW GLOBALLY)
+    // 4. PERCENTILE CLAMP VOLUME ENGINE
     // ==========================================
     let validChunks = [];
     let volumeBuckets = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
@@ -499,11 +494,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         });
     }
 
-    // Attach to final payload
     acousticData.volumeBuckets = volumeBuckets;
     acousticData.volumeLabels = volumeLabels;
     acousticData.volumeChunks = validChunks;
 
-    // 5. Return the massive unified payload
     return { ...nlpData, ...acousticData, trueDuration: duration };
 };
