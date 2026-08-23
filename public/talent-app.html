@@ -10,6 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     
+    <!-- NEW DOWNLOAD & PDF DEPENDENCIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
     <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
@@ -30,6 +35,9 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/edit-mode.js"></script>
     
+    <!-- NEW: RESULTS WIDGET (Spawnable & used headlessly for PDFs) -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/results.js"></script>
+    
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
@@ -40,6 +48,10 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
 
+    <!-- NEW MEDIUM WIDGETS -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/timer-med.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/upload-med.js"></script>
+
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
@@ -49,6 +61,7 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-runtime.js"></script>
     
     <style>
         /* DASHBOARD LOCK PROTECTION */
@@ -72,6 +85,18 @@
             </div>
             <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-slate-800 drop-shadow-sm text-center">Analyzing Audio...</h2>
             <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
+        </div>
+    </div>
+    
+    <!-- NEW: MASS DOWNLOAD CONFIRMATION MODAL -->
+    <div id="download-confirm-modal" class="hidden fixed inset-0 z-[10001] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-4 transition-all duration-300">
+        <div class="bg-white p-5 rounded-2xl shadow-xl max-w-[280px] w-full text-center">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Mass Download</h3>
+            <p id="download-confirm-text" class="text-xs text-slate-500 mb-5 font-medium leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button onclick="window.closeDownloadModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors">No</button>
+                <button id="btn-confirm-download" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-sm">Yes</button>
+            </div>
         </div>
     </div>
 
@@ -100,8 +125,33 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-            <div id="hist-tab-content-list" class="block space-y-3">
+            <div id="hist-tab-content-list" class="block">
+                
+                <!-- NEW: MASTER BUTTON PANEL -->
+                <div class="w-full flex items-center justify-end gap-2 pb-3 mb-3 border-b border-slate-200">
+                    <!-- Data (JSON) Download -->
+                    <button onclick="window.handleHistoryDownload('json')" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer" title="Download Data">
+                        <i data-lucide="file-json" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <!-- PDF Download -->
+                    <button onclick="window.handleHistoryDownload('pdf')" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Download PDF">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </button>
+                
+                    <div class="w-px h-5 bg-slate-300 mx-1"></div> <!-- Divider -->
+                
+                    <!-- ALL Toggle -->
+                    <button id="btn-history-all" onclick="window.toggleAllPrimer()" class="px-3 py-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        <span>All</span>
+                    </button>
                 </div>
+                
+                <!-- Dynamic Entry List -->
+                <div id="hist-tab-items-list" class="space-y-3"></div>
+            </div>
+            
             <div id="hist-tab-content-avg" class="hidden">
                 <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
             </div>
@@ -171,11 +221,27 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-simple', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-cyan-600 bg-white shadow-sm hover:border-cyan-400 hover:bg-cyan-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Simple % Pill
                         </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-pill-runtime', 'w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-indigo-600 bg-white shadow-sm hover:border-indigo-400 hover:bg-indigo-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-3 h-3 mb-0.5"></i> Runtime Pill
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-content-medium" class="hidden space-y-8">
+                <!-- NEW TOOLS CATEGORY FOR MEDIUM TIMERS AND UPLOADS -->
+                <div>
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> TOOLS <div class="w-full h-px bg-slate-200"></div></h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-timer-med', 'w-full md:w-[calc(50%-0.75rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="clock" class="w-4 h-4 mb-1"></i> Mic Timer
+                        </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-upload-speech-med', 'w-full md:w-[calc(50%-0.75rem)]', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-emerald-600 bg-white shadow-sm hover:border-emerald-400 hover:bg-emerald-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="upload-cloud" class="w-4 h-4 mb-1"></i> Upload Speech
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> CONTENT <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-2 gap-3">
@@ -249,6 +315,9 @@
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-record-reel', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-rose-600 bg-white shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Record Reel
                         </div>
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-results', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-teal-600 bg-white shadow-sm hover:border-teal-400 hover:bg-teal-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i> Results Report
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -316,14 +385,19 @@
                         </div>
                     </div>
 
+                    <!-- DEFAULT DASHBOARD WIDGET LOADOUT -->
                     <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 sm:gap-6 w-full items-start min-h-[150px] p-2 rounded-xl">
 
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-course-widget></thps-course-widget>
                         </div>
 
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-live-mic-timer></thps-live-mic-timer>
+                        <div class="w-full md:w-[calc(50%-0.75rem)] mt-2 cursor-move relative group">
+                            <thps-timer-med></thps-timer-med>
+                        </div>
+
+                        <div class="w-full md:w-[calc(50%-0.75rem)] mt-2 cursor-move relative group">
+                            <thps-upload-speech-med></thps-upload-speech-med>
                         </div>
                         
                         <div class="w-full mt-2 cursor-move relative group">
@@ -336,10 +410,6 @@
      
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-voice-timeline title="Voice Timeline"></thps-voice-timeline>
-                        </div>
-                        
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-tangible-text></thps-tangible-text>
                         </div>
                         
                         <div class="w-full mt-2 cursor-move relative group">
@@ -364,6 +434,7 @@
         // ==========================================
         window.thps_sessionHistory = [];
         window.thps_currentAttemptId = 1;
+        window.isHistoryAllPrimed = false; // MASS DOWNLOAD STATE
 
         // ==========================================
         // EDIT MODE (LOCK/UNLOCK) LOGIC
@@ -397,7 +468,6 @@
             if (window.lucide) window.lucide.createIcons();
         };
 
-        // Failsafe: Ensure it locks automatically on load
         setTimeout(() => {
             if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
                 window.THPS.Dashboard.sortableInstance.option("disabled", true);
@@ -419,7 +489,7 @@
             "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
             "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
             "Pause %": "The percentage of time you spend silent. Aim for 10-35%.",
-            "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
+            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 9.0s.",
             "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
             "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
             "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
@@ -430,6 +500,8 @@
         let menuOverlayTimeout = null;
 
         window.closeAllMenus = function() {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             const widgetDrawer = document.getElementById('widget-menu-drawer');
             const historyDrawer = document.getElementById('history-menu-drawer');
             const overlay = document.getElementById('widget-menu-overlay');
@@ -481,6 +553,8 @@
         };
 
         window.switchHistoryTab = function(tabName) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             ['list', 'avg', 'best'].forEach(s => {
                 const btn = document.getElementById(`hist-tab-btn-${s}`);
                 const content = document.getElementById(`hist-tab-content-${s}`);
@@ -509,6 +583,127 @@
             activeContent.classList.remove('hidden');
             activeContent.classList.add('block');
         };
+
+        // ==========================================
+        // MASS DOWNLOAD & PDF EXPORT LOGIC
+        // ==========================================
+        
+        window.toggleAllPrimer = function() {
+            window.isHistoryAllPrimed = !window.isHistoryAllPrimed;
+            const btn = document.getElementById('btn-history-all');
+            
+            if (window.isHistoryAllPrimed) {
+                btn.classList.replace('text-slate-500', 'text-blue-600');
+                btn.classList.replace('bg-white', 'bg-blue-50');
+                btn.classList.replace('border-slate-200', 'border-blue-200');
+            } else {
+                window.unprimeHistoryAll();
+            }
+        };
+
+        window.unprimeHistoryAll = function() {
+            window.isHistoryAllPrimed = false;
+            const btn = document.getElementById('btn-history-all');
+            if (btn) {
+                btn.classList.replace('text-blue-600', 'text-slate-500');
+                btn.classList.replace('bg-blue-50', 'bg-white');
+                btn.classList.replace('border-blue-200', 'border-slate-200');
+            }
+        };
+
+        window.handleHistoryDownload = function(type) {
+            const savedAttempts = window.thps_sessionHistory || [];
+            const totalEntries = savedAttempts.length;
+            
+            if (window.isHistoryAllPrimed && totalEntries > 1) {
+                // Mass Download Route
+                const estSeconds = totalEntries * (type === 'pdf' ? 1.5 : 0.1); 
+                document.getElementById('download-confirm-text').innerHTML = `Download <strong>${totalEntries} files</strong>?<br>(Estimated ${Math.ceil(estSeconds)} seconds)`;
+                
+                document.getElementById('btn-confirm-download').onclick = () => {
+                    window.closeDownloadModal();
+                    window.executeMassDownload(type, savedAttempts);
+                };
+                
+                document.getElementById('download-confirm-modal').classList.remove('hidden');
+            } else {
+                // Single Download Route
+                const activePayload = window.thps_lastPayload;
+                if (!activePayload) return alert("Please select an entry first.");
+                
+                if (type === 'json') {
+                    const blob = new Blob([JSON.stringify(activePayload, null, 2)], {type: "application/json"});
+                    saveAs(blob, `THPS_${activePayload.title ? activePayload.title.replace(/\s+/g, '_') : 'Attempt'}.json`);
+                } else if (type === 'pdf') {
+                    window.generatePhantomPDF(activePayload, true);
+                }
+            }
+        };
+
+        window.closeDownloadModal = function() {
+            document.getElementById('download-confirm-modal').classList.add('hidden');
+        };
+
+        window.generatePhantomPDF = async function(payload, saveImmediately = false) {
+            const ghostDiv = document.createElement('div');
+            ghostDiv.style.position = 'absolute';
+            ghostDiv.style.left = '-9999px';
+            ghostDiv.style.width = '210mm'; 
+            document.body.appendChild(ghostDiv);
+
+            const ghostWidget = document.createElement('thps-results');
+            ghostWidget.setAttribute('phantom', 'true');
+            ghostDiv.appendChild(ghostWidget);
+            
+            // Allow the custom element to be upgraded and connected
+            await new Promise(resolve => setTimeout(resolve, 50)); 
+            
+            if (typeof ghostWidget.injectDataAndRender === 'function') {
+                ghostWidget.injectDataAndRender(payload);
+            }
+
+            // Give the canvases time to paint their graphs before snapping
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            let result;
+            if (saveImmediately) {
+                if (typeof ghostWidget.triggerSingleDownload === 'function') {
+                    ghostWidget.triggerSingleDownload();
+                }
+            } else {
+                if (typeof ghostWidget.generatePDFBlob === 'function') {
+                    result = await ghostWidget.generatePDFBlob();
+                }
+            }
+            
+            document.body.removeChild(ghostDiv);
+            return result;
+        };
+
+        window.executeMassDownload = async function(type, attemptsArray) {
+            const zip = new JSZip();
+            
+            for (let i = 0; i < attemptsArray.length; i++) {
+                const payload = attemptsArray[i];
+                const attemptName = payload.title ? payload.title.replace(/\s+/g, '_') : `Attempt_${i+1}`;
+                
+                if (type === 'json') {
+                    zip.file(`THPS_${attemptName}.json`, JSON.stringify(payload, null, 2));
+                } else if (type === 'pdf') {
+                    const pdfBlob = await window.generatePhantomPDF(payload, false); 
+                    if (pdfBlob) zip.file(`THPS_${attemptName}.pdf`, pdfBlob);
+                }
+            }
+            
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, `THPS_Session_Data.zip`);
+                window.unprimeHistoryAll(); 
+            });
+        };
+
+        // ==========================================
+        // ACTIVE RECORDING & ANALYSIS LOGIC
+        // ==========================================
 
         window.toggleRecording = function() {
             const btnText = document.getElementById('toggle-text');
@@ -646,7 +841,11 @@
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
-            let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
+            // ==========================================
+            // NEW RUNTIME LOGIC
+            // ==========================================
+            let meaningfulPauses = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
+            let runtimeFloat = masterData.activeSpeakingSecs > 0 ? (masterData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
             
             try {
                 let totalPoints = 0;
@@ -685,9 +884,10 @@
                 else if (intangiblePercent >= 30) totalPoints += 0.75; 
                 else totalPoints += 1;
 
-                if (avgWpsFloat < 5) totalPoints += 0.75; 
-                else if (avgWpsFloat > 15) totalPoints += 0.25; 
-                else totalPoints += 1;
+                // NEW RUNTIME SCORING
+                if (runtimeFloat >= 3.0 && runtimeFloat <= 9.0) totalPoints += 1; 
+                else if ((runtimeFloat > 9.0 && runtimeFloat <= 15.0) || (runtimeFloat >= 1.5 && runtimeFloat < 3.0)) totalPoints += 0.75; 
+                else totalPoints += 0.25;
 
                 if (avgGrade < 5) totalPoints += 0.75; 
                 else if (avgGrade > 10) totalPoints += 0.25; 
@@ -712,7 +912,7 @@
                     paceBuckets: paceBuckets,   
                     pause: pausePercent,
                     intangible: intangiblePercent,
-                    wps: avgWpsFloat,
+                    runtime: runtimeFloat,
                     simple: coreSimpleScore,
                     totalPoints: totalPoints,
                     overrideGrade: overrideGrade,
@@ -759,7 +959,11 @@
             if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
             if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
             if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
-            if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'runtime') {
+                if (val >= 3.0 && val <= 9.0) return 1;
+                if ((val > 9.0 && val <= 15.0) || (val >= 1.5 && val < 3.0)) return 0.75;
+                return 0.25;
+            }
             if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
             if (key === 'simple') return (val >= 80 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
             return 0;
@@ -768,7 +972,8 @@
         window.formatMetric = function(key, val) {
             if (val === null || val === undefined) return '-';
             if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
-            if (['totalPoints', 'sps', 'wps', 'grade'].includes(key)) return val.toFixed(1);
+            if (['totalPoints', 'sps', 'grade'].includes(key)) return val.toFixed(1);
+            if (key === 'runtime') return val.toFixed(1) + 's';
             if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
             return Math.round(val);
         };
@@ -789,7 +994,7 @@
 
         window.updateHistoryUI = function() {
             const countEl = document.getElementById('history-count');
-            const listEl = document.getElementById('hist-tab-content-list');
+            const listEl = document.getElementById('hist-tab-items-list');
             const avgEl = document.getElementById('hist-tab-content-avg');
             const bestEl = document.getElementById('hist-tab-content-best');
             
@@ -839,7 +1044,7 @@
                 { label: 'WPM', key: 'wpm' },
                 { label: 'SPS', key: 'sps' },
                 { label: 'Pause', key: 'pause' },
-                { label: 'W/Sen', key: 'wps' },
+                { label: 'Runtime', key: 'runtime' },
                 { label: 'Comp', key: 'grade' },
                 { label: 'Sim%', key: 'simple' }
             ];
@@ -853,6 +1058,13 @@
 
                 window.thps_sessionHistory.forEach(h => {
                     let val = h[m.key];
+                    
+                    // LEGACY FALLBACK: Calculate runtime on the fly if missing from old saves
+                    if (m.key === 'runtime' && val === undefined) {
+                        let mp = (h.pauseBuckets?.blue || 0) + (h.pauseBuckets?.green || 0) + (h.pauseBuckets?.orange || 0) + (h.pauseBuckets?.red || 0);
+                        val = h.activeSpeakingSecs ? (h.activeSpeakingSecs / (mp + 1)) : 0;
+                    }
+
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
                         count++;
@@ -880,6 +1092,8 @@
         };
 
         window.loadHistoryAttempt = function(id) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+            
             const attempt = window.thps_sessionHistory.find(h => h.id === id);
             if (!attempt) return;
             
