@@ -270,17 +270,6 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 // Centralizes all acoustic and text math into a single payload
 // ==========================================
 
-// Global Syllable Counter (Type-Safe)
-window.THPS.NLP.countSyllables = function(word) {
-    if (!word || typeof word !== 'string') return 1; // Guard against STT token errors
-    let w = word.toLowerCase().replace(/[^a-z]/g, '');
-    if (w.length <= 3) return 1;
-    w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '');
-    const syl = w.match(/[aeiouy]{1,2}/g);
-    return syl ? syl.length : 1;
-};
-
-// Master Analyzer: Processes Text, Timestamps, and Volume
 window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSecs) {
     
     // 1. Process standard text-based NLP using explicit namespace
@@ -291,15 +280,16 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         wpm: 0, 
         mumbleScore: 0, 
         pausePercent: 0, 
+        runtime: 0, // NEW NATIVE RUNTIME VARIABLE
         activeSpeakingSecs: 0,
         pauseBuckets: { micro: 0, blue: 0, green: 0, orange: 0, red: 0 },
         paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
-        volumeData: volumeData || [] // Passed through for apps that need it
+        volumeData: volumeData || [] 
     };
 
     let duration = Math.min(240, elapsedSecs || 0);
 
-    // 3. Process the Acoustic Elastic Grid (With 350ms Exclusion Rule)
+    // 3. Process the Acoustic Elastic Grid
     if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
         let totalPauseTime = 0;
         
@@ -329,11 +319,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             let pauseUnitValue = 0;
 
             if (gap <= expectedTime) {
-                // Gap is shorter. No pause.
                 syllableUnitLength = gap / sylCount;
                 acousticData.pauseBuckets.micro++;
             } else {
-                // Gap is longer. Test spillover.
                 let evenExpansion = gap / expectedUnits;
 
                 if (evenExpansion < 0.35) {
@@ -343,21 +331,19 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                     syllableUnitLength = 0.35;
                     pauseUnitValue = gap - (sylCount * 0.35);
 
-                    // 350ms BRIGHT LINE TEST
                     if (pauseUnitValue >= 0.35) {
-                        totalPauseTime += pauseUnitValue; // Added to score
+                        totalPauseTime += pauseUnitValue; 
                         
                         if (pauseUnitValue >= 1.40) acousticData.pauseBuckets.red++;
                         else if (pauseUnitValue >= 1.05) acousticData.pauseBuckets.orange++;
                         else if (pauseUnitValue >= 0.70) acousticData.pauseBuckets.green++;
                         else acousticData.pauseBuckets.blue++;
                     } else {
-                        acousticData.pauseBuckets.micro++; // Ignored for score
+                        acousticData.pauseBuckets.micro++; 
                     }
                 }
             }
 
-            // Pace Intensity
             let paceRatio = syllableUnitLength / assumedUnitLength;
             if (paceRatio < 0.80) acousticData.paceBuckets.fastest++;
             else if (paceRatio < 0.95) acousticData.paceBuckets.fast++;
@@ -370,14 +356,20 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.pausePercent = Math.max(0, Math.min(100, (totalPauseTime / duration) * 100));
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
+        
+        // --- NEW NATIVE RUNTIME MATH ---
+        let meaningfulPauses = acousticData.pauseBuckets.blue + acousticData.pauseBuckets.green + acousticData.pauseBuckets.orange + acousticData.pauseBuckets.red;
+        acousticData.runtime = acousticData.activeSpeakingSecs > 0 ? (acousticData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
 
     } else if (timestamps && timestamps.length === 1) {
         acousticData.activeSpeakingSecs = 1.0;
         acousticData.pausePercent = 0;
+        acousticData.runtime = 1.0;
     } else {
         // STRICT ZERO FALLBACKS
         acousticData.activeSpeakingSecs = 0;
         acousticData.pausePercent = 0;
+        acousticData.runtime = 0;
     }
 
     // 4. Return the massive unified payload
