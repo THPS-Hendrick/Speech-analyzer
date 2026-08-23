@@ -485,7 +485,7 @@
             "Words/min": "Your speaking pace. 100-150 words per minute is 'just right'.",
             "Syllable/sec": "Our 'Mumble Meter'. It measures how densely packed your syllables are during active speech. 3 to 5 syllables per second is ideal.",
             "Pause %": "The percentage of time you spend silent. Aim for 10-35%.",
-            "Words/Sent": "The average length of your sentences. Aim for 5-15 words.",
+            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 9.0s.",
             "Comp. Grade": "The reading grade level of your speech. A grade of 5-10 is 'just right' and plain english.",
             "Simple %": "The percentage of your words within the 10,000 words used by people learning english. 80-95% is ideal.",
             "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
@@ -837,7 +837,11 @@
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
-            let avgWpsFloat = numSentences > 0 ? (numWords / numSentences) : 0;
+            // ==========================================
+            // NEW RUNTIME LOGIC
+            // ==========================================
+            let meaningfulPauses = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
+            let runtimeFloat = masterData.activeSpeakingSecs > 0 ? (masterData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
             
             try {
                 let totalPoints = 0;
@@ -876,9 +880,10 @@
                 else if (intangiblePercent >= 30) totalPoints += 0.75; 
                 else totalPoints += 1;
 
-                if (avgWpsFloat < 5) totalPoints += 0.75; 
-                else if (avgWpsFloat > 15) totalPoints += 0.25; 
-                else totalPoints += 1;
+                // NEW RUNTIME SCORING
+                if (runtimeFloat >= 3.0 && runtimeFloat <= 9.0) totalPoints += 1; 
+                else if ((runtimeFloat > 9.0 && runtimeFloat <= 15.0) || (runtimeFloat >= 1.5 && runtimeFloat < 3.0)) totalPoints += 0.75; 
+                else totalPoints += 0.25;
 
                 if (avgGrade < 5) totalPoints += 0.75; 
                 else if (avgGrade > 10) totalPoints += 0.25; 
@@ -903,7 +908,7 @@
                     paceBuckets: paceBuckets,   
                     pause: pausePercent,
                     intangible: intangiblePercent,
-                    wps: avgWpsFloat,
+                    runtime: runtimeFloat,
                     simple: coreSimpleScore,
                     totalPoints: totalPoints,
                     overrideGrade: overrideGrade,
@@ -950,7 +955,11 @@
             if (key === 'personal') return (val >= 30 && val <= 60) ? 1 : (val > 60 ? 0.75 : 0.25);
             if (key === 'visual') return (val >= 20 && val <= 50) ? 1 : (val > 50 ? 0.75 : 0.25);
             if (key === 'intangible') return (val < 30) ? 1 : (val <= 45 ? 0.75 : 0.25);
-            if (key === 'wps') return (val >= 5 && val <= 15) ? 1 : (val < 5 ? 0.75 : 0.25);
+            if (key === 'runtime') {
+                if (val >= 3.0 && val <= 9.0) return 1;
+                if ((val > 9.0 && val <= 15.0) || (val >= 1.5 && val < 3.0)) return 0.75;
+                return 0.25;
+            }
             if (key === 'grade') return (val >= 5 && val <= 10) ? 1 : (val < 5 ? 0.75 : 0.25);
             if (key === 'simple') return (val >= 80 && val <= 95) ? 1 : (val > 95 ? 0.75 : 0.25);
             return 0;
@@ -959,7 +968,8 @@
         window.formatMetric = function(key, val) {
             if (val === null || val === undefined) return '-';
             if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
-            if (['totalPoints', 'sps', 'wps', 'grade'].includes(key)) return val.toFixed(1);
+            if (['totalPoints', 'sps', 'grade'].includes(key)) return val.toFixed(1);
+            if (key === 'runtime') return val.toFixed(1) + 's';
             if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
             return Math.round(val);
         };
@@ -1030,7 +1040,7 @@
                 { label: 'WPM', key: 'wpm' },
                 { label: 'SPS', key: 'sps' },
                 { label: 'Pause', key: 'pause' },
-                { label: 'W/Sen', key: 'wps' },
+                { label: 'Runtime', key: 'runtime' },
                 { label: 'Comp', key: 'grade' },
                 { label: 'Sim%', key: 'simple' }
             ];
@@ -1044,6 +1054,13 @@
 
                 window.thps_sessionHistory.forEach(h => {
                     let val = h[m.key];
+                    
+                    // LEGACY FALLBACK: Calculate runtime on the fly if missing from old saves
+                    if (m.key === 'runtime' && val === undefined) {
+                        let mp = (h.pauseBuckets?.blue || 0) + (h.pauseBuckets?.green || 0) + (h.pauseBuckets?.orange || 0) + (h.pauseBuckets?.red || 0);
+                        val = h.activeSpeakingSecs ? (h.activeSpeakingSecs / (mp + 1)) : 0;
+                    }
+
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
                         count++;
