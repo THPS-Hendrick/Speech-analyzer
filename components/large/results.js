@@ -124,18 +124,19 @@ class THPSResultsWidget extends HTMLElement {
         const graphWidget = this.querySelector('#nested-voice-graph');
         const textWidget = this.querySelector('#nested-tangible-text');
 
-        // The "Bilingual" Update Function
+        // The "Bilingual" Update Function (FIXED FOR PHANTOM PDF LOOP)
         const forceUpdate = (widget) => {
             if (widget) {
-                // 1. For widgets that use the standard render() method
                 widget.data = this.data; 
                 if (typeof widget.render === 'function') {
                     widget.render();
                 }
-                
-                // 2. For widgets that use an update(data) method (like Tangible Text)
                 if (typeof widget.update === 'function') {
                     widget.update(this.data);
+                }
+                // NEW: Added support for widgets that use standard DOM event dispatch mapping
+                if (typeof widget.handleUpdate === 'function') {
+                    widget.handleUpdate({ detail: this.data });
                 }
             }
         };
