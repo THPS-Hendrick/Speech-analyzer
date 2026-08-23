@@ -478,7 +478,7 @@
         
         window.explanationsData = null;
         window.FALLBACK_EXPLANATIONS = {
-            "Score Summary": "Measures your Content, Delivery, and Simplicity. Metrics in the "green" zone get +10 points. Total Grade out of 100.",
+            "Score Summary": "Measures your Content, Delivery, and Simplicity. Metrics in the \"green\" zone get +10 points. Total Grade out of 100.",
             "Green Score": "Counts how many of the 9 metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10.",
             "Grade": "Your final score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).",
             "Content": "Measures the substance of your speech. Aim for 30-60% Personal and 20-50% Visual.",
@@ -935,7 +935,14 @@
                     totalSyllables: totalSyllables,
                     google10kCount: google10kCount,
                     unifiedSimpleCount: unifiedSimpleCount,
-                    readability: readability
+                    readability: readability,
+                    
+                    // NEW: EXPLICITLY PASSING TELEMETRY ARRAYS
+                    pauseEvents: masterData.pauseEvents || [],
+                    runPaces: masterData.runPaces || [],
+                    volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
+                    volumeLabels: masterData.volumeLabels || [],
+                    volumeChunks: masterData.volumeChunks || []
                 };
                 
                 window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
