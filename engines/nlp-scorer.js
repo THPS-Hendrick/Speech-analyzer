@@ -60,6 +60,9 @@ window.THPS.NLP.loadDictionaries = async function() {
 };
 
 window.THPS.NLP.countSyllables = function(word) {
+    // GHOST WORD SHIELD: Gracefully handle empty API transcription ticks
+    if (!word || typeof word !== 'string' || word.trim() === '') return 1;
+
     word = word.toLowerCase().replace(/[^a-z]/g, '');
     if (word.length <= 3) return 1;
     word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
@@ -301,7 +304,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         let currentRunWords = []; 
         
         let localTotalSyllables = 0;
-        timestamps.forEach(w => localTotalSyllables += window.THPS.NLP.countSyllables(w.word));
+        timestamps.forEach(w => {
+            // GHOST WORD SHIELD: Sanitize ghost words before counting
+            if (!w.word || typeof w.word !== 'string') w.word = "";
+            localTotalSyllables += window.THPS.NLP.countSyllables(w.word);
+        });
+        
         let totalAssumedUnits = localTotalSyllables + timestamps.length - 1;
 
         const firstWord = timestamps[0];
@@ -315,6 +323,10 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         for (let i = 0; i < timestamps.length - 1; i++) {
             let currWord = timestamps[i];
             let nextWord = timestamps[i+1];
+            
+            // GHOST WORD SHIELD: Ensure ghost words don't break the physics object structure
+            if (!currWord.word || typeof currWord.word !== 'string') currWord.word = "";
+            if (!nextWord.word || typeof nextWord.word !== 'string') nextWord.word = "";
             
             let gap = Math.max(0.01, nextWord.start - currWord.start);
 
@@ -401,6 +413,8 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         }
         
         let lastWordObj = timestamps[timestamps.length - 1];
+        if (!lastWordObj.word || typeof lastWordObj.word !== 'string') lastWordObj.word = ""; // Shield the final word
+        
         let lastWordSyl = window.THPS.NLP.countSyllables(lastWordObj.word);
         lastWordObj.telemetry = {
             sylCount: lastWordSyl,
