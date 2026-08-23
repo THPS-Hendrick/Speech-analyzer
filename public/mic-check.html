@@ -296,7 +296,7 @@
         const p3ScoringContent = [
             "<strong>1. Delivery (Pace, Mumble, Pause):</strong><br>Scores your speed, clarity, and pacing. Green is ideal, Yellow needs adjustment, Red means you are speaking too fast, too slow, or not enunciating.",
             "<strong>2. Content (Personal, Visual, Abstract):</strong><br>Scores the balance of your story. A perfect score blends personal anecdotes, visual imagery, and abstract concepts evenly.",
-            "<strong>3. Clarity (Word Avg, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Use shorter sentences and common English words to hit Green thresholds.",
+            "<strong>3. Clarity (Runtime, Eng 10K, Pop):</strong><br>Scores how easy you are to understand. Manage your continuous speaking time and use common English words to hit Green thresholds.",
             "<strong>4. Time:</strong><br>Speak for 60 to 80 seconds for max points. Anything under 20s or over 80s is disqualified so don't chicken out or ramble on!",
             "<strong>5. Stars & Final Grade:</strong><br> All 10 sub-scores combine into a Final Grade out of 10. The Star rating reflects the difficulty level you completed."
         ];
@@ -308,7 +308,7 @@
             "<strong>Personal:</strong> Use 'I', 'Me', 'He', 'She', etc to talk about a specific person. Aim for 30-60% personal content.",
             "<strong>Visual:</strong> Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.",
             "<strong>Abstract:</strong> Don't get lost in the clouds. Keep complex, theoretical concepts to a minimum (10-30%).",
-            "<strong>Word Avg:</strong> Short sentences punch harder. Aim for 7 to 14 words per sentence. Edit out the fluff.",
+            "<strong>Runtime:</strong> The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0 to 9.0 seconds.",
             "<strong>Eng 10K:</strong> Use simple, recognizable words. Over 80% of your speech should be from the 10,000 most common English words.",
             "<strong>Pop:</strong> Readability grade level. Aim for a 5th to 10th-grade reading level to maximize mass-market appeal.",
             "<strong>Time:</strong> Don't ramble! The goal is exactly 60 seconds. Going under 20s or over 80s will penalize your grade."
@@ -550,7 +550,6 @@
         function buildDynamicDrillData(masterData, elapsedSecs) {
             const words = Math.max(1, masterData.numWords || 0);
             
-            // The game no longer estimates logic - it simply pulls it from the universal math payload
             const wpm = masterData.wpm || 0;
             const pausePct = Math.round(masterData.pausePercent || 0);
             const sps = (masterData.mumbleScore || 0).toFixed(1);
@@ -558,7 +557,9 @@
             const perPct = Math.round(((masterData.personalCount || 0) / words) * 100);
             const visPct = Math.round(((masterData.visualCount || 0) / words) * 100);
             const absPct = Math.max(0, 100 - perPct - visPct);
-            const wps = Math.round(words / Math.max(1, masterData.numSentences || 1));
+            
+            // Extract the new Runtime metric
+            const runtime = masterData.runtime || 0;
             const engPct = Math.round(((masterData.google10kCount || 0) / words) * 100);
             
             let grade = 0;
@@ -586,13 +587,17 @@
             let scPers = scoreMetric(perPct, [30, 60], [20, 29], [61, 70]);
             let scVis = scoreMetric(visPct, [25, 50], [15, 24], [51, 60]);
             let scAbs = scoreMetric(absPct, [10, 30], [0, 9], [31, 40]);
-            let scSig = scoreMetric(wps, [6, 15], [3, 5], [16, 18]);
+            
+            // New Runtime Score Mapping
+            let scRun = scoreMetric(runtime, [3.0, 9.0], [1.5, 2.99], [9.01, 15.0]);
             let scEng = scoreMetric(engPct, [80, 95], [75, 79], [96, 100]);
             let scPop = scoreMetric(grade, [5, 10], [3, 4.99], [10.01, 12]);
 
             const sumDel = scPace.points + scMumb.points + scPaus.points;
             const sumCon = scPers.points + scVis.points + scAbs.points;
-            const sumCla = scSig.points + scEng.points + scPop.points;
+            
+            // Update sumCla to use scRun instead of scSig
+            const sumCla = scRun.points + scEng.points + scPop.points;
 
             const safeFb = (cat, state) => feedbackMatrix[cat] ? feedbackMatrix[cat][state] : { you: "-", try: "-", why: "-" };
             const getCol = (pts) => pts === 1 ? 'text-emerald-500' : (pts === 0.5 ? 'text-amber-500' : 'text-rose-500');
@@ -612,7 +617,7 @@
                 },
                 Clarity: { 
                     score: sumCla, star: getStarFromScore(sumCla),
-                    2: { name: "Word Avg", val: `${wps}`, color: getCol(scSig.points), ...safeFb('Signal', scSig.state) }, 
+                    2: { name: "Runtime", val: `${runtime.toFixed(1)}s`, color: getCol(scRun.points), ...safeFb('Runtime', scRun.state) }, 
                     3: { name: "Eng 10K", val: `${engPct}%`, color: getCol(scEng.points), ...safeFb('Eng10k', scEng.state) }, 
                     4: { name: "Pop", val: `~${popVal}%`, color: getCol(scPop.points), ...safeFb('Pop75', scPop.state) } 
                 },
@@ -797,7 +802,8 @@
                 document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
 
                 document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
-                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Word Avg", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
+                // REPLACED WORD AVG WITH RUNTIME
+                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Runtime", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
 
                 document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
                 document.getElementById('p5-front').innerHTML = `
@@ -988,7 +994,7 @@
                         buildDynamicDrillData({
                             numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
                             google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
-                            wpm: 0, pausePercent: 0, mumbleScore: 0
+                            wpm: 0, pausePercent: 0, mumbleScore: 0, runtime: 0
                         }, audioData.duration || 0);
                     } finally {
                         window.testTranscript = audioData.transcript || "No words captured.";
@@ -1001,7 +1007,7 @@
                     buildDynamicDrillData({
                         numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
                         google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
-                        wpm: 0, pausePercent: 0, mumbleScore: 0
+                        wpm: 0, pausePercent: 0, mumbleScore: 0, runtime: 0
                     }, 0);
                     phase = 'RESULTS';
                     sideBLevel = 0;
@@ -1101,7 +1107,8 @@
                     b4 = `${data[todayAdelaide].p4} examples.`;
                 }
                 
-                const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json');
+                // Added ?t= cache-buster to instantly pull the new Runtime updates!
+                const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json?t=' + Date.now());
                 feedbackMatrix = await fbRes.json();
                 
                 if (window.THPS && window.THPS.NLP) {
