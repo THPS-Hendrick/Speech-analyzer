@@ -29,10 +29,10 @@
     "high": { "you": "Too theoretical", "try": "Ground in reality", "why": "Easier to grasp" },
     "perfect": { "you": "Great balance", "try": "Keep this ratio", "why": "Deep but clear" }
   },
-  "Signal": {
-    "low": { "you": "Slightly choppy", "try": "Combine thoughts", "why": "Smooths delivery" },
-    "high": { "you": "Run-on sentences", "try": "Use more periods", "why": "Lets ideas breathe" },
-    "perfect": { "you": "Punchy sentences", "try": "Keep this length", "why": "High impact" }
+  "Runtime": {
+    "low": { "you": "Too fragmented", "try": "Link ideas together", "why": "Builds flow" },
+    "high": { "you": "Running out of breath", "try": "Pause more frequently", "why": "Paces the audience" },
+    "perfect": { "you": "Great vocal runs", "try": "Keep this continuous pace", "why": "Natural and conversational" }
   },
   "Eng10k": {
     "low": { "you": "Complex vocabulary", "try": "Use simpler words", "why": "Prevents alienating" },
