@@ -65,7 +65,7 @@ class ThpsVoiceTimeline extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- NEW: TELEMETRY INSPECTOR -->
+                <!-- TELEMETRY INSPECTOR -->
                 <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col w-full h-[100px]">
                     <div class="w-full h-full bg-slate-800 rounded-xl p-3 flex flex-col justify-center relative overflow-hidden shadow-inner">
                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 absolute top-2 left-3">Telemetry Inspector</span>
@@ -115,10 +115,10 @@ class ThpsVoiceTimeline extends HTMLElement {
     showPauseTelemetry(pause) {
         const container = this.querySelector('#timeline-telemetry-content');
         let category = "Unknown";
-        if (pause.duration <= 0.700) category = "Short (Blue)";
+        if (pause.duration <= 0.700) category = "Short (Orange)";
         else if (pause.duration <= 1.050) category = "Normal (Green)";
-        else if (pause.duration <= 1.400) category = "Long (Yellow)";
-        else category = "Very Long (Red)";
+        else if (pause.duration <= 1.400) category = "Long (Blue)";
+        else category = "Very Long (Purple)";
 
         container.innerHTML = `
             <span class="text-white bg-slate-600 px-1 rounded">Event: Pause</span>
@@ -147,28 +147,12 @@ class ThpsVoiceTimeline extends HTMLElement {
         const axis = this.querySelector('.thps-time-axis');
         const staff = this.querySelector('.thps-staff-words');
         
-        // 1. Fetching Global Maths from Payload
         const pauseEvents = data.pauseEvents || [];
         const runPaces = data.runPaces || [];
         const pauseCounts = data.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
         const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         const paceCounts = data.paceBuckets || { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
         const validChunks = data.volumeChunks || [];
-
-        // Add Canvas Click Listener for Pauses
-        canvas.onclick = (e) => {
-            const rect = canvas.getBoundingClientRect();
-            // Calculate scale based on actual rendered width vs CSS width
-            const scaleX = canvas.width / (rect.width * 2); // *2 because we scaled the context
-            const clickX = (e.clientX - rect.left) * scaleX; 
-            const clickTime = clickX / PIXELS_PER_SEC;
-
-            // Find if a pause was clicked
-            const clickedPause = pauseEvents.find(p => clickTime >= p.start && clickTime <= p.start + p.duration);
-            if (clickedPause) {
-                this.showPauseTelemetry(clickedPause);
-            }
-        };
 
         // --- VISUAL PAINTING 1: TIME AXIS ---
         axis.innerHTML = '';
@@ -190,7 +174,7 @@ class ThpsVoiceTimeline extends HTMLElement {
             }
         }
 
-        // --- VISUAL PAINTING 2: CANVAS BLOCKS & PAUSE BARS ---
+        // --- VISUAL PAINTING 2: CANVAS (VOLUME ONLY) ---
         const canvasHeight = canvasContainer.clientHeight;
         canvas.width = trackWidth * 2; 
         canvas.height = canvasHeight * 2;
@@ -219,33 +203,13 @@ class ThpsVoiceTimeline extends HTMLElement {
             ctx.shadowBlur = 0;
         });
 
-        // Draw Pauses over 350ms only
-        pauseEvents.forEach(p => {
-            let x = p.start * PIXELS_PER_SEC;
-            let w = p.duration * PIXELS_PER_SEC;
-            let h = canvasHeight * 0.10; 
-            let y = (p.yPct * canvasHeight) - (h / 2); 
-            
-            ctx.fillStyle = p.color;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = p.color;
-            
-            if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(x, y, w, h, 4);
-                ctx.fill();
-            } else {
-                ctx.fillRect(x, y, w, h);
-            }
-            ctx.shadowBlur = 0;
-        });
-
-        // --- VISUAL PAINTING 3: SPEECH STAFF (RUN PACE BARS & WORDS) ---
+        // --- VISUAL PAINTING 3: SPEECH STAFF (WORDS & INVISIBLE PAUSE BLOCKS) ---
         staff.querySelectorAll('.staff-item').forEach(el => el.remove());
 
+        // Draw Pace Run background lines
         runPaces.forEach(rp => {
             const bar = document.createElement('div');
-            bar.className = 'staff-item absolute opacity-30 pointer-events-none rounded-sm z-0';
+            bar.className = 'staff-item absolute opacity-20 pointer-events-none rounded-sm z-0';
             bar.style.backgroundColor = rp.color;
             bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
             bar.style.width = `${rp.width * PIXELS_PER_SEC}px`;
@@ -254,6 +218,7 @@ class ThpsVoiceTimeline extends HTMLElement {
             staff.appendChild(bar);
         });
 
+        // Draw the words with Pace-coded text
         data.wordTimestamps.forEach((w, index) => {
             const span = document.createElement('span');
             span.innerText = w.word;
@@ -261,22 +226,33 @@ class ThpsVoiceTimeline extends HTMLElement {
             const xPos = w.start * PIXELS_PER_SEC; 
             const row = index % 5;
             
-            let textColorCls = 'text-slate-700';
-            if (w.colorType === 'personal') textColorCls = 'text-emerald-500';
-            else if (w.colorType === 'visual') textColorCls = 'text-rose-500';
-            else if (w.colorType === 'overlap') textColorCls = 'text-fuchsia-600';
+            // Text color matches the pace heat map exactly
+            const paceColor = w.telemetry && w.telemetry.paceColor ? w.telemetry.paceColor : '#334155';
             
-            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white ${textColorCls} font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-indigo-50 hover:text-indigo-700 hover:z-20 hover:scale-110 transition-all cursor-pointer`;
+            span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-slate-50 hover:z-20 hover:scale-110 transition-all cursor-pointer`;
+            span.style.color = paceColor;
             span.style.left = `${xPos}px`; 
             span.style.top = `calc(${row * 20}% + 4px)`; 
             
-            // Interaction Hook
             span.onclick = () => this.showWordTelemetry(w.word, w.start, w.telemetry);
-            
             staff.appendChild(span);
         });
 
-        // --- VISUAL PAINTING 4: UI BAR GRAPHS ---
+        // Draw the "Invisible Word" pause blocks directly on the staff
+        pauseEvents.forEach((p) => {
+            const block = document.createElement('div');
+            block.className = `staff-item absolute rounded shadow-sm z-0 hover:brightness-110 transition-all cursor-pointer border border-black/10`;
+            block.style.backgroundColor = p.color;
+            block.style.left = `${p.start * PIXELS_PER_SEC}px`; 
+            block.style.width = `${p.duration * PIXELS_PER_SEC}px`;
+            block.style.top = `calc(40% + 4px)`; // Positioned centrally on the staff
+            block.style.height = `16px`; // Sized to match a word badge
+            
+            block.onclick = () => this.showPauseTelemetry(p);
+            staff.appendChild(block);
+        });
+
+        // --- VISUAL PAINTING 4: UI BAR GRAPHS (HEAT MAP UNIFIED) ---
         const drawHorizontalBars = (containerClass, countsObj, labels, colors) => {
             const container = this.querySelector(containerClass);
             container.innerHTML = '';
@@ -318,9 +294,12 @@ class ThpsVoiceTimeline extends HTMLElement {
             });
         };
 
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-slate-300', 'bg-blue-400', 'bg-emerald-500', 'bg-amber-400', 'bg-rose-500']);
+        // Pause Var (micro=red, short=orange, med=green, long=blue, vLong=purple)
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        // Voice Var
         drawVerticalBars('.thps-bar-container-voice', voiceCounts, data.volumeLabels || [], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
-        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['Fastest', 'Fast', 'Normal', 'Slow', 'Slowest'], ['bg-rose-500', 'bg-amber-400', 'bg-slate-300', 'bg-lime-400', 'bg-indigo-500']);
+        // Pace Var (fastest=red, fast=orange, norm=green, slow=blue, slowest=purple)
+        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['Fastest', 'Fast', 'Normal', 'Slow', 'Slowest'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
     }
 }
 
