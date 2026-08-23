@@ -280,11 +280,18 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         wpm: 0, 
         mumbleScore: 0, 
         pausePercent: 0, 
-        runtime: 0, // NEW NATIVE RUNTIME VARIABLE
+        runtime: 0, 
         activeSpeakingSecs: 0,
         pauseBuckets: { micro: 0, blue: 0, green: 0, orange: 0, red: 0 },
         paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
-        volumeData: volumeData || [] 
+        volumeData: volumeData || [],
+        
+        // --- NEW: TIMELINE TELEMETRY BUCKETS ---
+        pauseEvents: [], 
+        runPaces: [], 
+        volumeBuckets: { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
+        volumeLabels: [],
+        volumeChunks: []
     };
 
     let duration = Math.min(240, elapsedSecs || 0);
@@ -292,6 +299,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     // 3. Process the Acoustic Elastic Grid
     if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
         let totalPauseTime = 0;
+        let currentRunWords = []; // NEW: Array to collect words inside an accordion block
         
         let localTotalSyllables = 0;
         timestamps.forEach(w => localTotalSyllables += window.THPS.NLP.countSyllables(w.word));
@@ -317,6 +325,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
             let syllableUnitLength = 0;
             let pauseUnitValue = 0;
+            let isPauseOpp = false; // NEW: Telemetry hook
+            
+            currentRunWords.push({ word: currWord, sylCount: sylCount });
 
             if (gap <= expectedTime) {
                 syllableUnitLength = gap / sylCount;
@@ -333,11 +344,17 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
                     if (pauseUnitValue >= 0.35) {
                         totalPauseTime += pauseUnitValue; 
+                        isPauseOpp = true; // NEW: Triggers pause telemetry state
                         
-                        if (pauseUnitValue >= 1.40) acousticData.pauseBuckets.red++;
-                        else if (pauseUnitValue >= 1.05) acousticData.pauseBuckets.orange++;
-                        else if (pauseUnitValue >= 0.70) acousticData.pauseBuckets.green++;
-                        else acousticData.pauseBuckets.blue++;
+                        let pColor = '', pY = 0;
+                        if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#f43f5e'; pY = 0.85; }
+                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#fbbf24'; pY = 0.65; }
+                        else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.green++; pColor = '#10b981'; pY = 0.50; }
+                        else { acousticData.pauseBuckets.blue++; pColor = '#60a5fa'; pY = 0.35; }
+                        
+                        // NEW: Generate canvas event for Timeline
+                        let expectedNextStart = currWord.start + (sylCount * 0.35); 
+                        acousticData.pauseEvents.push({ start: expectedNextStart, duration: pauseUnitValue, color: pColor, yPct: pY });
                     } else {
                         acousticData.pauseBuckets.micro++; 
                     }
@@ -350,14 +367,60 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             else if (paceRatio <= 1.05) acousticData.paceBuckets.normal++;
             else if (paceRatio <= 1.20) acousticData.paceBuckets.slow++;
             else acousticData.paceBuckets.slowest++;
+
+            // --- NEW: INJECT WORD TELEMETRY DIRECTLY INTO JSON ---
+            currWord.telemetry = {
+                sylCount: sylCount,
+                expectedDurationMs: Math.round((sylCount * assumedUnitLength) * 1000),
+                actualDurationMs: Math.round(isPauseOpp ? (sylCount * 0.35 * 1000) : (gap * 1000)),
+                pauseOpp: isPauseOpp,
+                pauseOppMs: Math.round(pauseUnitValue * 1000),
+                accordionSyllableMs: Math.round(syllableUnitLength * 1000)
+            };
+
+            // --- NEW: DETERMINE RUNS FOR PACE TIMELINE CANVAS ---
+            if (isPauseOpp || i === timestamps.length - 2) {
+                let ratio = 1.0;
+                let blockWidth = sylCount * assumedUnitLength; 
+                
+                if (currentRunWords.length >= 2) {
+                    let actualTime = currentRunWords[currentRunWords.length - 1].word.start - currentRunWords[0].word.start;
+                    let expectedSyllables = 0;
+                    for (let j = 0; j < currentRunWords.length - 1; j++) expectedSyllables += currentRunWords[j].sylCount;
+                    let expectedTime = expectedSyllables * assumedUnitLength;
+                    ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
+                    blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * assumedUnitLength);
+                }
+
+                let paceColor = '', paceRow = 2;
+                if (ratio < 0.75) { paceColor = '#f43f5e'; paceRow = 4; }
+                else if (ratio < 0.91) { paceColor = '#fbbf24'; paceRow = 3; }
+                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; }
+                else if (ratio <= 1.30) { paceColor = '#60a5fa'; paceRow = 1; }
+                else { paceColor = '#cbd5e1'; paceRow = 0; }
+
+                acousticData.runPaces.push({ start: currentRunWords[0].word.start, width: blockWidth, color: paceColor, row: paceRow });
+                currentRunWords = []; 
+            }
         }
+        
+        // Ensure last word gets default telemetry to prevent crashes
+        let lastWordObj = timestamps[timestamps.length - 1];
+        let lastWordSyl = window.THPS.NLP.countSyllables(lastWordObj.word);
+        lastWordObj.telemetry = {
+            sylCount: lastWordSyl,
+            expectedDurationMs: Math.round((lastWordSyl * assumedUnitLength) * 1000),
+            actualDurationMs: Math.round((lastWordSyl * assumedUnitLength) * 1000),
+            pauseOpp: false,
+            pauseOppMs: 0,
+            accordionSyllableMs: Math.round(assumedUnitLength * 1000)
+        };
 
         acousticData.activeSpeakingSecs = Math.max(0, duration - totalPauseTime);
         acousticData.pausePercent = Math.max(0, Math.min(100, (totalPauseTime / duration) * 100));
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
         
-        // --- NEW NATIVE RUNTIME MATH ---
         let meaningfulPauses = acousticData.pauseBuckets.blue + acousticData.pauseBuckets.green + acousticData.pauseBuckets.orange + acousticData.pauseBuckets.red;
         acousticData.runtime = acousticData.activeSpeakingSecs > 0 ? (acousticData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
 
@@ -366,12 +429,81 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.pausePercent = 0;
         acousticData.runtime = 1.0;
     } else {
-        // STRICT ZERO FALLBACKS
         acousticData.activeSpeakingSecs = 0;
         acousticData.pausePercent = 0;
         acousticData.runtime = 0;
     }
 
-    // 4. Return the massive unified payload
+    // ==========================================
+    // 4. PERCENTILE CLAMP VOLUME ENGINE (NEW GLOBALLY)
+    // ==========================================
+    let validChunks = [];
+    let volumeBuckets = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
+    let volumeLabels = ['< -35dB', '-35dB', '-25dB', '-15dB', '> -15dB']; 
+
+    if (volumeData && volumeData.length > 0) {
+        let numChunks = Math.ceil(elapsedSecs / 3);
+        for(let c = 0; c < numChunks; c++) {
+            let chunkStart = c * 3;
+            let chunkEnd = chunkStart + 3;
+            
+            let linearSum = 0; let dbCount = 0;
+            volumeData.forEach(v => {
+                if (v.time >= chunkStart && v.time < chunkEnd) {
+                    linearSum += Math.pow(10, v.db / 10);
+                    dbCount++;
+                }
+            });
+            if (dbCount > 0) {
+                let avgDb = 10 * Math.log10(linearSum / dbCount);
+                validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
+            }
+        }
+
+        validChunks.sort((a, b) => a.db - b.db);
+
+        let floorDb = -40, ceilingDb = -10;
+        if (validChunks.length > 0) {
+            let floorIndex = Math.floor(validChunks.length * 0.05); 
+            let ceilIndex = Math.floor(validChunks.length * 0.95);  
+            if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
+            floorDb = validChunks[floorIndex].db;
+            ceilingDb = validChunks[ceilIndex].db;
+        }
+
+        let range = ceilingDb - floorDb;
+        if (range < 15) {
+            let midPoint = (ceilingDb + floorDb) / 2;
+            floorDb = midPoint - 7.5;
+            ceilingDb = midPoint + 7.5;
+            range = 15;
+        }
+
+        let step = range / 5;
+        let bounds = [floorDb + step, floorDb + (step * 2), floorDb + (step * 3), floorDb + (step * 4)];
+
+        volumeLabels = [
+            `< ${Math.round(bounds[0])}dB`,
+            `${Math.round(bounds[0])}dB`,
+            `${Math.round(bounds[1])}dB`,
+            `${Math.round(bounds[2])}dB`,
+            `> ${Math.round(bounds[3])}dB`
+        ];
+        
+        validChunks.forEach(vc => {
+            if (vc.db < bounds[0]) { volumeBuckets.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
+            else if (vc.db < bounds[1]) { volumeBuckets.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
+            else if (vc.db < bounds[2]) { volumeBuckets.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
+            else if (vc.db < bounds[3]) { volumeBuckets.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
+            else { volumeBuckets.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
+        });
+    }
+
+    // Attach to final payload
+    acousticData.volumeBuckets = volumeBuckets;
+    acousticData.volumeLabels = volumeLabels;
+    acousticData.volumeChunks = validChunks;
+
+    // 5. Return the massive unified payload
     return { ...nlpData, ...acousticData, trueDuration: duration };
 };
