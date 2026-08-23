@@ -426,7 +426,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
         
-        let meaningfulPauses = acousticData.pauseBuckets.blue + acousticData.pauseBuckets.green + acousticData.pauseBuckets.orange + acousticData.pauseBuckets.red;
+        let meaningfulPauses = acousticData.pauseBuckets.green + acousticData.pauseBuckets.orange + acousticData.pauseBuckets.red;
         acousticData.runtime = acousticData.activeSpeakingSecs > 0 ? (acousticData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
 
     } else if (timestamps && timestamps.length === 1) {
