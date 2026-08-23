@@ -16,12 +16,12 @@ class ThpsScoreSummary extends HTMLElement {
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4 pr-6">
                     <h2 class="text-lg font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors" onclick="this.closest('thps-score-summary').showLocalExplanation('Score Summary')">Score Summary</h2>
                     <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="this.closest('thps-score-summary').showLocalExplanation('Time')">
-                            <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Time:</span>
-                            <span id="sum-time" class="font-bold text-slate-800 text-sm pointer-events-none">-</span>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="this.closest('thps-score-summary').showLocalExplanation('Green Score')">
+                            <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Greens:</span>
+                            <span id="sum-greens" class="font-bold text-slate-800 text-sm pointer-events-none">- / 10</span>
                         </div>
                         <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-score-summary').showLocalExplanation('Grade')">
-                            Grade: <span id="sum-overallGrade" class="text-blue-600 pointer-events-none">- / 10</span>
+                            Grade: <span id="sum-overallGrade" class="text-blue-600 pointer-events-none">- / 100</span>
                         </div>
                     </div>
                 </div>
@@ -69,16 +69,13 @@ class ThpsScoreSummary extends HTMLElement {
 
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
         
-        // THE "WAKE-UP" CATCH-UP CHECK
         if (window.thps_lastPayload) {
             setTimeout(() => this.update(window.thps_lastPayload), 50);
         }
 
-        // Initialize default explanation
         this.showLocalExplanation('Score Summary');
     }
 
-    // INTERNAL EXPLANATION ROUTER
     showLocalExplanation(term) {
         const titleEl = this.querySelector('#local-explanation-title');
         const contentEl = this.querySelector('#local-explanation-content');
@@ -108,50 +105,40 @@ class ThpsScoreSummary extends HTMLElement {
             }
         };
 
-        const evalColor = (status) => {
-            if(status === 'just right' || status === 'pretty good!') return 'bg-green-100 text-green-700';
-            if(status.includes('too') || status.includes('slow') || status.includes('strain') || status === 'not enough') return 'bg-red-100 text-red-700';
-            return 'bg-amber-100 text-amber-700';
+        const formatBadge = (pts) => pts === 10 ? "+10" : "+" + pts.toFixed(1);
+
+        const getBadgeStyle = (pts) => {
+            if (pts === 10) return 'bg-green-100 text-green-700';
+            if (pts >= 5.0) return 'bg-amber-100 text-amber-700';
+            return 'bg-red-100 text-red-700';
         };
 
         // 1. Content
         this.querySelector('#sum-personal').textContent = `${data.personal}%`;
-        let pStatus = 'just right'; 
-        if (data.personal < 30) pStatus = 'not enough'; 
-        else if (data.personal > 60) pStatus = 'too much'; 
-        setEval('sum-personal-eval', pStatus, evalColor(pStatus));
+        let pPts = window.getMetricPoints ? window.getMetricPoints('personal', data.personal) : 0;
+        setEval('sum-personal-eval', formatBadge(pPts), getBadgeStyle(pPts));
 
         this.querySelector('#sum-visual').textContent = `${data.visual}%`;
-        let vStatus = 'just right'; 
-        if (data.visual < 20) vStatus = 'not enough'; 
-        else if (data.visual > 50) vStatus = 'too much'; 
-        setEval('sum-visual-eval', vStatus, evalColor(vStatus));
+        let vPts = window.getMetricPoints ? window.getMetricPoints('visual', data.visual) : 0;
+        setEval('sum-visual-eval', formatBadge(vPts), getBadgeStyle(vPts));
 
         this.querySelector('#sum-intangible').textContent = `${data.intangible}%`;
-        let iStatus = 'just right'; 
-        if (data.intangible > 45) iStatus = 'too much'; 
-        else if (data.intangible >= 30) iStatus = 'bit much'; 
-        setEval('sum-intangible-eval', iStatus, evalColor(iStatus));
+        let iPts = window.getMetricPoints ? window.getMetricPoints('intangible', data.intangible) : 0;
+        setEval('sum-intangible-eval', formatBadge(iPts), getBadgeStyle(iPts));
 
         // 2. Delivery
-        if (data.recordedAudio && data.time > 0) {
+        if (data.recordedAudio && !data.overrideGrade) {
             this.querySelector('#sum-wpm').textContent = data.wpm;
-            let wpmStatus = 'just right'; 
-            if (data.wpm < 100) wpmStatus = 'speed up'; 
-            else if (data.wpm > 150) wpmStatus = 'strain'; 
-            setEval('sum-wpm-eval', wpmStatus, evalColor(wpmStatus));
+            let wpmPts = window.getMetricPoints('wpm', data.wpm);
+            setEval('sum-wpm-eval', formatBadge(wpmPts), getBadgeStyle(wpmPts));
 
             this.querySelector('#sum-sps').textContent = data.sps.toFixed(1);
-            let spsStatus = 'just right'; 
-            if (data.sps < 3) spsStatus = 'speed up'; 
-            else if (data.sps > 5) spsStatus = 'strain'; 
-            setEval('sum-sps-eval', spsStatus, evalColor(spsStatus));
+            let spsPts = window.getMetricPoints('sps', data.sps);
+            setEval('sum-sps-eval', formatBadge(spsPts), getBadgeStyle(spsPts));
 
-            this.querySelector('#sum-pause').textContent = `${data.pause.toFixed(0)}%`;
-            let pzStatus = 'just right'; 
-            if (data.pause < 10) pzStatus = 'too little'; 
-            else if (data.pause > 30) pzStatus = 'too much'; 
-            setEval('sum-pause-eval', pzStatus, evalColor(pzStatus));
+            this.querySelector('#sum-pause').textContent = `${(data.pause || 0).toFixed(0)}%`;
+            let pausePts = window.getMetricPoints('pause', data.pause || 0);
+            setEval('sum-pause-eval', formatBadge(pausePts), getBadgeStyle(pausePts));
         } else {
             this.querySelector('#sum-wpm').textContent = "-";
             this.querySelector('#sum-sps').textContent = "-";
@@ -162,48 +149,31 @@ class ThpsScoreSummary extends HTMLElement {
         }
 
         // 3. Simplicity
-        
-        // RUNTIME LOGIC
-        if (data.recordedAudio && data.time > 0) {
-            const meaningfulPauses = (data.pauseBuckets?.blue || 0) + (data.pauseBuckets?.green || 0) + (data.pauseBuckets?.orange || 0) + (data.pauseBuckets?.red || 0);
-            
-            const activeSecs = data.activeSpeakingSecs !== undefined ? data.activeSpeakingSecs : (data.time * (1 - ((data.pause || 0) / 100)));
-            const fallbackRuntime = activeSecs ? (activeSecs / (meaningfulPauses + 1)) : 0;
-            const runtimeVal = data.runtime !== undefined ? data.runtime : fallbackRuntime;
-
+        if (data.recordedAudio && !data.overrideGrade) {
+            const runtimeVal = data.runtime !== undefined ? data.runtime : 0;
             this.querySelector('#sum-runtime').textContent = `${runtimeVal.toFixed(1)}s`;
-            
-            let rStatus = 'just right';
-            if (runtimeVal >= 3.0 && runtimeVal <= 9.0) rStatus = 'just right';
-            else if ((runtimeVal > 9.0 && runtimeVal <= 15.0) || (runtimeVal >= 1.5 && runtimeVal < 3.0)) rStatus = 'caution';
-            else rStatus = 'strain';
-            
-            setEval('sum-runtime-eval', rStatus, evalColor(rStatus));
+            let rPts = window.getMetricPoints('runtime', runtimeVal);
+            setEval('sum-runtime-eval', formatBadge(rPts), getBadgeStyle(rPts));
         } else {
             this.querySelector('#sum-runtime').textContent = "-";
             setEval('sum-runtime-eval', 'Text Only', 'bg-slate-100 text-slate-500');
         }
 
         this.querySelector('#sum-grade').textContent = data.grade.toFixed(1);
-        let gradeStatus = 'just right'; 
-        if (data.grade < 5) gradeStatus = 'simple'; 
-        else if (data.grade > 10) gradeStatus = 'complex'; 
-        setEval('sum-grade-eval', gradeStatus, evalColor(gradeStatus));
+        let gPts = window.getMetricPoints ? window.getMetricPoints('grade', data.grade) : 0;
+        setEval('sum-grade-eval', formatBadge(gPts), getBadgeStyle(gPts));
 
         this.querySelector('#sum-simple').textContent = `${data.simple}%`;
-        let simpleStatus = 'just right'; 
-        if (data.simple < 85) simpleStatus = 'complex'; 
-        else if (data.simple > 95) simpleStatus = 'simple'; 
-        setEval('sum-simple-eval', simpleStatus, evalColor(simpleStatus));
+        let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
+        setEval('sum-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
         
-        // Final Grade Output
+        // Final Output
         if (data.overrideGrade) {
-            this.querySelector('#sum-overallGrade').textContent = "- / 10";
-            this.querySelector('#sum-time').textContent = "-";
+            this.querySelector('#sum-overallGrade').textContent = "- / 100";
+            this.querySelector('#sum-greens').textContent = "- / 10";
         } else {
-            let formattedScore = data.totalPoints % 1 === 0 ? data.totalPoints : data.totalPoints.toFixed(2);
-            this.querySelector('#sum-overallGrade').textContent = `${formattedScore} / 10`;
-            this.querySelector('#sum-time').textContent = `${data.time.toFixed(0)}s`;
+            this.querySelector('#sum-overallGrade').textContent = `${data.totalPoints.toFixed(1)} / 100`;
+            this.querySelector('#sum-greens').textContent = `${data.greenScore || 0} / 10`;
         }
     }
 }
