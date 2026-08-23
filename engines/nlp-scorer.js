@@ -60,7 +60,6 @@ window.THPS.NLP.loadDictionaries = async function() {
 };
 
 window.THPS.NLP.countSyllables = function(word) {
-    // GHOST WORD SHIELD: Gracefully handle empty API transcription ticks
     if (!word || typeof word !== 'string' || word.trim() === '') return 1;
 
     word = word.toLowerCase().replace(/[^a-z]/g, '');
@@ -239,15 +238,6 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
             let tsObj = wordTimestamps.find(t => t.word.toLowerCase().replace(/[^a-z']/g, '') === cleanWord && !t.tagged);
             if (tsObj) {
                 tsObj.tagged = true;
-                
-                let root = cleanWord.replace(/(?:s|es|ed|ing)$/, '');
-                let isP = window.THPS.NLP.personalPronouns.has(cleanWord);
-                let isV = (!isP && (window.THPS.NLP.visualDictPronouns.has(cleanWord) || window.THPS.NLP.visualDictWords.has(cleanWord) || window.THPS.NLP.visualDictWords.has(root)));
-                
-                if (isP && isV) { tsObj.colorType = 'overlap'; }
-                else if (isP) { tsObj.colorType = 'personal'; }
-                else if (isV) { tsObj.colorType = 'visual'; }
-                else { tsObj.colorType = 'default'; }
             }
         }
     });
@@ -275,7 +265,7 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 
 window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSecs) {
     
-    // 1. Process standard text-based NLP using explicit namespace
+    // 1. Process standard text-based NLP
     const nlpData = window.THPS.NLP.analyzeTranscript(text, timestamps); 
     
     // 2. Initialize universal acoustic metrics
@@ -305,7 +295,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         
         let localTotalSyllables = 0;
         timestamps.forEach(w => {
-            // GHOST WORD SHIELD: Sanitize ghost words before counting
             if (!w.word || typeof w.word !== 'string') w.word = "";
             localTotalSyllables += window.THPS.NLP.countSyllables(w.word);
         });
@@ -324,7 +313,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             let currWord = timestamps[i];
             let nextWord = timestamps[i+1];
             
-            // GHOST WORD SHIELD: Ensure ghost words don't break the physics object structure
             if (!currWord.word || typeof currWord.word !== 'string') currWord.word = "";
             if (!nextWord.word || typeof nextWord.word !== 'string') nextWord.word = "";
             
@@ -357,11 +345,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                         totalPauseTime += pauseUnitValue; 
                         isPauseOpp = true; 
                         
+                        // NEW HEAT MAP: Fast/Short = Orange -> Slow/Long = Purple
                         let pColor = '', pY = 0;
-                        if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#f43f5e'; pY = 0.85; }
-                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#fbbf24'; pY = 0.65; }
-                        else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.green++; pColor = '#10b981'; pY = 0.50; }
-                        else { acousticData.pauseBuckets.blue++; pColor = '#60a5fa'; pY = 0.35; }
+                        if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Very Long)
+                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Long)
+                        else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.green++; pColor = '#10b981'; pY = 0.50; } // Green (Medium)
+                        else { acousticData.pauseBuckets.blue++; pColor = '#f97316'; pY = 0.35; } // Orange (Short)
                         
                         let expectedNextStart = currWord.start + (sylCount * 0.35); 
                         acousticData.pauseEvents.push({ start: expectedNextStart, duration: pauseUnitValue, color: pColor, yPct: pY });
@@ -372,10 +361,10 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             }
 
             let paceRatio = syllableUnitLength / assumedUnitLength;
-            if (paceRatio < 0.80) acousticData.paceBuckets.fastest++;
-            else if (paceRatio < 0.95) acousticData.paceBuckets.fast++;
-            else if (paceRatio <= 1.05) acousticData.paceBuckets.normal++;
-            else if (paceRatio <= 1.20) acousticData.paceBuckets.slow++;
+            if (paceRatio < 0.75) acousticData.paceBuckets.fastest++;
+            else if (paceRatio < 0.91) acousticData.paceBuckets.fast++;
+            else if (paceRatio <= 1.10) acousticData.paceBuckets.normal++;
+            else if (paceRatio <= 1.30) acousticData.paceBuckets.slow++;
             else acousticData.paceBuckets.slowest++;
 
             currWord.telemetry = {
@@ -400,12 +389,18 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                     blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * assumedUnitLength);
                 }
 
+                // NEW HEAT MAP: Fast = Red/Orange -> Slow = Blue/Purple
                 let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceColor = '#f43f5e'; paceRow = 4; }
-                else if (ratio < 0.91) { paceColor = '#fbbf24'; paceRow = 3; }
-                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; }
-                else if (ratio <= 1.30) { paceColor = '#60a5fa'; paceRow = 1; }
-                else { paceColor = '#cbd5e1'; paceRow = 0; }
+                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } // Red
+                else if (ratio < 0.91) { paceColor = '#f97316'; paceRow = 3; } // Orange
+                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } // Green
+                else if (ratio <= 1.30) { paceColor = '#3b82f6'; paceRow = 1; } // Blue
+                else { paceColor = '#8b5cf6'; paceRow = 0; } // Purple
+
+                // Inject the pace color into every word in the run
+                currentRunWords.forEach(cw => {
+                    if (cw.word.telemetry) cw.word.telemetry.paceColor = paceColor;
+                });
 
                 acousticData.runPaces.push({ start: currentRunWords[0].word.start, width: blockWidth, color: paceColor, row: paceRow });
                 currentRunWords = []; 
@@ -413,7 +408,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         }
         
         let lastWordObj = timestamps[timestamps.length - 1];
-        if (!lastWordObj.word || typeof lastWordObj.word !== 'string') lastWordObj.word = ""; // Shield the final word
+        if (!lastWordObj.word || typeof lastWordObj.word !== 'string') lastWordObj.word = ""; 
         
         let lastWordSyl = window.THPS.NLP.countSyllables(lastWordObj.word);
         lastWordObj.telemetry = {
@@ -422,7 +417,8 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             actualDurationMs: Math.round((lastWordSyl * assumedUnitLength) * 1000),
             pauseOpp: false,
             pauseOppMs: 0,
-            accordionSyllableMs: Math.round(assumedUnitLength * 1000)
+            accordionSyllableMs: Math.round(assumedUnitLength * 1000),
+            paceColor: '#10b981' // Default green for the last isolated word
         };
 
         acousticData.activeSpeakingSecs = Math.max(0, duration - totalPauseTime);
