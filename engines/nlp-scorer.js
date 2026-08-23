@@ -362,9 +362,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
             let paceRatio = syllableUnitLength / assumedUnitLength;
             if (paceRatio < 0.75) acousticData.paceBuckets.fastest++;
-            else if (paceRatio < 0.91) acousticData.paceBuckets.fast++;
+            else if (paceRatio < 0.90) acousticData.paceBuckets.fast++;
             else if (paceRatio <= 1.10) acousticData.paceBuckets.normal++;
-            else if (paceRatio <= 1.30) acousticData.paceBuckets.slow++;
+            else if (paceRatio <= 1.25) acousticData.paceBuckets.slow++;
             else acousticData.paceBuckets.slowest++;
 
             currWord.telemetry = {
@@ -391,11 +391,11 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
                 // NEW HEAT MAP: Fast = Red/Orange -> Slow = Blue/Purple
                 let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } // Red
-                else if (ratio < 0.91) { paceColor = '#f97316'; paceRow = 3; } // Orange
-                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } // Green
-                else if (ratio <= 1.30) { paceColor = '#3b82f6'; paceRow = 1; } // Blue
-                else { paceColor = '#8b5cf6'; paceRow = 0; } // Purple
+                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } // Red (Very Fast)
+                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; } // Orange (Fast)
+                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } // Green (Normal)
+                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; } // Blue (Slow)
+                else { paceColor = '#8b5cf6'; paceRow = 0; } // Purple (Very Slow)
 
                 // Inject the pace color into every word in the run
                 currentRunWords.forEach(cw => {
