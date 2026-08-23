@@ -149,11 +149,11 @@ class THPSVoiceGraph extends HTMLElement {
 
                 <!-- Pace Var Column -->
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
-                    <div data-desc="words 20%+ faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
-                    <div data-desc="words 5-20% faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
-                    <div data-desc="words at your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
-                    <div data-desc="words 5-20% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
-                    <div data-desc="words 20%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
+                    <div data-desc="words 25%+ faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
+                    <div data-desc="words 10-25% faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
+                    <div data-desc="words +/-10% of your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
+                    <div data-desc="words 10-25% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
+                    <div data-desc="words 25%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Pace Var</div>
                 </div>
             </div>
