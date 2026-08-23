@@ -475,8 +475,10 @@
         }, 1000);
 
         const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
-        let explanationsData = null;
-        const FALLBACK_EXPLANATIONS = {
+        
+        // --- NEW: Attach to global window object ---
+        window.explanationsData = null;
+        window.FALLBACK_EXPLANATIONS = {
             "Score Summary": "This panel breaks down your speech into 9 core metrics across Content, Delivery, and Simplicity. Every metric in the green ('just right') awards you 1 point toward your final Grade.",
             "Time": "Your total speaking time. Speaking for 60-90 seconds is 1p, 20-59 is 0.75p, and going under 20s or over 90s cancels your Grade entirely.",
             "Grade": "Your final score out of 10. Metrics in the green give 1 point, yellow gives 0.75, and red gives 0.25 points.",
@@ -1145,6 +1147,7 @@
             window.analyze();
         };
 
+        // --- UPDATED EXPLAIN FUNCTION ---
         window.explain = function(term) {
             const titleEl = document.getElementById('cba-explanationTitle');
             const contentEl = document.getElementById('cba-explanationContent');
@@ -1161,9 +1164,12 @@
             contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
 
             setTimeout(() => {
-                let text = (explanationsData && explanationsData[term]) 
-                           ? explanationsData[term] 
-                           : (FALLBACK_EXPLANATIONS[term] || `Detailed explanation for "${term}" will appear here soon.`);
+                // Ensure we explicitly reference the global window object here as well
+                let text = (window.explanationsData && window.explanationsData[term]) 
+                           ? window.explanationsData[term] 
+                           : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] 
+                                ? window.FALLBACK_EXPLANATIONS[term] 
+                                : `Detailed explanation for "${term}" will appear here soon.`);
                 contentEl.innerHTML = text;
             }, 150);
         };
@@ -1175,10 +1181,11 @@
             }
         });
         
+        // --- UPDATED FETCH FUNCTION ---
         async function fetchExplanations() {
             try {
                 const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
-                if (res.ok) explanationsData = await res.json();
+                if (res.ok) window.explanationsData = await res.json();
             } catch (e) {
                 console.warn("Using fallback explanations for 'What does this mean' panel.");
             }
