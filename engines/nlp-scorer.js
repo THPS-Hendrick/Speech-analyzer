@@ -345,7 +345,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                         totalPauseTime += pauseUnitValue; 
                         isPauseOpp = true; 
                         
-                        // NEW HEAT MAP: Fast/Short = Orange -> Slow/Long = Purple
                         let pColor = '', pY = 0;
                         if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Very Long)
                         else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Long)
@@ -360,23 +359,29 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 }
             }
 
+            // Word-Level Pace Evaluation
             let paceRatio = syllableUnitLength / assumedUnitLength;
-            if (paceRatio < 0.75) acousticData.paceBuckets.fastest++;
-            else if (paceRatio < 0.90) acousticData.paceBuckets.fast++;
-            else if (paceRatio <= 1.10) acousticData.paceBuckets.normal++;
-            else if (paceRatio <= 1.25) acousticData.paceBuckets.slow++;
-            else acousticData.paceBuckets.slowest++;
+            let wordPaceColor = '#10b981'; // Default Green
+            
+            if (paceRatio < 0.75) { acousticData.paceBuckets.fastest++; wordPaceColor = '#ef4444'; }
+            else if (paceRatio < 0.90) { acousticData.paceBuckets.fast++; wordPaceColor = '#f97316'; }
+            else if (paceRatio <= 1.10) { acousticData.paceBuckets.normal++; wordPaceColor = '#10b981'; }
+            else if (paceRatio <= 1.25) { acousticData.paceBuckets.slow++; wordPaceColor = '#3b82f6'; }
+            else { acousticData.paceBuckets.slowest++; wordPaceColor = '#8b5cf6'; }
 
+            // Inject the individual word pace color!
             currWord.telemetry = {
                 sylCount: sylCount,
                 expectedDurationMs: Math.round((sylCount * assumedUnitLength) * 1000),
                 actualDurationMs: Math.round(isPauseOpp ? (sylCount * 0.35 * 1000) : (gap * 1000)),
                 pauseOpp: isPauseOpp,
                 pauseOppMs: Math.round(pauseUnitValue * 1000),
-                accordionSyllableMs: Math.round(syllableUnitLength * 1000)
+                accordionSyllableMs: Math.round(syllableUnitLength * 1000),
+                paceColor: wordPaceColor 
             };
 
-            if (isPauseOpp || i === timestamps.length - 2) {
+            // TRUE RUNTIME BLOCK: Only breaks on pauses >= 0.70s or at the end
+            if (pauseUnitValue >= 0.70 || i === timestamps.length - 2) {
                 let ratio = 1.0;
                 let blockWidth = sylCount * assumedUnitLength; 
                 
@@ -386,21 +391,17 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                     for (let j = 0; j < currentRunWords.length - 1; j++) expectedSyllables += currentRunWords[j].sylCount;
                     let expectedTime = expectedSyllables * assumedUnitLength;
                     ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
+                    
+                    // True physical block duration in seconds
                     blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * assumedUnitLength);
                 }
 
-                // NEW HEAT MAP: Fast = Red/Orange -> Slow = Blue/Purple
                 let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } // Red (Very Fast)
-                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; } // Orange (Fast)
-                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } // Green (Normal)
-                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; } // Blue (Slow)
-                else { paceColor = '#8b5cf6'; paceRow = 0; } // Purple (Very Slow)
-
-                // Inject the pace color into every word in the run
-                currentRunWords.forEach(cw => {
-                    if (cw.word.telemetry) cw.word.telemetry.paceColor = paceColor;
-                });
+                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } 
+                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; } 
+                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } 
+                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; } 
+                else { paceColor = '#8b5cf6'; paceRow = 0; } 
 
                 acousticData.runPaces.push({ start: currentRunWords[0].word.start, width: blockWidth, color: paceColor, row: paceRow });
                 currentRunWords = []; 
@@ -418,16 +419,23 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             pauseOpp: false,
             pauseOppMs: 0,
             accordionSyllableMs: Math.round(assumedUnitLength * 1000),
-            paceColor: '#10b981' // Default green for the last isolated word
+            paceColor: '#10b981'
         };
 
+        // Protected Mumble Score
         acousticData.activeSpeakingSecs = Math.max(0, duration - totalPauseTime);
         acousticData.pausePercent = Math.max(0, Math.min(100, (totalPauseTime / duration) * 100));
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
         
-        let meaningfulPauses = acousticData.pauseBuckets.green + acousticData.pauseBuckets.blue + acousticData.pauseBuckets.purple;
-        acousticData.runtime = acousticData.activeSpeakingSecs > 0 ? (acousticData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
+        // NEW TRUE RUNTIME CALCULATION
+        if (acousticData.runPaces.length > 0) {
+            let totalRunTime = 0;
+            acousticData.runPaces.forEach(run => totalRunTime += run.width);
+            acousticData.runtime = totalRunTime / acousticData.runPaces.length;
+        } else {
+            acousticData.runtime = 0;
+        }
 
     } else if (timestamps && timestamps.length === 1) {
         acousticData.activeSpeakingSecs = 1.0;
