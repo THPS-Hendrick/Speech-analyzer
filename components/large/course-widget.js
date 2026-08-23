@@ -24,6 +24,9 @@ class THPSCourseWidget extends HTMLElement {
         // Say What You See Specific State
         this.swysLevel = 1;
         this.swysImageIndex = 0;
+
+        // Arcade Mode Specific State
+        this.arcadeRepeatIndex = 0; // Tracks the side-scroller position
     }
 
     connectedCallback() {
@@ -172,7 +175,6 @@ class THPSCourseWidget extends HTMLElement {
                     
                     <div class="relative flex items-center justify-center gap-2 bg-white border-2 border-slate-200 px-4 py-2 rounded-xl shadow-sm cursor-pointer hover:border-indigo-400 transition-colors group min-w-[170px]">
                         <i data-lucide="calendar" class="w-4 h-4 text-indigo-500 pointer-events-none"></i>
-                        <!-- Native Dropdown for "Jump to Date" functionality -->
                         <select id="mic-check-date-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" title="Jump to Date">
                             ${this.micCheckDates.map((dateStr, idx) => `
                                 <option value="${idx}" ${idx === this.micCheckCurrentDateIndex ? 'selected' : ''}>${dateStr}</option>
@@ -190,25 +192,21 @@ class THPSCourseWidget extends HTMLElement {
                 <!-- FOUR RESPONSIVE PROMPT FIELDS -->
                 <div class="flex-1 flex flex-col gap-2.5 max-w-lg mx-auto w-full mb-4 justify-center">
                     
-                    <!-- Challenge Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2 left-4">Challenge</span>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.challenge}</span>
                     </div>
 
-                    <!-- Sponsor Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2 left-4">Sponsor</span>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.sponsor}</span>
                     </div>
 
-                    <!-- Script Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2 left-4">Script</span>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.script}</span>
                     </div>
 
-                    <!-- Mic Check Prompt -->
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest absolute top-2 left-4">Mic Check</span>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.micCheck}</span>
@@ -304,6 +302,7 @@ class THPSCourseWidget extends HTMLElement {
             // THE ROUTER SECTION
             if (this.courseData.mode === 'arcade') {
                 this.currentStep = 'arcade';
+                this.arcadeRepeatIndex = 0; // Reset index on open
                 this.renderArcadeUI();
             } else if (this.courseData.mode === 'esl') {
                 this.currentStep = 'esl-menu';
@@ -729,12 +728,17 @@ class THPSCourseWidget extends HTMLElement {
             console.error("Prompt Fetch Error, loading defaults:", e);
             this.prompts = {
                 question: ["What's better: unlimited time or money?"],
-                repeat: ["Problem + Options + Solution"],
+                repeat: ["Word", "Question", "Statement", "Clarify in 2", "Emotion"],
                 count: ["1. First, 2. Second, 3. Third"]
             };
         }
 
         const getRandomPrompt = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // Failsafe bounds check on load
+        if (this.arcadeRepeatIndex >= this.prompts.repeat.length) {
+            this.arcadeRepeatIndex = 0;
+        }
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
@@ -748,21 +752,31 @@ class THPSCourseWidget extends HTMLElement {
                 <!-- THREE RESPONSIVE PROMPT FIELDS -->
                 <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 justify-center">
                     
-                    <!-- Question Prompt Field -->
+                    <!-- Question Prompt Field (Randomizer) -->
                     <div id="btn-prompt-q" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2.5 left-4">Question Prompt</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-indigo-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-q">${getRandomPrompt(this.prompts.question)}</span>
                     </div>
 
-                    <!-- Repeat Prompt Field -->
-                    <div id="btn-prompt-r" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-emerald-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
+                    <!-- Repeat Framework Field (Side Scroller) -->
+                    <div class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 relative group">
                         <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2.5 left-4">Repeat Framework</span>
-                        <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-emerald-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2" id="text-prompt-r">${getRandomPrompt(this.prompts.repeat)}</span>
+                        
+                        <div class="flex items-center justify-between w-full mt-3">
+                            <button id="btn-repeat-prev" class="p-2 text-slate-300 hover:text-emerald-500 transition-colors active:scale-90 z-10">
+                                <i data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
+                            </button>
+                            
+                            <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug flex-1 mx-2 line-clamp-2 select-none" id="text-prompt-r">${this.prompts.repeat[this.arcadeRepeatIndex]}</span>
+                            
+                            <button id="btn-repeat-next" class="p-2 text-slate-300 hover:text-emerald-500 transition-colors active:scale-90 z-10">
+                                <i data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Count Prompt Field -->
+                    <!-- Count Prompt Field (Randomizer) -->
                     <div id="btn-prompt-c" class="flex-1 max-h-[110px] min-h-[90px] bg-white border border-slate-200 hover:border-amber-400 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 cursor-pointer transition-all group relative active:scale-[0.99]">
                         <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2.5 left-4">Count Sequence</span>
                         <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-300 group-hover:text-amber-500 absolute top-2.5 right-4 opacity-40 group-hover:opacity-100 transition-all group-hover:rotate-45"></i>
@@ -772,10 +786,8 @@ class THPSCourseWidget extends HTMLElement {
 
                 <!-- SLEEK ARCADE TIMER BAR PANEL -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
-                    <!-- Progress Progression Bar Fill -->
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
-                    <!-- Pacing Target Indicators (Stars positioned relative to 80s ceiling) -->
                     <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;" title="20 Second Milestone">
                         <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
@@ -783,7 +795,6 @@ class THPSCourseWidget extends HTMLElement {
                         <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
                     </div>
                     
-                    <!-- Shared Combined Toggle Trigger Button -->
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
@@ -793,7 +804,7 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         
-        // Wire click selectors
+        // Navigation / Randomizer Listeners
         this.querySelector('.thps-exit-course').addEventListener('click', () => {
             this.courseData = null;
             this.currentStep = 0;
@@ -801,9 +812,26 @@ class THPSCourseWidget extends HTMLElement {
         });
 
         this.querySelector('#btn-prompt-q').addEventListener('click', () => { this.querySelector('#text-prompt-q').innerText = getRandomPrompt(this.prompts.question); });
-        this.querySelector('#btn-prompt-r').addEventListener('click', () => { this.querySelector('#text-prompt-r').innerText = getRandomPrompt(this.prompts.repeat); });
         this.querySelector('#btn-prompt-c').addEventListener('click', () => { this.querySelector('#text-prompt-c').innerText = getRandomPrompt(this.prompts.count); });
 
+        // Repeat Side-Scroller Listeners
+        const updateRepeatText = () => {
+            const rText = this.querySelector('#text-prompt-r');
+            if (rText) rText.innerText = this.prompts.repeat[this.arcadeRepeatIndex];
+        };
+
+        this.querySelector('#btn-repeat-prev')?.addEventListener('click', () => {
+            const len = this.prompts.repeat.length;
+            this.arcadeRepeatIndex = (this.arcadeRepeatIndex - 1 + len) % len;
+            updateRepeatText();
+        });
+
+        this.querySelector('#btn-repeat-next')?.addEventListener('click', () => {
+            this.arcadeRepeatIndex = (this.arcadeRepeatIndex + 1) % this.prompts.repeat.length;
+            updateRepeatText();
+        });
+
+        // Record Button
         this.querySelector('#arcade-record-btn').addEventListener('click', () => {
             if (typeof window.toggleRecording === 'function') window.toggleRecording();
         });
