@@ -43,7 +43,8 @@ class ThpsScoreSummary extends HTMLElement {
                     <!-- Simplicity -->
                     <div class="space-y-3">
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="window.explain('Simplicity')">Simplicity</h3>
-                        <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Words/Sent')"><span class="score-label group-hover:text-blue-600 transition-colors">Words/Sent:</span> <div class="flex items-center gap-1"><span id="sum-wps" class="score-value pointer-events-none">0</span> <span id="sum-wps-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
+                        <!-- NEW RUNTIME ROW -->
+                        <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Runtime')"><span class="score-label group-hover:text-blue-600 transition-colors">Runtime:</span> <div class="flex items-center gap-1"><span id="sum-runtime" class="score-value pointer-events-none">0.0s</span> <span id="sum-runtime-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                         <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Comp. Grade')"><span class="score-label group-hover:text-blue-600 transition-colors">Comp. Grade:</span> <div class="flex items-center gap-1"><span id="sum-grade" class="score-value pointer-events-none">0.0</span> <span id="sum-grade-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                         <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="window.explain('Simple %')"><span class="score-label group-hover:text-blue-600 transition-colors">Simple %:</span> <div class="flex items-center gap-1"><span id="sum-simple" class="score-value pointer-events-none">0%</span> <span id="sum-simple-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                     </div>
@@ -59,7 +60,7 @@ class ThpsScoreSummary extends HTMLElement {
 
         window.addEventListener('thps-dashboard-update', (e) => this.update(e.detail));
         
-        // NEW: THE "WAKE-UP" CATCH-UP CHECK
+        // THE "WAKE-UP" CATCH-UP CHECK
         if (window.thps_lastPayload) {
             setTimeout(() => this.update(window.thps_lastPayload), 50);
         }
@@ -131,11 +132,28 @@ class ThpsScoreSummary extends HTMLElement {
         }
 
         // 3. Simplicity
-        this.querySelector('#sum-wps').textContent = data.wps.toFixed(1);
-        let wpsStatus = 'just right'; 
-        if (data.wps < 5) wpsStatus = 'simple'; 
-        else if (data.wps > 15) wpsStatus = 'complex'; 
-        setEval('sum-wps-eval', wpsStatus, evalColor(wpsStatus));
+        
+        // NEW RUNTIME LOGIC
+        if (data.recordedAudio && data.time > 0) {
+            const meaningfulPauses = (data.pauseBuckets?.blue || 0) + (data.pauseBuckets?.green || 0) + (data.pauseBuckets?.orange || 0) + (data.pauseBuckets?.red || 0);
+            
+            // Reverse-engineer activeSpeakingSecs for old history files
+            const activeSecs = data.activeSpeakingSecs !== undefined ? data.activeSpeakingSecs : (data.time * (1 - ((data.pause || 0) / 100)));
+            const fallbackRuntime = activeSecs ? (activeSecs / (meaningfulPauses + 1)) : 0;
+            const runtimeVal = data.runtime !== undefined ? data.runtime : fallbackRuntime;
+
+            this.querySelector('#sum-runtime').textContent = `${runtimeVal.toFixed(1)}s`;
+            
+            let rStatus = 'just right';
+            if (runtimeVal >= 3.0 && runtimeVal <= 9.0) rStatus = 'just right';
+            else if ((runtimeVal > 9.0 && runtimeVal <= 15.0) || (runtimeVal >= 1.5 && runtimeVal < 3.0)) rStatus = 'caution';
+            else rStatus = 'strain';
+            
+            setEval('sum-runtime-eval', rStatus, evalColor(rStatus));
+        } else {
+            this.querySelector('#sum-runtime').textContent = "-";
+            setEval('sum-runtime-eval', 'Text Only', 'bg-slate-100 text-slate-500');
+        }
 
         this.querySelector('#sum-grade').textContent = data.grade.toFixed(1);
         let gradeStatus = 'just right'; 
