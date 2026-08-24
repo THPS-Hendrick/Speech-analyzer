@@ -69,7 +69,7 @@ class ThpsVoiceTimeline extends HTMLElement {
                 <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col w-full h-[100px]">
                     <div class="w-full h-full bg-slate-800 rounded-xl p-4 flex flex-col justify-center relative overflow-hidden shadow-inner">
                         <div id="timeline-telemetry-content" class="w-full h-full flex flex-col justify-center">
-                            <span class="text-xs font-mono text-slate-400 animate-pulse">Click a word or pause bar above to view Trackman acoustic data.</span>
+                            <span class="text-xs font-mono text-slate-400 animate-pulse">Click a word, pause bar, or colored run to view acoustic data.</span>
                         </div>
                     </div>
                 </div>
@@ -137,6 +137,23 @@ class ThpsVoiceTimeline extends HTMLElement {
                 <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(pause.start)}</span>
                 <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
                 <span><strong class="text-slate-300">Duration:</strong> ${Math.round(pause.duration * 1000)}ms</span>
+            </div>
+        `;
+    }
+
+    // NEW: Render logic for specific run blocks
+    showRunTelemetry(rp) {
+        if (!rp) return;
+        const container = this.querySelector('#timeline-telemetry-content');
+        
+        container.innerHTML = `
+            <div class="flex items-center text-[13px] font-bold tracking-wide mb-1.5" style="color: ${rp.color}">
+                Run ${rp.id} [${rp.duration.toFixed(2)} secs] (${rp.label})
+            </div>
+            <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+                <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(rp.start)}</span>
+                <span><strong class="text-slate-300">Wpm:</strong> ${rp.wpm}</span>
+                <span><strong class="text-slate-300">Sps:</strong> ${rp.sps}</span>
             </div>
         `;
     }
@@ -221,12 +238,15 @@ class ThpsVoiceTimeline extends HTMLElement {
         // Draw Pace Run background lines
         runPaces.forEach(rp => {
             const bar = document.createElement('div');
-            bar.className = 'staff-item absolute opacity-20 pointer-events-none rounded-sm z-0';
+            // REMOVED pointer-events-none, added hover and cursor pointers for interactivity
+            bar.className = 'staff-item absolute opacity-20 hover:opacity-40 cursor-pointer rounded-sm z-0 transition-all';
             bar.style.backgroundColor = rp.color;
             bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
             bar.style.width = `${rp.width * PIXELS_PER_SEC}px`;
             bar.style.top = `${rp.row * 20}%`;
             bar.style.height = `20%`;
+            
+            bar.onclick = () => this.showRunTelemetry(rp);
             staff.appendChild(bar);
         });
 
