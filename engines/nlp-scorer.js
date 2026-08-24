@@ -501,16 +501,16 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         });
         acousticData.ambientNoiseFloor = ambientNoiseFloor;
 
-        // 4. Duplicate array for sorting (preserves chronological order for timeline)
-        let sortedChunks = [...validChunks].sort((a, b) => a.db - b.db);
+        // 4. Isolate word chunks for statistical boundaries (excludes pauses from skewing the scale)
+        let wordChunksForStats = validChunks.filter(vc => vc.type === 'word').sort((a, b) => a.db - b.db);
 
         let floorDb = -40, ceilingDb = -10;
-        if (sortedChunks.length > 0) {
-            let floorIndex = Math.floor(sortedChunks.length * 0.05); 
-            let ceilIndex = Math.floor(sortedChunks.length * 0.95);  
-            if (ceilIndex >= sortedChunks.length) ceilIndex = sortedChunks.length - 1;
-            floorDb = sortedChunks[floorIndex].db;
-            ceilingDb = sortedChunks[ceilIndex].db;
+        if (wordChunksForStats.length > 0) {
+            let floorIndex = Math.floor(wordChunksForStats.length * 0.05); 
+            let ceilIndex = Math.floor(wordChunksForStats.length * 0.95);  
+            if (ceilIndex >= wordChunksForStats.length) ceilIndex = wordChunksForStats.length - 1;
+            floorDb = wordChunksForStats[floorIndex].db;
+            ceilingDb = wordChunksForStats[ceilIndex].db;
         }
 
         let range = ceilingDb - floorDb;
@@ -532,13 +532,28 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             `> ${Math.round(bounds[3])}dB`
         ];
         
-        // 5. Tally the events into buckets
+        // 5. Assign colors to ALL chunks for UI, but ONLY tally words for the statistical buckets
         validChunks.forEach(vc => {
-            if (vc.db < bounds[0]) { volumeBuckets.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
-            else if (vc.db < bounds[1]) { volumeBuckets.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
-            else if (vc.db < bounds[2]) { volumeBuckets.norm++; vc.color = '#10b981'; vc.hPct = 0.50; } 
-            else if (vc.db < bounds[3]) { volumeBuckets.high++; vc.color = '#f59e0b'; vc.hPct = 0.75; } 
-            else { volumeBuckets.vHigh++; vc.color = '#ef4444'; vc.hPct = 0.97; } 
+            if (vc.db < bounds[0]) { 
+                if (vc.type === 'word') volumeBuckets.vLow++; 
+                vc.color = '#8b5cf6'; vc.hPct = 0.15; 
+            } 
+            else if (vc.db < bounds[1]) { 
+                if (vc.type === 'word') volumeBuckets.low++; 
+                vc.color = '#3b82f6'; vc.hPct = 0.30; 
+            } 
+            else if (vc.db < bounds[2]) { 
+                if (vc.type === 'word') volumeBuckets.norm++; 
+                vc.color = '#10b981'; vc.hPct = 0.50; 
+            } 
+            else if (vc.db < bounds[3]) { 
+                if (vc.type === 'word') volumeBuckets.high++; 
+                vc.color = '#f59e0b'; vc.hPct = 0.75; 
+            } 
+            else { 
+                if (vc.type === 'word') volumeBuckets.vHigh++; 
+                vc.color = '#ef4444'; vc.hPct = 0.97; 
+            } 
         });
     }
 
