@@ -362,14 +362,15 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             // Word-Level Pace Evaluation
             let paceRatio = syllableUnitLength / assumedUnitLength;
             let wordPaceColor = '#10b981'; // Default Green
+            let wordPaceLabel = 'normal';
             
-            if (paceRatio < 0.75) { acousticData.paceBuckets.fastest++; wordPaceColor = '#ef4444'; }
-            else if (paceRatio < 0.90) { acousticData.paceBuckets.fast++; wordPaceColor = '#f97316'; }
-            else if (paceRatio <= 1.10) { acousticData.paceBuckets.normal++; wordPaceColor = '#10b981'; }
-            else if (paceRatio <= 1.25) { acousticData.paceBuckets.slow++; wordPaceColor = '#3b82f6'; }
-            else { acousticData.paceBuckets.slowest++; wordPaceColor = '#8b5cf6'; }
+            if (paceRatio < 0.75) { acousticData.paceBuckets.fastest++; wordPaceColor = '#ef4444'; wordPaceLabel = 'fastest'; }
+            else if (paceRatio < 0.90) { acousticData.paceBuckets.fast++; wordPaceColor = '#f97316'; wordPaceLabel = 'fast'; }
+            else if (paceRatio <= 1.10) { acousticData.paceBuckets.normal++; wordPaceColor = '#10b981'; wordPaceLabel = 'normal'; }
+            else if (paceRatio <= 1.25) { acousticData.paceBuckets.slow++; wordPaceColor = '#3b82f6'; wordPaceLabel = 'slow'; }
+            else { acousticData.paceBuckets.slowest++; wordPaceColor = '#8b5cf6'; wordPaceLabel = 'slowest'; }
 
-            // Inject the individual word pace color!
+            // Inject the individual word pace color and label!
             currWord.telemetry = {
                 sylCount: sylCount,
                 expectedDurationMs: Math.round((sylCount * assumedUnitLength) * 1000),
@@ -377,7 +378,8 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 pauseOpp: isPauseOpp,
                 pauseOppMs: Math.round(pauseUnitValue * 1000),
                 accordionSyllableMs: Math.round(syllableUnitLength * 1000),
-                paceColor: wordPaceColor 
+                paceColor: wordPaceColor,
+                paceLabel: wordPaceLabel
             };
 
             // TRUE RUNTIME BLOCK: Only breaks on pauses >= 0.70s or at the end
@@ -419,7 +421,8 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             pauseOpp: false,
             pauseOppMs: 0,
             accordionSyllableMs: Math.round(assumedUnitLength * 1000),
-            paceColor: '#10b981'
+            paceColor: '#10b981',
+            paceLabel: 'normal'
         };
 
         // Protected Mumble Score
@@ -457,20 +460,20 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     if (volumeData && volumeData.length > 0) {
         let dynamicEvents = [];
         
-        // 1. Gather all word instances
+        // 1. Gather all word instances (Pass the object reference)
         timestamps.forEach(w => {
             let dur = (w.telemetry && w.telemetry.actualDurationMs) ? (w.telemetry.actualDurationMs / 1000) : Math.max(0.1, (w.end - w.start) || 0.35);
-            dynamicEvents.push({ start: w.start, end: w.start + dur, type: 'word' });
+            dynamicEvents.push({ start: w.start, end: w.start + dur, type: 'word', ref: w.telemetry });
         });
         
-        // 2. Gather all pause instances
+        // 2. Gather all pause instances (Pass the object reference)
         acousticData.pauseEvents.forEach(p => {
-            dynamicEvents.push({ start: p.start, end: p.start + p.duration, type: 'pause' });
+            dynamicEvents.push({ start: p.start, end: p.start + p.duration, type: 'pause', ref: p });
         });
         
         dynamicEvents.sort((a, b) => a.start - b.start);
 
-        // 3. Map acoustic data to exact dynamic bounds
+        // 3. Map acoustic data to exact dynamic bounds and INJECT volumeDb
         dynamicEvents.forEach(ev => {
             let linearSum = 0; let dbCount = 0;
             volumeData.forEach(v => {
@@ -482,6 +485,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             if (dbCount > 0) {
                 let avgDb = 10 * Math.log10(linearSum / dbCount);
                 validChunks.push({ start: ev.start, end: ev.end, db: avgDb, type: ev.type });
+                if (ev.ref) ev.ref.volumeDb = avgDb; // <-- OPTION B VOLUME INJECTION
             }
         });
 
