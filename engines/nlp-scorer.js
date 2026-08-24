@@ -291,7 +291,10 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     // 3. Process the Acoustic Elastic Grid
     if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
         let totalPauseTime = 0;
+        let sumMeaningfulPauses = 0; // NEW: Accurate pause tracking
+        let meaningfulPauseCount = 0; // NEW
         let currentRunWords = []; 
+        let currentRunIndex = 1; // NEW: Unique ID for rendering blocks
         
         let localTotalSyllables = 0;
         timestamps.forEach(w => {
@@ -345,6 +348,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                         totalPauseTime += pauseUnitValue; 
                         isPauseOpp = true; 
                         
+                        // Capture >= 0.70s for runtime math
+                        if (pauseUnitValue >= 0.70) {
+                            sumMeaningfulPauses += pauseUnitValue;
+                            meaningfulPauseCount++;
+                        }
+
                         let pColor = '', pY = 0;
                         if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Very Long)
                         else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Long)
@@ -370,7 +379,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             else if (paceRatio <= 1.25) { acousticData.paceBuckets.slow++; wordPaceColor = '#3b82f6'; wordPaceLabel = 'slow'; }
             else { acousticData.paceBuckets.slowest++; wordPaceColor = '#8b5cf6'; wordPaceLabel = 'slowest'; }
 
-            // Inject the individual word pace color and label!
             currWord.telemetry = {
                 sylCount: sylCount,
                 expectedDurationMs: Math.round((sylCount * assumedUnitLength) * 1000),
@@ -384,28 +392,46 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
 
             // TRUE RUNTIME BLOCK: Only breaks on pauses >= 0.70s or at the end
             if (pauseUnitValue >= 0.70 || i === timestamps.length - 2) {
-                let ratio = 1.0;
-                let blockWidth = sylCount * assumedUnitLength; 
                 
-                if (currentRunWords.length >= 2) {
-                    let actualTime = currentRunWords[currentRunWords.length - 1].word.start - currentRunWords[0].word.start;
-                    let expectedSyllables = 0;
-                    for (let j = 0; j < currentRunWords.length - 1; j++) expectedSyllables += currentRunWords[j].sylCount;
-                    let expectedTime = expectedSyllables * assumedUnitLength;
-                    ratio = expectedTime > 0 ? (actualTime / expectedTime) : 1.0;
-                    
-                    // True physical block duration in seconds
-                    blockWidth = actualTime + (currentRunWords[currentRunWords.length - 1].sylCount * assumedUnitLength);
+                // Ensure the final word of the transcript is captured in the final run
+                if (i === timestamps.length - 2) {
+                    let lastSyl = window.THPS.NLP.countSyllables(nextWord.word);
+                    currentRunWords.push({ word: nextWord, sylCount: lastSyl });
                 }
 
-                let paceColor = '', paceRow = 2;
-                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; } 
-                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; } 
-                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; } 
-                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; } 
-                else { paceColor = '#8b5cf6'; paceRow = 0; } 
+                let runWordCount = currentRunWords.length;
+                let runSyllableCount = 0;
+                for(let j=0; j<runWordCount; j++) runSyllableCount += currentRunWords[j].sylCount;
+                
+                // True physical block boundaries
+                let runStart = currentRunWords[0].word.start;
+                let runEnd = currentRunWords[runWordCount - 1].word.start + (currentRunWords[runWordCount - 1].sylCount * assumedUnitLength);
+                let blockWidth = Math.max(0.1, runEnd - runStart);
+                
+                let runWpm = Math.round((runWordCount / blockWidth) * 60);
+                let runSps = (runSyllableCount / blockWidth).toFixed(1);
+                
+                let expectedTime = runSyllableCount * assumedUnitLength;
+                let ratio = expectedTime > 0 ? (blockWidth / expectedTime) : 1.0;
 
-                acousticData.runPaces.push({ start: currentRunWords[0].word.start, width: blockWidth, color: paceColor, row: paceRow });
+                let paceColor = '', paceRow = 2, paceLabel = 'normal';
+                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; paceLabel = 'fastest'; } 
+                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; paceLabel = 'fast'; } 
+                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; paceLabel = 'normal'; } 
+                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; paceLabel = 'slow'; } 
+                else { paceColor = '#8b5cf6'; paceRow = 0; paceLabel = 'slowest'; } 
+
+                acousticData.runPaces.push({ 
+                    id: currentRunIndex++,
+                    start: runStart, 
+                    width: blockWidth, 
+                    color: paceColor, 
+                    row: paceRow,
+                    label: paceLabel,
+                    wpm: runWpm,
+                    sps: runSps,
+                    duration: blockWidth
+                });
                 currentRunWords = []; 
             }
         }
@@ -431,14 +457,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
         
-        // NEW TRUE RUNTIME CALCULATION
-        if (acousticData.runPaces.length > 0) {
-            let totalRunTime = 0;
-            acousticData.runPaces.forEach(run => totalRunTime += run.width);
-            acousticData.runtime = totalRunTime / acousticData.runPaces.length;
-        } else {
-            acousticData.runtime = 0;
-        }
+        // NEW TRUE RUNTIME CALCULATION (Net Speaking Time)
+        let netSpeakingTime = Math.max(0, duration - sumMeaningfulPauses);
+        acousticData.runtime = netSpeakingTime > 0 ? (netSpeakingTime / (meaningfulPauseCount + 1)) : 0;
 
     } else if (timestamps && timestamps.length === 1) {
         acousticData.activeSpeakingSecs = 1.0;
@@ -460,20 +481,17 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     if (volumeData && volumeData.length > 0) {
         let dynamicEvents = [];
         
-        // 1. Gather all word instances (Pass the object reference)
         timestamps.forEach(w => {
             let dur = (w.telemetry && w.telemetry.actualDurationMs) ? (w.telemetry.actualDurationMs / 1000) : Math.max(0.1, (w.end - w.start) || 0.35);
             dynamicEvents.push({ start: w.start, end: w.start + dur, type: 'word', ref: w.telemetry });
         });
         
-        // 2. Gather all pause instances (Pass the object reference)
         acousticData.pauseEvents.forEach(p => {
             dynamicEvents.push({ start: p.start, end: p.start + p.duration, type: 'pause', ref: p });
         });
         
         dynamicEvents.sort((a, b) => a.start - b.start);
 
-        // 3. Map acoustic data to exact dynamic bounds and INJECT volumeDb
         dynamicEvents.forEach(ev => {
             let linearSum = 0; let dbCount = 0;
             volumeData.forEach(v => {
@@ -485,11 +503,10 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             if (dbCount > 0) {
                 let avgDb = 10 * Math.log10(linearSum / dbCount);
                 validChunks.push({ start: ev.start, end: ev.end, db: avgDb, type: ev.type });
-                if (ev.ref) ev.ref.volumeDb = avgDb; // <-- OPTION B VOLUME INJECTION
+                if (ev.ref) ev.ref.volumeDb = avgDb; 
             }
         });
 
-        // NEW: Option 2 Intelligent Noise Gate (Percentile Floor)
         let pauseChunks = validChunks.filter(vc => vc.type === 'pause').sort((a, b) => a.db - b.db);
         let ambientNoiseFloor = -60; 
         if (pauseChunks.length > 0) {
@@ -501,7 +518,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         });
         acousticData.ambientNoiseFloor = ambientNoiseFloor;
 
-        // 4. Isolate word chunks for statistical boundaries (excludes pauses from skewing the scale)
         let wordChunksForStats = validChunks.filter(vc => vc.type === 'word').sort((a, b) => a.db - b.db);
 
         let floorDb = -40, ceilingDb = -10;
@@ -532,7 +548,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             `> ${Math.round(bounds[3])}dB`
         ];
         
-        // 5. Assign colors to ALL chunks for UI, but ONLY tally words for the statistical buckets
         validChunks.forEach(vc => {
             if (vc.db < bounds[0]) { 
                 if (vc.type === 'word') volumeBuckets.vLow++; 
