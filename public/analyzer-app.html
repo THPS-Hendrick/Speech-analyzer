@@ -424,15 +424,14 @@
                         <div class="w-full md:w-[calc(50%-0.75rem)] mt-2 cursor-move relative group">
                             <thps-upload-speech-med></thps-upload-speech-med>
                         </div>
+                        
+                        <div class="w-full mt-2 cursor-move relative group">
+                            <thps-score-summary></thps-score-summary>
+                        </div>
 
                         <!-- NEW DEFAULT LOADOUT: PROGRESS GRAPH -->
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-progress></thps-progress>
-                            
-                        </div>
-
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-score-summary></thps-score-summary>
                         </div>
 
                         <div class="w-full mt-2 cursor-move relative group">
@@ -938,7 +937,7 @@
                 let greenScore = (greenCount === 9) ? 10 : greenCount;
                 totalPoints += greenScore;
 
-                // --- THE TRACKMAN BROADCAST & CACHE ---
+                // --- THE TRACKMAN CACHE ---
                 const payload = { 
                     sps: mumbleScore,
                     wpm: avgWpm,
@@ -977,9 +976,8 @@
                 };
                 
                 window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
-                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
 
-                // --- SAVE TO HISTORY ---
+                // --- SAVE TO HISTORY FIRST (Prevents Race Conditions) ---
                 if (text.trim() !== '' || elapsedSecs > 0) {
                     let existingIndex = window.thps_sessionHistory.findIndex(h => h.id === window.thps_currentAttemptId);
                     let historyPayload = { ...payload, id: window.thps_currentAttemptId, title: 'Attempt ' + window.thps_currentAttemptId, date: new Date() };
@@ -991,6 +989,9 @@
                     }
                     window.updateHistoryUI();
                 }
+
+                // --- NOW BROADCAST TO WIDGETS ---
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
         };
