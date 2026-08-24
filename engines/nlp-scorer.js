@@ -448,40 +448,65 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     }
 
     // ==========================================
-    // 4. PERCENTILE CLAMP VOLUME ENGINE
+    // 4. PERCENTILE CLAMP VOLUME ENGINE (DYNAMIC WIDTHS)
     // ==========================================
     let validChunks = [];
     let volumeBuckets = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
     let volumeLabels = ['< -35dB', '-35dB', '-25dB', '-15dB', '> -15dB']; 
 
     if (volumeData && volumeData.length > 0) {
-        let numChunks = Math.ceil(elapsedSecs / 3);
-        for(let c = 0; c < numChunks; c++) {
-            let chunkStart = c * 3;
-            let chunkEnd = chunkStart + 3;
-            
+        let dynamicEvents = [];
+        
+        // 1. Gather all word instances
+        timestamps.forEach(w => {
+            let dur = (w.telemetry && w.telemetry.actualDurationMs) ? (w.telemetry.actualDurationMs / 1000) : Math.max(0.1, (w.end - w.start) || 0.35);
+            dynamicEvents.push({ start: w.start, end: w.start + dur, type: 'word' });
+        });
+        
+        // 2. Gather all pause instances
+        acousticData.pauseEvents.forEach(p => {
+            dynamicEvents.push({ start: p.start, end: p.start + p.duration, type: 'pause' });
+        });
+        
+        dynamicEvents.sort((a, b) => a.start - b.start);
+
+        // 3. Map acoustic data to exact dynamic bounds
+        dynamicEvents.forEach(ev => {
             let linearSum = 0; let dbCount = 0;
             volumeData.forEach(v => {
-                if (v.time >= chunkStart && v.time < chunkEnd) {
+                if (v.time >= ev.start && v.time < ev.end) {
                     linearSum += Math.pow(10, v.db / 10);
                     dbCount++;
                 }
             });
             if (dbCount > 0) {
                 let avgDb = 10 * Math.log10(linearSum / dbCount);
-                validChunks.push({ start: chunkStart, end: chunkEnd, db: avgDb });
+                validChunks.push({ start: ev.start, end: ev.end, db: avgDb, type: ev.type });
             }
+        });
+
+        // NEW: Option 2 Intelligent Noise Gate (Percentile Floor)
+        let pauseChunks = validChunks.filter(vc => vc.type === 'pause').sort((a, b) => a.db - b.db);
+        let ambientNoiseFloor = -60; 
+        if (pauseChunks.length > 0) {
+            ambientNoiseFloor = pauseChunks[Math.floor(pauseChunks.length * 0.25)].db;
         }
 
-        validChunks.sort((a, b) => a.db - b.db);
+        validChunks.forEach(vc => {
+            vc.calibratedDb = vc.type === 'word' ? Math.max(0, vc.db - ambientNoiseFloor) : vc.db;
+        });
+        acousticData.ambientNoiseFloor = ambientNoiseFloor;
+
+        // 4. Duplicate array for sorting (preserves chronological order for timeline)
+        let sortedChunks = [...validChunks].sort((a, b) => a.db - b.db);
 
         let floorDb = -40, ceilingDb = -10;
-        if (validChunks.length > 0) {
-            let floorIndex = Math.floor(validChunks.length * 0.05); 
-            let ceilIndex = Math.floor(validChunks.length * 0.95);  
-            if (ceilIndex >= validChunks.length) ceilIndex = validChunks.length - 1;
-            floorDb = validChunks[floorIndex].db;
-            ceilingDb = validChunks[ceilIndex].db;
+        if (sortedChunks.length > 0) {
+            let floorIndex = Math.floor(sortedChunks.length * 0.05); 
+            let ceilIndex = Math.floor(sortedChunks.length * 0.95);  
+            if (ceilIndex >= sortedChunks.length) ceilIndex = sortedChunks.length - 1;
+            floorDb = sortedChunks[floorIndex].db;
+            ceilingDb = sortedChunks[ceilIndex].db;
         }
 
         let range = ceilingDb - floorDb;
@@ -503,6 +528,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             `> ${Math.round(bounds[3])}dB`
         ];
         
+        // 5. Tally the events into buckets
         validChunks.forEach(vc => {
             if (vc.db < bounds[0]) { volumeBuckets.vLow++; vc.color = '#8b5cf6'; vc.hPct = 0.15; } 
             else if (vc.db < bounds[1]) { volumeBuckets.low++; vc.color = '#3b82f6'; vc.hPct = 0.30; } 
