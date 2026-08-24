@@ -67,10 +67,9 @@ class ThpsVoiceTimeline extends HTMLElement {
 
                 <!-- TELEMETRY INSPECTOR -->
                 <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col w-full h-[100px]">
-                    <div class="w-full h-full bg-slate-800 rounded-xl p-3 flex flex-col justify-center relative overflow-hidden shadow-inner">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 absolute top-2 left-3">Telemetry Inspector</span>
-                        <div id="timeline-telemetry-content" class="text-xs font-mono text-slate-300 mt-4 leading-relaxed flex flex-wrap gap-x-4 gap-y-1">
-                            <span class="animate-pulse">Click a word or pause bar above to view Trackman acoustic data.</span>
+                    <div class="w-full h-full bg-slate-800 rounded-xl p-4 flex flex-col justify-center relative overflow-hidden shadow-inner">
+                        <div id="timeline-telemetry-content" class="w-full h-full flex flex-col justify-center">
+                            <span class="text-xs font-mono text-slate-400 animate-pulse">Click a word or pause bar above to view Trackman acoustic data.</span>
                         </div>
                     </div>
                 </div>
@@ -101,31 +100,44 @@ class ThpsVoiceTimeline extends HTMLElement {
     showWordTelemetry(word, start, t) {
         if (!t) return;
         const container = this.querySelector('#timeline-telemetry-content');
+        
+        let delta = t.actualDurationMs - t.expectedDurationMs;
+        let sign = delta >= 0 ? '+' : '';
+        let vol = t.volumeDb !== undefined ? t.volumeDb.toFixed(1) : '--';
+
         container.innerHTML = `
-            <span class="text-white bg-indigo-500/30 px-1 rounded">Word: "${word}"</span>
-            <span><strong class="text-slate-400">Start:</strong> ${this.formatTimeCode(start)}</span>
-            <span><strong class="text-slate-400">Syllables:</strong> ${t.sylCount}</span>
-            <span><strong class="text-slate-400">Expected Dur:</strong> ${t.expectedDurationMs}ms</span>
-            <span><strong class="text-slate-400">Actual Dur:</strong> ${t.actualDurationMs}ms</span>
-            <span><strong class="text-slate-400">Pause Opp:</strong> ${t.pauseOpp ? `<span class="text-emerald-400">True (${t.pauseOppMs}ms)</span>` : `<span class="text-rose-400">False (${t.pauseOppMs}ms)</span>`}</span>
-            <span><strong class="text-slate-400">Accordion Syl:</strong> ${t.accordionSyllableMs}ms x ${t.sylCount}</span>
+            <div class="flex items-center text-white text-[13px] font-bold tracking-wide mb-1.5">
+                ${word} [${t.sylCount}] (${t.paceLabel || 'normal'})
+            </div>
+            <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+                <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(start)}</span>
+                <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
+                <span><strong class="text-slate-300">Duration:</strong> ${t.actualDurationMs}ms [${sign}${delta}]</span>
+            </div>
         `;
     }
 
     showPauseTelemetry(pause) {
         const container = this.querySelector('#timeline-telemetry-content');
-        let category = "Unknown";
-        if (pause.duration <= 0.700) category = "Short (Orange)";
-        else if (pause.duration <= 1.050) category = "Normal (Green)";
-        else if (pause.duration <= 1.400) category = "Long (Blue)";
-        else category = "Very Long (Purple)";
+        let category = "unknown";
+        let range = "";
+        
+        if (pause.duration <= 0.700) { category = "short pause"; range = "0.35s to 0.70s"; }
+        else if (pause.duration <= 1.050) { category = "medium pause"; range = "0.70s to 1.05s"; }
+        else if (pause.duration <= 1.400) { category = "long pause"; range = "1.05s to 1.40s"; }
+        else { category = "very long pause"; range = "> 1.40s"; }
+
+        let vol = pause.volumeDb !== undefined ? pause.volumeDb.toFixed(1) : '--';
 
         container.innerHTML = `
-            <span class="text-white bg-slate-600 px-1 rounded">Event: Pause</span>
-            <span><strong class="text-slate-400">Start:</strong> ${this.formatTimeCode(pause.start)}</span>
-            <span><strong class="text-slate-400">Duration:</strong> ${Math.round(pause.duration * 1000)}ms</span>
-            <span><strong class="text-slate-400">Category:</strong> <span style="color:${pause.color}">${category}</span></span>
-            <span><strong class="text-slate-400">Pause Opp:</strong> <span class="text-emerald-400">True (≥ 350ms)</span></span>
+            <div class="flex items-center text-[13px] font-bold tracking-wide mb-1.5" style="color: ${pause.color}">
+                ${category} (${range})
+            </div>
+            <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+                <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(pause.start)}</span>
+                <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
+                <span><strong class="text-slate-300">Duration:</strong> ${Math.round(pause.duration * 1000)}ms</span>
+            </div>
         `;
     }
 
@@ -192,14 +204,14 @@ class ThpsVoiceTimeline extends HTMLElement {
 
         validChunks.forEach(vc => {
             let x = vc.start * PIXELS_PER_SEC;
-            let w = 3 * PIXELS_PER_SEC;
+            let w = Math.max(2, (vc.end - vc.start) * PIXELS_PER_SEC); 
             let h = vc.hPct * canvasHeight;
             let y = canvasHeight - h;
             
             ctx.fillStyle = vc.color;
             ctx.shadowBlur = 10;
             ctx.shadowColor = vc.color;
-            ctx.fillRect(x, y, w - 2, h); 
+            ctx.fillRect(x, y, w - 1, h); 
             ctx.shadowBlur = 0;
         });
 
