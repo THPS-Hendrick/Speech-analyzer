@@ -233,67 +233,77 @@ class ThpsProgress extends HTMLElement {
         const canvas = this.querySelector('#progress-canvas');
         
         if (this.chart) {
-            this.chart.destroy();
-        }
-
-        this.chart = new Chart(canvas, {
-            type: 'line',
-            plugins: [this.zoneBackgroundPlugin],
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: config.title,
-                    data: dataPoints,
-                    borderColor: 'rgba(15, 23, 42, 0.4)', // Slate-900 transparent line
-                    borderWidth: 1.5,
-                    borderDash: [5, 5], // Dotted connecting line
-                    pointBackgroundColor: '#0f172a', // Solid Black dots
-                    pointBorderColor: '#0f172a',
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    fill: false,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleFont: { size: 10 },
-                        bodyFont: { size: 13, weight: 'bold' },
-                        padding: 10,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.parsed.y}`;
+            // Natively mutate the existing chart data and scales
+            this.chart.data.labels = labels;
+            this.chart.data.datasets[0].label = config.title;
+            this.chart.data.datasets[0].data = dataPoints;
+            this.chart.options.scales.y.min = config.min;
+            this.chart.options.scales.y.max = config.max;
+            this.chart.options.plugins.zoneBackground.zones = config.zones;
+            
+            // Trigger smooth animation to the new metric
+            this.chart.update();
+        } else {
+            // Initial Creation
+            this.chart = new Chart(canvas, {
+                type: 'line',
+                plugins: [this.zoneBackgroundPlugin],
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: config.title,
+                        data: dataPoints,
+                        borderColor: 'rgba(15, 23, 42, 0.4)', // Slate-900 transparent line
+                        borderWidth: 1.5,
+                        borderDash: [5, 5], // Dotted connecting line
+                        pointBackgroundColor: '#0f172a', // Solid Black dots
+                        pointBorderColor: '#0f172a',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 10 },
+                            bodyFont: { size: 13, weight: 'bold' },
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y}`;
+                                }
                             }
+                        },
+                        zoneBackground: {
+                            zones: config.zones
                         }
                     },
-                    zoneBackground: {
-                        zones: config.zones
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                        },
+                        y: {
+                            min: config.min,
+                            max: config.max,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                        }
                     },
-                    y: {
-                        min: config.min,
-                        max: config.max,
-                        grid: { color: 'rgba(0,0,0,0.05)' },
-                        ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                    animation: {
+                        duration: 400,
+                        easing: 'easeOutQuart'
                     }
-                },
-                animation: {
-                    duration: 400,
-                    easing: 'easeOutQuart'
                 }
-            }
-        });
+            });
+        }
     }
 }
 
