@@ -902,9 +902,6 @@
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
 
-            let meaningfulPauses = pauseBuckets.blue + pauseBuckets.green + pauseBuckets.orange + pauseBuckets.red;
-            let runtimeFloat = masterData.activeSpeakingSecs > 0 ? (masterData.activeSpeakingSecs / (meaningfulPauses + 1)) : 0;
-            
             try {
                 let totalPoints = 0;
                 let greenCount = 0;
@@ -914,6 +911,8 @@
                     overrideGrade = true;
                 }
 
+                let finalRuntime = masterData.runtime || 0; // Capture safely
+
                 // New Sliding Scale Scoring Engine
                 const scoreKeys = [
                     {k: 'personal', v: personalPercent}, 
@@ -922,7 +921,7 @@
                     {k: 'wpm', v: avgWpm}, 
                     {k: 'sps', v: mumbleScore}, 
                     {k: 'pause', v: pausePercent}, 
-                    {k: 'runtime', v: runtimeFloat}, 
+                    {k: 'runtime', v: finalRuntime}, 
                     {k: 'grade', v: avgGrade}, 
                     {k: 'simple', v: coreSimpleScore}
                 ];
@@ -952,7 +951,7 @@
                     paceBuckets: paceBuckets,   
                     pause: pausePercent,
                     intangible: intangiblePercent,
-                    runtime: runtimeFloat,
+                    runtime: finalRuntime,
                     simple: coreSimpleScore,
                     totalPoints: totalPoints,
                     greenScore: greenScore,
