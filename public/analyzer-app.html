@@ -966,9 +966,10 @@
                     unifiedSimpleCount: unifiedSimpleCount,
                     readability: readability,
                     
-                    // NEW: EXPLICITLY PASSING TELEMETRY ARRAYS
+// NEW: EXPLICITLY PASSING TELEMETRY ARRAYS
                     pauseEvents: masterData.pauseEvents || [],
                     runPaces: masterData.runPaces || [],
+                    runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, // <-- THIS WAS MISSING
                     volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
                     volumeLabels: masterData.volumeLabels || [],
                     volumeChunks: masterData.volumeChunks || []
