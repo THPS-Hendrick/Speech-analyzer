@@ -43,6 +43,7 @@ class THPSVoiceGraph extends HTMLElement {
         }
 
         this.renderPauseColumn(data.pauseBuckets);
+        // Explicitly using the word-level paceBuckets, NOT the new macro runBuckets
         this.renderPaceColumn(data.paceBuckets);
         
         if (data.volumeBuckets) {
@@ -70,7 +71,6 @@ class THPSVoiceGraph extends HTMLElement {
         this.updateBar('vg-pace-slowest', paceBuckets.slowest, total);
     }
 
-    // NEW: Directly maps the master percentile clamp volume buckets
     renderVolumeColumn(volumeBuckets) {
         const total = volumeBuckets.vHigh + volumeBuckets.high + volumeBuckets.norm + volumeBuckets.low + volumeBuckets.vLow;
         this.updateBar('vg-vol-loudest', volumeBuckets.vHigh, total);
@@ -129,31 +129,31 @@ class THPSVoiceGraph extends HTMLElement {
                 
                 <!-- Pause Var Column -->
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
-                    <div data-desc="Pauses over 1.4 seconds" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-red"></div>
-                    <div data-desc="Pauses 1.05s to 1.4s" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-orange-100 rounded text-center text-xs font-bold text-orange-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-orange"></div>
+                    <div data-desc="Pauses over 1.4 seconds" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-red"></div>
+                    <div data-desc="Pauses 1.05s to 1.4s" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-orange"></div>
                     <div data-desc="Pauses 700ms to 1.05s" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-green"></div>
-                    <div data-desc="Pauses 350ms to 700ms" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-blue"></div>
-                    <div data-desc="Pauses under 350ms" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-500 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-micro"></div>
+                    <div data-desc="Pauses 350ms to 700ms" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-orange-100 rounded text-center text-xs font-bold text-orange-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-blue"></div>
+                    <div data-desc="Pauses under 350ms" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pause-micro"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Pause Var</div>
                 </div>
 
-                <!-- Voice Var Column -->
+                <!-- Voice Var Column (Now matching timeline 6dB colors) -->
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
-                    <div data-desc="Loudest volume peaks" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loudest"></div>
-                    <div data-desc="Loud variations" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loud"></div>
-                    <div data-desc="Your median volume" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-normal"></div>
-                    <div data-desc="Quiet variations" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quiet"></div>
-                    <div data-desc="Quietest whispers" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quietest"></div>
+                    <div data-desc="> 9dB above your average (Very Loud)" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-red-100 rounded text-center text-xs font-bold text-red-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loudest"></div>
+                    <div data-desc="3dB to 9dB above your average (Loud)" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-loud"></div>
+                    <div data-desc="Within ±3dB of your average (Normal)" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-normal"></div>
+                    <div data-desc="3dB to 9dB below your average (Quiet)" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quiet"></div>
+                    <div data-desc="> 9dB below your average (Very Quiet)" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-vol-quietest"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Voice Var</div>
                 </div>
 
-                <!-- Pace Var Column -->
+                <!-- Pace Var Column (Word-level Accordion logic intact) -->
                 <div class="flex flex-col justify-end items-center gap-1 h-full w-full">
-                    <div data-desc="words 25%+ faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
-                    <div data-desc="words 10-25% faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
-                    <div data-desc="words +/-10% of your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
-                    <div data-desc="words 10-25% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
-                    <div data-desc="words 25%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-slate-200 rounded text-center text-xs font-bold text-slate-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
+                    <div data-desc="Words 25%+ faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-rose-100 rounded text-center text-xs font-bold text-rose-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fastest"></div>
+                    <div data-desc="Words 10-25% faster than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-amber-100 rounded text-center text-xs font-bold text-amber-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-fast"></div>
+                    <div data-desc="Words +/-10% of your avg pace" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-emerald-100 rounded text-center text-xs font-bold text-emerald-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-normal"></div>
+                    <div data-desc="Words 10-25% slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-blue-100 rounded text-center text-xs font-bold text-blue-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slow"></div>
+                    <div data-desc="Words 25%+ slower than your avg" class="vg-bar cursor-pointer hover:brightness-95 w-full bg-purple-100 rounded text-center text-xs font-bold text-purple-600 transition-all duration-500 flex items-center justify-center overflow-hidden" id="vg-pace-slowest"></div>
                     <div class="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 border-t-2 border-slate-100 pt-2 w-full text-center">Pace Var</div>
                 </div>
             </div>
