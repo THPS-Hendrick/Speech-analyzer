@@ -11,7 +11,7 @@ window.THPS.NLP.DICT_URLS = {
     visual: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json"
 };
 
-window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "his","he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "myself", "mine", "him", "himself", "her", "hers", "her's", "herself"]);
+window.THPS.NLP.personalPronouns = new Set(["i", "i'd", "i'll", "i'm", "i've", "he", "his", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "myself", "mine", "him", "himself", "her", "hers", "her's", "herself", "we", "we'd", "we'll", "we're", "we've", "us", "our", "ours", "ourselves", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"]);
 window.THPS.NLP.visualDictPronouns = new Set();
 window.THPS.NLP.visualDictWords = new Set();
 window.THPS.NLP.simpleSet = new Set(); 
@@ -277,6 +277,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         activeSpeakingSecs: 0,
         pauseBuckets: { micro: 0, blue: 0, green: 0, orange: 0, red: 0 },
         paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
+        runBuckets: { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, // NEW: Absolute SPS Run Tracking
         volumeData: volumeData || [],
         
         pauseEvents: [], 
@@ -291,10 +292,10 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     // 3. Process the Acoustic Elastic Grid
     if (timestamps && timestamps.length > 1 && elapsedSecs > 0) {
         let totalPauseTime = 0;
-        let sumMeaningfulPauses = 0; // NEW: Accurate pause tracking
-        let meaningfulPauseCount = 0; // NEW
+        let sumMeaningfulPauses = 0; 
+        let meaningfulPauseCount = 0; 
         let currentRunWords = []; 
-        let currentRunIndex = 1; // NEW: Unique ID for rendering blocks
+        let currentRunIndex = 1; 
         
         let localTotalSyllables = 0;
         timestamps.forEach(w => {
@@ -411,23 +412,23 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 let runWpm = Math.round((runWordCount / blockWidth) * 60);
                 let runSps = (runSyllableCount / blockWidth).toFixed(1);
                 
-                let expectedTime = runSyllableCount * assumedUnitLength;
-                let ratio = expectedTime > 0 ? (blockWidth / expectedTime) : 1.0;
-
-                let paceColor = '', paceRow = 2, paceLabel = 'normal';
-                if (ratio < 0.75) { paceColor = '#ef4444'; paceRow = 4; paceLabel = 'fastest'; } 
-                else if (ratio < 0.90) { paceColor = '#f97316'; paceRow = 3; paceLabel = 'fast'; } 
-                else if (ratio <= 1.10) { paceColor = '#10b981'; paceRow = 2; paceLabel = 'normal'; } 
-                else if (ratio <= 1.25) { paceColor = '#3b82f6'; paceRow = 1; paceLabel = 'slow'; } 
-                else { paceColor = '#8b5cf6'; paceRow = 0; paceLabel = 'slowest'; } 
+                let runSpsFloat = parseFloat(runSps);
+                let runColor = '', runRow = 2, runLabel = '4.0sps';
+                
+                // NEW: Absolute SPS Run Tiers
+                if (runSpsFloat > 4.7) { runColor = '#ef4444'; runRow = 4; runLabel = '>5.0sps'; acousticData.runBuckets.vFast++; } 
+                else if (runSpsFloat > 4.2) { runColor = '#f97316'; runRow = 3; runLabel = '4.5sps'; acousticData.runBuckets.fast++; } 
+                else if (runSpsFloat >= 3.8) { runColor = '#10b981'; runRow = 2; runLabel = '4.0sps'; acousticData.runBuckets.norm++; } 
+                else if (runSpsFloat >= 3.3) { runColor = '#3b82f6'; runRow = 1; runLabel = '3.5sps'; acousticData.runBuckets.slow++; } 
+                else { runColor = '#8b5cf6'; runRow = 0; runLabel = '<3.0sps'; acousticData.runBuckets.vSlow++; } 
 
                 acousticData.runPaces.push({ 
                     id: currentRunIndex++,
                     start: runStart, 
                     width: blockWidth, 
-                    color: paceColor, 
-                    row: paceRow,
-                    label: paceLabel,
+                    color: runColor, 
+                    row: runRow,
+                    label: runLabel,
                     wpm: runWpm,
                     sps: runSps,
                     duration: blockWidth
@@ -457,7 +458,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         acousticData.wpm = Math.round((nlpData.numWords / duration) * 60);
         acousticData.mumbleScore = acousticData.activeSpeakingSecs > 0 ? (nlpData.totalSyllables / acousticData.activeSpeakingSecs) : 0;
         
-        // NEW TRUE RUNTIME CALCULATION (Net Speaking Time)
         let netSpeakingTime = Math.max(0, duration - sumMeaningfulPauses);
         acousticData.runtime = netSpeakingTime > 0 ? (netSpeakingTime / (meaningfulPauseCount + 1)) : 0;
 
@@ -472,7 +472,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     }
 
     // ==========================================
-    // 4. PERCENTILE CLAMP VOLUME ENGINE (DYNAMIC WIDTHS)
+    // 4. PSYCHOACOUSTIC VOLUME ENGINE (BIOLOGICAL 6dB TIERS)
     // ==========================================
     let validChunks = [];
     let volumeBuckets = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
@@ -507,38 +507,22 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             }
         });
 
-        let pauseChunks = validChunks.filter(vc => vc.type === 'pause').sort((a, b) => a.db - b.db);
-        let ambientNoiseFloor = -60; 
-        if (pauseChunks.length > 0) {
-            ambientNoiseFloor = pauseChunks[Math.floor(pauseChunks.length * 0.25)].db;
-        }
+        // NEW: Fixed 6dB Psychoacoustic thresholds (+/- 3dB and +/- 9dB from average spoken word)
+        let wordChunksForStats = validChunks.filter(vc => vc.type === 'word');
+        let avgSpokenDb = -40;
 
-        validChunks.forEach(vc => {
-            vc.calibratedDb = vc.type === 'word' ? Math.max(0, vc.db - ambientNoiseFloor) : vc.db;
-        });
-        acousticData.ambientNoiseFloor = ambientNoiseFloor;
-
-        let wordChunksForStats = validChunks.filter(vc => vc.type === 'word').sort((a, b) => a.db - b.db);
-
-        let floorDb = -40, ceilingDb = -10;
         if (wordChunksForStats.length > 0) {
-            let floorIndex = Math.floor(wordChunksForStats.length * 0.05); 
-            let ceilIndex = Math.floor(wordChunksForStats.length * 0.95);  
-            if (ceilIndex >= wordChunksForStats.length) ceilIndex = wordChunksForStats.length - 1;
-            floorDb = wordChunksForStats[floorIndex].db;
-            ceilingDb = wordChunksForStats[ceilIndex].db;
+            let totalWordDb = 0;
+            wordChunksForStats.forEach(vc => totalWordDb += vc.db);
+            avgSpokenDb = totalWordDb / wordChunksForStats.length;
         }
 
-        let range = ceilingDb - floorDb;
-        if (range < 15) {
-            let midPoint = (ceilingDb + floorDb) / 2;
-            floorDb = midPoint - 7.5;
-            ceilingDb = midPoint + 7.5;
-            range = 15;
-        }
-
-        let step = range / 5;
-        let bounds = [floorDb + step, floorDb + (step * 2), floorDb + (step * 3), floorDb + (step * 4)];
+        let bounds = [
+            avgSpokenDb - 9, // Very Quiet
+            avgSpokenDb - 3, // Quiet
+            avgSpokenDb + 3, // Loud
+            avgSpokenDb + 9  // Very Loud
+        ];
 
         volumeLabels = [
             `< ${Math.round(bounds[0])}dB`,
