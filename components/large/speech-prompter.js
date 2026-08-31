@@ -33,7 +33,7 @@ class ThpsSpeechPrompter extends HTMLElement {
         return { totalWords, familiarWords, sizingWords };
     }
 
-    generatePrompt() {
+generatePrompt() {
         const { totalWords, familiarWords, sizingWords } = this.calculateWordCounts();
         const s = this.state;
 
@@ -45,6 +45,11 @@ You must adhere to the following biological pacing and scoring guardrails:
 * **Word Count:** The total speech must be exactly **${totalWords}** words. Do not deviate.
 * **Sentence Pacing:** Sentences must average 7 to 15 words. Absolutely no sentence may exceed 22 words in length to force natural breathing pauses.
 * **Content Balance:** Ensure 30% to 60% of the speech uses personal pronouns and storytelling. Ensure 20% to 50% uses vivid, sensory, visual language.
+
+**Strict Stylistic & Behavioral Constraints**
+* **Vocabulary:** Maintain a conversational reading level between Grade 5.0 and 10.0. Severely limit multi-syllable, academic, or pompous words.
+* **The "You" Rule:** In Topics 1 and 2 (Parts 1 through 6), you are forbidden from addressing the audience directly or telling them they have a problem (do NOT use "you" or "your"). 
+* **Storytelling:** To achieve the Personal score in Topics 1 and 2, use 3rd-party case studies (real or hypothetical) featuring specific names and 3rd-person pronouns ("he", "she", "his", "hers") so the audience can see themselves in the story without feeling attacked.
 
 **The 12-Step Structure**
 Write the speech using the following 4 topics. Each topic has 2 spoken parts with strict word counts, and 1 non-spoken stage direction part.
