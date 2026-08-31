@@ -60,8 +60,8 @@ class ThpsVoiceTimeline extends HTMLElement {
                         <div class="thps-bar-container-voice flex-1 flex items-end"></div>
                     </div>
                     <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pace Var.')">Pace Var.</h4>
-                        <div class="thps-bar-container-pace flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
+                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Run Var.')">Run Var.</h4>
+                        <div class="thps-bar-container-run flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                 </div>
 
@@ -141,7 +141,6 @@ class ThpsVoiceTimeline extends HTMLElement {
         `;
     }
 
-    // NEW: Render logic for specific run blocks
     showRunTelemetry(rp) {
         if (!rp) return;
         const container = this.querySelector('#timeline-telemetry-content');
@@ -180,7 +179,8 @@ class ThpsVoiceTimeline extends HTMLElement {
         const runPaces = data.runPaces || [];
         const pauseCounts = data.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
         const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-        const paceCounts = data.paceBuckets || { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
+        // Switch from paceBuckets to the new absolute Run buckets
+        const runCounts = data.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 };
         const validChunks = data.volumeChunks || [];
 
         // --- VISUAL PAINTING 1: TIME AXIS ---
@@ -238,7 +238,6 @@ class ThpsVoiceTimeline extends HTMLElement {
         // Draw Pace Run background lines
         runPaces.forEach(rp => {
             const bar = document.createElement('div');
-            // REMOVED pointer-events-none, added hover and cursor pointers for interactivity
             bar.className = 'staff-item absolute opacity-20 hover:opacity-40 cursor-pointer rounded-sm z-0 transition-all';
             bar.style.backgroundColor = rp.color;
             bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
@@ -330,8 +329,8 @@ class ThpsVoiceTimeline extends HTMLElement {
         drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
         // Voice Var
         drawVerticalBars('.thps-bar-container-voice', voiceCounts, data.volumeLabels || [], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
-        // Pace Var (fastest=red, fast=orange, norm=green, slow=blue, slowest=purple)
-        drawHorizontalBars('.thps-bar-container-pace', paceCounts, ['Fastest', 'Fast', 'Normal', 'Slow', 'Slowest'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        // Run Var (vFast=red, fast=orange, norm=green, slow=blue, vSlow=purple)
+        drawHorizontalBars('.thps-bar-container-run', runCounts, ['>5.0sps', '4.5sps', '4.0sps', '3.5sps', '<3.0sps'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
     }
 }
 
