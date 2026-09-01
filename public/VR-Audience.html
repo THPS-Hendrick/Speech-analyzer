@@ -47,3 +47,138 @@
         </video>
         
     </main>
+
+    <script>
+        // --- 1. THE DATA STRUCTURE (Updated for MP4s) ---
+        const library = {
+            small: {
+                idle: 'assets/videos/small-idle.mp4', 
+                actions: [
+                    { id: 's-nod', label: 'Attentive Nod', visual: 'assets/videos/small-nod.mp4', audio: null, duration: 4000 },
+                    { id: 's-write', label: 'Taking Notes', visual: 'assets/videos/small-notes.mp4', audio: 'assets/audio/small-scribble.mp3', duration: 5000 }
+                ]
+            },
+            medium: {
+                idle: 'assets/videos/medium-idle.mp4', 
+                actions: [
+                    { id: 'm-clap', label: 'Polite Clap', visual: 'assets/videos/medium-clap.mp4', audio: 'assets/audio/medium-clap.mp3', duration: 6000 },
+                    { id: 'm-cough', label: 'One Cough', visual: 'assets/videos/medium-cough.mp4', audio: 'assets/audio/cough.mp3', duration: 3000 },
+                    { id: 'm-laugh', label: 'Light Laughter', visual: 'assets/videos/medium-laugh.mp4', audio: 'assets/audio/laugh.mp3', duration: 5000 }
+                ]
+            },
+            large: {
+                idle: 'assets/videos/large-idle.mp4',
+                actions: [
+                    { id: 'l-cheer', label: 'Standing Ovation', visual: 'assets/videos/large-cheer.mp4', audio: 'assets/audio/large-cheer.mp3', duration: 10000 },
+                    { id: 'l-murmur', label: 'Restless Murmuring', visual: 'assets/videos/large-murmur.mp4', audio: 'assets/audio/large-murmur.mp3', duration: 8000 }
+                ]
+            }
+        };
+
+        // --- 2. DOM ELEMENTS ---
+        const sizeSelector = document.getElementById('audience-size');
+        const buttonContainer = document.getElementById('button-container');
+        const idleVideo = document.getElementById('idle-video');
+        const actionVideo = document.getElementById('action-video');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        // --- 3. STATE MANAGEMENT & AUDIO CACHING ---
+        let currentSize = 'medium';
+        const audioCache = {};
+
+        // Preload all audio files into memory on app launch for zero-lag playback
+        function preloadAllAudio() {
+            Object.values(library).forEach(sizeData => {
+                sizeData.actions.forEach(action => {
+                    if (action.audio && !audioCache[action.audio]) {
+                        const audio = new Audio(action.audio);
+                        audio.preload = 'auto';
+                        audioCache[action.audio] = audio;
+                    }
+                });
+            });
+        }
+
+        // --- 4. CORE FUNCTIONS ---
+
+        // Sets the screen back to the idle loop for the current size
+        function setIdleState() {
+            // Update the underlying loop video
+            idleVideo.src = library[currentSize].idle;
+            idleVideo.play().catch(e => console.log("Autoplay blocked: ", e));
+            
+            // Hide the action video layer
+            actionVideo.classList.add('opacity-0');
+            
+            // UI Updates
+            statusIndicator.textContent = "Idle";
+            statusIndicator.className = "absolute top-4 right-4 bg-gray-600 text-white text-xs px-3 py-1 rounded-full opacity-50 z-30 transition-all";
+        }
+
+        // Triggers a specific action instantaneously
+        function triggerAction(actionData) {
+            // 1. Play Audio (instantly from RAM cache)
+            if (actionData.audio && audioCache[actionData.audio]) {
+                audioCache[actionData.audio].currentTime = 0; // Reset to start in case of rapid clicks
+                audioCache[actionData.audio].play().catch(e => console.log("Audio play blocked: ", e));
+            }
+
+            // 2. Change Visual & Reveal Layer
+            actionVideo.src = actionData.visual;
+            actionVideo.currentTime = 0;
+            
+            actionVideo.play().then(() => {
+                // Show the layer only after it successfully starts playing to prevent black flicker
+                actionVideo.classList.remove('opacity-0');
+            }).catch(e => console.log("Video play blocked or file missing: ", e));
+
+            // 3. Update UI Status
+            statusIndicator.textContent = `Playing: ${actionData.label}`;
+            statusIndicator.className = "absolute top-4 right-4 bg-blue-600 text-white text-xs px-3 py-1 rounded-full shadow-lg shadow-blue-500/50 z-30 transition-all";
+        }
+
+        // Return to idle automatically when the action video ends
+        actionVideo.onended = () => {
+            setIdleState();
+        };
+
+        // Renders the specific buttons for the chosen audience size
+        function renderButtons() {
+            buttonContainer.innerHTML = ''; // Clear current buttons
+            const actions = library[currentSize].actions;
+
+            actions.forEach(action => {
+                const btn = document.createElement('button');
+                btn.className = "bg-gray-700 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded transition-colors active:scale-95 flex flex-col items-center justify-center text-center";
+                
+                // The duration is kept in the data structure purely for the UI label now
+                btn.innerHTML = `
+                    <span class="text-sm">${action.label}</span>
+                    <span class="text-xs text-gray-400 font-normal mt-1">${(action.duration / 1000).toFixed(1)}s</span>
+                `;
+                
+                btn.onclick = () => triggerAction(action);
+                buttonContainer.appendChild(btn);
+            });
+        }
+
+        // --- 5. EVENT LISTENERS & INITIALIZATION ---
+
+        // When the user changes the dropdown size
+        sizeSelector.addEventListener('change', (e) => {
+            currentSize = e.target.value;
+            setIdleState();
+            renderButtons();
+        });
+
+        // Initialize the app on page load
+        function init() {
+            preloadAllAudio();
+            renderButtons();
+            setIdleState();
+        }
+
+        init();
+    </script>
+</body>
+</html>
