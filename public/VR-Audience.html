@@ -8,6 +8,7 @@
 </head>
 <body class="bg-gray-900 text-white h-screen flex font-sans overflow-hidden">
 
+    <!-- CONTROL PANEL (Dashboard) -->
     <aside class="w-1/3 bg-gray-800 p-6 flex flex-col gap-6 shadow-2xl z-20 overflow-y-auto">
         
         <div>
@@ -15,33 +16,41 @@
             <p class="text-gray-400 text-sm">Select room size and trigger behaviours.</p>
         </div>
 
+        <!-- Room Size Selector -->
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Audience Size</label>
             <select id="audience-size" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500">
                 <option value="small">Small (2 People - Interview)</option>
-                <option value="medium" selected>Medium (20 People - Classroom)</option>
+                <option value="medium" selected>Medium (20 People - Press)</option>
                 <option value="large">Large (100+ People - Theatre)</option>
             </select>
         </div>
 
         <hr class="border-gray-700">
 
+        <!-- Behaviour Widgets -->
         <div>
             <h2 class="text-sm font-medium text-gray-300 mb-3">Active Behaviours (Widgets)</h2>
             <div id="button-container" class="grid grid-cols-2 gap-3">
-                </div>
+                <!-- Buttons will be injected here by JavaScript -->
+            </div>
         </div>
     </aside>
 
+    <!-- MAIN SCREEN (The "Huge Screen") -->
     <main class="w-2/3 bg-black flex items-center justify-center relative overflow-hidden">
         
+        <!-- Status Indicator for you -->
         <div id="status-indicator" class="absolute top-4 right-4 bg-green-600 text-white text-xs px-3 py-1 rounded-full opacity-50 z-30 transition-all">
             Idle
         </div>
 
+        <!-- LAYER 1: Background Idle Loop -->
         <video id="idle-video" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
-            </video>
+            <!-- Source is set dynamically via JS based on selected size -->
+        </video>
 
+        <!-- LAYER 2: Foreground Action Video (Hidden by default, overlays Idle) -->
         <video id="action-video" muted playsinline class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-150">
             <source src="" type="video/mp4">
         </video>
@@ -49,28 +58,34 @@
     </main>
 
     <script>
-        // --- 1. THE DATA STRUCTURE (Updated for MP4s) ---
+        // --- 1. THE DATA STRUCTURE (Updated to lowercase naming convention) ---
+        // Assuming this HTML file is in the 'public' folder, we use '../' to go up to the root, then into 'image'
         const library = {
             small: {
-                idle: 'assets/videos/small-idle.mp4', 
+                idle: '../image/VR/small/small-idle.mp4', 
                 actions: [
-                    { id: 's-nod', label: 'Attentive Nod', visual: 'assets/videos/small-nod.mp4', audio: null, duration: 4000 },
-                    { id: 's-write', label: 'Taking Notes', visual: 'assets/videos/small-notes.mp4', audio: 'assets/audio/small-scribble.mp3', duration: 5000 }
+                    { id: 's-smile', label: 'Smile', visual: '../image/VR/small/small-smile.mp4' },
+                    { id: 's-clap', label: 'Clap', visual: '../image/VR/small/small-clap.mp4' },
+                    { id: 's-laugh', label: 'Laugh', visual: '../image/VR/small/small-laugh.mp4' },
+                    { id: 's-dislike', label: 'Dislike', visual: '../image/VR/small/small-dislike.mp4' }
                 ]
             },
             medium: {
-                idle: 'assets/videos/medium-idle.mp4', 
+                idle: '../image/VR/medium/medium-idle.mp4', 
                 actions: [
-                    { id: 'm-clap', label: 'Polite Clap', visual: 'assets/videos/medium-clap.mp4', audio: 'assets/audio/medium-clap.mp3', duration: 6000 },
-                    { id: 'm-cough', label: 'One Cough', visual: 'assets/videos/medium-cough.mp4', audio: 'assets/audio/cough.mp3', duration: 3000 },
-                    { id: 'm-laugh', label: 'Light Laughter', visual: 'assets/videos/medium-laugh.mp4', audio: 'assets/audio/laugh.mp3', duration: 5000 }
+                    { id: 'm-smile', label: 'Smile', visual: '../image/VR/medium/medium-smile.mp4' },
+                    { id: 'm-clap', label: 'Clap', visual: '../image/VR/medium/medium-clap.mp4' },
+                    { id: 'm-laugh', label: 'Laugh', visual: '../image/VR/medium/medium-laugh.mp4' },
+                    { id: 'm-dislike', label: 'Dislike', visual: '../image/VR/medium/medium-dislike.mp4' }
                 ]
             },
             large: {
-                idle: 'assets/videos/large-idle.mp4',
+                idle: '../image/VR/large/large-idle.mp4',
                 actions: [
-                    { id: 'l-cheer', label: 'Standing Ovation', visual: 'assets/videos/large-cheer.mp4', audio: 'assets/audio/large-cheer.mp3', duration: 10000 },
-                    { id: 'l-murmur', label: 'Restless Murmuring', visual: 'assets/videos/large-murmur.mp4', audio: 'assets/audio/large-murmur.mp3', duration: 8000 }
+                    { id: 'l-smile', label: 'Smile', visual: '../image/VR/large/large-smile.mp4' },
+                    { id: 'l-clap', label: 'Clap', visual: '../image/VR/large/large-clap.mp4' },
+                    { id: 'l-laugh', label: 'Laugh', visual: '../image/VR/large/large-laugh.mp4' }, 
+                    { id: 'l-dislike', label: 'Dislike', visual: '../image/VR/large/large-dislike.mp4' }
                 ]
             }
         };
@@ -82,22 +97,8 @@
         const actionVideo = document.getElementById('action-video');
         const statusIndicator = document.getElementById('status-indicator');
 
-        // --- 3. STATE MANAGEMENT & AUDIO CACHING ---
+        // --- 3. STATE MANAGEMENT ---
         let currentSize = 'medium';
-        const audioCache = {};
-
-        // Preload all audio files into memory on app launch for zero-lag playback
-        function preloadAllAudio() {
-            Object.values(library).forEach(sizeData => {
-                sizeData.actions.forEach(action => {
-                    if (action.audio && !audioCache[action.audio]) {
-                        const audio = new Audio(action.audio);
-                        audio.preload = 'auto';
-                        audioCache[action.audio] = audio;
-                    }
-                });
-            });
-        }
 
         // --- 4. CORE FUNCTIONS ---
 
@@ -117,27 +118,22 @@
 
         // Triggers a specific action instantaneously
         function triggerAction(actionData) {
-            // 1. Play Audio (instantly from RAM cache)
-            if (actionData.audio && audioCache[actionData.audio]) {
-                audioCache[actionData.audio].currentTime = 0; // Reset to start in case of rapid clicks
-                audioCache[actionData.audio].play().catch(e => console.log("Audio play blocked: ", e));
-            }
-
-            // 2. Change Visual & Reveal Layer
+            
+            // Change Visual & Reveal Layer
             actionVideo.src = actionData.visual;
-            actionVideo.currentTime = 0;
+            actionVideo.currentTime = 0; // Reset video to the very beginning
             
             actionVideo.play().then(() => {
                 // Show the layer only after it successfully starts playing to prevent black flicker
                 actionVideo.classList.remove('opacity-0');
             }).catch(e => console.log("Video play blocked or file missing: ", e));
 
-            // 3. Update UI Status
+            // Update UI Status
             statusIndicator.textContent = `Playing: ${actionData.label}`;
             statusIndicator.className = "absolute top-4 right-4 bg-blue-600 text-white text-xs px-3 py-1 rounded-full shadow-lg shadow-blue-500/50 z-30 transition-all";
         }
 
-        // Return to idle automatically when the action video ends
+        // Return to idle automatically exactly when the action MP4 finishes playing
         actionVideo.onended = () => {
             setIdleState();
         };
@@ -149,13 +145,9 @@
 
             actions.forEach(action => {
                 const btn = document.createElement('button');
-                btn.className = "bg-gray-700 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded transition-colors active:scale-95 flex flex-col items-center justify-center text-center";
+                btn.className = "bg-gray-700 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded transition-colors active:scale-95 flex flex-col items-center justify-center text-center shadow";
                 
-                // The duration is kept in the data structure purely for the UI label now
-                btn.innerHTML = `
-                    <span class="text-sm">${action.label}</span>
-                    <span class="text-xs text-gray-400 font-normal mt-1">${(action.duration / 1000).toFixed(1)}s</span>
-                `;
+                btn.innerHTML = `<span class="text-base">${action.label}</span>`;
                 
                 btn.onclick = () => triggerAction(action);
                 buttonContainer.appendChild(btn);
@@ -167,13 +159,14 @@
         // When the user changes the dropdown size
         sizeSelector.addEventListener('change', (e) => {
             currentSize = e.target.value;
+            // Interrupt any action and immediately reset to the new idle
+            actionVideo.pause(); 
             setIdleState();
             renderButtons();
         });
 
         // Initialize the app on page load
         function init() {
-            preloadAllAudio();
             renderButtons();
             setIdleState();
         }
