@@ -58,34 +58,34 @@
     </main>
 
     <script>
-        // --- 1. THE DATA STRUCTURE (Updated to lowercase naming convention) ---
-        // Assuming this HTML file is in the 'public' folder, we use '../' to go up to the root, then into 'image'
+        // --- 1. THE DATA STRUCTURE ---
+        // Paths are now sibling relative to the HTML file in the public folder
         const library = {
             small: {
-                idle: '../image/VR/small/small-idle.mp4', 
+                idle: 'VR/small/small-idle.mp4', 
                 actions: [
-                    { id: 's-smile', label: 'Smile', visual: '../image/VR/small/small-smile.mp4' },
-                    { id: 's-clap', label: 'Clap', visual: '../image/VR/small/small-clap.mp4' },
-                    { id: 's-laugh', label: 'Laugh', visual: '../image/VR/small/small-laugh.mp4' },
-                    { id: 's-dislike', label: 'Dislike', visual: '../image/VR/small/small-dislike.mp4' }
+                    { id: 's-smile', label: 'Smile', visual: 'VR/small/small-smile.mp4' },
+                    { id: 's-clap', label: 'Clap', visual: 'VR/small/small-clap.mp4' },
+                    { id: 's-laugh', label: 'Laugh', visual: 'VR/small/small-laugh.mp4' },
+                    { id: 's-dislike', label: 'Dislike', visual: 'VR/small/small-dislike.mp4' }
                 ]
             },
             medium: {
-                idle: '../image/VR/medium/medium-idle.mp4', 
+                idle: 'VR/medium/medium-idle.mp4', 
                 actions: [
-                    { id: 'm-smile', label: 'Smile', visual: '../image/VR/medium/medium-smile.mp4' },
-                    { id: 'm-clap', label: 'Clap', visual: '../image/VR/medium/medium-clap.mp4' },
-                    { id: 'm-laugh', label: 'Laugh', visual: '../image/VR/medium/medium-laugh.mp4' },
-                    { id: 'm-dislike', label: 'Dislike', visual: '../image/VR/medium/medium-dislike.mp4' }
+                    { id: 'm-smile', label: 'Smile', visual: 'VR/medium/medium-smile.mp4' },
+                    { id: 'm-clap', label: 'Clap', visual: 'VR/medium/medium-clap.mp4' },
+                    { id: 'm-laugh', label: 'Laugh', visual: 'VR/medium/medium-laugh.mp4' },
+                    { id: 'm-dislike', label: 'Dislike', visual: 'VR/medium/medium-dislike.mp4' }
                 ]
             },
             large: {
-                idle: '../image/VR/large/large-idle.mp4',
+                idle: 'VR/large/large-idle.mp4',
                 actions: [
-                    { id: 'l-smile', label: 'Smile', visual: '../image/VR/large/large-smile.mp4' },
-                    { id: 'l-clap', label: 'Clap', visual: '../image/VR/large/large-clap.mp4' },
-                    { id: 'l-laugh', label: 'Laugh', visual: '../image/VR/large/large-laugh.mp4' }, 
-                    { id: 'l-dislike', label: 'Dislike', visual: '../image/VR/large/large-dislike.mp4' }
+                    { id: 'l-smile', label: 'Smile', visual: 'VR/large/large-smile.mp4' },
+                    { id: 'l-clap', label: 'Clap', visual: 'VR/large/large-clap.mp4' },
+                    { id: 'l-laugh', label: 'Laugh', visual: 'VR/large/large-laugh.mp4' }, 
+                    { id: 'l-dislike', label: 'Dislike', visual: 'VR/large/large-dislike.mp4' }
                 ]
             }
         };
