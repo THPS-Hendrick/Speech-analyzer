@@ -6,20 +6,29 @@
     <title>Virtual Audience Behaviour Board</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white h-screen flex font-sans overflow-hidden">
+<body class="bg-gray-900 text-white h-screen w-full flex font-sans overflow-hidden relative">
 
-    <!-- CONTROL PANEL (Dashboard) -->
-    <aside class="w-1/3 bg-gray-800 p-6 flex flex-col gap-6 shadow-2xl z-20 overflow-y-auto">
+    <!-- COLLAPSIBLE CONTROL PANEL (Drawer) -->
+    <!-- z-40 floats it above the video, transition handles the sliding -->
+    <aside id="dashboard" class="fixed top-0 bottom-0 left-0 w-80 bg-gray-800 p-6 flex flex-col gap-6 shadow-2xl z-40 transition-transform duration-300 translate-x-0 border-r border-gray-700">
         
+        <!-- Drawer Toggle Button (Attached to right edge) -->
+        <button id="toggle-drawer" class="absolute top-1/2 -right-10 w-10 h-16 bg-gray-800 text-gray-400 hover:text-white flex items-center justify-center rounded-r-md shadow-2xl border-y border-r border-gray-700 transition-colors focus:outline-none">
+            <svg id="chevron-icon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+
         <div>
             <h1 class="text-2xl font-bold mb-2">Audience Control</h1>
-            <p class="text-gray-400 text-sm">Select room size and trigger behaviours.</p>
+            <p class="text-gray-400 text-sm mb-4">Select room size and trigger behaviours.</p>
+            <button id="fullscreen-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2 rounded shadow transition-colors">
+                ⛶ Enter Fullscreen Mode
+            </button>
         </div>
 
         <!-- Room Size Selector -->
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Audience Size</label>
-            <select id="audience-size" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Audience Size (Keys: s, m, l)</label>
+            <select id="audience-size" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500 transition-colors">
                 <option value="small">Small (2 People - Interview)</option>
                 <option value="medium" selected>Medium (20 People - Press)</option>
                 <option value="large">Large (100+ People - Theatre)</option>
@@ -32,25 +41,30 @@
         <div>
             <h2 class="text-sm font-medium text-gray-300 mb-3">Active Behaviours (Widgets)</h2>
             <div id="button-container" class="grid grid-cols-2 gap-3">
-                <!-- Buttons will be injected here by JavaScript -->
+                <!-- Buttons injected via JS -->
             </div>
+        </div>
+        
+        <!-- Hotkey Legend -->
+        <div class="mt-auto text-xs text-gray-500">
+            <p><strong>Hotkeys:</strong> Use <strong>1, 2, 3, 4</strong> to trigger actions. Use <strong>s, m, l</strong> to change room size. Use <strong>Esc</strong> to exit fullscreen.</p>
         </div>
     </aside>
 
-    <!-- MAIN SCREEN (The "Huge Screen") -->
-    <main class="w-2/3 bg-black flex items-center justify-center relative overflow-hidden">
+    <!-- MAIN SCREEN (Now 100% width) -->
+    <!-- id added for the Fullscreen API target -->
+    <main id="main-screen" class="w-full h-full bg-black flex items-center justify-center relative overflow-hidden z-10">
         
-        <!-- Status Indicator for you -->
+        <!-- Status Indicator -->
         <div id="status-indicator" class="absolute top-4 right-4 bg-green-600 text-white text-xs px-3 py-1 rounded-full opacity-50 z-30 transition-all">
             Idle
         </div>
 
         <!-- LAYER 1: Background Idle Loop -->
         <video id="idle-video" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
-            <!-- Source is set dynamically via JS based on selected size -->
         </video>
 
-        <!-- LAYER 2: Foreground Action Video (Hidden by default, overlays Idle) -->
+        <!-- LAYER 2: Foreground Action Video -->
         <video id="action-video" muted playsinline class="absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-150">
             <source src="" type="video/mp4">
         </video>
@@ -58,8 +72,6 @@
     </main>
 
     <script>
-        // --- 1. THE DATA STRUCTURE ---
-        // Paths are now sibling relative to the HTML file in the public folder
         const library = {
             small: {
                 idle: 'VR/small/small-idle.mp4', 
@@ -90,82 +102,102 @@
             }
         };
 
-        // --- 2. DOM ELEMENTS ---
         const sizeSelector = document.getElementById('audience-size');
         const buttonContainer = document.getElementById('button-container');
         const idleVideo = document.getElementById('idle-video');
         const actionVideo = document.getElementById('action-video');
         const statusIndicator = document.getElementById('status-indicator');
+        
+        // UI Control Elements
+        const dashboard = document.getElementById('dashboard');
+        const toggleBtn = document.getElementById('toggle-drawer');
+        const chevronIcon = document.getElementById('chevron-icon');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const mainScreen = document.getElementById('main-screen');
 
-        // --- 3. STATE MANAGEMENT ---
         let currentSize = 'medium';
 
-        // --- 4. CORE FUNCTIONS ---
-
-        // Sets the screen back to the idle loop for the current size
         function setIdleState() {
-            // Update the underlying loop video
             idleVideo.src = library[currentSize].idle;
             idleVideo.play().catch(e => console.log("Autoplay blocked: ", e));
-            
-            // Hide the action video layer
             actionVideo.classList.add('opacity-0');
-            
-            // UI Updates
             statusIndicator.textContent = "Idle";
             statusIndicator.className = "absolute top-4 right-4 bg-gray-600 text-white text-xs px-3 py-1 rounded-full opacity-50 z-30 transition-all";
         }
 
-        // Triggers a specific action instantaneously
         function triggerAction(actionData) {
-            
-            // Change Visual & Reveal Layer
             actionVideo.src = actionData.visual;
-            actionVideo.currentTime = 0; // Reset video to the very beginning
-            
+            actionVideo.currentTime = 0; 
             actionVideo.play().then(() => {
-                // Show the layer only after it successfully starts playing to prevent black flicker
                 actionVideo.classList.remove('opacity-0');
-            }).catch(e => console.log("Video play blocked or file missing: ", e));
+            }).catch(e => console.log("Video play blocked: ", e));
 
-            // Update UI Status
             statusIndicator.textContent = `Playing: ${actionData.label}`;
             statusIndicator.className = "absolute top-4 right-4 bg-blue-600 text-white text-xs px-3 py-1 rounded-full shadow-lg shadow-blue-500/50 z-30 transition-all";
         }
 
-        // Return to idle automatically exactly when the action MP4 finishes playing
-        actionVideo.onended = () => {
-            setIdleState();
-        };
+        actionVideo.onended = () => setIdleState();
 
-        // Renders the specific buttons for the chosen audience size
         function renderButtons() {
-            buttonContainer.innerHTML = ''; // Clear current buttons
+            buttonContainer.innerHTML = ''; 
             const actions = library[currentSize].actions;
 
-            actions.forEach(action => {
+            actions.forEach((action, index) => {
                 const btn = document.createElement('button');
-                btn.className = "bg-gray-700 hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded transition-colors active:scale-95 flex flex-col items-center justify-center text-center shadow";
-                
-                btn.innerHTML = `<span class="text-base">${action.label}</span>`;
-                
+                btn.className = "bg-gray-700 hover:bg-blue-600 text-white font-semibold py-3 px-2 rounded transition-colors active:scale-95 flex flex-col items-center justify-center text-center shadow";
+                btn.innerHTML = `<span class="text-xs text-gray-400 mb-1 font-mono">[${index + 1}]</span><span class="text-base">${action.label}</span>`;
                 btn.onclick = () => triggerAction(action);
                 buttonContainer.appendChild(btn);
             });
         }
 
-        // --- 5. EVENT LISTENERS & INITIALIZATION ---
-
-        // When the user changes the dropdown size
+        // Dropdown Listener
         sizeSelector.addEventListener('change', (e) => {
             currentSize = e.target.value;
-            // Interrupt any action and immediately reset to the new idle
             actionVideo.pause(); 
             setIdleState();
             renderButtons();
         });
 
-        // Initialize the app on page load
+        // Drawer Toggle Listener
+        toggleBtn.addEventListener('click', () => {
+            dashboard.classList.toggle('-translate-x-full');
+            chevronIcon.classList.toggle('rotate-180');
+        });
+
+        // Fullscreen API Listener
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                mainScreen.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (Note: Squarespace iframe must allow="fullscreen")`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Global Hotkey Listener
+        document.addEventListener('keydown', (e) => {
+            // Ignore input if the user is typing in a text field (safeguard)
+            if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') return;
+
+            const key = e.key.toLowerCase();
+            const actions = library[currentSize].actions;
+
+            // Handle Size Changes (s, m, l)
+            if (key === 's' || key === 'm' || key === 'l') {
+                const sizeMap = { 's': 'small', 'm': 'medium', 'l': 'large' };
+                sizeSelector.value = sizeMap[key];
+                sizeSelector.dispatchEvent(new Event('change')); // Trigger update
+            }
+
+            // Handle Action Triggers (1, 2, 3, 4)
+            if (['1', '2', '3', '4'].includes(key)) {
+                const index = parseInt(key) - 1;
+                if (actions[index]) triggerAction(actions[index]);
+            }
+        });
+
         function init() {
             renderButtons();
             setIdleState();
