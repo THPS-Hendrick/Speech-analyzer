@@ -46,6 +46,11 @@
 </head>
 <body class="w-full mx-auto bg-slate-50 min-h-screen flex flex-col items-center justify-start p-2 md:p-8">
 
+    <!-- NEW: GLOBAL FULL SCREEN TOGGLE BUTTON -->
+    <button onclick="window.toggleFullScreen()" id="global-fs-btn" class="absolute top-4 right-4 text-slate-500 hover:text-blue-600 bg-white p-2 rounded-full shadow-sm border border-slate-200 z-[9999] transition-all active:scale-95" title="Toggle Fullscreen">
+        <i id="fullscreen-icon" data-lucide="maximize" class="w-4 h-4"></i>
+    </button>
+
     <div id="view-menu" class="w-full max-w-6xl mx-auto flex flex-col items-center animate-in fade-in duration-500">
         
         <div class="w-full flex flex-col items-center mb-8 px-2 mt-4">
@@ -886,6 +891,38 @@ document.getElementById('p5-back').innerHTML = `<div id="timer-progress" class="
 
             renderPhase(); if (window.lucide) window.lucide.createIcons();
         }
+
+        // ==========================================
+        // FULL SCREEN LOGIC
+        // ==========================================
+        window.toggleFullScreen = function() {
+            const icon = document.getElementById('fullscreen-icon');
+            
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if (icon) icon.setAttribute('data-lucide', 'minimize');
+                    if (window.lucide) window.lucide.createIcons();
+                }).catch(err => {
+                    console.warn(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if (icon) icon.setAttribute('data-lucide', 'maximize');
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                }
+            }
+        };
+
+        // Listen for Esc key exits to keep the icon in sync
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (!document.fullscreenElement && icon) {
+                icon.setAttribute('data-lucide', 'maximize');
+                if (window.lucide) window.lucide.createIcons();
+            }
+        });
     </script>
 </body>
 </html>
