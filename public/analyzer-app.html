@@ -403,10 +403,17 @@
                         
                         <!-- RIGHT ALIGNED: Edit Lock & Add Widget (Stacked) -->
                         <div class="flex flex-col items-end gap-2">
-                            <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200 w-max">
-                                <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
-                                <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <!-- New Full Screen Button -->
+                                <button onclick="window.toggleFullScreen()" class="flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-xl transition-all shadow-sm active:scale-95 border border-slate-200" title="Toggle Fullscreen">
+                                    <i id="fullscreen-icon" data-lucide="maximize" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200 w-max">
+                                    <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
+                                    <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                                </button>
+                            </div>
                             <button onclick="window.toggleWidgetMenu()" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group w-max">
                                 <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
                                 <span class="hidden sm:inline">Add Widget</span>
@@ -1217,6 +1224,38 @@
             }
             fetchExplanations();
         };
+
+        // ==========================================
+        // FULL SCREEN LOGIC
+        // ==========================================
+        window.toggleFullScreen = function() {
+            const icon = document.getElementById('fullscreen-icon');
+            
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if (icon) icon.setAttribute('data-lucide', 'minimize');
+                    if (window.lucide) window.lucide.createIcons();
+                }).catch(err => {
+                    console.warn(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if (icon) icon.setAttribute('data-lucide', 'maximize');
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                }
+            }
+        };
+
+        // Listen for Esc key exits to keep the icon in sync
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (!document.fullscreenElement && icon) {
+                icon.setAttribute('data-lucide', 'maximize');
+                if (window.lucide) window.lucide.createIcons();
+            }
+        });
 
         window.spawnCompareWidget = function() {
             window.closeAllMenus();
