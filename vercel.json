@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https://tomhendrick.com https://tomhendrick.com https://talentacademy.com.au https://*.talentacademy.com.au https://*.filesusr.com;"
+"value": "frame-ancestors 'self' https://tomhendrick.com https://tomhendrick.com https://talentacademy.com.au https://*.talentacademy.com.au https://*.filesusr.com https://*.usrfiles.com https://*.wix.com https://*.wixsites.com;"
         },
         {
           "key": "X-Frame-Options",
