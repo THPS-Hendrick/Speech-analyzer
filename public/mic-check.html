@@ -51,12 +51,14 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen">
 
+    <!-- GLOBAL FULL SCREEN TOGGLE BUTTON -->
     <button onclick="window.toggleFullScreen()" id="global-fs-btn" class="absolute top-4 right-4 text-slate-500 hover:text-blue-600 bg-white p-2 rounded-full shadow-sm border border-slate-200 z-[9999] transition-all active:scale-95" title="Toggle Fullscreen">
         <i id="fullscreen-icon" data-lucide="maximize" class="w-4 h-4"></i>
     </button>
 
     <div class="relative w-full max-w-[368px] aspect-[9/16] max-h-[850px] bg-slate-100 rounded-[2rem] shadow-2xl flex flex-col pt-6 pb-2.5 px-2 overflow-hidden">
         
+        <!-- HUB OVERLAY START -->
         <div id="hub-overlay" class="absolute inset-0 z-50 bg-slate-100/90 backdrop-blur-md flex flex-col pt-6 pb-2.5 px-2 opacity-0 pointer-events-none transition-all duration-300">
             <div class="w-full grid grid-rows-5 gap-2 shrink-0 mb-3" style="height: 55%;">
                 <div class="w-full h-full min-h-[3rem] bg-[#AA0000] rounded-[0.85rem] shadow-sm flex items-center justify-center px-4 text-center border border-[#AA0000]">
@@ -406,7 +408,7 @@
             const yellowHighTop = b.yellowHigh ? getRawY(b.yellowHigh[1]) : 0;
             const yellowHighHeight = b.yellowHigh ? Math.abs(getRawY(b.yellowHigh[0]) - yellowHighTop) : 0;
 
-            let svg = `<svg viewBox="0 0 100 100" class="w-full h-full preserve-3d" style="background-color: #fee2e2;" preserveAspectRatio="none">`;
+            let svg = `<svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full preserve-3d" style="background-color: #fee2e2;" preserveAspectRatio="none">`;
             
             if (b.yellowHigh) svg += `<rect x="0" y="${yellowHighTop}" width="100" height="${yellowHighHeight}" fill="#fef08a" />`;
             svg += `<rect x="0" y="${greenTop}" width="100" height="${greenHeight}" fill="#dcfce3" />`;
@@ -628,7 +630,6 @@
             return 'empty';
         }
 
-        // NEW: Extracts the specific numerical score for Practice tracking
         function extractRawScore(metric, data) {
             const words = Math.max(1, data.numWords || 0);
             if (metric === 'Pace') return data.wpm || 0;
@@ -648,7 +649,6 @@
             return 0;
         }
 
-        // NEW: Ingests the Master Analyzer payload
         function buildDynamicDrillData(masterData, elapsedSecs) {
             const words = Math.max(1, masterData.numWords || 0);
             
@@ -793,8 +793,18 @@
             else if (phase === 'PRACTICE_LEVEL_SELECT' || phase === 'PRACTICE_ACTIVE_LEVEL' || phase === 'PRACTICE_RECORDING') {
                 const isSelect = phase === 'PRACTICE_LEVEL_SELECT';
                 
-                document.getElementById('p1-front').className = `face face-front ${col.p1} !border-gray-800`;
-                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center cursor-pointer" ${isSelect ? "onclick=\"phase = 'PRACTICE_MENU'; renderPhase();\"" : ""}><span class="text-[12px] uppercase text-white font-black tracking-widest">${isSelect ? 'Complete all Levels' : 'Level ' + activePracticeLevel}</span></div>`;
+                const p1BackAction = isSelect 
+                    ? "phase = 'PRACTICE_MENU'; renderPhase();" 
+                    : "if(typeof timerInterval !== 'undefined') clearInterval(timerInterval); isStarting = false; phase = 'PRACTICE_LEVEL_SELECT'; renderPhase();";
+
+                document.getElementById('p1-front').className = `face face-front ${col.p1} !border-gray-800 hover:brightness-110 transition-colors`;
+                document.getElementById('p1-front').innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center cursor-pointer" onclick="${p1BackAction}">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${isSelect ? 'chevron-left' : 'arrow-left'}" class="w-4 h-4 text-white"></i>
+                            <span class="text-[12px] uppercase text-white font-black tracking-widest">${isSelect ? 'Complete all Levels' : 'Level ' + activePracticeLevel}</span>
+                        </div>
+                    </div>`;
 
                 const textColors = [col.textP2, col.textP3, col.textP4, col.textP5];
 
@@ -810,7 +820,6 @@
                         pFront.className = `face face-front ${col.w} ${col.borderW} cursor-pointer hover:bg-slate-50 transition-colors`;
                         pFront.innerHTML = `<div class="w-full h-full flex items-center justify-between px-5" onclick="activePracticeLevel = ${lvl}; phase = 'PRACTICE_ACTIVE_LEVEL'; renderPhase();"><span class="text-[13px] font-black uppercase ${textColor} tracking-widest">Level ${lvl}</span>${star}</div>`;
                     } else {
-                        // Active Level State - P2=Goal, P3=Topic, P4=Modifier, P5=Timer
                         if (i === 2) {
                             pFront.className = `face face-front ${col.w} border-slate-200 shadow-sm`;
                             pFront.innerHTML = `<div class="w-full h-full flex items-center justify-center px-4 text-center"><span class="text-[11px] font-bold uppercase text-slate-500 tracking-widest leading-tight">${practiceData[selectedPracticeMetric].shortText}</span></div>`;
@@ -822,11 +831,23 @@
                             const targetDate = bDate.toISOString().split('T')[0];
                             
                             const promptData = globalPanelData[targetDate] || { p3: "Any Topic", p4: "Any Examples" };
-                            const promptText = i === 3 ? promptData.p3 : promptData.p4;
                             const promptColor = i === 3 ? col.textP3 : col.textP4;
                             
+                            let formattedText = "";
+                            if (i === 3) {
+                                formattedText = `
+                                    <span class="text-[9px] font-medium text-slate-400 normal-case tracking-normal block mb-0.5">Talk about</span>
+                                    <span class="text-[12px] font-bold uppercase ${promptColor} tracking-widest leading-tight block">${promptData.p3}</span>
+                                    <span class="text-[9px] font-medium text-slate-400 normal-case tracking-normal block mt-0.5">and</span>`;
+                            } else {
+                                formattedText = `
+                                    <span class="text-[9px] font-medium text-slate-400 normal-case tracking-normal block mb-0.5">give</span>
+                                    <span class="text-[12px] font-bold uppercase ${promptColor} tracking-widest leading-tight block">${promptData.p4}</span>
+                                    <span class="text-[9px] font-medium text-slate-400 normal-case tracking-normal block mt-0.5">examples.</span>`;
+                            }
+
                             pFront.className = `face face-front ${col.w} border-slate-200 shadow-sm`;
-                            pFront.innerHTML = `<div class="w-full h-full flex items-center justify-start pl-5 pr-5"><span class="text-[13px] font-bold uppercase ${promptColor} tracking-widest leading-tight">${promptText}</span></div>`;
+                            pFront.innerHTML = `<div class="w-full h-full flex flex-col items-start justify-center pl-5 pr-5 leading-none">${formattedText}</div>`;
                         } else if (i === 5) {
                             pFront.className = `face face-front ${col.b} text-white cursor-pointer pointer-events-auto`;
                             pFront.innerHTML = `
