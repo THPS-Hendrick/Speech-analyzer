@@ -398,19 +398,18 @@
         function generatePracticeSVG(metric) {
             const b = practiceData[metric].bounds;
             const hist = practiceHistory[metric];
-            const height = 100;
             
-            // Map raw value to Y coordinate (inverted because SVG Y goes down), clamped so it doesn't break viewBox
-            const getY = (val) => Math.max(0, Math.min(100, height - (((val - b.min) / (b.max - b.min)) * height)));
+            // Map raw value to Y coordinate (0 to 100)
+            const getRawY = (val) => 100 - (((val - b.min) / (b.max - b.min)) * 100);
             
-            const greenTop = getY(b.green[1]);
-            const greenHeight = Math.max(0, getY(b.green[0]) - greenTop);
+            const greenTop = getRawY(b.green[1]);
+            const greenHeight = Math.abs(getRawY(b.green[0]) - greenTop);
             
-            const yellowLowTop = getY(b.yellowLow[1]);
-            const yellowLowHeight = Math.max(0, getY(b.yellowLow[0]) - yellowLowTop);
+            const yellowLowTop = getRawY(b.yellowLow[1]);
+            const yellowLowHeight = Math.abs(getRawY(b.yellowLow[0]) - yellowLowTop);
             
-            const yellowHighTop = b.yellowHigh ? getY(b.yellowHigh[1]) : 0;
-            const yellowHighHeight = b.yellowHigh ? Math.max(0, getY(b.yellowHigh[0]) - yellowHighTop) : 0;
+            const yellowHighTop = b.yellowHigh ? getRawY(b.yellowHigh[1]) : 0;
+            const yellowHighHeight = b.yellowHigh ? Math.abs(getRawY(b.yellowHigh[0]) - yellowHighTop) : 0;
 
             let svg = `<svg viewBox="0 0 100 100" class="w-full h-full preserve-3d" style="background-color: #fee2e2;" preserveAspectRatio="none">`; // Red baseline
             
@@ -425,11 +424,11 @@
                 svg += `<text x="${xPos[lvl]}" y="96" font-size="5" font-weight="bold" fill="#94a3b8" text-anchor="middle">L${lvl}</text>`;
             });
 
-            // Draw Data Points & Connective Lines (if applicable)
+            // Draw Data Points
             [1, 2, 3, 4].forEach(lvl => {
                 hist[lvl].forEach((score, index) => {
                     const offset = (index * 2) - ((hist[lvl].length - 1) * 1); 
-                    const cy = Math.max(2, Math.min(98, getY(score)));
+                    const cy = Math.max(5, Math.min(95, getRawY(score))); // Clamped so dots don't clip borders
                     svg += `<circle cx="${xPos[lvl] + offset}" cy="${cy}" r="1.5" fill="#0f172a" />`;
                 });
             });
@@ -808,20 +807,24 @@
             else if (phase === 'PRACTICE_LEVEL_SELECT' || phase === 'PRACTICE_ACTIVE_LEVEL' || phase === 'PRACTICE_RECORDING') {
                 const isSelect = phase === 'PRACTICE_LEVEL_SELECT';
                 
-                document.getElementById('p1-front').className = `face face-front bg-slate-900 border-gray-800`;
+                // P1: Red background with white text
+                document.getElementById('p1-front').className = `face face-front ${col.p1} !border-gray-800`;
                 document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center cursor-pointer" ${isSelect ? "onclick=\"phase = 'PRACTICE_MENU'; renderPhase();\"" : ""}><span class="text-[12px] uppercase text-white font-black tracking-widest">${isSelect ? 'Complete all Levels' : 'Level ' + activePracticeLevel}</span></div>`;
+
+                // Dynamic text colors for Panels 2 to 5 (Purple, Blue, Green, Yellow)
+                const textColors = [col.textP2, col.textP3, col.textP4, col.textP5];
 
                 for (let i = 2; i <= 5; i++) {
                     const lvl = i - 1;
                     const pFront = document.getElementById(`p${i}-front`);
                     
                     if (isSelect) {
-                        // Check if any score in history is in the green zone
                         const passed = practiceHistory[selectedPracticeMetric][lvl].some(score => score >= practiceData[selectedPracticeMetric].bounds.green[0] && score <= practiceData[selectedPracticeMetric].bounds.green[1]);
                         const star = passed ? createStar('filled', 16, 'text-yellow-400') : createStar('empty', 16, 'text-slate-300');
+                        const textColor = textColors[lvl - 1]; // Maps to correct color
                         
                         pFront.className = `face face-front ${col.w} ${col.borderW} cursor-pointer hover:bg-slate-50 transition-colors`;
-                        pFront.innerHTML = `<div class="w-full h-full flex items-center justify-between px-5" onclick="activePracticeLevel = ${lvl}; phase = 'PRACTICE_ACTIVE_LEVEL'; renderPhase();"><span class="text-[13px] font-black uppercase text-slate-700 tracking-widest">Level ${lvl}</span>${star}</div>`;
+                        pFront.innerHTML = `<div class="w-full h-full flex items-center justify-between px-5" onclick="activePracticeLevel = ${lvl}; phase = 'PRACTICE_ACTIVE_LEVEL'; renderPhase();"><span class="text-[13px] font-black uppercase ${textColor} tracking-widest">Level ${lvl}</span>${star}</div>`;
                     } else {
                         // Active Level State - Blank out 2, 3, 4. Load timer on 5.
                         if (i < 5) {
@@ -840,14 +843,14 @@
                     }
                 }
                 
-                // Inject Graph to Panel 6
+                // Inject Graph to Panel 6 using strict Flexbox spacing
                 const p6f = document.getElementById('p6-front');
-                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] overflow-hidden flex flex-col justify-start items-center transition-colors duration-300 relative`;
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] overflow-hidden flex flex-col justify-start items-center transition-colors duration-300`;
                 p6f.innerHTML = `
-                    <div class="absolute top-0 left-0 w-full h-8 bg-white/80 backdrop-blur-sm border-b border-slate-200 z-10 flex items-center justify-center shadow-sm">
+                    <div class="w-full h-8 shrink-0 bg-white/80 backdrop-blur-sm border-b border-slate-200 z-10 flex items-center justify-center shadow-sm">
                         <span class="text-[10px] font-black uppercase text-slate-800 tracking-widest">Practice: ${selectedPracticeMetric}</span>
                     </div>
-                    <div class="w-full h-full inset-0 absolute pt-8">
+                    <div class="flex-1 w-full relative">
                         ${generatePracticeSVG(selectedPracticeMetric)}
                     </div>
                 `;
@@ -880,14 +883,12 @@
                 
                 document.getElementById('p5-front').className = `face face-front ${col.w} overflow-hidden`;
                 
-                // UPDATED: "SELECT LEVEL X?" 
                 document.getElementById('p5-front').innerHTML = `
                     <div id="p5-fill" class="absolute left-0 top-0 bottom-0 ${col.p5} transition-all duration-500 ease-out z-0" style="width: ${fillP}%;"></div>
                     <div class="relative w-full h-full z-10 flex items-center justify-center pointer-events-auto cursor-pointer active:scale-95" onclick="handleActionClick(event)">
                         <span id="p5-level-num" class="text-[16px] font-black uppercase tracking-[0.2em] text-slate-900 drop-shadow-sm">SELECT LEVEL ${getLevelCount() + 1}?</span>
                     </div>`;
                 
-                // PRELOAD ARMED STATE ON THE BACK
                 document.getElementById('p5-back').className = `face face-back ${col.b} text-white`; 
                 document.getElementById('p5-back').innerHTML = `
                     <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
@@ -917,14 +918,11 @@
                         </div>
                         <span class="absolute right-3 pointer-events-none">${chosenStar}</span>`;
                         
-                    // Re-apply flips for context panels so they stay correct
                     if(selections[i] === 'B') document.getElementById(`bar-${i}`).classList.add('flip-active');
                 }
 
-                // Keep panel 5 flipped so we can see the recording UI on its back
                 document.getElementById('bar-5').classList.add('flip-active');
 
-                // Active recording timer loaded dynamically onto the BACK of panel 5
                 document.getElementById('p5-back').className = `face face-back ${col.b} text-white`;
                 document.getElementById('p5-back').innerHTML = `
                     <div id="timer-progress" class="absolute left-0 top-0 bottom-0 w-0 bg-rose-600 transition-all duration-1000 ease-linear z-0"></div>
@@ -944,7 +942,6 @@
                 for (let i = 1; i <= 5; i++) {
                     const pFront = document.getElementById(`p${i}-front`);
                     
-                    // In practice mode, panels 2,3,4 were set transparent, restore them slightly to match style
                     if (phase === 'PRACTICE_PROCESSING' && i >= 2 && i <= 4) {
                         pFront.className = `face face-front bg-slate-50 border-slate-200`;
                         pFront.innerHTML = '';
@@ -992,7 +989,6 @@
                 document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Personal", drillData.Content[2].val, drillData.Content[2].color, "Content", 2)}${third("Visual", drillData.Content[3].val, drillData.Content[3].color, "Content", 3)}${third("Abstract", drillData.Content[4].val, drillData.Content[4].color, "Content", 4)}</div>`;
 
                 document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
-                // REPLACED WORD AVG WITH RUNTIME
                 document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${third("Runtime", drillData.Clarity[2].val, drillData.Clarity[2].color, "Clarity", 2)}${third("Eng 10K", drillData.Clarity[3].val, drillData.Clarity[3].color, "Clarity", 3)}${third("Pop", drillData.Clarity[4].val, drillData.Clarity[4].color, "Clarity", 4)}</div>`;
 
                 document.getElementById('p5-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
@@ -1006,7 +1002,6 @@
                         </div>
                     </div>`;
 
-                // Set up the Camera-Side Grade Overlay
                 let transBg = gradeBg === 'bg-[#F4B532]' ? 'bg-[#F4B532]/80' : gradeBg + '/80';
                 const camOverlay = document.getElementById('p6-camera-grade-overlay');
                 if (camOverlay) {
@@ -1018,7 +1013,6 @@
                     camOverlay.classList.remove('opacity-0');
                 }
 
-                // Update Globals for P6 Shape-Shifter
                 window.lastAchievedGrade = totalScore;
                 window.lastAchievedGradeFloat = parseFloat(totalScore);
                 window.lastAchievedTimeValid = (timerSeconds >= 20 && timerSeconds <= 80);
@@ -1085,7 +1079,6 @@
             }
 
             if (phase === 'START' || phase === 'ARMED') {
-                // If they interact with prompts while armed, revert safety catch
                 if (phase === 'ARMED' && panelNum >= 1 && panelNum <= 4) {
                     phase = 'START';
                     document.getElementById('bar-5').classList.remove('flip-active');
@@ -1099,7 +1092,6 @@
             } 
             
             else if (phase === 'RESULTS') {
-                // Return from Feedback Cards
                 if (sideBLevel === 3 && panelNum === 5) {
                     sideBLevel = 0;
                     for (let i = 1; i <= 5; i++) {
@@ -1114,12 +1106,10 @@
             if (event) event.stopPropagation();
 
             if (phase === 'START') {
-                // ARM Phase: Flips the panel to reveal the Play button
                 phase = 'ARMED';
                 document.getElementById('bar-5').classList.add('flip-active');
             } 
             else if (phase === 'ARMED' || phase === 'PRACTICE_ACTIVE_LEVEL') {
-                // INSTANT RECORD: No visual countdown
                 if (isStarting) return; isStarting = true;
                 
                 if (window.THPS && window.THPS.Audio) {
@@ -1176,7 +1166,6 @@
                     
                     try {
                         if (window.THPS.NLP && audioData.transcript) {
-                            // Request the Universal Payload from the Master Analyzer
                             const masterData = window.THPS.NLP.analyzeSpeech(
                                 audioData.transcript, 
                                 audioData.timestamps || [], 
@@ -1185,7 +1174,6 @@
                             );
                             buildDynamicDrillData(masterData, audioData.duration);
                             
-                            // Fork practice results back to history graph
                             if (isPracticeSession) {
                                 let rawScore = extractRawScore(selectedPracticeMetric, masterData);
                                 practiceHistory[selectedPracticeMetric][activePracticeLevel].push(rawScore);
@@ -1200,7 +1188,6 @@
                         }
                     } catch (error) {
                         console.warn("Processing failed, applying strict zero fallback.", error);
-                        // Safe Empty Payload with strict zeroes
                         buildDynamicDrillData({
                             numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
                             google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
@@ -1219,7 +1206,6 @@
                         renderPhase();
                     }
                 } else {
-                    // Fallback if window.THPS.Audio is not available at all
                     buildDynamicDrillData({
                         numWords: 0, totalSyllables: 0, personalCount: 0, visualCount: 0, 
                         google10kCount: 0, numSentences: 0, reportMarkdownText: "", 
@@ -1239,8 +1225,8 @@
         }
 
         function resetGame() {
-            if (isLegalOpen) toggleLegalOverlay(); // Closes the legal screen if open!
-            if (isHubOpen) toggleHubOverlay();     // Closes the hub screen if open!
+            if (isLegalOpen) toggleLegalOverlay();
+            if (isHubOpen) toggleHubOverlay();
             
             phase = 'MENU';
             activeMenuTopic = 'LOGO';
@@ -1262,7 +1248,6 @@
             }
         }
 
-        // --- ASYNC INIT & CAMERA ---
         async function toggleCamera() {
             if (phase === 'RECORDING' || phase === 'PROCESSING' || phase === 'PRACTICE_RECORDING' || phase === 'PRACTICE_PROCESSING' || isStarting || isCameraLoading) return;
 
@@ -1344,9 +1329,6 @@
             if (window.lucide) window.lucide.createIcons();
         }
 
-        // ==========================================
-        // FULL SCREEN LOGIC
-        // ==========================================
         window.toggleFullScreen = function() {
             const icon = document.getElementById('fullscreen-icon');
             
@@ -1367,7 +1349,6 @@
             }
         };
 
-        // Listen for Esc key exits to keep the icon in sync
         document.addEventListener('fullscreenchange', () => {
             const icon = document.getElementById('fullscreen-icon');
             if (!document.fullscreenElement && icon) {
@@ -1376,7 +1357,6 @@
             }
         });
 
-        // Init
         initApp();
     </script>
 </body>
