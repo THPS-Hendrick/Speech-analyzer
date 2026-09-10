@@ -1,18 +1,13 @@
 {
   "headers": [
     {
-      "source": "/mic-check.html",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
-"value": "frame-ancestors 'self' https://tomhendrick.com https://tomhendrick.com https://talentacademy.com.au https://*.talentacademy.com.au https://*.filesusr.com https://*.usrfiles.com https://*.wix.com https://*.wixsites.com;"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "ALLOWALL"
+          "value": "frame-ancestors *;"
         }
       ]
     }
   ]
 }
-
