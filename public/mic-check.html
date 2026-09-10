@@ -51,7 +51,7 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen">
 
-    <!-- NEW: GLOBAL FULL SCREEN TOGGLE BUTTON -->
+    <!-- GLOBAL FULL SCREEN TOGGLE BUTTON -->
     <button onclick="window.toggleFullScreen()" id="global-fs-btn" class="absolute top-4 right-4 text-slate-500 hover:text-blue-600 bg-white p-2 rounded-full shadow-sm border border-slate-200 z-[9999] transition-all active:scale-95" title="Toggle Fullscreen">
         <i id="fullscreen-icon" data-lucide="maximize" class="w-4 h-4"></i>
     </button>
@@ -225,6 +225,20 @@
         let phase = 'MENU'; 
         let activeMenuTopic = 'LOGO'; 
         let currentMenuPage = 1;
+
+        // NEW: Practice Mode State & Dictionary
+        let selectedPracticeMetric = 'Pace';
+        const practiceData = {
+            'Pace': { range: '100-150', cat: 'Delivery', text: 'Aim for 100-150 words per minute. If you speak faster, you risk overwhelming the listener. Slower, and you lose their attention.' },
+            'Mumble': { range: '3.0-4.9', cat: 'Delivery', text: 'Syllables per second (SPS). Keep it between 3.0 and 5.0. Open your mouth wider to hit those hard consonants.' },
+            'Pause': { range: '10-30%', cat: 'Delivery', text: 'Silence is powerful—use it to let your audience digest your points. Aim for 10-30% pause time.' },
+            'Personal': { range: '30-60%', cat: 'Content', text: 'Use "I", "Me", "He", "She", etc. to talk about a specific person. Aim for 30-60% personal content.' },
+            'Visual': { range: '25-50%', cat: 'Content', text: 'Paint a picture. Use descriptive, sensory words. Aim for 25-50% visual language.' },
+            'Abstract': { range: '10-30%', cat: 'Content', text: 'Don\'t get lost in the clouds. Keep complex, theoretical concepts to a minimum.' },
+            'Runtime': { range: '3.0-9.0s', cat: 'Clarity', text: 'The average seconds you speak continuously before taking a meaningful pause. Aim for 3 to 9 seconds.' },
+            'Eng 10K': { range: '80-95%', cat: 'Clarity', text: 'Use simple, recognizable words. Over 80% of your speech should be from the 10,000 most common English words.' },
+            'Pop': { range: '5-10', cat: 'Clarity', text: 'Readability grade level. Aim for a 5th to 10th-grade reading level to maximize mass-market appeal.' }
+        };
 
         let timerSeconds = 0;
         let timerInterval = null;
@@ -406,6 +420,20 @@
                         <li>Press start to play.</li>
                         <li>Press stop to see scores & stats.</li>
                     </ol>
+                `;
+            }
+            else if (activeMenuTopic === 'PRACTICE_EXPLAINER') {
+                const data = practiceData[selectedPracticeMetric];
+                let titleCol = col.textB;
+                if (data.cat === 'Delivery') titleCol = col.textP2;
+                if (data.cat === 'Content') titleCol = col.textP3;
+                if (data.cat === 'Clarity') titleCol = col.textP4;
+
+                p6f.className = `face face-front bg-slate-50 border border-slate-200 rounded-[1.25rem] p-5 flex flex-col justify-start items-start transition-colors duration-300`;
+                p6f.innerHTML = `
+                    ${cameraIconDark}
+                    <h3 class="text-[11px] font-black uppercase ${titleCol} tracking-widest mb-2">${selectedPracticeMetric} Goal: ${data.range}</h3>
+                    <p class="text-[10px] text-slate-600 font-medium leading-relaxed pr-2">${data.text}</p>
                 `;
             }
             else if (activeMenuTopic === 'P3' || activeMenuTopic === 'P4') {
@@ -642,7 +670,7 @@
 
         // --- UI GENERATOR (Side A) ---
         function renderPhase() {
-            if (phase === 'MENU' || phase === 'START') {
+            if (phase === 'MENU' || phase === 'START' || phase === 'PRACTICE_MENU') {
                 if (document.getElementById('p6-grade-front')) document.getElementById('p6-grade-front').remove();
                 
                 const camOverlay = document.getElementById('p6-camera-grade-overlay');
@@ -660,7 +688,7 @@
             if (phase === 'MENU') {
                 const menuData = {
                     1: { title: "What is Mic-Check?", bg: col.p1, text: col.textW },
-                    2: { title: "How to Play", bg: col.p2, text: col.textW },
+                    2: { title: "Practice Mode", bg: col.p2, text: col.textW },
                     3: { title: "Scoring", bg: col.p3, text: col.textW },
                     4: { title: "Tips", bg: col.p4, text: col.textW }
                 };
@@ -673,6 +701,30 @@
                 document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
                 document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center pointer-events-auto" onclick="toggleFlip(5); event.stopPropagation();"><span class="text-[18px] font-black uppercase tracking-[0.3em] text-slate-900">START</span></div>`;
                 
+                renderP6Front();
+            }
+            else if (phase === 'PRACTICE_MENU') {
+                const pThird = (metric, range, colorClass) => `
+                    <div onclick="selectedPracticeMetric = '${metric}'; renderPhase(); event.stopPropagation();" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-slate-100 transition-colors ${selectedPracticeMetric === metric ? 'bg-slate-100' : ''}">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5 pointer-events-none">${metric}</span>
+                        <span class="text-[11px] font-black ${colorClass} leading-none mt-1 pointer-events-none">${range}</span>
+                    </div>`;
+
+                document.getElementById('p1-front').className = `face face-front ${col.p2} cursor-pointer hover:brightness-110 transition-colors`;
+                document.getElementById('p1-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="resetGame()"><span class="text-[14px] uppercase text-white font-black tracking-widest">Practice Mode</span></div>`;
+
+                document.getElementById('p2-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p2-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${pThird('Pace', practiceData['Pace'].range, col.textP2)}${pThird('Mumble', practiceData['Mumble'].range, col.textP2)}${pThird('Pause', practiceData['Pause'].range, col.textP2)}</div>`;
+
+                document.getElementById('p3-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p3-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${pThird('Personal', practiceData['Personal'].range, col.textP3)}${pThird('Visual', practiceData['Visual'].range, col.textP3)}${pThird('Abstract', practiceData['Abstract'].range, col.textP3)}</div>`;
+
+                document.getElementById('p4-front').className = `face face-front ${col.w} ${col.borderW} overflow-hidden`;
+                document.getElementById('p4-front').innerHTML = `<div class="w-full h-full grid grid-cols-3 divide-x divide-slate-100">${pThird('Runtime', practiceData['Runtime'].range, col.textP4)}${pThird('Eng 10K', practiceData['Eng 10K'].range, col.textP4)}${pThird('Pop', practiceData['Pop'].range, col.textP4)}</div>`;
+
+                document.getElementById('p5-front').className = `face face-front ${col.p5} cursor-pointer hover:brightness-105 transition-all`;
+                document.getElementById('p5-front').innerHTML = `<div class="w-full h-full flex items-center justify-center" onclick="phase = 'PRACTICE_CHALLENGES'; renderPhase(); event.stopPropagation();"><span class="text-[14px] font-black uppercase tracking-widest text-slate-900">Practice: ${selectedPracticeMetric}</span></div>`;
+
                 renderP6Front();
             }
             else if (phase === 'START') {
@@ -881,6 +933,13 @@
             }
 
             if (phase === 'MENU') {
+                if (panelNum === 2) { 
+                    phase = 'PRACTICE_MENU';
+                    activeMenuTopic = 'PRACTICE_EXPLAINER';
+                    selectedPracticeMetric = 'Pace'; 
+                    renderPhase(); 
+                    return; 
+                }
                 if (panelNum >= 1 && panelNum <= 4) {
                     activeMenuTopic = 'P' + panelNum;
                     currentMenuPage = 1;
@@ -1112,7 +1171,6 @@
                     b4 = `${data[todayAdelaide].p4} examples.`;
                 }
                 
-                // Added ?t= cache-buster to instantly pull the new Runtime updates!
                 const fbRes = await fetch('https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/feedback-matrix.json?t=' + Date.now());
                 feedbackMatrix = await fbRes.json();
                 
