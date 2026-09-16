@@ -49,6 +49,10 @@ async function loadClients() {
             let colId = "";
             if (clientData.stage === "Enquiry Received") colId = "col-enquiry";
             if (clientData.stage === "Assessment Booked") colId = "col-assessment";
+            if (clientData.stage === "Session 1 Booked") colId = "col-session1";
+            if (clientData.stage === "Session 2 Booked") colId = "col-session2";
+            if (clientData.stage === "Session 3 Booked") colId = "col-session3";
+            if (clientData.stage === "Session 4 Booked") colId = "col-session4";
             
             if (colId) {
                 const columnElement = document.getElementById(colId);
