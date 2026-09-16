@@ -1,0 +1,8 @@
+{
+  "name": "speaker-crm",
+  "version": "1.0.0",
+  "description": "Backend for Speaker CRM",
+  "dependencies": {
+    "googleapis": "^126.0.0"
+  }
+}
