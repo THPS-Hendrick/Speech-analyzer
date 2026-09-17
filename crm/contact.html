@@ -74,7 +74,7 @@
                 document.getElementById('enquiry-form').classList.add('hidden');
                 document.getElementById('success-message').classList.remove('hidden');
             } else {
-                alert('Submission failed: ' + result.message);
+                alert('Submission failed: ' + (result.error || result.message));
                 submitBtn.disabled = false;
                 submitBtn.innerText = 'Send Message';
             }
