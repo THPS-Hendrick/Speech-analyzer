@@ -1,8 +1,9 @@
 {
-  "name": "speaker-crm",
+  "name": "thps-crm",
   "version": "1.0.0",
-  "description": "Backend for Speaker CRM",
+  "description": "Backend for THPS CRM",
   "dependencies": {
+    "firebase": "^10.8.0",
     "googleapis": "^126.0.0"
   }
 }
