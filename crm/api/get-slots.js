@@ -1,0 +1,1 @@
+A backend function that looks at your Google Calendar, checks your predefined working hours (e.g., Mon-Fri, 9 AM - 5 PM), subtracts any times where you already have meetings, and returns the open slots.
