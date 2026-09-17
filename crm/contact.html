@@ -44,21 +44,47 @@
         </div>
     </div>
 
-    <script>
-        // Temporary UI Logic - We will wire this to /api/submit-enquiry next!
-        document.getElementById('enquiry-form').addEventListener('submit', (e) => {
-            e.preventDefault(); // Stop page from refreshing
-            
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Sending...';
+<script>
+    document.getElementById('enquiry-form').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Stop page from refreshing
+        
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
 
-            // Simulate a network delay of 1 second
-            setTimeout(() => {
+        // Gather the data from the form
+        const payload = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            message: document.getElementById('message').value
+        };
+
+        try {
+            // Send the data to your Vercel backend
+            const res = await fetch('/api/submit-enquiry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                // Hide the form and show the success message
                 document.getElementById('enquiry-form').classList.add('hidden');
                 document.getElementById('success-message').classList.remove('hidden');
-            }, 1000);
-        });
-    </script>
+            } else {
+                alert('Submission failed: ' + result.message);
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Send Message';
+            }
+        } catch (err) {
+            console.error(err);
+            alert('An error occurred. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Send Message';
+        }
+    });
+</script>
 </body>
 </html>
