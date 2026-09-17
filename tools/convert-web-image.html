@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JFIF to PNG Converter</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+            color: #1f2937;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        input[type="file"], input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #1d4ed8; }
+        .error { color: #dc2626; font-size: 0.875rem; margin-top: 0.5rem; display: none; }
+        #preview {
+            max-width: 100%;
+            margin-top: 1rem;
+            border-radius: 4px;
+            display: none;
+            border: 1px dashed #d1d5db;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>JFIF to PNG Converter</h2>
+
+    <div class="form-group">
+        <label for="imageInput">Upload JFIF Image:</label>
+        <!-- Browsers often treat JFIF files under the JPEG MIME type -->
+        <input type="file" id="imageInput" accept=".jfif, image/jpeg">
+        <div id="errorMsg" class="error">Please select an image file first.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="widthInput">Target Width (px):</label>
+        <input type="number" id="widthInput" placeholder="e.g. 800" min="1">
+        <small style="color: #6b7280;">Leave blank to keep original size. Height will scale automatically to keep the aspect ratio.</small>
+    </div>
+
+    <button id="convertBtn">Convert & Download PNG</button>
+    
+    <!-- A hidden canvas used for the actual image processing -->
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <img id="preview" alt="Converted Image Preview">
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const widthInput = document.getElementById('widthInput');
+        const convertBtn = document.getElementById('convertBtn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const preview = document.getElementById('preview');
+        const errorMsg = document.getElementById('errorMsg');
+
+        convertBtn.addEventListener('click', () => {
+            const file = imageInput.files[0];
+            
+            if (!file) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+            errorMsg.style.display = 'none';
+
+            // Create a URL for the uploaded file
+            const objectURL = URL.createObjectURL(file);
+            const img = new Image();
+
+            img.onload = () => {
+                let newWidth = img.width;
+                let newHeight = img.height;
+
+                // Calculate new dimensions if a custom width was provided
+                const targetWidth = parseInt(widthInput.value);
+                if (targetWidth && targetWidth > 0) {
+                    newWidth = targetWidth;
+                    // Keep aspect ratio by scaling height by the same percentage
+                    const ratio = newWidth / img.width;
+                    newHeight = img.height * ratio;
+                }
+
+                // Set canvas to the new dimensions
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+
+                // Draw the resized image onto the canvas
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                // Convert the canvas drawing to a PNG data URL
+                const pngDataUrl = canvas.toDataURL('image/png');
+
+                // Show a preview of the new image
+                preview.src = pngDataUrl;
+                preview.style.display = 'block';
+
+                // Create a temporary link to force the download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pngDataUrl;
+                
+                // Get original filename without extension and append .png
+                const originalName = file.name.split('.')[0];
+                downloadLink.download = `${originalName}-converted.png`;
+                
+                // Trigger download
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                // Clean up the object URL to free memory
+                URL.revokeObjectURL(objectURL);
+            };
+
+            // Start loading the image
+            img.src = objectURL;
+        });
+    </script>
+</body>
+</html>
