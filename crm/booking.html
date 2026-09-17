@@ -20,7 +20,7 @@
                 1 Hour
             </div>
             <div class="text-gray-600 flex items-center text-sm font-medium">
-                <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2-2v8a2 2 0 002 2z"></path></svg>
                 Google Meet
             </div>
         </div>
@@ -29,162 +29,166 @@
         <div class="p-6 md:p-8 md:w-2/3">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Select a Date & Time</h3>
             
-            <!-- Mock Dates (Will be populated by Vercel later) -->
-            <div class="grid grid-cols-3 gap-3 mb-6" id="date-grid">
-                <button class="border-2 border-blue-600 bg-blue-50 text-blue-800 rounded-lg p-2 md:p-3 text-center text-sm font-medium cursor-pointer">Mon<br>Sep 21</button>
-                <button class="border border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors">Tue<br>Sep 22</button>
-                <button class="border border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors">Wed<br>Sep 23</button>
+            <!-- Loading Indicator -->
+            <div id="loading-state" class="text-gray-500 text-sm py-4">Loading available time slots...</div>
+
+            <!-- Date Grid -->
+            <div class="grid grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
+
+            <!-- Time Label & Grid -->
+            <div id="time-section" class="hidden">
+                <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide" id="selected-date-label">Available Times</h3>
+                <div class="grid grid-cols-2 gap-3 mb-6" id="time-grid"></div>
             </div>
 
-            <!-- Mock Times -->
-            <h3 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">Available Times for Mon, Sep 21</h3>
-            <div class="grid grid-cols-2 gap-3 mb-6" id="time-grid">
-                <button class="border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm">9:00 AM</button>
-                <button class="border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm">11:00 AM</button>
-                <button class="border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm">1:30 PM</button>
-                <button class="border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm">3:00 PM</button>
-            </div>
-
-            <!-- Hidden Form (Shows when a time is clicked) -->
-            <div id="booking-form" class="hidden bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <!-- Booking Form -->
+            <form id="booking-form" class="hidden bg-gray-50 p-5 rounded-lg border border-gray-200">
                 <h3 class="font-bold text-gray-800 mb-4">Confirm Details</h3>
-                <input type="text" id="client-name" placeholder="Full Name" class="w-full mb-3 p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
-                <input type="email" id="client-email" placeholder="Email Address" class="w-full mb-4 p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
-                <button class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition-colors shadow-sm">Confirm Booking</button>
+                <input type="hidden" id="selected-iso" name="selectedIso">
+                <input type="text" id="client-name" placeholder="Full Name" required class="w-full mb-3 p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
+                <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
+                <button type="submit" id="submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition-colors shadow-sm">Confirm Booking</button>
+            </form>
+
+            <!-- Success State Message -->
+            <div id="success-message" class="hidden bg-green-50 text-green-800 p-6 rounded-lg border border-green-200 text-center">
+                <h3 class="text-lg font-bold mb-2">Booking Confirmed!</h3>
+                <p class="text-sm">A Google Meet invitation has been sent to your email address.</p>
             </div>
 
         </div>
     </div>
-<script>
-let slotsData = [];
 
-async function fetchAvailableSlots() {
-    try {
-        const response = await fetch('/api/get-slots');
-        const data = await response.json();
+    <script>
+        let slotsData = [];
 
-        if (!data.success || !data.slots.length) {
-            document.getElementById('loading-state').innerText = 'No available slots found for the upcoming week.';
-            return;
+        async function fetchAvailableSlots() {
+            try {
+                const response = await fetch('/api/get-slots');
+                const data = await response.json();
+
+                if (!data.success || !data.slots.length) {
+                    document.getElementById('loading-state').innerText = 'No available slots found for the upcoming week.';
+                    return;
+                }
+
+                slotsData = data.slots;
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('date-grid').classList.remove('hidden');
+
+                renderDates();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading-state').innerText = 'Failed to load available times. Please refresh.';
+            }
         }
 
-        slotsData = data.slots;
-        document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('date-grid').classList.remove('hidden');
+        function renderDates() {
+            const dateGrid = document.getElementById('date-grid');
+            dateGrid.innerHTML = '';
 
-        renderDates();
-    } catch (err) {
-        console.error(err);
-        document.getElementById('loading-state').innerText = 'Failed to load available times. Please refresh.';
-    }
-}
+            const uniqueDates = [...new Set(slotsData.map(s => s.date))];
 
-function renderDates() {
-    const dateGrid = document.getElementById('date-grid');
-    dateGrid.innerHTML = '';
+            uniqueDates.forEach((dateStr, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `border rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors ${
+                    index === 0 ? 'border-2 border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-600 hover:bg-blue-50'
+                }`;
+                btn.innerHTML = dateStr.replace(',', '<br>');
+                btn.onclick = () => selectDate(dateStr, btn);
+                dateGrid.appendChild(btn);
+            });
 
-    const uniqueDates = [...new Set(slotsData.map(s => s.date))];
+            if (uniqueDates.length > 0) {
+                renderTimes(uniqueDates[0]);
+            }
+        }
 
-    uniqueDates.forEach((dateStr, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `border rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors ${
-            index === 0 ? 'border-2 border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-600 hover:bg-blue-50'
-        }`;
-        btn.innerHTML = dateStr.replace(',', '<br>');
-        btn.onclick = () => selectDate(dateStr, btn);
-        dateGrid.appendChild(btn);
-    });
+        function selectDate(dateStr, clickedBtn) {
+            document.querySelectorAll('#date-grid button').forEach(b => {
+                b.className = 'border border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors';
+            });
+            clickedBtn.className = 'border-2 border-blue-600 bg-blue-50 text-blue-800 rounded-lg p-2 md:p-3 text-center text-sm font-medium';
 
-    if (uniqueDates.length > 0) {
-        renderTimes(uniqueDates[0]);
-    }
-}
+            renderTimes(dateStr);
+        }
 
-function selectDate(dateStr, clickedBtn) {
-    document.querySelectorAll('#date-grid button').forEach(b => {
-        b.className = 'border border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors';
-    });
-    clickedBtn.className = 'border-2 border-blue-600 bg-blue-50 text-blue-800 rounded-lg p-2 md:p-3 text-center text-sm font-medium';
+        function renderTimes(dateStr) {
+            const timeSection = document.getElementById('time-section');
+            const timeGrid = document.getElementById('time-grid');
+            const label = document.getElementById('selected-date-label');
+            const form = document.getElementById('booking-form');
 
-    renderTimes(dateStr);
-}
+            timeSection.classList.remove('hidden');
+            form.classList.add('hidden');
+            timeGrid.innerHTML = '';
+            label.innerText = `Available Times for ${dateStr}`;
 
-function renderTimes(dateStr) {
-    const timeSection = document.getElementById('time-section');
-    const timeGrid = document.getElementById('time-grid');
-    const label = document.getElementById('selected-date-label');
-    const form = document.getElementById('booking-form');
+            const filteredSlots = slotsData.filter(s => s.date === dateStr);
 
-    timeSection.classList.remove('hidden');
-    form.classList.add('hidden');
-    timeGrid.innerHTML = '';
-    label.innerText = `Available Times for ${dateStr}`;
+            filteredSlots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
+                btn.innerText = slot.time;
+                btn.onclick = () => selectTime(slot, btn);
+                timeGrid.appendChild(btn);
+            });
+        }
 
-    const filteredSlots = slotsData.filter(s => s.date === dateStr);
+        function selectTime(slot, clickedBtn) {
+            document.querySelectorAll('#time-grid button').forEach(b => {
+                b.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
+            });
+            clickedBtn.className = 'border py-2 rounded font-medium transition-colors text-sm bg-blue-600 text-white border-blue-600';
 
-    filteredSlots.forEach(slot => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
-        btn.innerText = slot.time;
-        btn.onclick = () => selectTime(slot, btn);
-        timeGrid.appendChild(btn);
-    });
-}
+            document.getElementById('selected-iso').value = slot.iso;
+            document.getElementById('booking-form').classList.remove('hidden');
+        }
 
-function selectTime(slot, clickedBtn) {
-    document.querySelectorAll('#time-grid button').forEach(b => {
-        b.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
-    });
-    clickedBtn.className = 'border py-2 rounded font-medium transition-colors text-sm bg-blue-600 text-white border-blue-600';
+        // Handle Form Submit
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    document.getElementById('selected-iso').value = slot.iso;
-    document.getElementById('booking-form').classList.remove('hidden');
-}
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Booking...';
 
-// Handle Form Submit
-document.getElementById('booking-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+            const payload = {
+                name: document.getElementById('client-name').value,
+                email: document.getElementById('client-email').value,
+                selectedIso: document.getElementById('selected-iso').value
+            };
 
-    const submitBtn = document.getElementById('submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'Booking...';
+            try {
+                const res = await fetch('/api/book-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-    const payload = {
-        name: document.getElementById('client-name').value,
-        email: document.getElementById('client-email').value,
-        selectedIso: document.getElementById('selected-iso').value
-    };
+                const result = await res.json();
 
-    try {
-        const res = await fetch('/api/book-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+                if (result.success) {
+                    document.getElementById('booking-form').classList.add('hidden');
+                    document.getElementById('date-grid').classList.add('hidden');
+                    document.getElementById('time-section').classList.add('hidden');
+                    document.getElementById('success-message').classList.remove('hidden');
+                } else {
+                    alert('Booking failed: ' + result.error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Confirm Booking';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Confirm Booking';
+            }
         });
 
-        const result = await res.json();
-
-        if (result.success) {
-            document.getElementById('booking-form').classList.add('hidden');
-            document.getElementById('date-grid').classList.add('hidden');
-            document.getElementById('time-section').classList.add('hidden');
-            document.getElementById('success-message').classList.remove('hidden');
-        } else {
-            alert('Booking failed: ' + result.error);
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Confirm Booking';
-        }
-    } catch (err) {
-        console.error(err);
-        alert('An error occurred. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Confirm Booking';
-    }
-});
-
-fetchAvailableSlots();
-</script>
+        fetchAvailableSlots();
+    </script>
 </body>
 </html>
