@@ -55,28 +55,136 @@
 
         </div>
     </div>
+<script>
+let slotsData = [];
 
-    <script>
-        // UI Logic: Highlight selected time and show the form
-        const timeButtons = document.querySelectorAll('#time-grid button');
-        const form = document.getElementById('booking-form');
+async function fetchAvailableSlots() {
+    try {
+        const response = await fetch('/api/get-slots');
+        const data = await response.json();
 
-        timeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove highlight from all buttons
-                timeButtons.forEach(b => {
-                    b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                    b.classList.add('border-gray-200', 'text-gray-700');
-                });
-                
-                // Add highlight to the clicked button
-                btn.classList.remove('border-gray-200', 'text-gray-700');
-                btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
-                
-                // Reveal the name/email form
-                form.classList.remove('hidden');
-            });
+        if (!data.success || !data.slots.length) {
+            document.getElementById('loading-state').innerText = 'No available slots found for the upcoming week.';
+            return;
+        }
+
+        slotsData = data.slots;
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('date-grid').classList.remove('hidden');
+
+        renderDates();
+    } catch (err) {
+        console.error(err);
+        document.getElementById('loading-state').innerText = 'Failed to load available times. Please refresh.';
+    }
+}
+
+function renderDates() {
+    const dateGrid = document.getElementById('date-grid');
+    dateGrid.innerHTML = '';
+
+    const uniqueDates = [...new Set(slotsData.map(s => s.date))];
+
+    uniqueDates.forEach((dateStr, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `border rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors ${
+            index === 0 ? 'border-2 border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-200 hover:border-blue-600 hover:bg-blue-50'
+        }`;
+        btn.innerHTML = dateStr.replace(',', '<br>');
+        btn.onclick = () => selectDate(dateStr, btn);
+        dateGrid.appendChild(btn);
+    });
+
+    if (uniqueDates.length > 0) {
+        renderTimes(uniqueDates[0]);
+    }
+}
+
+function selectDate(dateStr, clickedBtn) {
+    document.querySelectorAll('#date-grid button').forEach(b => {
+        b.className = 'border border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg p-2 md:p-3 text-center text-sm font-medium transition-colors';
+    });
+    clickedBtn.className = 'border-2 border-blue-600 bg-blue-50 text-blue-800 rounded-lg p-2 md:p-3 text-center text-sm font-medium';
+
+    renderTimes(dateStr);
+}
+
+function renderTimes(dateStr) {
+    const timeSection = document.getElementById('time-section');
+    const timeGrid = document.getElementById('time-grid');
+    const label = document.getElementById('selected-date-label');
+    const form = document.getElementById('booking-form');
+
+    timeSection.classList.remove('hidden');
+    form.classList.add('hidden');
+    timeGrid.innerHTML = '';
+    label.innerText = `Available Times for ${dateStr}`;
+
+    const filteredSlots = slotsData.filter(s => s.date === dateStr);
+
+    filteredSlots.forEach(slot => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
+        btn.innerText = slot.time;
+        btn.onclick = () => selectTime(slot, btn);
+        timeGrid.appendChild(btn);
+    });
+}
+
+function selectTime(slot, clickedBtn) {
+    document.querySelectorAll('#time-grid button').forEach(b => {
+        b.className = 'border border-gray-200 py-2 rounded hover:border-blue-600 hover:text-blue-600 font-medium transition-colors text-sm';
+    });
+    clickedBtn.className = 'border py-2 rounded font-medium transition-colors text-sm bg-blue-600 text-white border-blue-600';
+
+    document.getElementById('selected-iso').value = slot.iso;
+    document.getElementById('booking-form').classList.remove('hidden');
+}
+
+// Handle Form Submit
+document.getElementById('booking-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Booking...';
+
+    const payload = {
+        name: document.getElementById('client-name').value,
+        email: document.getElementById('client-email').value,
+        selectedIso: document.getElementById('selected-iso').value
+    };
+
+    try {
+        const res = await fetch('/api/book-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
-    </script>
+
+        const result = await res.json();
+
+        if (result.success) {
+            document.getElementById('booking-form').classList.add('hidden');
+            document.getElementById('date-grid').classList.add('hidden');
+            document.getElementById('time-section').classList.add('hidden');
+            document.getElementById('success-message').classList.remove('hidden');
+        } else {
+            alert('Booking failed: ' + result.error);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Confirm Booking';
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Confirm Booking';
+    }
+});
+
+fetchAvailableSlots();
+</script>
 </body>
 </html>
