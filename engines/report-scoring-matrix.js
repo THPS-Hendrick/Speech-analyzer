@@ -38,9 +38,70 @@ window.THPS_ReportScoring = {
     },
 
     // 2. Image / Imagination Inhibition Algorithm
-    scoreVisualInhibition: function(visualData) {
-        const h = visualData?.A || { wpm: 0, visual: 0, recorded: false };
-        const i = visualData?.B || { wpm: 0, visual: 0, recorded: false };
+scoreVocalInhibition: function(vocalData) {
+        if (!vocalData || !vocalData.recorded) {
+            return {
+                hasInhibition: false, label: "No Inhibition",
+                pauseVariety: "low", voiceVariety: "low", runVariety: "low",
+                bars: { pause: [0,0,0,0,0], voice: [0,0,0,0,0], run: [0,0,0,0,0] }
+            };
+        }
+
+        // 1. Safely extract raw buckets (fallback to zeroes if missing)
+        const pBuckets = vocalData.pauseBuckets || [0, 0, 0, 0, 0];
+        const vBuckets = vocalData.volumeBuckets || [0, 0, 0, 0, 0];
+        const rBuckets = vocalData.runBuckets || [0, 0, 0, 0, 0];
+
+        // 2. Pause Evaluation: Needs >= 2 in indices 2, 3, and 4 (Medium, Long, Very Long)
+        const pausePass = pBuckets[2] >= 2 && pBuckets[3] >= 2 && pBuckets[4] >= 2;
+        const pauseVariety = pausePass ? "high" : "low";
+
+        // 3. Volume Evaluation: Calculate percentages, fail if >= 2 buckets are < 10%
+        const totalWords = Math.max(1, vBuckets.reduce((sum, count) => sum + count, 0));
+        const vPercentages = vBuckets.map(count => (count / totalWords) * 100);
+        const voiceFailCount = vPercentages.filter(pct => pct < 10).length;
+        const voicePass = voiceFailCount < 2;
+        const voiceVariety = voicePass ? "high" : "low";
+
+        // 4. Run Evaluation: Fail if >= 2 buckets have < 2 runs
+        const runFailCount = rBuckets.filter(count => count < 2).length;
+        const runPass = runFailCount < 2;
+        const runVariety = runPass ? "high" : "low";
+
+        // 5. Overarching Diagnosis Routing
+        let fails = 0;
+        if (!pausePass) fails++;
+        if (!voicePass) fails++;
+        if (!runPass) fails++;
+
+        let label = "No Inhibition";
+        if (fails >= 2) {
+            label = "High Inhibition";
+        } else if (fails === 1) {
+            if (!pausePass) label = "Pause Inhibition";
+            if (!voicePass) label = "Volume Inhibition";
+            if (!runPass) label = "Run Inhibition";
+        }
+
+        // 6. Chart Normalization (Scale highest value to 100% for CSS rendering)
+        const normalize = (arr) => {
+            const max = Math.max(...arr, 1); // Avoid division by zero
+            return arr.map(val => (val / max) * 100);
+        };
+
+        return {
+            hasInhibition: fails > 0,
+            label: label,
+            pauseVariety: pauseVariety,
+            voiceVariety: voiceVariety,
+            runVariety: runVariety,
+            bars: { 
+                pause: normalize(pBuckets), 
+                voice: normalize(vBuckets), 
+                run: normalize(rBuckets) 
+            }
+        };
+    },
 
         // House Test Thresholds: Time ~60s, WPM < 100, Visual > 50%
         const hTimePass = h.recorded;
