@@ -1,1 +1,22 @@
-Functionality: Stores plain-English text descriptions mapped to each test when flagged as a "Strength" (above average) or a "Gap" (average/below average).
+{
+  "sams": {
+    "strength": "High physiological composure under pressure with minimal baseline discomfort.",
+    "gap": "Elevated sympathetic nerves threshold leading to hesitation or tension when challenged."
+  },
+  "phantasia": {
+    "strength": "Effortless mental image generation allowing dynamic storytelling without notes.",
+    "gap": "Abstract conceptual focus making unscripted visual descriptions harder to sustain."
+  },
+  "vocal": {
+    "strength": "Dynamic range in pitch and volume with uninhibited vocal release.",
+    "gap": "Restricted vocal range or static volume causing monotone delivery patterns."
+  },
+  "visual": {
+    "strength": "High visual word percentage with balanced pacing across both prompt styles.",
+    "gap": "Struggles to maintain visual sensory detail when increasing speaking pace."
+  },
+  "repeat": {
+    "strength": "Rapid recall and accurate delivery under categorical constraint rules.",
+    "gap": "Delayed response times or missing vocal activation when navigating strict category rules."
+  }
+}
