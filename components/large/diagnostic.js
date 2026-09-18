@@ -10,13 +10,13 @@ class THPSDiagnostic extends HTMLElement {
         // SAMS Explanation Data
         this.samsExplanations = null;
         
-        // NEW: Single continuous data slot for Test 3
+        // Single continuous data slot for Test 3
         this.vocalInhibitionData = { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" };
-        this.pendingT3Payload = false; // Tracks if the next incoming payload belongs to Test 3
+        this.pendingT3Payload = false; 
 
-        // Test 3 "App-Within-An-App" State Variables
+        // Test 3 State Variables
         this.t3Slide = 0; 
-        this.t3LineIndex = 0; // Tracks the individual line we are reading
+        this.t3LineIndex = 0; 
         
         this.pacinoBlocks = [
             { level: 1, color: "purple-600", lines: ["You know, when you get old in life things get taken from you. I mean that's...part of life.", "You find out life's this game of inches"] },
@@ -71,8 +71,9 @@ class THPSDiagnostic extends HTMLElement {
         this.attachListeners();
         this.updateT3Tutorial();
         
-        // Start the Test 3 Timer Sync Loop
+        // Active Sync Loops
         this.syncLoop = setInterval(() => this.updateT3TimerUI(), 50);
+        this.s5SyncLoop = setInterval(() => this.updateS5TimerUI(), 50);
     }
 
     disconnectedCallback() {
@@ -81,6 +82,7 @@ class THPSDiagnostic extends HTMLElement {
         }
         Object.values(this.activeTimers).forEach(t => clearInterval(t.interval));
         if (this.syncLoop) clearInterval(this.syncLoop);
+        if (this.s5SyncLoop) clearInterval(this.s5SyncLoop);
     }
 
     async fetchSamsExplanations() {
@@ -170,6 +172,7 @@ class THPSDiagnostic extends HTMLElement {
                 `;
             }).join('') + `</div>`;
 
+        if (window.lucide) window.lucide.createIcons({ root: this });
         this.updateUI();
     }
 
@@ -227,23 +230,28 @@ class THPSDiagnostic extends HTMLElement {
                 };
                 
                 console.log("Vocal Inhibition Data Saved:", this.vocalInhibitionData);
-                this.pendingT3Payload = false; // Reset the flag
+                this.pendingT3Payload = false; 
             }
 
             // Catch and route execution frames for Visual Association targets (Stage 5)
             if (this.currentStage5Slot !== null) {
                 const slot = this.currentStage5Slot;
+                
+                // Save to the memory slot for Report Card later
                 this.stage5DataSlots[slot] = {
                     recorded: true,
                     wpm: payload.wpm || 0,
                     visual: payload.visual || 0
                 };
-
-                const displayEl = this.querySelector(`[data-ref="s5-status-${slot}"]`);
-                if (displayEl) {
-                    displayEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Captured</span> — Pace: ${payload.wpm} WPM | Visual Content: ${payload.visual}%`;
-                }
-                this.currentStage5Slot = null;
+            
+                // Inject data directly into the UI pills
+                const wpmPill = this.querySelector(`#s5-wpm-${slot}`);
+                const visPill = this.querySelector(`#s5-vis-${slot}`);
+                
+                if (wpmPill) wpmPill.innerText = `${payload.wpm || 0} WPM`;
+                if (visPill) visPill.innerText = `${Math.round(payload.visual || 0)}% VIS`;
+            
+                this.currentStage5Slot = null; // Un-prime the slot
             }
         });
     }
@@ -377,19 +385,45 @@ class THPSDiagnostic extends HTMLElement {
         }
     }
 
-    // --------------------------------------------------
+    // --- TEST 4 VISUAL ASSOCIATION METHODS ---
 
     toggleVisualRecord(slot) {
-        const btn = this.querySelector(`[data-ref="s5-btn-${slot}"]`);
         if (!window.isActive) {
-            this.currentStage5Slot = slot;
-            window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Recording`;
-            btn.classList.replace('bg-indigo-600', 'bg-red-500');
+            this.currentStage5Slot = slot; 
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
         } else {
-            window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1 pointer-events-none"></i> Start Recording`;
-            btn.classList.replace('bg-red-500', 'bg-indigo-600');
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        }
+    }
+
+    updateS5TimerUI() {
+        if (this.currentStage5Slot !== null) {
+            const slot = this.currentStage5Slot;
+            const progressEl = this.querySelector(`#s5-progress-${slot}`);
+            const btnEl = this.querySelector(`#s5-btn-${slot}`);
+            const iconEl = this.querySelector(`#s5-icon-${slot}`);
+    
+            if (window.isActive && window.THPS?.Audio?.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                
+                // Guide fill to 60 seconds (100% cap)
+                const fillPct = Math.min((elapsedSecs / 60) * 100, 100);
+                if (progressEl) progressEl.style.width = `${fillPct}%`;
+                
+                // Swap icon to stop square
+                if (iconEl && iconEl.getAttribute('data-lucide') !== 'square') {
+                    iconEl.setAttribute('data-lucide', 'square');
+                    if (window.lucide) window.lucide.createIcons({ root: btnEl });
+                }
+            } else {
+                if (progressEl) progressEl.style.width = '0%';
+                
+                // Revert icon to mic
+                if (iconEl && iconEl.getAttribute('data-lucide') !== 'mic') {
+                    iconEl.setAttribute('data-lucide', 'mic');
+                    if (window.lucide) window.lucide.createIcons({ root: btnEl });
+                }
+            }
         }
     }
 
@@ -544,7 +578,7 @@ class THPSDiagnostic extends HTMLElement {
             client: { name: clientName, date: date, goals: goals },
             nervesScore: totalNervesScore,
             phantasia: phantasiaSelection,
-            vocalInhibition: this.vocalInhibitionData, // Pass the new single payload object
+            vocalInhibition: this.vocalInhibitionData, 
             visualAssociation: this.stage5DataSlots,
             repeatCount: stage6Metrics
         };
@@ -711,7 +745,7 @@ class THPSDiagnostic extends HTMLElement {
                             <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
                                 <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-3">
                                     
-                                    <button data-action="t3GlideUp" class="thps-t3-up p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm" disabled>
+                                    <button data-action="t3GlideUp" class="thps-t3-up w-12 h-12 rounded-full bg-white border-2 border-slate-300 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 transition-colors active:scale-90 shadow-sm flex items-center justify-center disabled:opacity-30" disabled>
                                         <i class="fas fa-chevron-up text-lg pointer-events-none"></i>
                                     </button>
                                     
@@ -722,7 +756,7 @@ class THPSDiagnostic extends HTMLElement {
                                         </button>
                                     </div>
 
-                                    <button data-action="t3GlideDown" class="thps-t3-down p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm">
+                                    <button data-action="t3GlideDown" class="thps-t3-down w-12 h-12 rounded-full bg-white border-2 border-slate-300 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 transition-colors active:scale-90 shadow-sm flex items-center justify-center disabled:opacity-30">
                                         <i class="fas fa-chevron-down text-lg pointer-events-none"></i>
                                     </button>
 
@@ -732,33 +766,61 @@ class THPSDiagnostic extends HTMLElement {
 
                     </section>
 
-                    <!-- PAGE 5 -->
-                    <section data-ref="page-5" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
-                        <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 4: Word Association Visual (Part A)</h3>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-                            <div>
-                                <img src="https://content.api.news/v3/images/bin/42df73e55c8f6009e64b1997f5d2cb75" class="w-full rounded-md shadow">
-                                <div class="bg-indigo-50 border p-3 rounded mt-4 text-xs text-indigo-900 leading-relaxed"><b>Goal:</b> Speak under 100 WPM, Visual Content over 20%.</div>
+                    <!-- PAGE 5: VISUAL PT 1 -->
+                    <section data-ref="page-5" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full min-h-[600px]">
+                        <h3 class="text-2xl font-bold mb-4 text-slate-800 shrink-0">Test 4: Word Association Visual (Part A)</h3>
+                        
+                        <!-- Image Container -->
+                        <div class="w-full flex-1 min-h-[200px] max-h-[280px] bg-slate-200 rounded-xl overflow-hidden shadow-inner mb-6 relative">
+                            <img src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_1.png" class="w-full h-full object-cover md:object-contain bg-slate-900">
+                        </div>
+
+                        <!-- Goal Text & Live Pills -->
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shrink-0">
+                            <p class="text-sm font-semibold text-slate-700 flex-1 leading-relaxed">
+                                <b class="text-indigo-600">Goal:</b> Visually describe the house slowly for 60 sec (under 100 WPM, over 50% visual words).
+                            </p>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <div class="px-4 py-2 bg-indigo-100 text-indigo-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-wpm-A">0 WPM</div>
+                                <div class="px-4 py-2 bg-emerald-100 text-emerald-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-vis-A">0% VIS</div>
                             </div>
-                            <div class="flex flex-col justify-between">
-                                <button data-action="toggleVisualRecord" data-slot="A" data-ref="s5-btn-A" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2 pointer-events-none"></i> Start Recording</button>
-                                <div data-ref="s5-status-A" class="mt-4 p-4 border rounded bg-slate-50 text-sm font-medium text-slate-600 text-center">No execution frames logged.</div>
-                            </div>
+                        </div>
+
+                        <!-- Sleek Arcade Timer Bar -->
+                        <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800">
+                            <div id="s5-progress-A" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                            <button data-action="toggleVisualRecord" data-slot="A" id="s5-btn-A" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
+                                <i data-lucide="mic" id="s5-icon-A" class="w-5 h-5 pointer-events-none transition-transform"></i>
+                            </button>
                         </div>
                     </section>
 
-                    <!-- PAGE 6 -->
-                    <section data-ref="page-6" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
-                        <h3 class="text-2xl font-bold mb-2 text-slate-800">Test 4: Word Association Visual (Part B)</h3>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-                            <div>
-                                <div class="bg-slate-300 rounded aspect-video w-full flex items-center justify-center text-slate-500 font-bold text-center">Memory Prompt Card</div>
-                                <div class="bg-amber-50 border p-3 rounded mt-4 text-xs text-amber-900 leading-relaxed"><b>Goal:</b> Speak over 170 WPM, Visual Content over 20%.</div>
+                    <!-- PAGE 6: VISUAL PT 2 -->
+                    <section data-ref="page-6" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full min-h-[600px]">
+                        <h3 class="text-2xl font-bold mb-4 text-slate-800 shrink-0">Test 4: Word Association Visual (Part B)</h3>
+                        
+                        <!-- Blank Prompt Card -->
+                        <div class="w-full flex-1 min-h-[200px] max-h-[280px] bg-slate-300 rounded-xl overflow-hidden shadow-inner mb-6 flex items-center justify-center">
+                            <span class="text-slate-500 font-black text-xl md:text-2xl tracking-widest uppercase">Memory Prompt Card</span>
+                        </div>
+
+                        <!-- Goal Text & Live Pills -->
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shrink-0">
+                            <p class="text-sm font-semibold text-slate-700 flex-1 leading-relaxed">
+                                <b class="text-amber-600">Goal:</b> Visually describe building an imaginary house for 60 sec (over 170 WPM, over 50% visual words).
+                            </p>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <div class="px-4 py-2 bg-indigo-100 text-indigo-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-wpm-B">0 WPM</div>
+                                <div class="px-4 py-2 bg-emerald-100 text-emerald-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-vis-B">0% VIS</div>
                             </div>
-                            <div class="flex flex-col justify-between">
-                                <button data-action="toggleVisualRecord" data-slot="B" data-ref="s5-btn-B" class="w-full py-4 bg-indigo-600 text-white font-black text-center rounded-xl shadow-md"><i class="fas fa-mic mr-2 pointer-events-none"></i> Start Recording</button>
-                                <div data-ref="s5-status-B" class="mt-4 p-4 border rounded bg-slate-50 text-sm font-medium text-slate-600 text-center">No execution frames logged.</div>
-                            </div>
+                        </div>
+
+                        <!-- Sleek Arcade Timer Bar -->
+                        <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800">
+                            <div id="s5-progress-B" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                            <button data-action="toggleVisualRecord" data-slot="B" id="s5-btn-B" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
+                                <i data-lucide="mic" id="s5-icon-B" class="w-5 h-5 pointer-events-none transition-transform"></i>
+                            </button>
                         </div>
                     </section>
 
