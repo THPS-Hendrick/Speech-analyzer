@@ -2,9 +2,12 @@ class THPSReportCard extends HTMLElement {
     constructor() {
         super();
         this.data = window.thps_diagnosticData || null; 
+        this.explainerData = { strengthsGaps: null, phantasia: null };
+        this.isLoading = true;
     }
 
-    connectedCallback() {
+    async connectedCallback() {
+        await this.fetchExplainers();
         this.render();
 
         this.diagListener = (e) => {
@@ -18,25 +21,37 @@ class THPSReportCard extends HTMLElement {
         if (this.diagListener) window.removeEventListener('thps-diagnostic-complete', this.diagListener);
     }
 
-    getNervesPercentile(score) {
-        if (score <= 16) return { name: "Top 80-100%", desc: "Highly stable physiological response.", dial: 5 };
-        if (score <= 24) return { name: "Top 60-80%", desc: "Typical adaptive focus variables.", dial: 4 };
-        if (score <= 27) return { name: "Mid 40-60%", desc: "Moderate nervous activation thresholds.", dial: 3 };
-        if (score <= 31) return { name: "Bottom 20-40%", desc: "High somatic reaction indicators.", dial: 2 };
-        return { name: "Bottom 0-20%", desc: "Severe sympathetic stress thresholds.", dial: 1 };
+    async fetchExplainers() {
+        try {
+            const [sgRes, phanRes] = await Promise.all([
+                fetch('https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/Explainers/strengths-gaps.json'),
+                fetch('https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/Explainers/phantasia-preferences.json')
+            ]);
+            if (sgRes.ok) this.explainerData.strengthsGaps = await sgRes.json();
+            if (phanRes.ok) this.explainerData.phantasia = await phanRes.json();
+        } catch (e) { 
+            console.warn("Could not load Report Card explainer JSONs", e); 
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    getPhantasiaInterpretation(type) {
-        switch(type) {
-            case "Aphantasia":
-                return "<b>Aphantasia (~1% of population):</b> Complete absence of voluntary visual imagery. <i>Speaking Implication:</i> Highly structured abstract logical processors. Likely requires clear systematic frameworks or notes to navigate dense conceptual structures easily, as they cannot pull from a 'visable' mind-map scene dynamically.";
-            case "Hypophantasia":
-                return "<b>Hypo-phantasia (~3% of population):</b> Strained or delayed mental image generation. <i>Speaking Implication:</i> May experience slight friction or conceptual hitches when attempting to improvise storytelling arcs or visual scene architectures under immediate public pressure.";
-            case "Hyperphantasia":
-                return "<b>Hyper-phantasia (~6% of population):</b> Effortless, highly vivid, and frequently involuntary mental visuals. <i>Speaking Implication:</i> Phenomenal creative projection capacity. However, they run an intense risk of speaking too quickly or wandering off-topic, as their brain continuously forces secondary visual imagery (like unprompted orchard scenes or background environmental textures) directly into their operational awareness.";
-            default:
-                return "<b>Phantasia (~89% of population):</b> Standard, typical visual memory access. <i>Speaking Implication:</i> Well-balanced visual landscape memory tracking. Can conjure recognizable shapes (like red apple targets) with low cognitive overhead, ensuring balanced delivery loops when well-paced.";
+    downloadPDF() {
+        const element = this.querySelector('#report-card-pdf-target');
+        if (!element || typeof html2pdf === 'undefined') {
+            alert("PDF generation engine is initializing or unavailable.");
+            return;
         }
+
+        const opt = {
+            margin:       0,
+            filename:     `Speech_Assessment_${this.data?.client?.name || 'Client'}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
     }
 
     render() {
@@ -53,271 +68,182 @@ class THPSReportCard extends HTMLElement {
             return; 
         }
 
-        const nerves = this.getNervesPercentile(this.data.nervesScore);
-        const phantasiaText = this.getPhantasiaInterpretation(this.data.phantasia);
-        
-        const vInhibPasses = Object.values(this.data.vocalInhibition).filter(v => v.recorded).length;
-        const s5Passes = (this.data.visualAssociation.A.wpm < 100 ? 1 : 0) + (this.data.visualAssociation.B.wpm > 170 ? 1 : 0);
-
-        // --- NEW: STAGE 4 PROGRESSIVE INTENSITY MATH & HTML ---
-        const levels = [1, 2, 3, 4, 5];
-        const activeLevels = levels.filter(l => this.data.vocalInhibition[l]?.recorded);
-        
-        let maxWPM = 1; let maxPause = 1; let minDb = -40; let maxDb = -10;
-        
-        // Find maximums for chart scaling
-        if (activeLevels.length > 0) {
-            maxWPM = Math.max(150, ...activeLevels.map(l => this.data.vocalInhibition[l].wpm));
-            maxPause = Math.max(40, ...activeLevels.map(l => this.data.vocalInhibition[l].pause));
-            const activeDbs = activeLevels.map(l => this.data.vocalInhibition[l].db);
-            minDb = Math.min(-35, ...activeDbs);
-            maxDb = Math.max(-10, ...activeDbs);
+        if (this.isLoading) {
+            this.innerHTML = `
+                <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
+                    <i class="fas fa-spinner fa-spin text-indigo-600 text-3xl mb-4"></i>
+                    <p class="text-sm font-bold text-slate-600">Compiling Report Scoring Matrix...</p>
+                </div>
+            `;
+            return;
         }
 
-        // Build the 3 Bar Charts
-        let paceBars = '', pauseBars = '', dbBars = '';
-        levels.forEach(l => {
-            const slot = this.data.vocalInhibition[l];
-            if (slot && slot.recorded) {
-                const wpmHeight = Math.max(5, (slot.wpm / maxWPM) * 100);
-                const pauseHeight = Math.max(5, (slot.pause / maxPause) * 100);
-                // For DB, normalize the negative range to a positive percentage
-                const dbRange = maxDb - minDb;
-                const dbHeight = Math.max(5, ((slot.db - minDb) / (dbRange || 1)) * 100);
+        // Invoke Scoring Matrix Engine (Failsafe fallback if engine not loaded)
+        const scoring = window.THPS_ReportScoring || {
+            scoreVocalInhibition: () => ({ hasInhibition: false, label: "No Inhibition", pauseVariety: "med", voiceVariety: "med", runVariety: "med", bars: { pause: [20,20,20,20,20], voice: [20,20,20,20,20], run: [20,20,20,20,20] } }),
+            scoreVisualInhibition: () => ({ label: "Not Inhibited", house: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 }, imagination: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 } }),
+            scoreCategoryInhibition: () => ({ label: "Not Inhibited" }),
+            sortStrengthsAndGaps: () => ({ strengths: [], gaps: [] }),
+            calculateTotalScore: () => ({ score: 0, grade: "average" })
+        };
 
-                paceBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-indigo-500 rounded-sm rounded-b-none" style="height: ${wpmHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
-                pauseBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-emerald-500 rounded-sm rounded-b-none" style="height: ${pauseHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
-                dbBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1 group"><div class="w-full bg-rose-500 rounded-sm rounded-b-none" style="height: ${dbHeight}%;"></div><span class="text-[8px] font-bold text-slate-500">L${l}</span></div>`;
-            } else {
-                paceBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
-                pauseBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
-                dbBars += `<div class="flex-1 flex flex-col justify-end items-center gap-1"><div class="w-full bg-slate-100 rounded-sm rounded-b-none" style="height: 5%;"></div><span class="text-[8px] font-bold text-slate-300">L${l}</span></div>`;
-            }
-        });
+        const vocal = scoring.scoreVocalInhibition(this.data.vocalInhibition);
+        const visual = scoring.scoreVisualInhibition(this.data.visualAssociation);
+        const category = scoring.scoreCategoryInhibition(this.data.repeatCount);
+        const splitData = scoring.sortStrengthsAndGaps(this.data, this.explainerData.strengthsGaps);
+        const total = scoring.calculateTotalScore(this.data);
 
-        // Delta & Linearity Logic
-        let paceInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
-        let pauseInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
-        let dbInsights = `<span class="text-slate-400 italic">Insufficient Data</span>`;
-
-        if (activeLevels.length >= 2) {
-            const first = this.data.vocalInhibition[activeLevels[0]];
-            const last = this.data.vocalInhibition[activeLevels[activeLevels.length - 1]];
-            
-            const wpmDelta = Math.round(last.wpm - first.wpm);
-            const pauseDelta = (last.pause - first.pause).toFixed(1);
-            const dbDelta = (last.db - first.db).toFixed(1);
-
-            let wpmDrops = 0; let dbDrops = 0;
-            for (let i = 1; i < activeLevels.length; i++) {
-                const prev = this.data.vocalInhibition[activeLevels[i-1]];
-                const curr = this.data.vocalInhibition[activeLevels[i]];
-                if (curr.wpm < prev.wpm - 10) wpmDrops++;
-                if (curr.db < prev.db - 1.5) dbDrops++;
-            }
-
-            paceInsights = `<b>Absolute Change:</b> ${wpmDelta > 0 ? '+' : ''}${wpmDelta} WPM<br><b>Linearity:</b> ${wpmDelta > 20 ? (wpmDrops === 0 ? '<span class="text-emerald-600 font-semibold">Smooth Acceleration</span>' : '<span class="text-amber-600 font-semibold">Inconsistent Steps</span>') : '<span class="text-rose-500 font-semibold">Flatlined Pace</span>'}`;
-            
-            pauseInsights = `<b>Absolute Change:</b> ${pauseDelta > 0 ? '+' : ''}${pauseDelta}%<br><b>Linearity:</b> ${pauseDelta < -10 ? '<span class="text-emerald-600 font-semibold">Successful Reduction</span>' : '<span class="text-amber-600 font-semibold">Static Silence Ratio</span>'}`;
-            
-            dbInsights = `<b>Absolute Change:</b> ${dbDelta > 0 ? '+' : ''}${dbDelta} dB<br><b>Linearity:</b> ${dbDelta > 6 ? (dbDrops === 0 ? '<span class="text-emerald-600 font-semibold">Smooth Swell</span>' : '<span class="text-amber-600 font-semibold">Erratic Intensity Drops</span>') : '<span class="text-rose-500 font-semibold">Flatlined Volume</span>'}`;
-        }
+        const phantasiaText = (this.explainerData.phantasia && this.explainerData.phantasia[this.data.phantasia]) 
+            ? this.explainerData.phantasia[this.data.phantasia] 
+            : `Selected profile: ${this.data.phantasia}`;
 
         this.innerHTML = `
         <style>
             .a4-container { width: 100%; max-width: 800px; margin: 0 auto; }
-            .a4-page { width: 210mm; height: 295mm; background: white; padding: 20mm; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-col: column; justify-content: space-between; position: relative; border: 1px border-slate-200; box-sizing: border-box; }
-            .dial-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-            .dot-active { background: #4f46e5; transform: scale(1.2); box-shadow: 0 0 6px rgba(79,70,229,0.4); }
-            .dot-inactive { background: #e2e8f0; }
-            
-            @media print {
-                body, html, aside, main header, footer, #widget-menu-drawer, #celebration-panel, button, .tools-header-ui {
-                    visibility: hidden !important;
-                    height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;
-                }
-                thps-report-card, thps-report-card * { visibility: visible !important; }
-                thps-report-card { position: absolute !important; left: 0 !important; top: 0 !important; width: 210mm !important; }
-                .a4-page { width: 210mm !important; height: 297mm !important; page-break-after: always !important; page-break-inside: avoid !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
-                .no-print { display: none !important; }
-            }
+            .a4-page { width: 210mm; min-height: 295mm; bg-white; padding: 15mm; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; background: white; }
         </style>
 
         <div class="a4-container font-['Inter',sans-serif] text-slate-800">
-            
-            <div class="flex justify-end mb-4 no-print">
-                <button data-action="printPDF" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow flex items-center gap-2 transition"><i class="fas fa-file-pdf"></i> Download PDF Report</button>
+            <div class="flex justify-end mb-4">
+                <button id="btn-download-pdf" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow flex items-center gap-2 transition cursor-pointer">
+                    <i class="fas fa-file-pdf"></i> Download PDF Report
+                </button>
             </div>
 
-            <!-- PAGE 1 -->
-            <div class="a4-page border border-slate-200 rounded-2xl mx-auto flex flex-col justify-between">
-                <div>
-                    <!-- Header Block -->
-                    <div class="flex justify-between items-center border-b-2 border-slate-900 pb-4 mb-6">
-                        <div>
-                            <h1 class="text-3xl font-black tracking-tight text-slate-900">THPS DIAGNOSTIC REPORT</h1>
-                            <p class="text-xs font-bold uppercase tracking-widest text-indigo-600 mt-1">Acoustic & Cognitive Neuro-Performance Metric</p>
-                        </div>
-                        <div class="text-right text-xs text-slate-400 font-bold">CONFIDENTIAL</div>
-                    </div>
-
-                    <!-- Stage 1: Client Details -->
-                    <div class="grid grid-cols-2 gap-6 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-sm">
-                        <div>
-                            <div class="mb-2"><span class="font-bold text-slate-500 uppercase text-[10px] block">Speaker Profile</span> <span class="text-base font-black text-slate-800">${this.data.client.name}</span></div>
-                            <div><span class="font-bold text-slate-500 uppercase text-[10px] block">Assessment Frame Date</span> <span class="font-semibold">${this.data.client.date}</span></div>
-                        </div>
-                        <div>
-                            <span class="font-bold text-slate-500 uppercase text-[10px] block">Strategic Objective Targets</span>
-                            <p class="text-xs leading-relaxed font-medium text-slate-600 line-clamp-3">${this.data.client.goals}</p>
-                        </div>
-                    </div>
-
-                    <!-- Stage 7: Executive Summary Percentile Matrix -->
-                    <div class="mb-8">
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-4">Stage 7: Performance Percentile Gauges</h2>
-                        <div class="grid grid-cols-5 gap-3">
-                            ${[
-                                { title: "Nerve Control", score: nerves.dial, lbl: nerves.name },
-                                { title: "Mind's Eye", score: this.data.phantasia === 'Phantasia' ? 4 : (this.data.phantasia === 'Hyperphantasia' ? 5 : 2), lbl: this.data.phantasia },
-                                { title: "Vocal Release", score: Math.max(1, vInhibPasses), lbl: `Lvl ${vInhibPasses}/5 verified` },
-                                { title: "Visual Flow", score: s5Passes === 2 ? 5 : (s5Passes === 1 ? 3 : 1), lbl: `${s5Passes}/2 Targets` },
-                                { title: "Repeat Engine", score: 4, lbl: "Stable tracking" }
-                            ].map(dial => `
-                                <div class="border border-slate-200 rounded-xl p-3 bg-white text-center shadow-sm">
-                                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2 truncate">${dial.title}</div>
-                                    <div class="flex justify-center gap-1 mb-2">
-                                        ${[1,2,3,4,5].map(pt => `<span class="dial-dot ${pt === dial.score ? 'dot-active' : 'dot-inactive'}"></span>`).join('')}
-                                    </div>
-                                    <div class="text-[11px] font-bold text-indigo-600 mt-1 truncate">${dial.lbl}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="grid grid-cols-5 text-[8px] uppercase tracking-widest text-slate-400 font-bold px-1 mt-2 text-center">
-                            <span>0-20%</span><span>20-40%</span><span>40-60%</span><span>60-80%</span><span>80-100%</span>
-                        </div>
-                    </div>
-
-                    <!-- Stage 2: Nerve Self-Assessment Breakdown -->
-                    <div class="mb-6">
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 2: Sympathetic Nervous Activation</h2>
-                        <p class="text-xs text-slate-500 mb-3 font-medium">Measures sensory threshold adjustments under immediate communication stress frames. Target profile values look to optimize baseline tranquility vectors.</p>
-                        <div class="bg-slate-50 border rounded-xl p-4 flex justify-between items-center">
+            <div id="report-card-pdf-target">
+                <!-- PAGE 1 -->
+                <div class="a4-page border border-slate-200 rounded-2xl mx-auto">
+                    <div>
+                        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-4 mb-6">
                             <div>
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Accumulated Trauma Load Matrix</span>
-                                <div class="text-3xl font-black text-slate-900 mt-0.5">${this.data.nervesScore} <span class="text-sm font-bold text-slate-400">/ 40 total</span></div>
+                                <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">THPS SPEECH ASSESSMENT</h1>
+                                <p class="text-sm font-semibold text-slate-700 mt-1">Speaker Name: <span class="font-normal text-slate-900">${this.data.client.name}</span></p>
+                                <p class="text-sm font-semibold text-slate-700">Assessment Date: <span class="font-normal text-slate-900">${this.data.client.date}</span></p>
                             </div>
-                            <div class="text-right">
-                                <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold font-mono">${nerves.name}</span>
-                                <div class="text-xs font-medium text-slate-500 mt-1 max-w-[200px]">${nerves.desc}</div>
-                            </div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Confidential</div>
                         </div>
-                    </div>
 
-                    <!-- Stage 3: Phantasia Mind's Eye Profiles -->
-                    <div>
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 3: Imagery Cognitive Baseline</h2>
-                        <div class="p-4 border border-indigo-100 bg-indigo-50/40 rounded-xl text-xs leading-relaxed text-slate-700">
-                            ${phantasiaText}
+                        <div class="mb-6">
+                            <h3 class="font-bold text-base text-slate-900 mb-2">Speaker Goals:</h3>
+                            <p class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">${this.data.client.goals}</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Strengths [${splitData.strengths.length}/5]</h3>
+                            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5">
+                                ${splitData.strengths.length > 0 
+                                    ? splitData.strengths.map(s => `<li><b>${s.name}:</b>${s.text}</li>`).join('') 
+                                    : `<li class="text-slate-400 italic">No primary strengths flagged in this baseline.</li>`}
+                            </ul>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Gaps [${splitData.gaps.length}/5]</h3>
+                            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5">
+                                ${splitData.gaps.length > 0 
+                                    ? splitData.gaps.map(g => `<li><b>${g.name}:</b>${g.text}</li>`).join('') 
+                                    : `<li class="text-slate-400 italic">No significant gaps flagged.</li>`}
+                            </ul>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-bold text-base text-slate-900 mb-2">When speaking, do you prefer thinking in Images or Concepts?</h3>
+                            <p class="text-sm text-slate-700 leading-relaxed bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">${phantasiaText}</p>
                         </div>
                     </div>
+                    <div class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest border-t pt-3 mt-4">THPS Analytics Core — Page 1</div>
                 </div>
-                <div class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest border-t pt-4">THPS Analytics Core — Page 1</div>
-            </div>
 
-            <!-- PAGE 2 -->
-            <div class="a4-page border border-slate-200 rounded-2xl mx-auto flex flex-col justify-between">
-                <div>
-                    
-                    <!-- NEW STAGE 4: PROGRESSIVE INTENSITY ANALYSIS -->
-                    <div class="mb-8">
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 4: Progressive Intensity Analysis</h2>
-                        <p class="text-xs text-slate-500 mb-4 font-medium">Evaluating the speaker's ability to exert granular, deliberate control over physiological pacing, silence allocation, and vocal intensity across a 5-step gradient.</p>
-                        
-                        <div class="grid grid-cols-3 gap-4">
-                            <!-- Pace Visualizer -->
-                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
-                                <span class="text-[10px] font-black uppercase text-indigo-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Pace (WPM)</span>
-                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
-                                    ${paceBars}
-                                </div>
-                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
-                                    ${paceInsights}
-                                </div>
-                            </div>
-                            
-                            <!-- Silence Visualizer -->
-                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
-                                <span class="text-[10px] font-black uppercase text-emerald-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Silence (%)</span>
-                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
-                                    ${pauseBars}
-                                </div>
-                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
-                                    ${pauseInsights}
-                                </div>
-                            </div>
-                            
-                            <!-- Intensity Visualizer -->
-                            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col">
-                                <span class="text-[10px] font-black uppercase text-rose-600 tracking-wider mb-2 text-center border-b border-slate-200 pb-1">Intensity (dB)</span>
-                                <div class="flex-1 flex gap-1 h-20 items-end px-2 mb-2">
-                                    ${dbBars}
-                                </div>
-                                <div class="text-[9px] text-slate-600 bg-white border border-slate-200 rounded p-2 leading-relaxed">
-                                    ${dbInsights}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stage 5: Visual Word Association Targets -->
-                    <div class="mb-8">
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 5: Dual Image & Memory Prompt Targets</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Part A -->
-                            <div class="border rounded-xl p-4 bg-slate-50/50">
-                                <div class="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Part A: External Image Prompt</div>
-                                <div class="text-xs font-semibold text-slate-600 space-y-1">
-                                    <div>Target Boundary: <span class="font-mono font-bold">&lt; 100 WPM | &gt; 20% Visual</span></div>
-                                    <div class="text-sm text-slate-900 font-bold pt-1">Actual: ${this.data.visualAssociation.A.wpm} WPM | ${this.data.visualAssociation.A.visual}% Visual</div>
-                                    <div class="pt-2">Result: ${this.data.visualAssociation.A.wpm < 100 && this.data.visualAssociation.A.visual > 20 ? '<span class="text-emerald-600 font-black uppercase">✓ Target Passed</span>' : '<span class="text-rose-500 font-black uppercase">✗ Boundary Failure</span>'}</div>
-                                </div>
-                            </div>
-                            <!-- Part B -->
-                            <div class="border rounded-xl p-4 bg-slate-50/50">
-                                <div class="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Part B: Internal Memory Prompt</div>
-                                <div class="text-xs font-semibold text-slate-600 space-y-1">
-                                    <div>Target Boundary: <span class="font-mono font-bold">&gt; 170 WPM | &gt; 20% Visual</span></div>
-                                    <div class="text-sm text-slate-900 font-bold pt-1">Actual: ${this.data.visualAssociation.B.wpm} WPM | ${this.data.visualAssociation.B.visual}% Visual</div>
-                                    <div class="pt-2">Result: ${this.data.visualAssociation.B.wpm > 170 && this.data.visualAssociation.B.visual > 20 ? '<span class="text-emerald-600 font-black uppercase">✓ Target Passed</span>' : '<span class="text-rose-500 font-black uppercase">✗ Boundary Failure</span>'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stage 6: Repeat Count Supervised Matrix -->
+                <!-- PAGE 2 -->
+                <div class="a4-page border border-slate-200 rounded-2xl mx-auto mt-6">
                     <div>
-                        <h2 class="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2 mb-3">Stage 6: Supervised Repeat Count Vector Rounds</h2>
-                        <div class="grid grid-cols-2 gap-3 text-xs font-medium">
-                            ${this.data.repeatCount.map(round => `
-                                <div class="border rounded-xl p-3 bg-white flex justify-between items-center shadow-sm">
-                                    <div class="font-bold text-slate-700">${round.name} Map</div>
-                                    <div class="text-[11px] font-mono bg-slate-100 text-slate-600 px-2 py-1 rounded">
-                                        C: ${round.correct}/5 | D: ${round.noDelay}/5 | V: ${round.voice}/5
+                        <div class="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-6">
+                            <h1 class="text-xl font-black tracking-tight text-slate-900 uppercase">THPS SPEECH ASSESSMENT</h1>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Confidential</div>
+                        </div>
+
+                        <!-- 1. VOCAL INHIBITION -->
+                        <div class="mb-8">
+                            <h3 class="font-bold text-base text-slate-900 mb-3">Do you have Vocal Inhibition? <span class="text-indigo-600">[${vocal.hasInhibition ? 'Yes - ' + vocal.label : 'No'}]</span></h3>
+                            
+                            <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-2">PAUSE VAR.</p>
+                                    <div class="flex items-end gap-1 h-16 border-b border-slate-200 pb-1">
+                                        ${vocal.bars.pause.map(val => `<div class="flex-1 bg-rose-500 rounded-t" style="height: ${Math.max(5, val)}%;"></div>`).join('')}
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-600 text-center mt-2">[${vocal.pauseVariety} variety]</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-2">VOICE VAR.</p>
+                                    <div class="flex items-end gap-1 h-16 border-b border-slate-200 pb-1">
+                                        ${vocal.bars.voice.map(val => `<div class="flex-1 bg-indigo-500 rounded-t" style="height: ${Math.max(5, val)}%;"></div>`).join('')}
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-600 text-center mt-2">[${vocal.voiceVariety} variety]</p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-2">RUN VAR.</p>
+                                    <div class="flex items-end gap-1 h-16 border-b border-slate-200 pb-1">
+                                        ${vocal.bars.run.map(val => `<div class="flex-1 bg-emerald-500 rounded-t" style="height: ${Math.max(5, val)}%;"></div>`).join('')}
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-600 text-center mt-2">[${vocal.runVariety} variety]</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. IMAGE INHIBITION -->
+                        <div class="mb-8">
+                            <h3 class="font-bold text-base text-slate-900 mb-3">Is your speaking inhibited by Image or Imagination prompts? <span class="text-indigo-600">[${visual.label}]</span></h3>
+                            
+                            <div class="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">House Test</h4>
+                                    <div class="space-y-1 text-xs text-slate-600">
+                                        <div class="flex justify-between"><span>Time:</span> <span class="font-bold">${visual.house.time}s (${visual.house.timePass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Pace:</span> <span class="font-bold">${visual.house.pace} wpm (${visual.house.pacePass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${visual.house.vis}% (${visual.house.visPass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between text-slate-900 font-black pt-2 border-t border-slate-200"><span>Result:</span> <span>${visual.house.score}/3 (${visual.house.score === 3 ? 'pass' : 'fail'})</span></div>
                                     </div>
                                 </div>
-                            `).join('')}
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">Imagination Test</h4>
+                                    <div class="space-y-1 text-xs text-slate-600">
+                                        <div class="flex justify-between"><span>Time:</span> <span class="font-bold">${visual.imagination.time}s (${visual.imagination.timePass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Pace:</span> <span class="font-bold">${visual.imagination.pace} wpm (${visual.imagination.pacePass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${visual.imagination.vis}% (${visual.imagination.visPass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between text-slate-900 font-black pt-2 border-t border-slate-200"><span>Result:</span> <span>${visual.imagination.score}/3 (${visual.imagination.score === 3 ? 'pass' : 'fail'})</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. CATEGORY INHIBITION -->
+                        <div class="mb-8">
+                            <h3 class="font-bold text-base text-slate-900 mb-3">Is your speaking inhibited by Rules or Category prompts? <span class="text-indigo-600">[${category.label}]</span></h3>
+                            
+                            <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+                                ${this.data.repeatCount.map(round => `
+                                    <div class="border rounded-lg p-2.5 bg-slate-50 flex justify-between items-center">
+                                        <span class="font-sans font-bold text-slate-700">${round.name} Map</span>
+                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 \vert{} V:${round.voice}/5</span>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest border-t pt-4">THPS Analytics Core — Page 2</div>
-            </div>
 
+                    <!-- TOTAL SCORE FOOTER -->
+                    <div class="border-t-2 border-slate-900 pt-4 flex justify-between items-center">
+                        <h3 class="font-black text-lg text-slate-900">Total Score: <span class="text-indigo-600">${total.score} / 90</span></h3>
+                        <span class="px-4 py-1.5 bg-indigo-100 text-indigo-800 font-black rounded-full uppercase tracking-wider text-xs">${total.grade}</span>
+                    </div>
+                </div>
+            </div>
         </div>
         `;
 
-        const printBtn = this.querySelector('[data-action="printPDF"]');
-        if (printBtn) printBtn.addEventListener('click', () => window.print());
+        const downloadBtn = this.querySelector('#btn-download-pdf');
+        if (downloadBtn) downloadBtn.addEventListener('click', () => this.downloadPDF());
     }
 }
 customElements.define('thps-report-card', THPSReportCard);
