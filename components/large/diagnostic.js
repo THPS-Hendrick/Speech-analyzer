@@ -406,8 +406,8 @@ class THPSDiagnostic extends HTMLElement {
             if (window.isActive && window.THPS?.Audio?.recordStartTime) {
                 const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
                 
-                // Guide fill to 60 seconds (100% cap)
-                const fillPct = Math.min((elapsedSecs / 60) * 100, 100);
+                // Scale mapped to 80 seconds (so 20s = 25% mark, 60s = 75% mark)
+                const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
                 if (progressEl) progressEl.style.width = `${fillPct}%`;
                 
                 // Swap icon to stop square
@@ -768,11 +768,9 @@ class THPSDiagnostic extends HTMLElement {
 
                     <!-- PAGE 5: VISUAL PT 1 -->
                     <section data-ref="page-5" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full min-h-[600px]">
-                        <h3 class="text-2xl font-bold mb-4 text-slate-800 shrink-0">Test 4: Word Association Visual (Part A)</h3>
-                        
                         <!-- Image Container -->
-                        <div class="w-full flex-1 min-h-[200px] max-h-[280px] bg-slate-200 rounded-xl overflow-hidden shadow-inner mb-6 relative">
-                            <img src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_1.png" class="w-full h-full object-cover md:object-contain bg-slate-900">
+                        <div class="w-full flex-1 min-h-[250px] bg-slate-200 rounded-xl overflow-hidden shadow-inner mb-6 relative">
+                            <img src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_1.png" class="w-full h-full object-cover">
                         </div>
 
                         <!-- Goal Text & Live Pills -->
@@ -786,9 +784,13 @@ class THPSDiagnostic extends HTMLElement {
                             </div>
                         </div>
 
-                        <!-- Sleek Arcade Timer Bar -->
+                        <!-- Sleek Arcade Timer Bar (With Markers) -->
                         <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800">
                             <div id="s5-progress-A" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                            
+                            <div class="absolute top-0 bottom-0 w-[2px] bg-rose-500/60 z-10" style="left: 25%;"></div>
+                            <div class="absolute top-0 bottom-0 w-[2px] bg-rose-500/60 z-10" style="left: 75%;"></div>
+                            
                             <button data-action="toggleVisualRecord" data-slot="A" id="s5-btn-A" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                                 <i data-lucide="mic" id="s5-icon-A" class="w-5 h-5 pointer-events-none transition-transform"></i>
                             </button>
@@ -797,10 +799,8 @@ class THPSDiagnostic extends HTMLElement {
 
                     <!-- PAGE 6: VISUAL PT 2 -->
                     <section data-ref="page-6" class="thps-diag-page max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full min-h-[600px]">
-                        <h3 class="text-2xl font-bold mb-4 text-slate-800 shrink-0">Test 4: Word Association Visual (Part B)</h3>
-                        
                         <!-- Blank Prompt Card -->
-                        <div class="w-full flex-1 min-h-[200px] max-h-[280px] bg-slate-300 rounded-xl overflow-hidden shadow-inner mb-6 flex items-center justify-center">
+                        <div class="w-full flex-1 min-h-[250px] bg-slate-300 rounded-xl overflow-hidden shadow-inner mb-6 flex items-center justify-center">
                             <span class="text-slate-500 font-black text-xl md:text-2xl tracking-widest uppercase">Memory Prompt Card</span>
                         </div>
 
@@ -815,9 +815,13 @@ class THPSDiagnostic extends HTMLElement {
                             </div>
                         </div>
 
-                        <!-- Sleek Arcade Timer Bar -->
+                        <!-- Sleek Arcade Timer Bar (With Markers) -->
                         <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800">
                             <div id="s5-progress-B" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
+                            
+                            <div class="absolute top-0 bottom-0 w-[2px] bg-rose-500/60 z-10" style="left: 25%;"></div>
+                            <div class="absolute top-0 bottom-0 w-[2px] bg-rose-500/60 z-10" style="left: 75%;"></div>
+                            
                             <button data-action="toggleVisualRecord" data-slot="B" id="s5-btn-B" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                                 <i data-lucide="mic" id="s5-icon-B" class="w-5 h-5 pointer-events-none transition-transform"></i>
                             </button>
