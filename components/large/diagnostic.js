@@ -7,6 +7,9 @@ class THPSDiagnostic extends HTMLElement {
         this.isPlayingTTS = false;
         this.ttsUtterance = null;
         
+        // NEW: SAMS Explanation Data
+        this.samsExplanations = null;
+        
         // Track unique metrics across 5 distinct Vercel pipeline audio passes
         this.stage4AudioSlots = {
             1: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
@@ -75,7 +78,18 @@ class THPSDiagnostic extends HTMLElement {
         Object.values(this.activeTimers).forEach(t => clearInterval(t.interval));
     }
 
+    async fetchSamsExplanations() {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/Explainers/SAMS-test.json');
+            this.samsExplanations = await response.json();
+        } catch (error) {
+            console.warn("Could not load SAMS explanations JSON.", error);
+        }
+    }
+
     initApp() {
+        this.fetchSamsExplanations();
+
         const navMenu = this.querySelector('[data-ref="nav-menu"]');
         this.navItems.forEach(item => {
             const a = document.createElement('a');
@@ -156,6 +170,10 @@ class THPSDiagnostic extends HTMLElement {
             if (action === 'resetTimer') this.resetTimer(btn.getAttribute('data-timer'), 60);
             if (action === 'toggleTTS') this.toggleTTS();
             
+            // SAMS Update Hooks
+            if (action === 'incrementSams') this.adjustSams(btn.getAttribute('data-target'), 1);
+            if (action === 'decrementSams') this.adjustSams(btn.getAttribute('data-target'), -1);
+            
             // Custom Pipeline Listeners
             if (action === 'toggleLevelRecord') this.toggleLevelRecord(this.t3ActiveLevel);
             if (action === 'toggleVisualRecord') this.toggleVisualRecord(btn.getAttribute('data-slot'));
@@ -200,7 +218,6 @@ class THPSDiagnostic extends HTMLElement {
                 
                 const statusEl = this.querySelector(`[data-ref="t3-status-${lvl}"]`);
                 if (statusEl) {
-                    // BUG 1 FIXED: Added .toFixed(1) to payload.pause
                     statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Silence: ${Number(payload.pause).toFixed(1)}% | Intensity: ${avgDb.toFixed(1)} dB`;
                 }
                 this.currentRecordingLevel = null;
@@ -222,15 +239,48 @@ class THPSDiagnostic extends HTMLElement {
                 this.currentStage5Slot = null;
             }
         });
+    }
 
-        this.addEventListener('input', (e) => {
-            const ref = e.target.getAttribute('data-ref');
-            if (ref && ref.startsWith('t1-q')) {
-                const num = ref.split('-q')[1];
-                const valEl = this.querySelector(`[data-ref="val-q${num}"]`);
-                if (valEl) valEl.innerText = e.target.value;
-            }
-        });
+    adjustSams(target, delta) {
+        const valEl = this.querySelector(`[data-ref="val-${target}"]`);
+        if (!valEl) return;
+        
+        let currentVal = parseInt(valEl.innerText);
+        let newVal = currentVal + delta;
+        
+        if (newVal >= 1 && newVal <= 10) {
+            valEl.innerText = newVal;
+            this.updateSamsExplanation(target, newVal);
+        }
+    }
+    
+    updateSamsExplanation(target, val) {
+        const explanationEl = this.querySelector('[data-ref="sams-explanation"]');
+        if (!explanationEl || !this.samsExplanations) return;
+    
+        // Map the HTML question targets to the JSON category names
+        const keyMap = {
+            'q1': 'Preparation Discomfort',
+            'q2': 'Presentation Discomfort',
+            'q3': 'Bad News Discomfort',
+            'q4': 'Heckling Discomfort'
+        };
+        
+        const category = keyMap[target];
+        if (!category || !this.samsExplanations[category]) return;
+    
+        // Determine the bucket string based on the value
+        let bucket = "";
+        if (val >= 0 && val <= 4) bucket = "nil (0-4)";
+        else if (val >= 5 && val <= 6) bucket = "low (5-6)";
+        else if (val >= 7 && val <= 8) bucket = "med (7-8)";
+        else if (val >= 9 && val <= 10) bucket = "high (9-10)";
+    
+        // Account for potential typos in JSON keys (like trailing spaces)
+        const data = this.samsExplanations[category];
+        const text = data[bucket] || data[bucket + " "] || "Explanation missing for this range.";
+        
+        explanationEl.innerText = text;
     }
 
     // --- TEST 3 INLINE STATE MACHINE METHODS ---
@@ -450,10 +500,11 @@ class THPSDiagnostic extends HTMLElement {
         const date = this.querySelector('[data-ref="assessmentDate"]').value || new Date().toLocaleDateString();
         const goals = this.querySelector('[data-ref="goalsChallenges"]').value || 'None recorded.';
 
-        const t1q1 = parseInt(this.querySelector('[data-ref="t1-q1"]').value);
-        const t1q2 = parseInt(this.querySelector('[data-ref="t1-q2"]').value);
-        const t1q3 = parseInt(this.querySelector('[data-ref="t1-q3"]').value);
-        const t1q4 = parseInt(this.querySelector('[data-ref="t1-q4"]').value);
+        // Updated to read innerText from the new span structure
+        const t1q1 = parseInt(this.querySelector('[data-ref="val-q1"]').innerText);
+        const t1q2 = parseInt(this.querySelector('[data-ref="val-q2"]').innerText);
+        const t1q3 = parseInt(this.querySelector('[data-ref="val-q3"]').innerText);
+        const t1q4 = parseInt(this.querySelector('[data-ref="val-q4"]').innerText);
         const totalNervesScore = t1q1 + t1q2 + t1q3 + t1q4;
 
         const phantasiaSelection = this.querySelector('input[name="vviq"]:checked')?.value || 'Phantasia';
@@ -524,14 +575,62 @@ class THPSDiagnostic extends HTMLElement {
                         </div>
                     </section>
 
-                    <!-- PAGE 2 -->
+                    <!-- PAGE 2: TEST 1 SAMS -->
                     <section data-ref="page-2" class="thps-diag-page max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-100">
-                        <h3 class="text-2xl font-bold mb-2 text-slate-800">0-2 'none', 3-4 'fine', 5-6 'some', 7-8 'lots', 9-10 'too much'</h3>
-                        <div class="space-y-8">
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">1. How much discomfort before a big presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q1">5</span></div><input type="range" data-ref="t1-q1" min="1" max="10" value="5" class="thps-diag-range"></div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">2. How much discomfort at start of presentation?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q2">5</span></div><input type="range" data-ref="t1-q2" min="1" max="10" value="5" class="thps-diag-range"></div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">3. How much discomfort communicating bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q3">5</span></div><input type="range" data-ref="t1-q3" min="1" max="10" value="5" class="thps-diag-range"></div>
-                            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200"><div class="flex justify-between items-center mb-4"><label class="font-semibold text-slate-700">4. How much discomfort receiving bad feedback?</label><span class="text-xl font-bold text-indigo-600 w-8" data-ref="val-q4">5</span></div><input type="range" data-ref="t1-q4" min="1" max="10" value="5" class="thps-diag-range"></div>
+                        <div class="space-y-4"> 
+                            
+                            <!-- Question 1 -->
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center gap-4">
+                                <label class="font-semibold text-slate-700 flex-1">1. How much discomfort before a big presentation?</label>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="flex flex-col gap-1">
+                                        <button data-action="incrementSams" data-target="q1" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-up text-xs pointer-events-none"></i></button>
+                                        <button data-action="decrementSams" data-target="q1" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-down text-xs pointer-events-none"></i></button>
+                                    </div>
+                                    <span class="text-2xl font-black text-indigo-600 w-8 text-center" data-ref="val-q1">5</span>
+                                </div>
+                            </div>
+
+                            <!-- Question 2 -->
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center gap-4">
+                                <label class="font-semibold text-slate-700 flex-1">2. How much discomfort at start of presentation?</label>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="flex flex-col gap-1">
+                                        <button data-action="incrementSams" data-target="q2" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-up text-xs pointer-events-none"></i></button>
+                                        <button data-action="decrementSams" data-target="q2" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-down text-xs pointer-events-none"></i></button>
+                                    </div>
+                                    <span class="text-2xl font-black text-indigo-600 w-8 text-center" data-ref="val-q2">5</span>
+                                </div>
+                            </div>
+
+                            <!-- Question 3 -->
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center gap-4">
+                                <label class="font-semibold text-slate-700 flex-1">3. How much discomfort communicating bad feedback?</label>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="flex flex-col gap-1">
+                                        <button data-action="incrementSams" data-target="q3" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-up text-xs pointer-events-none"></i></button>
+                                        <button data-action="decrementSams" data-target="q3" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-down text-xs pointer-events-none"></i></button>
+                                    </div>
+                                    <span class="text-2xl font-black text-indigo-600 w-8 text-center" data-ref="val-q3">5</span>
+                                </div>
+                            </div>
+
+                            <!-- Question 4 -->
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 flex justify-between items-center gap-4">
+                                <label class="font-semibold text-slate-700 flex-1">4. How much discomfort receiving bad feedback?</label>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="flex flex-col gap-1">
+                                        <button data-action="incrementSams" data-target="q4" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-up text-xs pointer-events-none"></i></button>
+                                        <button data-action="decrementSams" data-target="q4" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded p-1.5 flex items-center justify-center transition-colors"><i class="fas fa-chevron-down text-xs pointer-events-none"></i></button>
+                                    </div>
+                                    <span class="text-2xl font-black text-indigo-600 w-8 text-center" data-ref="val-q4">5</span>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Explanation Footer -->
+                            <div class="mt-6 p-5 bg-indigo-50 border border-indigo-100 rounded-lg min-h-[90px] flex items-center">
+                                <p data-ref="sams-explanation" class="text-indigo-900 text-sm font-medium leading-relaxed italic">Adjust a score above to see its meaning.</p>
+                            </div>
                         </div>
                     </section>
 
@@ -588,7 +687,6 @@ class THPSDiagnostic extends HTMLElement {
                             <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
                                 <div class="flex justify-between items-center max-w-lg mx-auto w-full mb-2">
                                     
-                                    <!-- BUG 2 FIXED: Adjusted Chevron styling for visibility -->
                                     <button data-action="t3GlideUp" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
                                         <i class="fas fa-chevron-up text-lg pointer-events-none"></i>
                                     </button>
@@ -597,7 +695,6 @@ class THPSDiagnostic extends HTMLElement {
                                         <i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level 1
                                     </button>
 
-                                    <!-- BUG 2 FIXED: Adjusted Chevron styling for visibility -->
                                     <button data-action="t3GlideDown" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
                                         <i class="fas fa-chevron-down text-lg pointer-events-none"></i>
                                     </button>
