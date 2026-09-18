@@ -1,29 +1,26 @@
 {
   "Preparation Discomfort": {
-    "nil (0-4)": { "You predict your speaking performance will meet or exceed your expectations. You feel excitement, not stress" },
-    "low (5-6) ": { "You predict your speaking performance might not meet your expectations. You feel some stress, not much" },
-    "med (7-8)": { "You predict your speaking performance will go badly. Stress might cause lack of sleep or lots of doubt" },
-    "high (9-10)": { "You predict your speaking performance will go very badly. Stress is very high. You consider quitting, faking illness, etc" }
+    "nil (0-4)": "You predict your speaking performance will meet or exceed your expectations. You feel excitement, not stress",
+    "low (5-6)": "You predict your speaking performance might not meet your expectations. You feel some stress, not much",
+    "med (7-8)": "You predict your speaking performance will go badly. Stress might cause lack of sleep or lots of doubt",
+    "high (9-10)": "You predict your speaking performance will go very badly. Stress is very high. You consider quitting, faking illness, etc"
   },
-{
   "Presentation Discomfort": {
-    "nil (0-4)": { "You feel calm and in control the second you start speaking" },
-    "low (5-6) ": { "You feel a slightly higher heart rate or mild nerves, but it passes quickly" },
-    "med (7-8)": { "You don't feel yourself. Noticable stress, heart rate, fidgeting, etc. Others might notice too" },
-    "high (9-10)": { "The nerves are significantly affecting your performance. Going blank, voice restrictions, etc" }
+    "nil (0-4)": "You feel calm and in control the second you start speaking",
+    "low (5-6)": "You feel a slightly higher heart rate or mild nerves, but it passes quickly",
+    "med (7-8)": "You don't feel yourself. Noticeable stress, heart rate, fidgeting, etc. Others might notice too",
+    "high (9-10)": "The nerves are significantly affecting your performance. Going blank, voice restrictions, etc"
   },
-  {
   "Bad News Discomfort": {
-    "nil (0-4)": { "You can give bad news without hesitation. Concisely, confidently and honestly" },
-    "low (5-6) ": { "You can give bad news with some hesitation. Perhaps you put a positive spin, but the message is clear and honest" },
-    "med (7-8)": { "You struggle to give bad news. It might be a last resort, or your distort the message to be mroe positive than clear" },
-    "high (9-10)": { "You feel incapable of giving bad news. It hurts you to think of hurting others with the honest truth" }
+    "nil (0-4)": "You can give bad news without hesitation. Concisely, confidently and honestly",
+    "low (5-6)": "You can give bad news with some hesitation. Perhaps you put a positive spin, but the message is clear and honest",
+    "med (7-8)": "You struggle to give bad news. It might be a last resort, or you distort the message to be more positive than clear",
+    "high (9-10)": "You feel incapable of giving bad news. It hurts you to think of hurting others with the honest truth"
   },
-  {
   "Heckling Discomfort": {
-    "nil (0-4)": { "You can receive bad news without discomfort or affecting your speaking performance" },
-    "low (5-6) ": { "It hurts a little to receive bad news, but you recover quickly and speaking performance is not affected much" },
-    "med (7-8)": { "It hurts to receive bad news. Your thoughts prioritize how you let someone down over speaking in your normal way" },
-    "high (9-10)": { "It hurts a lot to receive bad news. You might need to leave the presentation or conversation to compose yourself" }
+    "nil (0-4)": "You can receive bad news without discomfort or affecting your speaking performance",
+    "low (5-6)": "It hurts a little to receive bad news, but you recover quickly and speaking performance is not affected much",
+    "med (7-8)": "It hurts to receive bad news. Your thoughts prioritize how you let someone down over speaking in your normal way",
+    "high (9-10)": "It hurts a lot to receive bad news. You might need to leave the presentation or conversation to compose yourself"
   }
 }
