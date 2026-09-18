@@ -1,1 +1,6 @@
-Functionality: Stores plain-English explanations for how a speaker thinks (Images vs. Concepts), keyed directly to the VVIQ radio choices (Aphantasia, Hypophantasia, Phantasia, Hyperphantasia).
+{
+  "Aphantasia": "You operate almost entirely in abstract concepts rather than mental imagery. When speaking, you thrive using structured frameworks, logical sequences, and clear outlines rather than dynamic visual storytelling.",
+  "Hypophantasia": "You generate mental images with mild effort or delay. You prefer balanced conceptual thinking, but can access visual scenes with a brief pause.",
+  "Phantasia": "You have a balanced mind's eye. You seamlessly blend visual imagery and conceptual ideas, allowing you to describe vivid scenes naturally while staying on topic.",
+  "Hyperphantasia": "You involuntarily experience vivid, highly detailed mental visuals. While this makes your storytelling exceptionally rich, your primary challenge is managing information overload to keep from wandering off-topic."
+}
