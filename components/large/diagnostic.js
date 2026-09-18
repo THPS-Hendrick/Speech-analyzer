@@ -7,22 +7,17 @@ class THPSDiagnostic extends HTMLElement {
         this.isPlayingTTS = false;
         this.ttsUtterance = null;
         
-        // NEW: SAMS Explanation Data
+        // SAMS Explanation Data
         this.samsExplanations = null;
         
-        // Track unique metrics across 5 distinct Vercel pipeline audio passes
-        this.stage4AudioSlots = {
-            1: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
-            2: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
-            3: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
-            4: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" },
-            5: { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" }
-        };
-        this.currentRecordingLevel = null;
+        // NEW: Single continuous data slot for Test 3
+        this.vocalInhibitionData = { recorded: false, wpm: 0, sps: 0, pause: 0, db: -40, text: "" };
+        this.pendingT3Payload = false; // Tracks if the next incoming payload belongs to Test 3
 
         // Test 3 "App-Within-An-App" State Variables
         this.t3Slide = 0; 
-        this.t3ActiveLevel = 1;
+        this.t3LineIndex = 0; // Tracks the individual line we are reading
+        
         this.pacinoBlocks = [
             { level: 1, color: "purple-600", lines: ["You know, when you get old in life things get taken from you. I mean that's...part of life.", "You find out life's this game of inches"] },
             { level: 2, color: "blue-500", lines: ["So is football. Because in either game, life or football, the margin for error is so small.", "One-half a step too late, or too early, and you don't quite make it."] },
@@ -30,6 +25,12 @@ class THPSDiagnostic extends HTMLElement {
             { level: 4, color: "orange-500", lines: ["On this team, we fight for that inch.", "On this team, we tear ourselves and everyone else around us to pieces for that inch."] },
             { level: 5, color: "rose-600", lines: ["We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!", "Between livin' and dyin'!"] }
         ];
+
+        // Flatten the blocks into a single array of lines for the prompter
+        this.t3Lines = [];
+        this.pacinoBlocks.forEach(block => {
+            block.lines.forEach(line => this.t3Lines.push({ intensity: block.level, text: line }));
+        });
 
         // Tracks values from the two Stage 5 transcription passes
         this.stage5DataSlots = {
@@ -68,7 +69,10 @@ class THPSDiagnostic extends HTMLElement {
         this.render();
         this.initApp();
         this.attachListeners();
-        this.updateT3Tutorial(); // Initialize the inline state machine
+        this.updateT3Tutorial();
+        
+        // Start the Test 3 Timer Sync Loop
+        this.syncLoop = setInterval(() => this.updateT3TimerUI(), 50);
     }
 
     disconnectedCallback() {
@@ -76,6 +80,7 @@ class THPSDiagnostic extends HTMLElement {
             window.speechSynthesis.cancel();
         }
         Object.values(this.activeTimers).forEach(t => clearInterval(t.interval));
+        if (this.syncLoop) clearInterval(this.syncLoop);
     }
 
     async fetchSamsExplanations() {
@@ -135,23 +140,35 @@ class THPSDiagnostic extends HTMLElement {
         const dateEl = this.querySelector('[data-ref="assessmentDate"]');
         if (dateEl) dateEl.valueAsDate = new Date();
 
-        // Render the 5 Al Pacino Prompter Blocks
+        // Render the Al Pacino Gliding Prompter Lines
+        const getStyle = (intensity) => {
+            switch(parseInt(intensity)) {
+                case 1: return { bg: 'bg-purple-600', text: 'text-white', ring: 'ring-purple-600' };
+                case 2: return { bg: 'bg-blue-500', text: 'text-white', ring: 'ring-blue-500' };
+                case 3: return { bg: 'bg-emerald-500', text: 'text-white', ring: 'ring-emerald-500' };
+                case 4: return { bg: 'bg-orange-500', text: 'text-white', ring: 'ring-orange-500' };
+                case 5: return { bg: 'bg-rose-600', text: 'text-white', ring: 'ring-rose-600' };
+                default: return { bg: 'bg-slate-200', text: 'text-slate-600', ring: 'ring-slate-200' };
+            }
+        };
+
         const prompterContainer = this.querySelector('#t3-scroll-viewport');
-        prompterContainer.innerHTML = this.pacinoBlocks.map((block) => `
-            <div id="t3-block-${block.level}" class="t3-prompter-block mb-6 transition-all duration-300 ${block.level === 1 ? 'opacity-100 scale-100' : 'opacity-30 scale-95'}">
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <div class="flex gap-4 items-start">
-                        <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-${block.color} text-white shadow-inner">
-                            <span class="text-xl font-black">${block.level}</span>
-                        </div>
-                        <div class="flex-1 space-y-3 pt-1">
-                            ${block.lines.map(line => `<p class="text-lg font-bold text-slate-800 leading-snug">${line}</p>`).join('')}
+        prompterContainer.innerHTML = `<div class="max-w-2xl mx-auto flex flex-col pb-48">` + 
+            this.t3Lines.map((line, index) => {
+                const style = getStyle(line.intensity);
+                return `
+                    <div class="t3-line-wrapper py-3 w-full" id="t3-line-${index}">
+                        <div class="t3-line-content flex gap-4 p-4 rounded-2xl border-2 border-transparent transition-all duration-300 ${index === this.t3LineIndex ? 'opacity-100 bg-white shadow-sm ring-1 ' + style.ring : 'opacity-40'}">
+                            <div class="shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${style.bg} ${style.text}">
+                                <span class="text-xl font-black leading-none">${line.intensity}</span>
+                            </div>
+                            <div class="flex-1 flex items-center">
+                                <p class="text-lg md:text-xl font-bold text-slate-800 leading-snug">${line.text}</p>
+                            </div>
                         </div>
                     </div>
-                    <div data-ref="t3-status-${block.level}" class="text-xs text-slate-400 mt-4 font-medium italic border-t pt-3">Waiting for capture step...</div>
-                </div>
-            </div>
-        `).join('');
+                `;
+            }).join('') + `</div>`;
 
         this.updateUI();
     }
@@ -175,7 +192,6 @@ class THPSDiagnostic extends HTMLElement {
             if (action === 'decrementSams') this.adjustSams(btn.getAttribute('data-target'), -1);
             
             // Custom Pipeline Listeners
-            if (action === 'toggleLevelRecord') this.toggleLevelRecord(this.t3ActiveLevel);
             if (action === 'toggleVisualRecord') this.toggleVisualRecord(btn.getAttribute('data-slot'));
             if (action === 'compileReportCard') this.compileReportCard();
 
@@ -183,8 +199,9 @@ class THPSDiagnostic extends HTMLElement {
             if (action === 't3PrevSlide') { if (this.t3Slide > 0) { this.t3Slide--; this.updateT3Tutorial(); } }
             if (action === 't3NextSlide') { if (this.t3Slide < 5) { this.t3Slide++; this.updateT3Tutorial(); } }
             if (action === 't3StartPrompter') this.startT3Prompter();
-            if (action === 't3GlideUp') { if (this.t3ActiveLevel > 1) { this.t3ActiveLevel--; this.updateT3Prompter(); } }
-            if (action === 't3GlideDown') { if (this.t3ActiveLevel < 5) { this.t3ActiveLevel++; this.updateT3Prompter(); } }
+            if (action === 't3GlideUp') { if (this.t3LineIndex > 0) { this.t3LineIndex--; this.updateT3PrompterScroll(); } }
+            if (action === 't3GlideDown') { if (this.t3LineIndex < this.t3Lines.length - 1) { this.t3LineIndex++; this.updateT3PrompterScroll(); } }
+            if (action === 'toggleT3Record') this.toggleT3Record();
         });
 
         // Track global engine execution returns
@@ -193,21 +210,14 @@ class THPSDiagnostic extends HTMLElement {
             if (!payload || !payload.text) return;
 
             // Catch and route execution frames for Vocal Inhibition (Stage 4)
-            if (this.currentRecordingLevel !== null) {
-                const lvl = this.currentRecordingLevel;
-
-                // --- LOGARITHMIC VOLUME EXTRACTION MATH ---
-                let linearSum = 0; 
-                let dbCount = 0;
+            if (this.pendingT3Payload) {
+                let linearSum = 0, dbCount = 0;
                 if (payload.volumeData && payload.volumeData.length > 0) {
-                    payload.volumeData.forEach(v => {
-                        linearSum += Math.pow(10, v.db / 10);
-                        dbCount++;
-                    });
+                    payload.volumeData.forEach(v => { linearSum += Math.pow(10, v.db / 10); dbCount++; });
                 }
                 const avgDb = dbCount > 0 ? (10 * Math.log10(linearSum / dbCount)) : -40;
-
-                this.stage4AudioSlots[lvl] = {
+            
+                this.vocalInhibitionData = {
                     recorded: true,
                     wpm: payload.wpm || 0,
                     sps: payload.sps || 0,
@@ -216,11 +226,8 @@ class THPSDiagnostic extends HTMLElement {
                     text: payload.text
                 };
                 
-                const statusEl = this.querySelector(`[data-ref="t3-status-${lvl}"]`);
-                if (statusEl) {
-                    statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Processed</span> — Pace: ${payload.wpm} WPM | Silence: ${Number(payload.pause).toFixed(1)}% | Intensity: ${avgDb.toFixed(1)} dB`;
-                }
-                this.currentRecordingLevel = null;
+                console.log("Vocal Inhibition Data Saved:", this.vocalInhibitionData);
+                this.pendingT3Payload = false; // Reset the flag
             }
 
             // Catch and route execution frames for Visual Association targets (Stage 5)
@@ -258,7 +265,6 @@ class THPSDiagnostic extends HTMLElement {
         const explanationEl = this.querySelector('[data-ref="sams-explanation"]');
         if (!explanationEl || !this.samsExplanations) return;
     
-        // Map the HTML question targets to the JSON category names
         const keyMap = {
             'q1': 'Preparation Discomfort',
             'q2': 'Presentation Discomfort',
@@ -269,14 +275,12 @@ class THPSDiagnostic extends HTMLElement {
         const category = keyMap[target];
         if (!category || !this.samsExplanations[category]) return;
     
-        // Determine the bucket string based on the value
         let bucket = "";
         if (val >= 0 && val <= 4) bucket = "nil (0-4)";
         else if (val >= 5 && val <= 6) bucket = "low (5-6)";
         else if (val >= 7 && val <= 8) bucket = "med (7-8)";
         else if (val >= 9 && val <= 10) bucket = "high (9-10)";
     
-        // Account for potential typos in JSON keys (like trailing spaces)
         const data = this.samsExplanations[category];
         const text = data[bucket] || data[bucket + " "] || "Explanation missing for this range.";
         
@@ -306,54 +310,70 @@ class THPSDiagnostic extends HTMLElement {
         this.querySelector('#t3-tutorial-container').classList.add('hidden');
         this.querySelector('#t3-prompter-container').classList.remove('hidden');
         
-        // Wait for DOM to render the block height before forcing the UI update so math works!
-        requestAnimationFrame(() => this.updateT3Prompter());
+        requestAnimationFrame(() => this.updateT3PrompterScroll());
     }
 
-    updateT3Prompter() {
+    updateT3PrompterScroll() {
         const viewport = this.querySelector('#t3-scroll-viewport');
-        const blocks = this.querySelectorAll('.t3-prompter-block');
+        const lines = this.querySelectorAll('.t3-line-content');
         
-        // Update Focus Opacity
-        blocks.forEach(block => {
-            const numId = parseInt(block.id.split('-')[2]);
-            if (numId === this.t3ActiveLevel) {
-                block.classList.add('opacity-100', 'scale-100');
-                block.classList.remove('opacity-30', 'scale-95');
+        lines.forEach((line, idx) => {
+            if (idx === this.t3LineIndex) {
+                line.classList.remove('opacity-40');
+                line.classList.add('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
             } else {
-                block.classList.remove('opacity-100', 'scale-100');
-                block.classList.add('opacity-30', 'scale-95');
+                line.classList.add('opacity-40');
+                line.classList.remove('opacity-100', 'bg-white', 'shadow-sm', 'ring-1');
             }
         });
+    
+        const targetWrapper = this.querySelector(`#t3-line-${this.t3LineIndex}`);
+        if (targetWrapper && viewport) viewport.scrollTo({ top: targetWrapper.offsetTop - 40, behavior: 'smooth' });
+    
+        this.querySelector('.thps-t3-up').disabled = this.t3LineIndex === 0;
+        this.querySelector('.thps-t3-down').disabled = this.t3LineIndex === this.t3Lines.length - 1;
+    }
 
-        // Glide scroll position
-        const targetBlock = this.querySelector(`#t3-block-${this.t3ActiveLevel}`);
-        if (targetBlock && viewport) {
-            viewport.scrollTo({ top: targetBlock.offsetTop - 24, behavior: 'smooth' });
-        }
-
-        // Update Record Button Text
-        const recBtn = this.querySelector('#t3-record-btn');
-        if (recBtn) {
-            recBtn.innerHTML = window.isActive && this.currentRecordingLevel === this.t3ActiveLevel ? 
-                `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Level ${this.t3ActiveLevel}` : 
-                `<i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level ${this.t3ActiveLevel}`;
+    toggleT3Record() {
+        if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        
+        if (window.isActive) {
+            this.t3LineIndex = 0;
+            this.updateT3PrompterScroll();
+            this.pendingT3Payload = true;
         }
     }
 
-    toggleLevelRecord(level) {
-        const btn = this.querySelector('#t3-record-btn');
-        if (!window.isActive) {
-            this.currentRecordingLevel = level;
-            window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-stop mr-1 pointer-events-none"></i> Stop Level ${level}`;
-            btn.classList.replace('bg-indigo-600', 'bg-red-500');
-            btn.classList.replace('hover:bg-indigo-500', 'hover:bg-red-400');
-        } else {
-            window.toggleRecording();
-            if(btn) btn.innerHTML = `<i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level ${level}`;
-            btn.classList.replace('bg-red-500', 'bg-indigo-600');
-            btn.classList.replace('hover:bg-red-400', 'hover:bg-indigo-500');
+    updateT3TimerUI() {
+        const timerDisplay = this.querySelector('#t3-timer-display');
+        const recordBtn = this.querySelector('#t3-record-btn');
+        const recordIcon = this.querySelector('#t3-record-icon');
+        const recordText = this.querySelector('#t3-record-text');
+        
+        if (timerDisplay && recordBtn) {
+            if (window.isActive && this.pendingT3Payload && window.THPS?.Audio?.recordStartTime) {
+                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                let m = Math.floor(elapsedSecs / 60).toString().padStart(2, '0');
+                let s = Math.floor(elapsedSecs % 60).toString().padStart(2, '0');
+                
+                timerDisplay.innerText = `${m}:${s}`;
+                timerDisplay.classList.add('text-rose-500');
+    
+                if (!recordBtn.classList.contains('bg-rose-500')) {
+                    recordBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
+                    recordBtn.classList.replace('hover:bg-indigo-500', 'hover:bg-rose-400');
+                    if (recordText) recordText.innerText = "Finish";
+                    if (recordIcon) recordIcon.className = "fas fa-square mr-1 pointer-events-none";
+                }
+            } else {
+                timerDisplay.classList.remove('text-rose-500');
+                if (recordBtn.classList.contains('bg-rose-500')) {
+                    recordBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
+                    recordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-indigo-500');
+                    if (recordText) recordText.innerText = "Start Performance";
+                    if (recordIcon) recordIcon.className = "fas fa-mic mr-1 pointer-events-none";
+                }
+            }
         }
     }
 
@@ -500,7 +520,6 @@ class THPSDiagnostic extends HTMLElement {
         const date = this.querySelector('[data-ref="assessmentDate"]').value || new Date().toLocaleDateString();
         const goals = this.querySelector('[data-ref="goalsChallenges"]').value || 'None recorded.';
 
-        // Updated to read innerText from the new span structure
         const t1q1 = parseInt(this.querySelector('[data-ref="val-q1"]').innerText);
         const t1q2 = parseInt(this.querySelector('[data-ref="val-q2"]').innerText);
         const t1q3 = parseInt(this.querySelector('[data-ref="val-q3"]').innerText);
@@ -525,7 +544,7 @@ class THPSDiagnostic extends HTMLElement {
             client: { name: clientName, date: date, goals: goals },
             nervesScore: totalNervesScore,
             phantasia: phantasiaSelection,
-            vocalInhibition: this.stage4AudioSlots,
+            vocalInhibition: this.vocalInhibitionData, // Pass the new single payload object
             visualAssociation: this.stage5DataSlots,
             repeatCount: stage6Metrics
         };
@@ -550,6 +569,9 @@ class THPSDiagnostic extends HTMLElement {
             .thps-diag-range { -webkit-appearance: none; width: 100%; background: transparent; }
             .thps-diag-range::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #4f46e5; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
             .thps-diag-range::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; }
+            .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         </style>
         
         <div class="flex flex-row w-full h-[700px] min-h-[700px] overflow-hidden rounded-xl border border-slate-200 shadow-xl bg-slate-50 font-['Inter',sans-serif]">
@@ -671,31 +693,36 @@ class THPSDiagnostic extends HTMLElement {
                             <button data-action="t3StartPrompter" class="absolute top-4 right-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-full shadow-md transition-colors active:scale-95">Skip to Test</button>
                         </div>
 
-                        <!-- PHASE 2: AL PACINO PROMPTER -->
+                        <!-- PHASE 2: AL PACINO GLIDING PROMPTER -->
                         <div id="t3-prompter-container" class="hidden relative w-full h-[550px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex flex-col shadow-inner">
                             
                             <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
                                 <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest px-2">Voice Choice: Intensity</span>
                             </div>
 
-                            <div id="t3-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative p-4 md:p-8 pb-32 custom-scrollbar">
-                                <!-- JS Dynamic Injection -->
+                            <div class="flex-1 relative flex flex-col min-h-0">
+                                <div id="t3-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative px-4 md:px-12 py-10 custom-scrollbar">
+                                    <!-- JS Dynamic Injection -->
+                                </div>
+                                <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none z-10"></div>
+                                <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
                             </div>
 
-                            <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
-
                             <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
-                                <div class="flex justify-between items-center max-w-lg mx-auto w-full mb-2">
+                                <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-3">
                                     
-                                    <button data-action="t3GlideUp" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
+                                    <button data-action="t3GlideUp" class="thps-t3-up p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm" disabled>
                                         <i class="fas fa-chevron-up text-lg pointer-events-none"></i>
                                     </button>
                                     
-                                    <button id="t3-record-btn" data-action="toggleLevelRecord" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] active:scale-95 flex items-center gap-2">
-                                        <i class="fas fa-mic mr-1 pointer-events-none"></i> Record Level 1
-                                    </button>
+                                    <div class="flex flex-col items-center">
+                                        <div id="t3-timer-display" class="text-3xl font-mono font-black text-slate-800 tracking-wider mb-2">00:00</div>
+                                        <button id="t3-record-btn" data-action="toggleT3Record" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-2.5 rounded-full font-black uppercase tracking-widest text-xs transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] active:scale-95 flex items-center gap-2">
+                                            <i class="fas fa-mic mr-1 pointer-events-none" id="t3-record-icon"></i> <span id="t3-record-text">Start Performance</span>
+                                        </button>
+                                    </div>
 
-                                    <button data-action="t3GlideDown" class="p-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm flex items-center justify-center">
+                                    <button data-action="t3GlideDown" class="thps-t3-down p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90 shadow-sm">
                                         <i class="fas fa-chevron-down text-lg pointer-events-none"></i>
                                     </button>
 
