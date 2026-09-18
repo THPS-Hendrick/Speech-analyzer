@@ -69,10 +69,10 @@ window.THPS_ReportScoring = {
 
     // 3. Category / Rules Inhibition Algorithm
     scoreCategoryInhibition: function(repeatData) {
-        if (!repeatCount || repeatCount.length === 0) return { label: "Not Inhibited" };
+        if (!repeatData || repeatData.length === 0) return { label: "Not Inhibited" };
 
         let totalCorrect = 0;
-        repeatCount.forEach(r => totalCorrect += r.correct);
+        repeatData.forEach(r => totalCorrect += r.correct);
 
         let label = "Not Inhibited";
         if (totalCorrect < 15) label = "Very Inhibited";
