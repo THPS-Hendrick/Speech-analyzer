@@ -6,22 +6,11 @@
     <title>Contract Timeline & Agreement</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Include html2pdf library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-        }
-        .fade-enter {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        .fade-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 300ms ease-out, transform 300ms ease-out;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .fade-enter { opacity: 0; transform: translateY(10px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms ease-out, transform 300ms ease-out; }
         @media print {
             .no-print { display: none !important; }
             body { background-color: white !important; }
@@ -41,26 +30,19 @@
 
     <!-- EXPLAINER MAIN (no-print) -->
     <main class="flex-grow max-w-6xl mx-auto w-full p-6 flex flex-col md:flex-row gap-8 mt-6 no-print">
-        
-        <!-- Left Column: Timeline Navigation -->
         <section class="w-full md:w-1/3 lg:w-2/5 flex-shrink-0">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-xl font-semibold mb-6 text-slate-800">The Contract Steps</h2>
-                
                 <div class="relative">
                     <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 z-0"></div>
-                    <ul id="timeline-list" class="relative z-10 flex flex-col gap-6">
-                        <!-- JavaScript will inject items here -->
-                    </ul>
+                    <ul id="timeline-list" class="relative z-10 flex flex-col gap-6"></ul>
                 </div>
             </div>
         </section>
 
-        <!-- Right Column: Explainer Content -->
         <section class="w-full md:w-2/3 lg:w-3/5 flex flex-col">
             <div class="bg-white p-8 md:p-10 rounded-2xl shadow-lg border border-blue-100 flex-grow relative overflow-hidden">
                 <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
-                
                 <div id="content-display" class="relative z-10 flex flex-col h-full justify-center min-h-[300px]">
                     <div class="mb-4 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold uppercase tracking-wider w-max" id="display-clauses">
                         Clauses 1 & 2
@@ -71,7 +53,6 @@
                     </p>
                 </div>
             </div>
-            
             <p class="text-center text-sm text-slate-400 mt-6">
                 *This plain English guide summarizes the standard terms. Please refer to the formal Services Agreement below for exact legal phrasing.
             </p>
@@ -80,13 +61,10 @@
 
     <!-- FORMAL LEGAL CONTRACT SECTION (no-print) -->
     <div class="max-w-4xl mx-auto w-full p-6 mt-8 mb-16 no-print">
-        
-        <!-- Loading State -->
         <div id="loading" class="text-center py-10 text-gray-500 font-semibold bg-white rounded-xl shadow-sm border border-gray-200">
             Loading your secure document...
         </div>
 
-        <!-- Contract Content -->
         <div id="contract-content" class="hidden space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
             <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide">Public Speaking Services Agreement</h1>
             
@@ -133,7 +111,6 @@
             <h3 class="font-bold mt-4">9. GOVERNING LAW</h3>
             <p class="text-sm text-gray-700">This Agreement shall be governed by and construed in accordance with the laws of South Australia. Any disputes arising from this Agreement shall be resolved in the courts of South Australia.</p>
 
-            <!-- BOILERPLATE CLAUSES -->
             <h3 class="font-bold mt-4">10. ENTIRE AGREEMENT</h3>
             <p class="text-sm text-gray-700">This Agreement constitutes the entire agreement between the parties regarding the subject matter herein and supersedes all prior proposals, negotiations, understandings, and agreements, whether written or oral.</p>
 
@@ -155,12 +132,11 @@
             <h3 class="font-bold mt-4">16. SURVIVAL</h3>
             <p class="text-sm text-gray-700">Clauses regarding Intellectual Property, Confidentiality, Limitation of Liability, and any other provisions that by their nature should survive termination, shall survive the expiration or termination of this Agreement.</p>
 
-            <!-- SCHEDULE OF SERVICES -->
             <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-10">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">SCHEDULE OF SERVICES (The "Inclusions")</h2>
                 <ul class="space-y-3 text-slate-700">
                     <li><strong>Selected Services:</strong> <span id="dyn-inclusions" class="font-medium"></span></li>
-                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span></li>
+                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span> (See attached invoice for itemization)</li>
                     <li><strong>Payment Structure:</strong> <span id="dyn-payment" class="font-medium"></span></li>
                     <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target" class="font-medium"></span></li>
                     <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
@@ -169,7 +145,6 @@
 
             <hr class="my-8">
 
-            <!-- Signature Section -->
             <div id="signature-block" class="bg-blue-50 p-6 md:p-8 rounded-lg border border-blue-200 scroll-mt-10">
                 <h3 class="font-bold text-xl mb-4 text-slate-900">Digital Signature</h3>
                 <label class="flex items-start space-x-4 cursor-pointer p-4 bg-white rounded border border-blue-100 hover:border-blue-300 transition-colors">
@@ -181,12 +156,10 @@
                 </button>
             </div>
 
-            <!-- Signed State Message -->
             <div id="signed-state" class="hidden bg-green-50 text-green-800 p-8 rounded-lg border border-green-200 text-center">
                 <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <h3 class="text-2xl font-bold mb-2">Contract Signed</h3>
                 <p class="text-md">Thank you. A finalized, time-stamped copy has been emailed to both parties for their records.</p>
-                <!-- Button to reveal invoice -->
                 <button id="view-invoice-btn" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md transition-colors shadow-sm inline-flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     View & Download Invoice
@@ -195,13 +168,9 @@
         </div>
     </div>
 
-    <!-- INVOICE WRAPPER (Hidden by default, shown after clicking "View Invoice") -->
+    <!-- INVOICE WRAPPER -->
     <div id="invoice-wrapper" class="hidden max-w-4xl mx-auto mb-16 px-6">
-        
-        <!-- INVOICE PAGE -->
         <div class="bg-white p-10 rounded shadow-lg print-shadow-none" id="invoicePage">
-            
-            <!-- Header -->
             <div class="flex justify-between items-start border-b-2 border-yellow-500 pb-6 mb-6">
                 <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
                 <div class="text-right">
@@ -210,9 +179,7 @@
                 </div>
             </div>
 
-            <!-- Details Section -->
             <div class="grid grid-cols-2 gap-8 mb-8">
-                <!-- Provider Details -->
                 <div>
                     <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Service Provider details</h3>
                     <p class="font-bold">Tom Hendrick</p>
@@ -223,30 +190,23 @@
                     <p>Suite 110/147 Pirie St</p>
                     <p>Adelaide SA 5000, Australia</p>
                 </div>
-
-                <!-- Customer Details -->
                 <div>
                     <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Customer Details</h3>
                     <div class="grid grid-cols-3 gap-2">
                         <span class="font-semibold text-gray-600">Date:</span>
                         <span class="col-span-2" id="outDate"></span>
-                        
                         <span class="font-semibold text-gray-600">Invoice #:</span>
                         <span class="col-span-2 font-bold" id="outInvoiceNum"></span>
-
                         <span class="font-semibold text-gray-600">Due Date:</span>
                         <span class="col-span-2 text-red-600 font-bold" id="outDueDate"></span>
-                        
                         <span class="font-semibold text-gray-600 mt-2">Name:</span>
                         <span class="col-span-2 mt-2" id="outName"></span>
-                        
                         <span class="font-semibold text-gray-600">Email:</span>
                         <span class="col-span-2" id="outEmail"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Services Table -->
             <table class="w-full mb-8 text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-100 border-b-2 border-yellow-500">
@@ -257,21 +217,13 @@
                         <th class="py-2 px-3 text-right">Amount</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="border-b">
-                        <td class="py-3 px-3 font-bold text-sm whitespace-pre-wrap">Public Speaking Coaching</td>
-                        <td class="py-3 px-3 text-sm text-gray-600 whitespace-pre-wrap" id="outDesc1"></td>
-                        <td class="py-3 px-3 text-center">1</td>
-                        <td class="py-3 px-3 text-right" id="outPrice1">$0</td>
-                        <td class="py-3 px-3 text-right" id="outAmt1">$0</td>
-                    </tr>
-                </tbody>
+                <!-- Rows injected dynamically via JS -->
+                <tbody id="invoice-rows"></tbody>
             </table>
 
-            <!-- Totals -->
             <div class="flex justify-end mb-8">
                 <div class="w-64">
-                    <div class="flex justify-between py-1 border-b">
+                    <div class="flex justify-between py-1 border-b" id="gstRow">
                         <span class="font-bold text-gray-600">GST (10%)</span>
                         <span id="outGst">$0</span>
                     </div>
@@ -282,7 +234,6 @@
                 </div>
             </div>
 
-            <!-- Payment Methods -->
             <div class="bg-gray-50 p-6 rounded border">
                 <h3 class="font-bold text-lg mb-4 border-b pb-2">Payment Methods</h3>
                 <div class="grid grid-cols-2 gap-6">
@@ -305,7 +256,6 @@
             </div>
         </div>
 
-        <!-- Download Button (no-print) -->
         <div class="mt-6 flex justify-center no-print">
             <button onclick="downloadPDF()" class="bg-yellow-600 text-white px-8 py-3 rounded-md font-bold hover:bg-yellow-700 transition-colors shadow-sm inline-flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -315,7 +265,6 @@
     </div>
 
     <script>
-        // --- 1. TIMELINE EXPLAINER LOGIC ---
         const stages = [
             { id: 'stage-1', title: 'Signing & Invoicing', clauses: 'Clauses 1 & 2', description: "Once you accept and sign the contract (below), you'll receive an invoice for the services listed below." },
             { id: 'stage-2', title: 'Payment Terms', clauses: 'Clause 2', description: "Invoices are due within 7 days. For coaching, it's 100% upfront to secure your spot. For script-writing, it's 50% upfront and 50% on delivery. Late payments incur a 5% monthly fee." },
@@ -365,7 +314,6 @@
 
                 textContainer.appendChild(title);
                 textContainer.appendChild(subtitle);
-
                 li.appendChild(circleContainer);
                 li.appendChild(textContainer);
                 timelineList.appendChild(li);
@@ -403,10 +351,10 @@
             }
         }
 
-        // --- 2. FIREBASE CONTRACT & INVOICE LOGIC ---
+        // --- FIREBASE & INVOICE LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
         const contractId = urlParams.get('id');
-        let globalContractData = null; // Store for invoice generator
+        let globalContractData = null;
 
         async function loadContract() {
             if (!contractId) {
@@ -420,12 +368,12 @@
 
                 if (data.success) {
                     const c = data.contract;
-                    globalContractData = c; // Save for later
+                    globalContractData = c; 
                     
                     if (c.status === "signed") {
                         document.getElementById('signature-block').classList.add('hidden');
                         document.getElementById('signed-state').classList.remove('hidden');
-                        populateInvoiceData(c); // Prep invoice data even if already signed
+                        populateInvoiceData(c); 
                     }
 
                     const dateObj = new Date(c.createdAt);
@@ -433,7 +381,7 @@
                     document.getElementById('dyn-client-name').innerText = c.clientName;
                     document.getElementById('dyn-client-address').innerText = c.clientAddress;
                     document.getElementById('dyn-inclusions').innerText = c.inclusions;
-                    document.getElementById('dyn-fee').innerText = c.totalFee;
+                    document.getElementById('dyn-fee').innerText = formatCurrency(c.totalFee || 0);
                     document.getElementById('dyn-payment').innerText = c.paymentStructure;
                     document.getElementById('dyn-target').innerText = c.targetDate;
                     document.getElementById('dyn-agree-name').innerText = c.clientName;
@@ -448,7 +396,6 @@
             }
         }
 
-        // Setup Checkbox & Signing Button
         const checkbox = document.getElementById('agree-checkbox');
         const signBtn = document.getElementById('sign-btn');
         const viewInvoiceBtn = document.getElementById('view-invoice-btn');
@@ -481,11 +428,7 @@
                 if (result.success) {
                     document.getElementById('signature-block').classList.add('hidden');
                     document.getElementById('signed-state').classList.remove('hidden');
-                    
-                    // Populate the invoice DOM with contract data
-                    if(globalContractData) {
-                        populateInvoiceData(globalContractData);
-                    }
+                    if(globalContractData) populateInvoiceData(globalContractData);
                 } else {
                     alert('Error: ' + result.message);
                     signBtn.disabled = false;
@@ -498,13 +441,11 @@
             }
         });
 
-        // Reveal the Invoice
         viewInvoiceBtn.addEventListener('click', () => {
             invoiceWrapper.classList.remove('hidden');
             invoiceWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
-        // --- 3. INVOICE POPULATION & PDF LOGIC ---
         function formatCurrency(amount) {
             return "$" + parseFloat(amount).toLocaleString('en-AU', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
@@ -518,9 +459,8 @@
         function populateInvoiceData(c) {
             const today = new Date();
             const due = new Date();
-            due.setDate(today.getDate() + 7); // 7 day terms as per contract
+            due.setDate(today.getDate() + 7); 
 
-            // Header info
             document.getElementById('outName').innerText = c.clientName;
             document.getElementById('outEmail').innerText = c.clientEmail;
             
@@ -529,38 +469,51 @@
             document.getElementById('outDueDate').innerText = formatDate(due);
             document.getElementById('outInvoiceNum').innerText = generateInvoiceNumber(c.clientName, today.toISOString());
 
-            // Service details (Calculations mapped to remove GST from base if total includes it)
-            const totalStr = c.totalFee.toString().replace(/,/g, ''); // strip commas if any
-            const grossTotal = parseFloat(totalStr);
-            const netSubtotal = grossTotal / 1.10;
-            const gstAmount = grossTotal - netSubtotal;
-
-            document.getElementById('outDesc1').innerText = c.inclusions;
-            document.getElementById('outPrice1').innerText = formatCurrency(netSubtotal);
-            document.getElementById('outAmt1').innerText = formatCurrency(netSubtotal);
+            // Build rows dynamically based on the lineItems array
+            const tbody = document.getElementById('invoice-rows');
+            tbody.innerHTML = ''; 
             
-            // Totals
+            let subtotal = 0;
+            if (c.lineItems && Array.isArray(c.lineItems)) {
+                c.lineItems.forEach(item => {
+                    const rowTotal = item.rate * item.qty;
+                    subtotal += rowTotal;
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b';
+                    tr.innerHTML = `
+                        <td class="py-3 px-3 font-bold text-sm whitespace-pre-wrap">${item.name || ''}</td>
+                        <td class="py-3 px-3 text-sm text-gray-600 whitespace-pre-wrap">${item.desc || ''}</td>
+                        <td class="py-3 px-3 text-center">${item.qty}</td>
+                        <td class="py-3 px-3 text-right">${formatCurrency(item.rate)}</td>
+                        <td class="py-3 px-3 text-right">${formatCurrency(rowTotal)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Calculate exact total based on admin GST toggle
+            const gstAmount = c.applyGst ? (subtotal * 0.10) : 0;
+            const finalTotal = subtotal + gstAmount;
+
+            document.getElementById('gstRow').style.display = c.applyGst ? 'flex' : 'none';
             document.getElementById('outGst').innerText = formatCurrency(gstAmount);
-            document.getElementById('outTotalTop').innerText = `AUD ${formatCurrency(grossTotal)}`;
-            document.getElementById('outTotalBottom').innerText = formatCurrency(grossTotal);
+            document.getElementById('outTotalTop').innerText = `AUD ${formatCurrency(finalTotal)}`;
+            document.getElementById('outTotalBottom').innerText = formatCurrency(finalTotal);
         }
 
-        // HTML2PDF Export
         function downloadPDF() {
             const element = document.getElementById('invoicePage');
             const opt = {
                 margin:       10,
                 filename:     `Invoice_${document.getElementById('outInvoiceNum').innerText}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // useCORS allows the logo image to render
+                html2canvas:  { scale: 2, useCORS: true }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-
-            // Promise-based generation
             html2pdf().set(opt).from(element).save();
         }
 
-        // Initialize on load
         window.onload = () => {
             initTimeline();
             contentDisplay.classList.add('fade-enter-active');
