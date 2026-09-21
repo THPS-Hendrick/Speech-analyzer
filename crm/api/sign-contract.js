@@ -28,14 +28,12 @@ export default async function handler(req, res) {
     try {
         const docRef = doc(db, "Contracts", id);
         
-        // 1. Fetch the contract details so we can put them in the receipt email
         const docSnap = await getDoc(docRef);
         if (!docSnap.exists()) {
             return res.status(404).json({ success: false, message: 'Contract not found' });
         }
         const contractData = docSnap.data();
 
-        // 2. Update the contract status to signed
         const signedAt = new Date().toISOString();
         const signerIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown IP';
         
@@ -45,7 +43,9 @@ export default async function handler(req, res) {
             signerIp: signerIp
         });
 
-        // 3. Email the final receipt via Gmail API
+        // Generate the permanent magic link
+        const magicLink = `https://thps-crm.vercel.app/contract.html?id=${id}`;
+
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -54,42 +54,45 @@ export default async function handler(req, res) {
         oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
         const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-        const subject = "Executed Service Agreement - Tom Hendrick & " + contractData.clientName;
+        const subject = "Executed Service Agreement & Tax Invoice - Tom Hendrick";
         const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
         
-        // Format the date nicely for the email
         const niceDate = new Date(signedAt).toLocaleString('en-AU', { timeZone: 'Australia/Adelaide' });
 
+        // Email layout with the new Invoice button
         const emailHtml = `
-            <p>Hi ${contractData.clientName.split(' ')[0]},</p>
-            <p>Thank you for accepting the Service Agreement. This email serves as your finalized, time-stamped copy for your records.</p>
-            
-            <div style="background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 5px; margin-top: 20px;">
-                <h3 style="margin-top:0;">Digital Signature Record</h3>
-                <p><strong>Signed By:</strong> ${contractData.clientName}</p>
-                <p><strong>Date/Time:</strong> ${niceDate} (ACST)</p>
-                <p><strong>IP Address:</strong> ${signerIp}</p>
-                <p><strong>Contract ID:</strong> ${id}</p>
+            <div style="font-family: sans-serif; color: #334155; max-width: 600px; margin: 0 auto;">
+                <p>Hi ${contractData.clientName.split(' ')[0]},</p>
+                <p>Thank you for accepting the Service Agreement. We are all set to begin!</p>
                 
-                <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 20px 0;">
+                <div style="text-align: center; margin: 35px 0;">
+                    <a href="${magicLink}" style="background-color: #ca8a04; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">View & Download Tax Invoice</a>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 12px;">This secure link also contains your permanent, time-stamped copy of the Service Agreement.</p>
+                </div>
+
+                <div style="background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                    <h3 style="margin-top:0; color: #0f172a;">Digital Signature Record</h3>
+                    <p style="margin: 5px 0;"><strong>Signed By:</strong> ${contractData.clientName}</p>
+                    <p style="margin: 5px 0;"><strong>Date/Time:</strong> ${niceDate} (ACST)</p>
+                    <p style="margin: 5px 0;"><strong>IP Address:</strong> ${signerIp}</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #cbd5e1; margin: 20px 0;">
+                    
+                    <h3 style="margin-top:0; color: #0f172a;">Schedule of Services</h3>
+                    <p style="margin: 5px 0;"><strong>Inclusions:</strong> ${contractData.inclusions}</p>
+                    <p style="margin: 5px 0;"><strong>Total Fee:</strong> $${contractData.totalFee}</p>
+                </div>
                 
-                <h3 style="margin-top:0;">Schedule of Services</h3>
-                <p><strong>Inclusions:</strong> ${contractData.inclusions}</p>
-                <p><strong>Total Fee:</strong> $${contractData.totalFee}</p>
-                <p><strong>Payment Structure:</strong> ${contractData.paymentStructure}</p>
+                <br>
+                <p>Best regards,</p>
+                <p><strong>Tom Hendrick</strong></p>
             </div>
-            
-            <p>I look forward to working with you!</p>
-            <br>
-            <p>Best regards,</p>
-            <p><strong>Tom Hendrick</strong></p>
         `;
 
-        // Send to the client, and BCC yourself so you get a copy too!
-        // Replace 'your-email@gmail.com' with your actual business email address
+        // Remember to change your-email@gmail.com to your actual email so you get the BCC copy!
         const messageParts = [
             `To: ${contractData.clientEmail}`,
-            `Bcc: tom@tomhendrick.com`, 
+            `Bcc: your-email@gmail.com`, 
             `Subject: ${utf8Subject}`,
             'Content-Type: text/html; charset=utf-8',
             '',
