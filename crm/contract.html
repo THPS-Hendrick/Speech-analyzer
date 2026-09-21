@@ -136,11 +136,17 @@
                 <h2 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">SCHEDULE OF SERVICES (The "Inclusions")</h2>
                 <ul class="space-y-3 text-slate-700">
                     <li><strong>Selected Services:</strong> <span id="dyn-inclusions" class="font-medium"></span></li>
-                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span> (See attached invoice for itemization)</li>
+                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span></li>
                     <li><strong>Payment Structure:</strong> <span id="dyn-payment" class="font-medium"></span></li>
                     <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target" class="font-medium"></span></li>
                     <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
                 </ul>
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <button id="view-invoice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors shadow-sm inline-flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        View Itemized Invoice Draft
+                    </button>
+                </div>
             </div>
 
             <hr class="my-8">
@@ -160,10 +166,6 @@
                 <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <h3 class="text-2xl font-bold mb-2">Contract Signed</h3>
                 <p class="text-md">Thank you. A finalized, time-stamped copy has been emailed to both parties for their records.</p>
-                <button id="view-invoice-btn" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md transition-colors shadow-sm inline-flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    View & Download Invoice
-                </button>
             </div>
         </div>
     </div>
@@ -370,10 +372,12 @@
                     const c = data.contract;
                     globalContractData = c; 
                     
+                    // Always populate invoice data immediately so they can view the draft
+                    populateInvoiceData(c); 
+                    
                     if (c.status === "signed") {
                         document.getElementById('signature-block').classList.add('hidden');
                         document.getElementById('signed-state').classList.remove('hidden');
-                        populateInvoiceData(c); 
                     }
 
                     const dateObj = new Date(c.createdAt);
@@ -428,7 +432,6 @@
                 if (result.success) {
                     document.getElementById('signature-block').classList.add('hidden');
                     document.getElementById('signed-state').classList.remove('hidden');
-                    if(globalContractData) populateInvoiceData(globalContractData);
                 } else {
                     alert('Error: ' + result.message);
                     signBtn.disabled = false;
@@ -469,7 +472,6 @@
             document.getElementById('outDueDate').innerText = formatDate(due);
             document.getElementById('outInvoiceNum').innerText = generateInvoiceNumber(c.clientName, today.toISOString());
 
-            // Build rows dynamically based on the lineItems array
             const tbody = document.getElementById('invoice-rows');
             tbody.innerHTML = ''; 
             
@@ -492,7 +494,6 @@
                 });
             }
 
-            // Calculate exact total based on admin GST toggle
             const gstAmount = c.applyGst ? (subtotal * 0.10) : 0;
             const finalTotal = subtotal + gstAmount;
 
