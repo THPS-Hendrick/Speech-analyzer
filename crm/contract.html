@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Agreement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-4 md:p-8">
+    
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6 md:p-10">
+        
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-10 text-gray-500">Loading your secure document...</div>
+
+        <!-- Contract Content -->
+        <div id="contract-content" class="hidden space-y-6">
+            <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide">Public Speaking Services Agreement</h1>
+            
+            <p>This Services Agreement ("Agreement") is entered into on <span id="dyn-date" class="font-semibold"></span> by and between:</p>
+            
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Service Provider:</strong> Tom Hendrick, located in South Australia ("Provider", "I", "me", "my")</li>
+                <li><strong>Client:</strong> <span id="dyn-client-name" class="font-semibold"></span>, located at <span id="dyn-client-address" class="font-semibold"></span> ("Client", "you", "your")</li>
+            </ul>
+
+            <h2 class="text-xl font-bold border-b pb-2 mt-8">SCHEDULE OF SERVICES (The "Inclusions")</h2>
+            <ul class="space-y-2">
+                <li><strong>Selected Services:</strong> <span id="dyn-inclusions"></span></li>
+                <li><strong>Total Fee:</strong> $<span id="dyn-fee"></span></li>
+                <li><strong>Payment Structure:</strong> <span id="dyn-payment"></span></li>
+                <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target"></span></li>
+                <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
+            </ul>
+
+            <h2 class="text-xl font-bold border-b pb-2 mt-8">TERMS AND CONDITIONS</h2>
+            
+            <h3 class="font-bold mt-4">1. SCOPE OF SERVICES</h3>
+            <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services above. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
+
+            <h3 class="font-bold mt-4">2. FEES AND PAYMENT</h3>
+            <p class="text-sm text-gray-700"><strong>Payment Schedule:</strong> Coaching packages and portal access require 100% payment upfront prior to commencement. Drafting and custom presentation services require a 50% non-refundable deposit to secure the Provider's time, with the remaining 50% due upon delivery of the final draft.<br>
+            <strong>Terms:</strong> All invoices are due within seven (7) days of receipt.<br>
+            <strong>Late Fees:</strong> Overdue invoices will incur a late fee of 5% per month on the outstanding balance. The Provider reserves the right to suspend services or portal access if payments are past due.</p>
+
+            <h3 class="font-bold mt-4">3. CANCELLATIONS, RESCHEDULING, AND REFUNDS</h3>
+            <p class="text-sm text-gray-700"><strong>Coaching Sessions:</strong> The Client must provide a minimum of twenty-four (24) hours' notice to reschedule a coaching session. Failure to provide 24 hours' notice, or failing to attend a scheduled session, will result in the forfeiture of that session.<br>
+            <strong>Refunds:</strong> No refunds will be provided for "change of mind" or partially completed coaching packages. Refunds will only be issued if the Provider is unable to deliver the agreed-upon services.</p>
+
+            <h3 class="font-bold mt-4">4. DELIVERABLES, REVISIONS, AND SCOPE CREEP</h3>
+            <p class="text-sm text-gray-700"><strong>Drafting Revisions:</strong> For presentation drafting services, the Client is entitled to two (2) rounds of revisions within a fourteen (14) day period following the delivery of the initial draft.<br>
+            <strong>Scope Changes:</strong> Revisions must be based on the original brief. If the Client requests a complete change of topic, requires revisions beyond the included two rounds, or requests work outside the agreed Schedule of Services, such work will be billed at the Provider’s standard hourly rate stated above.</p>
+
+            <h3 class="font-bold mt-4">5. INTELLECTUAL PROPERTY</h3>
+            <p class="text-sm text-gray-700"><strong>Provider’s IP:</strong> The Provider retains 100% ownership of all proprietary methodologies, speech measuring tools, rubrics, metrics, course materials, frameworks, and login portal infrastructure. The Client is granted a limited, non-exclusive license to use these tools during the term of this Agreement.<br>
+            <strong>Client’s IP:</strong> Upon receipt of full payment, the Client will retain full ownership of the final customized presentation drafts and their individual assessment reports created under this Agreement.</p>
+
+            <h3 class="font-bold mt-4">6. CONFIDENTIALITY</h3>
+            <p class="text-sm text-gray-700">Both parties agree to a mutual standard of confidentiality. The Provider will not disclose any of the Client's sensitive business information, personal stories, corporate strategies, or trade secrets shared during coaching or drafting. In return, the Client agrees not to share, distribute, or resell their portal login credentials, or the Provider’s proprietary coaching frameworks and course materials, to any third parties.</p>
+
+            <h3 class="font-bold mt-4">7. GUARANTEES AND LIMITATION OF LIABILITY</h3>
+            <p class="text-sm text-gray-700"><strong>Deliverable Guarantee:</strong> The Provider guarantees that the services and deliverables will be measured against and meet the objective metrics ("Green Zone") established by the Provider's speech measuring tool.<br>
+            <strong>Outcome Disclaimer:</strong> The Client acknowledges that the Provider does not and cannot guarantee specific real-world outcomes resulting from the use of these services (e.g., winning a pitch, securing funding, obtaining a promotion).<br>
+            <strong>Liability Cap:</strong> The Provider’s total liability for any claim arising out of this Agreement shall not exceed the total fees paid by the Client to the Provider under this Agreement.</p>
+
+            <h3 class="font-bold mt-4">8. TERM AND TERMINATION</h3>
+            <p class="text-sm text-gray-700">Either party may terminate this Agreement at any time by providing fourteen (14) days' written notice to the other party. Upon early termination by the Client, the Client will be billed on a pro-rata basis for all work completed up to the date of termination. Any unearned deposit funds remaining after accounting for completed work will be refunded to the Client.</p>
+
+            <h3 class="font-bold mt-4">9. GOVERNING LAW</h3>
+            <p class="text-sm text-gray-700">This Agreement shall be governed by and construed in accordance with the laws of South Australia. Any disputes arising from this Agreement shall be resolved in the courts of South Australia.</p>
+
+            <hr class="my-8">
+
+            <!-- Signature Section -->
+            <div id="signature-block" class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                <h3 class="font-bold text-lg mb-4">Digital Signature</h3>
+                <label class="flex items-start space-x-3 cursor-pointer">
+                    <input type="checkbox" id="agree-checkbox" class="mt-1 h-5 w-5 text-blue-600 rounded">
+                    <span class="text-sm text-gray-800">I, <strong id="dyn-agree-name"></strong>, have read and agree to the Terms and Conditions outlined in this Service Agreement.</span>
+                </label>
+                <button id="sign-btn" disabled class="mt-6 w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-md transition-colors cursor-not-allowed">
+                    Accept & Sign Contract
+                </button>
+            </div>
+
+            <!-- Signed State Message -->
+            <div id="signed-state" class="hidden bg-green-50 text-green-800 p-6 rounded-lg border border-green-200 text-center">
+                <h3 class="text-lg font-bold mb-2">Contract Signed</h3>
+                <p class="text-sm">Thank you. A finalized copy has been emailed to both parties for their records.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Get the Contract ID from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const contractId = urlParams.get('id');
+
+        async function loadContract() {
+            if (!contractId) {
+                document.getElementById('loading').innerText = "Error: Invalid Contract Link.";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/get-contract?id=${contractId}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const c = data.contract;
+                    
+                    // If already signed, hide the signature box
+                    if (c.status === "signed") {
+                        document.getElementById('signature-block').classList.add('hidden');
+                        document.getElementById('signed-state').classList.remove('hidden');
+                    }
+
+                    // Populate the DOM elements
+                    const dateObj = new Date(c.createdAt);
+                    document.getElementById('dyn-date').innerText = dateObj.toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+                    document.getElementById('dyn-client-name').innerText = c.clientName;
+                    document.getElementById('dyn-client-address').innerText = c.clientAddress;
+                    document.getElementById('dyn-inclusions').innerText = c.inclusions;
+                    document.getElementById('dyn-fee').innerText = c.totalFee;
+                    document.getElementById('dyn-payment').innerText = c.paymentStructure;
+                    document.getElementById('dyn-target').innerText = c.targetDate;
+                    document.getElementById('dyn-agree-name').innerText = c.clientName;
+
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('contract-content').classList.remove('hidden');
+                } else {
+                    document.getElementById('loading').innerText = "Error: " + data.message;
+                }
+            } catch (err) {
+                document.getElementById('loading').innerText = "Failed to load document.";
+            }
+        }
+
+        // 2. Handle Checkbox toggle
+        const checkbox = document.getElementById('agree-checkbox');
+        const signBtn = document.getElementById('sign-btn');
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                signBtn.disabled = false;
+                signBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                signBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+            } else {
+                signBtn.disabled = true;
+                signBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                signBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+            }
+        });
+
+        // 3. Handle Signature Submit
+        signBtn.addEventListener('click', async () => {
+            signBtn.disabled = true;
+            signBtn.innerText = "Signing...";
+
+            try {
+                const res = await fetch('/api/sign-contract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: contractId })
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    document.getElementById('signature-block').classList.add('hidden');
+                    document.getElementById('signed-state').classList.remove('hidden');
+                } else {
+                    alert('Error: ' + result.message);
+                    signBtn.disabled = false;
+                    signBtn.innerText = "Accept & Sign Contract";
+                }
+            } catch (err) {
+                alert('An error occurred.');
+                signBtn.disabled = false;
+                signBtn.innerText = "Accept & Sign Contract";
+            }
+        });
+
+        loadContract();
+    </script>
+</body>
+</html>
