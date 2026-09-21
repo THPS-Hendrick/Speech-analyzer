@@ -89,7 +89,7 @@ export default async function handler(req, res) {
         // Replace 'your-email@gmail.com' with your actual business email address
         const messageParts = [
             `To: ${contractData.clientEmail}`,
-            `Bcc: your-email@gmail.com`, 
+            `Bcc: tom@tomhendrick.com`, 
             `Subject: ${utf8Subject}`,
             'Content-Type: text/html; charset=utf-8',
             '',
