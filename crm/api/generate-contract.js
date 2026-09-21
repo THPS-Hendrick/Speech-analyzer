@@ -26,7 +26,6 @@ export default async function handler(req, res) {
     }
 
     try {
-        // 1. Calculate the total fee dynamically based on the line items
         let subtotal = 0;
         lineItems.forEach(item => {
             subtotal += (item.rate * item.qty);
@@ -35,7 +34,6 @@ export default async function handler(req, res) {
         const gstAmount = applyGst ? (subtotal * 0.10) : 0;
         const totalFee = subtotal + gstAmount;
 
-        // 2. Save Contract to Firebase with the new detailed structure
         const docRef = await addDoc(collection(db, "Contracts"), {
             clientName,
             clientEmail,
@@ -45,17 +43,14 @@ export default async function handler(req, res) {
             targetDate,
             applyGst,
             lineItems,
-            totalFee, // Storing the calculated total
+            totalFee, 
             status: "pending",
             createdAt: new Date().toISOString()
         });
 
         const contractId = docRef.id;
-
-        // 3. Generate the Magic Link
         const magicLink = `https://thps-crm.vercel.app/contract.html?id=${contractId}`;
 
-        // 4. Email the Client via Gmail API
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -81,6 +76,7 @@ export default async function handler(req, res) {
 
         const messageParts = [
             `To: ${clientEmail}`,
+            `Bcc: tom@tomhendrick.com`, // Added this line so you get a copy!
             `Subject: ${utf8Subject}`,
             'Content-Type: text/html; charset=utf-8',
             '',
