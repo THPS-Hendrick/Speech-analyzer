@@ -3,40 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Agreement</title>
+    <title>Contract Timeline & Agreement</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans p-4 md:p-8">
-    
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6 md:p-10">
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- EXPLAINER HEADER -->
+    <header class="bg-slate-900 text-white py-8 px-6 shadow-md">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold tracking-tight">Services Agreement Map</h1>
+            <p class="mt-2 text-slate-300 text-lg">Click through the timeline to understand how our partnership works, step-by-step.</p>
+        </div>
+    </header>
+
+    <!-- EXPLAINER MAIN -->
+    <main class="flex-grow max-w-6xl mx-auto w-full p-6 flex flex-col md:flex-row gap-8 mt-6">
+        
+        <!-- Left Column: Timeline Navigation -->
+        <section class="w-full md:w-1/3 lg:w-2/5 flex-shrink-0">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-semibold mb-6 text-slate-800">The Journey</h2>
+                
+                <div class="relative">
+                    <!-- Vertical Line -->
+                    <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 z-0"></div>
+                    
+                    <!-- Timeline Items Container -->
+                    <ul id="timeline-list" class="relative z-10 flex flex-col gap-6">
+                        <!-- JavaScript will inject items here -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Explainer Content -->
+        <section class="w-full md:w-2/3 lg:w-3/5 flex flex-col">
+            <div class="bg-white p-8 md:p-10 rounded-2xl shadow-lg border border-blue-100 flex-grow relative overflow-hidden">
+                <!-- Decorative background blob -->
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+                
+                <div id="content-display" class="relative z-10 flex flex-col h-full justify-center min-h-[300px]">
+                    <div class="mb-4 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold uppercase tracking-wider w-max" id="display-clauses">
+                        Clauses 1 & 2
+                    </div>
+                    <h3 id="display-title" class="text-3xl font-bold text-slate-900 mb-6">Signing & Invoicing</h3>
+                    <p id="display-desc" class="text-lg text-slate-600 leading-relaxed">
+                        We agree on the plan, set our dates, and sign the contract. You'll receive an invoice for the coaching package or custom draft deposit.
+                    </p>
+                </div>
+            </div>
+            
+            <p class="text-center text-sm text-slate-400 mt-6">
+                *This plain English guide summarizes the standard terms. Please refer to the formal Services Agreement below for exact legal phrasing.
+            </p>
+        </section>
+    </main>
+
+    <!-- FORMAL LEGAL CONTRACT SECTION -->
+    <div class="max-w-4xl mx-auto w-full p-6 mt-8 mb-16">
         
         <!-- Loading State -->
-        <div id="loading" class="text-center py-10 text-gray-500">Loading your secure document...</div>
+        <div id="loading" class="text-center py-10 text-gray-500 font-semibold bg-white rounded-xl shadow-sm border border-gray-200">
+            Loading your secure document...
+        </div>
 
         <!-- Contract Content -->
-        <div id="contract-content" class="hidden space-y-6">
+        <div id="contract-content" class="hidden space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
             <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide">Public Speaking Services Agreement</h1>
             
-            <p>This Services Agreement ("Agreement") is entered into on <span id="dyn-date" class="font-semibold"></span> by and between:</p>
+            <p>This Services Agreement ("Agreement") is entered into on <span id="dyn-date" class="font-semibold text-blue-700"></span> by and between:</p>
             
             <ul class="list-disc pl-6 space-y-2">
                 <li><strong>Service Provider:</strong> Tom Hendrick, located in South Australia ("Provider", "I", "me", "my")</li>
-                <li><strong>Client:</strong> <span id="dyn-client-name" class="font-semibold"></span>, located at <span id="dyn-client-address" class="font-semibold"></span> ("Client", "you", "your")</li>
-            </ul>
-
-            <h2 class="text-xl font-bold border-b pb-2 mt-8">SCHEDULE OF SERVICES (The "Inclusions")</h2>
-            <ul class="space-y-2">
-                <li><strong>Selected Services:</strong> <span id="dyn-inclusions"></span></li>
-                <li><strong>Total Fee:</strong> $<span id="dyn-fee"></span></li>
-                <li><strong>Payment Structure:</strong> <span id="dyn-payment"></span></li>
-                <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target"></span></li>
-                <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
+                <li><strong>Client:</strong> <span id="dyn-client-name" class="font-semibold text-blue-700"></span>, located at <span id="dyn-client-address" class="font-semibold text-blue-700"></span> ("Client", "you", "your")</li>
             </ul>
 
             <h2 class="text-xl font-bold border-b pb-2 mt-8">TERMS AND CONDITIONS</h2>
             
             <h3 class="font-bold mt-4">1. SCOPE OF SERVICES</h3>
-            <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services above. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
+            <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services below. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
 
             <h3 class="font-bold mt-4">2. FEES AND PAYMENT</h3>
             <p class="text-sm text-gray-700"><strong>Payment Schedule:</strong> Coaching packages and portal access require 100% payment upfront prior to commencement. Drafting and custom presentation services require a 50% non-refundable deposit to secure the Provider's time, with the remaining 50% due upon delivery of the final draft.<br>
@@ -49,7 +110,7 @@
 
             <h3 class="font-bold mt-4">4. DELIVERABLES, REVISIONS, AND SCOPE CREEP</h3>
             <p class="text-sm text-gray-700"><strong>Drafting Revisions:</strong> For presentation drafting services, the Client is entitled to two (2) rounds of revisions within a fourteen (14) day period following the delivery of the initial draft.<br>
-            <strong>Scope Changes:</strong> Revisions must be based on the original brief. If the Client requests a complete change of topic, requires revisions beyond the included two rounds, or requests work outside the agreed Schedule of Services, such work will be billed at the Provider’s standard hourly rate stated above.</p>
+            <strong>Scope Changes:</strong> Revisions must be based on the original brief. If the Client requests a complete change of topic, requires revisions beyond the included two rounds, or requests work outside the agreed Schedule of Services, such work will be billed at the Provider’s standard hourly rate stated below.</p>
 
             <h3 class="font-bold mt-4">5. INTELLECTUAL PROPERTY</h3>
             <p class="text-sm text-gray-700"><strong>Provider’s IP:</strong> The Provider retains 100% ownership of all proprietary methodologies, speech measuring tools, rubrics, metrics, course materials, frameworks, and login portal infrastructure. The Client is granted a limited, non-exclusive license to use these tools during the term of this Agreement.<br>
@@ -69,30 +130,172 @@
             <h3 class="font-bold mt-4">9. GOVERNING LAW</h3>
             <p class="text-sm text-gray-700">This Agreement shall be governed by and construed in accordance with the laws of South Australia. Any disputes arising from this Agreement shall be resolved in the courts of South Australia.</p>
 
+            <!-- MOVED SCHEDULE OF SERVICES -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-10">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">SCHEDULE OF SERVICES (The "Inclusions")</h2>
+                <ul class="space-y-3 text-slate-700">
+                    <li><strong>Selected Services:</strong> <span id="dyn-inclusions" class="font-medium"></span></li>
+                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span></li>
+                    <li><strong>Payment Structure:</strong> <span id="dyn-payment" class="font-medium"></span></li>
+                    <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target" class="font-medium"></span></li>
+                    <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
+                </ul>
+            </div>
+
             <hr class="my-8">
 
             <!-- Signature Section -->
-            <div id="signature-block" class="bg-blue-50 p-6 rounded-lg border border-blue-200">
-                <h3 class="font-bold text-lg mb-4">Digital Signature</h3>
-                <label class="flex items-start space-x-3 cursor-pointer">
-                    <input type="checkbox" id="agree-checkbox" class="mt-1 h-5 w-5 text-blue-600 rounded">
-                    <span class="text-sm text-gray-800">I, <strong id="dyn-agree-name"></strong>, have read and agree to the Terms and Conditions outlined in this Service Agreement.</span>
+            <div id="signature-block" class="bg-blue-50 p-6 md:p-8 rounded-lg border border-blue-200 scroll-mt-10">
+                <h3 class="font-bold text-xl mb-4 text-slate-900">Digital Signature</h3>
+                <label class="flex items-start space-x-4 cursor-pointer p-4 bg-white rounded border border-blue-100 hover:border-blue-300 transition-colors">
+                    <input type="checkbox" id="agree-checkbox" class="mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                    <span class="text-sm text-gray-800 leading-relaxed">I, <strong id="dyn-agree-name" class="text-blue-700"></strong>, have read and agree to the Terms and Conditions and the Schedule of Services outlined in this Service Agreement.</span>
                 </label>
-                <button id="sign-btn" disabled class="mt-6 w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-md transition-colors cursor-not-allowed">
+                <button id="sign-btn" disabled class="mt-6 w-full bg-gray-400 text-white font-bold py-4 px-4 rounded-md transition-all cursor-not-allowed text-lg shadow-sm">
                     Accept & Sign Contract
                 </button>
             </div>
 
             <!-- Signed State Message -->
-            <div id="signed-state" class="hidden bg-green-50 text-green-800 p-6 rounded-lg border border-green-200 text-center">
-                <h3 class="text-lg font-bold mb-2">Contract Signed</h3>
-                <p class="text-sm">Thank you. A finalized copy has been emailed to both parties for their records.</p>
+            <div id="signed-state" class="hidden bg-green-50 text-green-800 p-8 rounded-lg border border-green-200 text-center">
+                <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-2xl font-bold mb-2">Contract Signed</h3>
+                <p class="text-md">Thank you. A finalized, time-stamped copy has been emailed to both parties for their records.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. Get the Contract ID from the URL
+        // --- 1. TIMELINE EXPLAINER LOGIC ---
+        const stages = [
+            {
+                id: 'stage-1',
+                title: 'Signing & Invoicing',
+                clauses: 'Clauses 1 & 2',
+                description: "We agree on the plan, set our dates, and sign the contract. You'll receive an invoice for the coaching package or custom draft deposit."
+            },
+            {
+                id: 'stage-2',
+                title: 'Payment Terms',
+                clauses: 'Clause 2',
+                description: "Invoices are due within 7 days. For coaching, it's 100% upfront to secure your spot. For custom drafting, it's 50% upfront and 50% on delivery. Late payments incur a 5% monthly fee."
+            },
+            {
+                id: 'stage-3',
+                title: 'Delivering the Work',
+                clauses: 'Clauses 1 & 7',
+                description: "We get to work! Whether it's coaching sessions or drafting, quality is guaranteed by my objective 'Green Zone' metrics, so you know exactly what standard you are getting."
+            },
+            {
+                id: 'stage-4',
+                title: 'Rescheduling & Cancellations',
+                clauses: 'Clauses 3 & 8',
+                description: "Need to change a session? Just give me 24 hours' notice and we'll reschedule for free. Less than 24 hours' notice means the session is forfeited. No refunds for change of mind once we start."
+            },
+            {
+                id: 'stage-5',
+                title: 'Completion & Ownership',
+                clauses: 'Clauses 5 & 7',
+                description: "Once fully paid, you own your final presentation and reports! I keep the rights to my proprietary teaching tools and frameworks. Remember, while I guarantee the speech metrics, I can't guarantee you'll win the pitch!"
+            },
+            {
+                id: 'stage-6',
+                title: 'Sign Your Contract',
+                clauses: 'Final Step',
+                description: "Review the formal terms and your custom Schedule of Services below, then tick the box to digitally accept and kick things off!"
+            }
+        ];
+
+        let activeStageIndex = 0;
+
+        const timelineList = document.getElementById('timeline-list');
+        const displayTitle = document.getElementById('display-title');
+        const displayDesc = document.getElementById('display-desc');
+        const displayClauses = document.getElementById('display-clauses');
+        const contentDisplay = document.getElementById('content-display');
+
+        function initTimeline() {
+            stages.forEach((stage, index) => {
+                const li = document.createElement('li');
+                li.className = 'group cursor-pointer flex items-start gap-4 transition-all duration-200';
+                li.onclick = () => selectStage(index);
+
+                const circleContainer = document.createElement('div');
+                circleContainer.className = 'relative flex-shrink-0 mt-1';
+                
+                const circle = document.createElement('div');
+                circle.id = `circle-${index}`;
+                circle.className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 ' + 
+                                   (index === activeStageIndex ? 'border-blue-600 bg-blue-50' : 'border-slate-300 group-hover:border-blue-400');
+                
+                const innerDot = document.createElement('div');
+                innerDot.id = `dot-${index}`;
+                innerDot.className = 'w-3 h-3 rounded-full transition-colors duration-300 ' +
+                                     (index === activeStageIndex ? 'bg-blue-600' : 'bg-transparent');
+
+                circle.appendChild(innerDot);
+                circleContainer.appendChild(circle);
+
+                const textContainer = document.createElement('div');
+                
+                const title = document.createElement('h4');
+                title.id = `title-${index}`;
+                title.className = 'font-semibold transition-colors duration-300 ' +
+                                  (index === activeStageIndex ? 'text-blue-700' : 'text-slate-600 group-hover:text-blue-500');
+                title.innerText = stage.title;
+
+                const subtitle = document.createElement('p');
+                subtitle.className = 'text-xs text-slate-400 mt-0.5';
+                subtitle.innerText = stage.clauses;
+
+                textContainer.appendChild(title);
+                textContainer.appendChild(subtitle);
+
+                li.appendChild(circleContainer);
+                li.appendChild(textContainer);
+                
+                timelineList.appendChild(li);
+            });
+        }
+
+        function selectStage(index) {
+            if (index === activeStageIndex) return;
+
+            const prevIndex = activeStageIndex;
+            activeStageIndex = index;
+
+            // Update Timeline UI
+            document.getElementById(`circle-${prevIndex}`).className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 border-slate-300 group-hover:border-blue-400';
+            document.getElementById(`dot-${prevIndex}`).className = 'w-3 h-3 rounded-full transition-colors duration-300 bg-transparent';
+            document.getElementById(`title-${prevIndex}`).className = 'font-semibold transition-colors duration-300 text-slate-600 group-hover:text-blue-500';
+
+            document.getElementById(`circle-${activeStageIndex}`).className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 border-blue-600 bg-blue-50';
+            document.getElementById(`dot-${activeStageIndex}`).className = 'w-3 h-3 rounded-full transition-colors duration-300 bg-blue-600';
+            document.getElementById(`title-${activeStageIndex}`).className = 'font-semibold transition-colors duration-300 text-blue-700';
+
+            // Animate Explainer Content
+            contentDisplay.classList.remove('fade-enter-active');
+            setTimeout(() => {
+                displayTitle.innerText = stages[index].title;
+                displayDesc.innerText = stages[index].description;
+                displayClauses.innerText = stages[index].clauses;
+                
+                contentDisplay.classList.add('fade-enter');
+                void contentDisplay.offsetWidth; 
+                contentDisplay.classList.add('fade-enter-active');
+                contentDisplay.classList.remove('fade-enter');
+            }, 50);
+
+            // Auto-scroll to signature if step 6 (index 5) is clicked
+            if (index === 5) {
+                const sigBlock = document.getElementById('signature-block');
+                if(sigBlock) {
+                    sigBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        // --- 2. FIREBASE CONTRACT LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
         const contractId = urlParams.get('id');
 
@@ -109,13 +312,11 @@
                 if (data.success) {
                     const c = data.contract;
                     
-                    // If already signed, hide the signature box
                     if (c.status === "signed") {
                         document.getElementById('signature-block').classList.add('hidden');
                         document.getElementById('signed-state').classList.remove('hidden');
                     }
 
-                    // Populate the DOM elements
                     const dateObj = new Date(c.createdAt);
                     document.getElementById('dyn-date').innerText = dateObj.toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
                     document.getElementById('dyn-client-name').innerText = c.clientName;
@@ -136,7 +337,6 @@
             }
         }
 
-        // 2. Handle Checkbox toggle
         const checkbox = document.getElementById('agree-checkbox');
         const signBtn = document.getElementById('sign-btn');
 
@@ -144,18 +344,17 @@
             if (checkbox.checked) {
                 signBtn.disabled = false;
                 signBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                signBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                signBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer', 'shadow-md');
             } else {
                 signBtn.disabled = true;
                 signBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-                signBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                signBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer', 'shadow-md');
             }
         });
 
-        // 3. Handle Signature Submit
         signBtn.addEventListener('click', async () => {
             signBtn.disabled = true;
-            signBtn.innerText = "Signing...";
+            signBtn.innerText = "Signing & Sending Receipts...";
 
             try {
                 const res = await fetch('/api/sign-contract', {
@@ -175,13 +374,18 @@
                     signBtn.innerText = "Accept & Sign Contract";
                 }
             } catch (err) {
-                alert('An error occurred.');
+                alert('An error occurred. Please try again.');
                 signBtn.disabled = false;
                 signBtn.innerText = "Accept & Sign Contract";
             }
         });
 
-        loadContract();
+        // Initialize on load
+        window.onload = () => {
+            initTimeline();
+            contentDisplay.classList.add('fade-enter-active');
+            loadContract();
+        };
     </script>
 </body>
 </html>
