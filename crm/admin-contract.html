@@ -8,14 +8,16 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen">
     
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="bg-slate-800 p-6 text-white">
-            <h1 class="text-2xl font-bold">Generate Service Agreement</h1>
-            <p class="text-sm text-slate-300 mt-1">Draft a new contract and email the secure link to the client.</p>
+            <h1 class="text-2xl font-bold">Generate Service Agreement & Invoice</h1>
+            <p class="text-sm text-slate-300 mt-1">Draft the contract terms and configure the invoice line items.</p>
         </div>
 
         <form id="contract-form" class="p-6 md:p-8 space-y-6">
-            <!-- Client Details -->
+            
+            <!-- 1. Client & Contract Details -->
+            <h3 class="font-bold border-b pb-2 text-lg text-slate-800">1. Client & Contract Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Client Name / Company</label>
@@ -31,19 +33,12 @@
                 </div>
             </div>
 
-            <hr class="border-gray-200">
-
-            <!-- Service Details -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Schedule of Services (Inclusions)</label>
-                <textarea id="inclusions" rows="3" required placeholder="e.g., 4x 1-hour coaching sessions, Portal Access" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-slate-800"></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Schedule of Services (Contract Narrative)</label>
+                <textarea id="inclusions" rows="2" required placeholder="High-level summary for the legal text (e.g., 4x 1-hour coaching sessions)" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-slate-800"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Fee ($)</label>
-                    <input type="number" id="total-fee" required placeholder="1500" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-slate-800">
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Payment Structure</label>
                     <select id="payment-structure" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-slate-800 bg-white">
@@ -57,15 +52,84 @@
                 </div>
             </div>
 
-            <button type="submit" id="submit-btn" class="w-full bg-slate-800 text-white font-bold py-3 px-4 rounded-md hover:bg-slate-900 transition-colors">
+            <!-- 2. Invoice Line Items -->
+            <h3 class="font-bold border-b pb-2 text-lg text-slate-800 mt-8">2. Invoice Line Items</h3>
+            
+            <div class="flex items-center mb-4 bg-yellow-50 p-3 rounded border border-yellow-200">
+                <input type="checkbox" id="applyGst" checked class="w-5 h-5 mr-3 text-yellow-600 rounded focus:ring-yellow-500">
+                <label class="text-sm font-bold text-yellow-900">Apply 10% GST (Australia) to this invoice</label>
+            </div>
+
+            <!-- Service 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Service 1 Name</label>
+                    <input type="text" id="svcName1" placeholder="ONE OFF COACHING" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-5">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                    <input type="text" id="svcDesc1" placeholder="Ad hoc public speaking coaching" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                    <input type="number" id="svcPrice1" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                    <input type="number" id="svcQty1" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Service 2 Name</label>
+                    <input type="text" id="svcName2" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-5">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                    <input type="text" id="svcDesc2" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                    <input type="number" id="svcPrice2" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                    <input type="number" id="svcQty2" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Service 3 Name</label>
+                    <input type="text" id="svcName3" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-5">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Description</label>
+                    <input type="text" id="svcDesc3" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
+                    <input type="number" id="svcPrice3" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
+                    <input type="number" id="svcQty3" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="w-full bg-slate-800 text-white font-bold py-4 px-4 rounded-md hover:bg-slate-900 transition-colors text-lg mt-4">
                 Generate & Send Contract
             </button>
         </form>
 
-        <div id="success-message" class="hidden bg-green-50 text-green-800 p-6 border-t border-green-200 text-center">
-            <h3 class="text-lg font-bold mb-2">Contract Sent!</h3>
-            <p class="text-sm">The magic link has been emailed to the client and saved to the database.</p>
-            <button onclick="location.reload()" class="mt-4 text-sm underline font-medium">Create Another</button>
+        <div id="success-message" class="hidden bg-green-50 text-green-800 p-8 border-t border-green-200 text-center">
+            <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h3 class="text-xl font-bold mb-2">Contract Sent!</h3>
+            <p class="text-md mb-6">The magic link has been emailed to the client and the invoice data is securely saved.</p>
+            <button onclick="location.reload()" class="bg-white text-green-800 border border-green-300 px-6 py-2 rounded font-medium hover:bg-green-100 transition-colors">Create Another</button>
         </div>
     </div>
 
@@ -74,6 +138,26 @@
             e.preventDefault();
             
             const submitBtn = document.getElementById('submit-btn');
+            
+            // Gather the dynamic line items (only grab rows where Qty > 0)
+            const lineItems = [];
+            for (let i = 1; i <= 3; i++) {
+                const qty = parseInt(document.getElementById(`svcQty${i}`).value) || 0;
+                if (qty > 0) {
+                    lineItems.push({
+                        name: document.getElementById(`svcName${i}`).value,
+                        desc: document.getElementById(`svcDesc${i}`).value,
+                        rate: parseFloat(document.getElementById(`svcPrice${i}`).value) || 0,
+                        qty: qty
+                    });
+                }
+            }
+
+            if (lineItems.length === 0) {
+                alert("Please add at least one service with a quantity greater than 0.");
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.innerText = 'Generating & Sending...';
 
@@ -82,9 +166,10 @@
                 clientEmail: document.getElementById('client-email').value,
                 clientAddress: document.getElementById('client-address').value,
                 inclusions: document.getElementById('inclusions').value,
-                totalFee: document.getElementById('total-fee').value,
                 paymentStructure: document.getElementById('payment-structure').value,
-                targetDate: document.getElementById('target-date').value
+                targetDate: document.getElementById('target-date').value,
+                applyGst: document.getElementById('applyGst').checked,
+                lineItems: lineItems // Sending the bundled array to the backend
             };
 
             try {
