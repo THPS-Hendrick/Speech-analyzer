@@ -19,32 +19,43 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, message: 'Only POST requests allowed' });
     }
 
-    const { clientName, clientEmail, clientAddress, inclusions, totalFee, paymentStructure, targetDate } = req.body;
+    const { clientName, clientEmail, clientAddress, inclusions, paymentStructure, targetDate, applyGst, lineItems } = req.body;
 
-    if (!clientName || !clientEmail || !totalFee) {
-        return res.status(400).json({ success: false, message: 'Missing required contract fields.' });
+    if (!clientName || !clientEmail || !lineItems || lineItems.length === 0) {
+        return res.status(400).json({ success: false, message: 'Missing required contract fields or line items.' });
     }
 
     try {
-        // 1. Save Contract to Firebase (This automatically generates the secure ID)
+        // 1. Calculate the total fee dynamically based on the line items
+        let subtotal = 0;
+        lineItems.forEach(item => {
+            subtotal += (item.rate * item.qty);
+        });
+        
+        const gstAmount = applyGst ? (subtotal * 0.10) : 0;
+        const totalFee = subtotal + gstAmount;
+
+        // 2. Save Contract to Firebase with the new detailed structure
         const docRef = await addDoc(collection(db, "Contracts"), {
             clientName,
             clientEmail,
             clientAddress,
             inclusions,
-            totalFee,
             paymentStructure,
             targetDate,
+            applyGst,
+            lineItems,
+            totalFee, // Storing the calculated total
             status: "pending",
             createdAt: new Date().toISOString()
         });
 
-        const contractId = docRef.id; // e.g., "7xK2pL5mQ8vR1wZ4abcd"
+        const contractId = docRef.id;
 
-        // 2. Generate the Magic Link
+        // 3. Generate the Magic Link
         const magicLink = `https://thps-crm.vercel.app/contract.html?id=${contractId}`;
 
-        // 3. Email the Client via Gmail API
+        // 4. Email the Client via Gmail API
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
