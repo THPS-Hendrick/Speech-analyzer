@@ -34,8 +34,8 @@ class THPSDiagnostic extends HTMLElement {
 
         // Tracks values from the two Stage 5 transcription passes
         this.stage5DataSlots = {
-            A: { wpm: 0, visual: 0, recorded: false },
-            B: { wpm: 0, visual: 0, recorded: false }
+            A: { wpm: 0, visual: 0, time: 0, recorded: false },
+            B: { wpm: 0, visual: 0, time: 0, recorded: false }
         };
         this.currentStage5Slot = null;
         
@@ -239,18 +239,22 @@ class THPSDiagnostic extends HTMLElement {
             // Catch and route execution frames for Visual Association targets (Stage 5)
             if (this.currentStage5Slot !== null) {
                 const slot = this.currentStage5Slot;
+                const timeValue = payload.time || 0;
                 
                 // Save to the memory slot for Report Card later
                 this.stage5DataSlots[slot] = {
                     recorded: true,
                     wpm: payload.wpm || 0,
-                    visual: payload.visual || 0
+                    visual: payload.visual || 0,
+                    time: timeValue
                 };
             
                 // Inject data directly into the UI pills
+                const timePill = this.querySelector(`#s5-time-${slot}`);
                 const wpmPill = this.querySelector(`#s5-wpm-${slot}`);
                 const visPill = this.querySelector(`#s5-vis-${slot}`);
                 
+                if (timePill) timePill.innerText = `${Math.round(timeValue)}s TIME`;
                 if (wpmPill) wpmPill.innerText = `${payload.wpm || 0} WPM`;
                 if (visPill) visPill.innerText = `${Math.round(payload.visual || 0)}% VIS`;
             
@@ -782,6 +786,7 @@ class THPSDiagnostic extends HTMLElement {
                                 <b class="text-indigo-600">Goal:</b> Visually describe the house slowly for 60 sec (under 100 WPM, over 50% visual words).
                             </p>
                             <div class="flex items-center gap-3 shrink-0">
+                                <div class="px-4 py-2 bg-amber-100 text-amber-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-time-A">0s TIME</div>
                                 <div class="px-4 py-2 bg-indigo-100 text-indigo-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-wpm-A">0 WPM</div>
                                 <div class="px-4 py-2 bg-emerald-100 text-emerald-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-vis-A">0% VIS</div>
                             </div>
@@ -813,6 +818,7 @@ class THPSDiagnostic extends HTMLElement {
                                 <b class="text-amber-600">Goal:</b> Visually describe building an imaginary house for 60 sec (over 170 WPM, over 50% visual words).
                             </p>
                             <div class="flex items-center gap-3 shrink-0">
+                                <div class="px-4 py-2 bg-amber-100 text-amber-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-time-B">0s TIME</div>
                                 <div class="px-4 py-2 bg-indigo-100 text-indigo-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-wpm-B">0 WPM</div>
                                 <div class="px-4 py-2 bg-emerald-100 text-emerald-700 font-black rounded-full text-xs tracking-wider shadow-sm" id="s5-vis-B">0% VIS</div>
                             </div>
