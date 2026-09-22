@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1,
+    "title": "Word Repeat",
+    "description": "Repeat a single keyword before answering.",
+    "sets": [
+      { "question": "How do I optimize sleep?", "repeat": "Word", "count": "[none]" },
+      { "question": "How do I manage stress?", "repeat": "Word", "count": "[none]" },
+      { "question": "How do I write a resume?", "repeat": "Word", "count": "[none]" },
+      { "question": "How do I clean my laptop?", "repeat": "Word", "count": "[none]" },
+      { "question": "What is your dream garden?", "repeat": "Word", "count": "[none]" },
+      { "question": "What is your dream career?", "repeat": "Word", "count": "[none]" },
+      { "question": "How do 3D printers work?", "repeat": "Word", "count": "[none]" },
+      { "question": "What is your dream kitchen?", "repeat": "Word", "count": "[none]" },
+      { "question": "What is a perfect date night?", "repeat": "Word", "count": "[none]" },
+      { "question": "How do solar panels work?", "repeat": "Word", "count": "[none]" }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Question Repeat",
+    "description": "Repeat the question before answering.",
+    "sets": [
+      { "question": "How do jet engines work?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do black holes work?", "repeat": "Question", "count": "[none]" },
+      { "question": "What is the best comfort food?", "repeat": "Question", "count": "[none]" },
+      { "question": "What is your ideal weekend?", "repeat": "Question", "count": "[none]" },
+      { "question": "What is a perfect birthday?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do I start a business?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do I organize my desk?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do I speak Spanish?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do I ask for a raise?", "repeat": "Question", "count": "[none]" },
+      { "question": "How do I invest in stocks?", "repeat": "Question", "count": "[none]" }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Statement Repeat",
+    "description": "Turn the question into a statement before answering.",
+    "sets": [
+      { "question": "How do I jump start a car?", "repeat": "Statement", "count": "[none]" },
+      { "question": "Would you invest in a gym?", "repeat": "Statement", "count": "[none]" },
+      { "question": "Would you invest in a spa?", "repeat": "Statement", "count": "[none]" },
+      { "question": "Would you invest in a cafe?", "repeat": "Statement", "count": "[none]" },
+      { "question": "Would you invest in a bank?", "repeat": "Statement", "count": "[none]" },
+      { "question": "Would you invest in a farm?", "repeat": "Statement", "count": "[none]" },
+      { "question": "What is your dream vacation?", "repeat": "Statement", "count": "[none]" },
+      { "question": "What is a perfect breakfast?", "repeat": "Statement", "count": "[none]" },
+      { "question": "What is the best way to relax?", "repeat": "Statement", "count": "[none]" },
+      { "question": "How does blockchain work?", "repeat": "Statement", "count": "[none]" }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Clarify in 2",
+    "description": "Clarify if they want a large or small example",
+    "sets": [
+      { "question": "How do fiber optics work?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "How does a microchip work?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "How do touch screens work?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: gold or silver?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: early or late?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: fiction or fact?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: a night out or in?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: summer or winter?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: books or movies?", "repeat": "Clarify in 2", "count": "Small+Big" },
+      { "question": "What's better: cash or credit?", "repeat": "Clarify in 2", "count": "Small+Big" }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Repeat Small+Big",
+    "description": "Repeat then give a Wrong + Right example",
+    "sets": [
+      { "question": "What's better: city or country?", "repeat": "Word", "count": "Wrong+Right" },
+      { "question": "What's better: diet or exercise?", "repeat": "Word", "count": "Wrong+Right" },
+      { "question": "How do I save for retirement?", "repeat": "Question", "count": "Wrong+Right" },
+      { "question": "Would you invest in a salon?", "repeat": "Question", "count": "Wrong+Right" },
+      { "question": "Would you invest in a hotel?", "repeat": "Statement", "count": "Wrong+Right" },
+      { "question": "Would you invest in a bakery?", "repeat": "Statement", "count": "Wrong+Right" },
+      { "question": "Would you invest in a winery?", "repeat": "Word", "count": "Wrong+Right" },
+      { "question": "Would you invest in a florist?", "repeat": "Statement", "count": "Wrong+Right" },
+      { "question": "Would you invest in a startup?", "repeat": "Question", "count": "Wrong+Right" },
+      { "question": "What is the ideal family trip?", "repeat": "Clarify", "count": "Wrong+Right" }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Word + Count",
+    "description": "Repeat a Word then Count",
+    "sets": [
+      { "question": "What is the ultimate road trip?", "repeat": "Word", "count": "Inside + Outside" },
+      { "question": "What is your ideal living room?", "repeat": "Word", "count": "Expensive + Cheap" },
+      { "question": "What is a perfect summer day?", "repeat": "Word", "count": "Open + Closed" },
+      { "question": "How do nuclear reactors work?", "repeat": "Word", "count": "Begin + End" },
+      { "question": "How do search engines work?", "repeat": "Word", "count": "Give + Take" },
+      { "question": "How do electric vehicles work?", "repeat": "Word", "count": "Win + Lose" },
+      { "question": "How does quantum physics work?", "repeat": "Word", "count": "Create + Destroy" },
+      { "question": "How do trust distributions work?", "repeat": "Word", "count": "Ahead + Behind" },
+      { "question": "How does machine learning work?", "repeat": "Word", "count": "Amateur + Pro" },
+      { "question": "How does cloud computing work?", "repeat": "Word", "count": "Chaos + Order" }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Question + Count",
+    "description": "Repeat the Question then Count",
+    "sets": [
+      { "question": "How does cryptocurrency work?", "repeat": "Question", "count": "Local + International" },
+      { "question": "What's better: sweet or savory?", "repeat": "Question", "count": "Clear + Unclear" },
+      { "question": "What's better: iOS or Android?", "repeat": "Question", "count": "Pros + Cons" },
+      { "question": "What's better: driving or flying?", "repeat": "Question", "count": "Internal + External" },
+      { "question": "What's better: logic or emotion?", "repeat": "Question", "count": "Incomplete + Complete" },
+      { "question": "What's better: cardio or weights?", "repeat": "Question", "count": "Private + Public" },
+      { "question": "What's better: saving or spending?", "repeat": "Question", "count": "Me + Others" },
+      { "question": "What's better: working or playing?", "repeat": "Question", "count": "Singular + Plural" },
+      { "question": "Would you invest in a pharmacy?", "repeat": "Question", "count": "Bright + Dull" },
+      { "question": "Would you invest in a toy shop?", "repeat": "Question", "count": "Emotional + Logical" }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Statement + Count",
+    "description": "Use Statement Repeat then Count",
+    "sets": [
+      { "question": "Would you invest in a bookstore?", "repeat": "Statement", "count": "Simple + Complex" },
+      { "question": "Would you invest in a car wash?", "repeat": "Statement", "count": "Small + Big" },
+      { "question": "Would you invest in a pet store?", "repeat": "Statement", "count": "Wrong + Right" },
+      { "question": "Would you invest in a restaurant?", "repeat": "Statement", "count": "Open + Closed" },
+      { "question": "Would you invest in a barbershop?", "repeat": "Statement", "count": "Give + Take" },
+      { "question": "Would you invest in a laundromat?", "repeat": "Statement", "count": "Win + Lose" },
+      { "question": "Would you invest in a food truck?", "repeat": "Statement", "count": "Inside + Outside" },
+      { "question": "What is the best way to wake up?", "repeat": "Statement", "count": "Ahead + Behind" },
+      { "question": "What is the ideal sunday routine?", "repeat": "Statement", "count": "Chaos + Order" },
+      { "question": "How does the stock market work?", "repeat": "Statement", "count": "Pros + Cons" }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Clarify + Count",
+    "description": "Use Clarify Repeat then Count",
+    "sets": [
+      { "question": "How does facial recognition work?", "repeat": "Clarify in 2", "count": "Amateur + Pro" },
+      { "question": "How do you invest in yourself?", "repeat": "Clarify in 2", "count": "Create + Destroy" },
+      { "question": "What's better: unlimited time or money?", "repeat": "Clarify in 2", "count": "Clear + Unclear" },
+      { "question": "How does compounding interest work?", "repeat": "Clarify in 2", "count": "Internal + External" },
+      { "question": "In what areas of your life are you playing it too safe?", "repeat": "Clarify in 2", "count": "Private + Public" },
+      { "question": "Does true altruism exist, or are all good deeds slightly selfish?", "repeat": "Clarify in 2", "count": "Singular + Plural" },
+      { "question": "What is a complete \"waste of time\" that you deeply, personally value?", "repeat": "Clarify in 2", "count": "Emotional + Logical" },
+      { "question": "What's your dream hobby if money didn't matter?", "repeat": "Clarify in 2", "count": "Incomplete + Complete" },
+      { "question": "Who do you want to become by the time you are old?", "repeat": "Clarify in 2", "count": "Me + Others" },
+      { "question": "What does a \"life well lived\" look like to you?", "repeat": "Clarify in 2", "count": "Bright + Dull" }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Hostile Mode",
+    "description": "Use any Repeat and any Count!",
+    "sets": [
+      { "question": "How do you find meaning in mundane, everyday tasks?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "When is it the right time to quietly walk away from a toxic friendship?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "What makes a neighborhood or group feel like a true \"community\"?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "Is happiness a conscious choice, a mere byproduct, or an illusion?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "What exact role does gratitude play in your normal daily routine?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "How do you find peace in the things you cannot possibly control?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "How do you actively keep your inner child alive as an adult?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "Are you trading too much of your time for money, or vice versa?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "What is your core personal philosophy on taking on financial debt?", "repeat": "[Blank]", "count": "[Blank]" },
+      { "question": "How do you personally define the concept of \"financial freedom\"?", "repeat": "[Blank]", "count": "[Blank]" }
+    ]
+  }
+]
