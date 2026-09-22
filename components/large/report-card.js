@@ -223,7 +223,7 @@ class THPSReportCard extends HTMLElement {
                                 ${this.data.repeatCount.map(round => `
                                     <div class="border rounded-lg p-2.5 bg-slate-50 flex justify-between items-center">
                                         <span class="font-sans font-bold text-slate-700">${round.name} Map</span>
-                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 \vert{} V:${round.voice}/5</span>
+                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 | V:${round.voice}/5</span>
                                     </div>
                                 `).join('')}
                             </div>
