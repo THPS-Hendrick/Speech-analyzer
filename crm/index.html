@@ -12,7 +12,8 @@
     <!-- Top Navigation -->
     <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-800">Pipeline</h1>
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium">
+        <!-- Updated Button -->
+        <button id="new-client-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium transition-colors">
             + New Client
         </button>
     </header>
@@ -81,6 +82,34 @@
         </div>
         
     </main>
+
+    <!-- NEW CLIENT MODAL POPUP -->
+    <div id="new-client-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div class="bg-slate-800 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-white font-bold text-lg">Add New Client</h2>
+                <button type="button" id="close-modal-x" class="text-slate-300 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <form id="new-client-form" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+                    <input type="text" id="modal-name" required class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="modal-email" required class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Source / Tags (e.g., Website, Cold)</label>
+                    <input type="text" id="modal-source" required class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded font-medium transition-colors">Cancel</button>
+                    <button type="submit" id="save-client-btn" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 font-medium transition-colors">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Link your JavaScript file via Githack -->
     <script type="module" src="app.js"></script>
