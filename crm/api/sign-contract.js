@@ -80,7 +80,7 @@ export default async function handler(req, res) {
                     
                     <h3 style="margin-top:0; color: #0f172a;">Schedule of Services</h3>
                     <p style="margin: 5px 0;"><strong>Inclusions:</strong> ${contractData.inclusions}</p>
-                    <p style="margin: 5px 0;"><strong>Total Fee:</strong> $${contractData.totalFee}</p>
+                    <p style="margin: 5px 0;"><strong>Total Fee:</strong> ${contractData.totalFee}</p>
                 </div>
                 
                 <br>
