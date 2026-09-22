@@ -226,7 +226,10 @@ class THPSDiagnostic extends HTMLElement {
                     sps: payload.sps || 0,
                     pause: payload.pause || 0,
                     db: avgDb,
-                    text: payload.text
+                    text: payload.text,
+                    pauseBuckets: payload.pauseBuckets || [0, 0, 0, 0, 0],
+                    volumeBuckets: payload.volumeBuckets || [0, 0, 0, 0, 0],
+                    runBuckets: payload.runBuckets || [0, 0, 0, 0, 0]
                 };
                 
                 console.log("Vocal Inhibition Data Saved:", this.vocalInhibitionData);
