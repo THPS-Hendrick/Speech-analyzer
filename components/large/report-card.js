@@ -129,7 +129,7 @@ class THPSReportCard extends HTMLElement {
                         </div>
 
                         <div class="mb-6">
-                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Strengths [${splitData.strengths.length}/5]</h3>
+                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Strengths [${splitData.strengths.length}/4]</h3>
                             <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5">
                                 ${splitData.strengths.length > 0 
                                     ? splitData.strengths.map(s => `<li><b>${s.name}:</b>${s.text}</li>`).join('') 
@@ -138,7 +138,7 @@ class THPSReportCard extends HTMLElement {
                         </div>
 
                         <div class="mb-6">
-                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Gaps [${splitData.gaps.length}/5]</h3>
+                            <h3 class="font-bold text-base text-slate-900 mb-2">Your Speaking Gaps [${splitData.gaps.length}/4]</h3>
                             <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1.5">
                                 ${splitData.gaps.length > 0 
                                     ? splitData.gaps.map(g => `<li><b>${g.name}:</b>${g.text}</li>`).join('') 
