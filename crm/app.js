@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // 1. Your Firebase config
 const firebaseConfig = {
@@ -31,7 +31,7 @@ function createClientCard(client) {
         </div>
     </div>
     `;
-} // <-- Removed stray semicolon here
+}
 
 // 3. Fetch data and place it in columns
 async function loadClients() {
@@ -69,3 +69,53 @@ async function loadClients() {
 
 // Run this function when the page loads
 loadClients();
+
+
+// --- 4. NEW CLIENT MODAL LOGIC ---
+const newClientBtn = document.getElementById('new-client-btn');
+const newClientModal = document.getElementById('new-client-modal');
+const closeModalX = document.getElementById('close-modal-x');
+const cancelModalBtn = document.getElementById('cancel-modal-btn');
+const newClientForm = document.getElementById('new-client-form');
+const saveClientBtn = document.getElementById('save-client-btn');
+
+// Open Modal
+newClientBtn.addEventListener('click', () => {
+    newClientModal.classList.remove('hidden');
+});
+
+// Close Modal
+const closeModal = () => {
+    newClientModal.classList.add('hidden');
+    newClientForm.reset(); // Clear inputs when closing
+};
+closeModalX.addEventListener('click', closeModal);
+cancelModalBtn.addEventListener('click', closeModal);
+
+// Save Data to Firebase
+newClientForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Stop page from refreshing early
+    saveClientBtn.disabled = true;
+    saveClientBtn.innerText = "Saving...";
+
+    try {
+        await addDoc(collection(db, "Clients"), {
+            name: document.getElementById('modal-name').value,
+            email: document.getElementById('modal-email').value,
+            tags: [document.getElementById('modal-source').value], // Saving as an array for your tag bubbles
+            stage: "Enquiry Received", // Drops them directly into column 1
+            createdAt: new Date().toISOString(),
+            last_contact_date: new Date().toISOString()
+        });
+
+        closeModal();
+        // Reload the page to fetch the newly updated list of clients
+        window.location.reload(); 
+    } catch (error) {
+        console.error("Error adding client: ", error);
+        alert("Failed to add client. Check console.");
+    } finally {
+        saveClientBtn.disabled = false;
+        saveClientBtn.innerText = "Save";
+    }
+});
