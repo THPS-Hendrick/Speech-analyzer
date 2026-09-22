@@ -69,7 +69,17 @@
         </div>
 
         <div id="contract-content" class="hidden space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
-            <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide">Public Speaking Services Agreement</h1>
+            
+            <!-- NEW PROMINENT BUTTON -->
+            <div class="flex justify-center mb-2 no-print">
+                <button class="scroll-to-invoice-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 inline-flex items-center text-lg">
+                    <svg class="w-5 h-5 mr-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    View Invoice
+                </button>
+            </div>
+
+            <!-- We add border-t and pt-8 to create a nice separator line under the button -->
+            <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide border-t border-slate-200 pt-8">Public Speaking Services Agreement</h1>
             
             <p>This Services Agreement ("Agreement") is entered into on <span id="dyn-date" class="font-semibold text-blue-700"></span> by and between:</p>
             
@@ -139,15 +149,15 @@
                 <h2 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">SCHEDULE OF SERVICES (The "Inclusions")</h2>
                 <ul class="space-y-3 text-slate-700">
                     <li><strong>Selected Services:</strong> <span id="dyn-inclusions" class="font-medium"></span></li>
-                    <li><strong>Total Fee:</strong> $<span id="dyn-fee" class="font-medium"></span></li>
+                    <li><strong>Total Fee:</strong> <span id="dyn-fee" class="font-medium"></span></li>
                     <li><strong>Payment Structure:</strong> <span id="dyn-payment" class="font-medium"></span></li>
                     <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target" class="font-medium"></span></li>
                     <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
                 </ul>
                 <div class="mt-4 pt-4 border-t border-slate-200">
-                    <button id="view-invoice-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors shadow-sm inline-flex items-center text-sm">
+                    <button class="scroll-to-invoice-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors shadow-sm inline-flex items-center text-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        View Itemized Invoice Draft
+                        View Invoice
                     </button>
                 </div>
             </div>
@@ -174,7 +184,7 @@
     </div>
 
     <!-- INVOICE WRAPPER (This is the only element that prints) -->
-    <div id="invoice-wrapper" class="hidden max-w-4xl mx-auto mb-16 px-6">
+    <div id="invoice-wrapper" class="max-w-4xl mx-auto mb-16 px-6">
         <div class="bg-white p-10 rounded shadow-lg print-shadow-none" id="invoicePage">
             <div class="flex justify-between items-start border-b-2 border-yellow-500 pb-6 mb-6">
                 <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
@@ -277,7 +287,7 @@
             { id: 'stage-3', title: 'Delivering the Work', clauses: 'Clauses 1 & 7', description: "Be sure to schedule your coaching sessions & script view appointments (booking link will be sent in an email after acceptance). Quality is guaranteed by agreed upon 'Green Zone' metrics, so you know exactly what standard you are getting." },
             { id: 'stage-4', title: 'Rescheduling & Cancellations', clauses: 'Clauses 3 & 8', description: "Need to change a session? Just give me 24 hours' notice and we'll reschedule for free. Less than 24 hours' notice means the session is forfeited. No refunds for change of mind once we start." },
             { id: 'stage-5', title: 'Completion & Ownership', clauses: 'Clauses 5 & 7', description: "Once fully paid, you own your final presentation and reports! I keep the rights to my proprietary teaching tools and frameworks. As your coach, I can only guarantee speech metrics you're happy with, I can't guarantee how audiences will react!" },
-            { id: 'stage-6', title: 'Sign Your Contract', clauses: 'Final Step', description: "Review the formal terms and your custom Schedule of Services below, then tick the box to digitally accept and kick things off!" }
+            { id: 'stage-6', title: 'Sign Contract & Pay Invoice', clauses: 'Final Step', description: "Review the contract and invoice (below). Tick the box to digitally accept, pay the invoice and we'll kick things off!" }
         ];
 
         let activeStageIndex = 0;
@@ -403,8 +413,8 @@
 
         const checkbox = document.getElementById('agree-checkbox');
         const signBtn = document.getElementById('sign-btn');
-        const viewInvoiceBtn = document.getElementById('view-invoice-btn');
         const invoiceWrapper = document.getElementById('invoice-wrapper');
+        const scrollButtons = document.querySelectorAll('.scroll-to-invoice-btn');
 
         checkbox.addEventListener('change', () => {
             if (checkbox.checked) {
@@ -445,9 +455,10 @@
             }
         });
 
-        viewInvoiceBtn.addEventListener('click', () => {
-            invoiceWrapper.classList.remove('hidden');
-            invoiceWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                invoiceWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
         });
 
         function formatCurrency(amount) {
