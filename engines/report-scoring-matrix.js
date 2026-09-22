@@ -1,6 +1,6 @@
 window.THPS_ReportScoring = {
     
-    // 1. Vocal Inhibition Algorithm
+  // 1. Vocal Inhibition Algorithm
     scoreVocalInhibition: function(vocalData) {
         if (!vocalData || !vocalData.recorded) {
             return {
@@ -10,23 +10,34 @@ window.THPS_ReportScoring = {
             };
         }
 
-        const pBuckets = vocalData.pauseBuckets || [0, 0, 0, 0, 0];
-        const vBuckets = vocalData.volumeBuckets || [0, 0, 0, 0, 0];
-        const rBuckets = vocalData.runBuckets || [0, 0, 0, 0, 0];
+        // HELPER: Forces any incoming data (Object or Array) into a strict 5-number array
+        const formatBuckets = (data) => {
+            if (!data) return [0, 0, 0, 0, 0];
+            const arr = Array.isArray(data) ? data : Object.values(data);
+            return arr.length > 0 ? arr : [0, 0, 0, 0, 0];
+        };
 
-        const pausePass = pBuckets[2] >= 2 && pBuckets[3] >= 2 && pBuckets[4] >= 2;
+        const pBuckets = formatBuckets(vocalData.pauseBuckets);
+        const vBuckets = formatBuckets(vocalData.volumeBuckets);
+        const rBuckets = formatBuckets(vocalData.runBuckets);
+
+        // 2. Pause Evaluation: Needs >= 2 in indices 2, 3, and 4 (Medium, Long, Very Long)
+        const pausePass = (pBuckets[2] || 0) >= 2 && (pBuckets[3] || 0) >= 2 && (pBuckets[4] || 0) >= 2;
         const pauseVariety = pausePass ? "high" : "low";
 
+        // 3. Volume Evaluation: Calculate percentages, fail if >= 2 buckets are < 10%
         const totalWords = Math.max(1, vBuckets.reduce((sum, count) => sum + count, 0));
         const vPercentages = vBuckets.map(count => (count / totalWords) * 100);
         const voiceFailCount = vPercentages.filter(pct => pct < 10).length;
         const voicePass = voiceFailCount < 2;
         const voiceVariety = voicePass ? "high" : "low";
 
+        // 4. Run Evaluation: Fail if >= 2 buckets have < 2 runs
         const runFailCount = rBuckets.filter(count => count < 2).length;
         const runPass = runFailCount < 2;
         const runVariety = runPass ? "high" : "low";
 
+        // 5. Overarching Diagnosis Routing
         let fails = 0;
         if (!pausePass) fails++;
         if (!voicePass) fails++;
@@ -41,6 +52,7 @@ window.THPS_ReportScoring = {
             if (!runPass) label = "Run Inhibition";
         }
 
+        // 6. Chart Normalization (Scale highest value to 100% for CSS rendering)
         const normalize = (arr) => {
             const max = Math.max(...arr, 1);
             return arr.map(val => (val / max) * 100);
