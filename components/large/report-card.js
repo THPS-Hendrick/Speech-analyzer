@@ -45,7 +45,7 @@ class THPSReportCard extends HTMLElement {
 
         const opt = {
             margin:       0,
-            filename:     `Speech_Assessment_${this.data?.client?.name || 'Client'}.pdf`,
+            filename:     `Speech_Assessment_${this.data?.client?.name?.replace(/\s+/g, '_') || 'Client'}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, logging: false },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -82,16 +82,14 @@ class THPSReportCard extends HTMLElement {
         const scoring = window.THPS_ReportScoring || {
             scoreVocalInhibition: () => ({ hasInhibition: false, label: "No Inhibition", pauseVariety: "med", voiceVariety: "med", runVariety: "med", bars: { pause: [20,20,20,20,20], voice: [20,20,20,20,20], run: [20,20,20,20,20] } }),
             scoreVisualInhibition: () => ({ label: "Not Inhibited", house: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 }, imagination: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 } }),
-            scoreCategoryInhibition: () => ({ label: "Not Inhibited" }),
-            sortStrengthsAndGaps: () => ({ strengths: [], gaps: [] }),
-            calculateTotalScore: () => ({ score: 0, grade: "average" })
+            scoreCategoryInhibition: () => ({ total: 0, label: "Not Inhibited", grade: "Average" }),
+            sortStrengthsAndGaps: () => ({ strengths: [], gaps: [] })
         };
 
         const vocal = scoring.scoreVocalInhibition(this.data.vocalInhibition);
         const visual = scoring.scoreVisualInhibition(this.data.visualAssociation);
         const category = scoring.scoreCategoryInhibition(this.data.repeatCount);
         const splitData = scoring.sortStrengthsAndGaps(this.data, this.explainerData.strengthsGaps);
-        const total = scoring.calculateTotalScore(this.data);
 
         const phantasiaText = (this.explainerData.phantasia && this.explainerData.phantasia[this.data.phantasia]) 
             ? this.explainerData.phantasia[this.data.phantasia] 
@@ -100,7 +98,7 @@ class THPSReportCard extends HTMLElement {
         this.innerHTML = `
         <style>
             .a4-container { width: 100%; max-width: 800px; margin: 0 auto; }
-            .a4-page { width: 210mm; min-height: 295mm; bg-white; padding: 15mm; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; background: white; }
+            .a4-page { width: 210mm; min-height: 295mm; padding: 15mm; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; background: white; }
         </style>
 
         <div class="a4-container font-['Inter',sans-serif] text-slate-800">
@@ -201,7 +199,7 @@ class THPSReportCard extends HTMLElement {
                                     <div class="space-y-1 text-xs text-slate-600">
                                         <div class="flex justify-between"><span>Time:</span> <span class="font-bold">${visual.house.time}s (${visual.house.timePass ? 'pass' : 'fail'})</span></div>
                                         <div class="flex justify-between"><span>Pace:</span> <span class="font-bold">${visual.house.pace} wpm (${visual.house.pacePass ? 'pass' : 'fail'})</span></div>
-                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${visual.house.vis}% (${visual.house.visPass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${Math.round(visual.house.vis)}% (${visual.house.visPass ? 'pass' : 'fail'})</span></div>
                                         <div class="flex justify-between text-slate-900 font-black pt-2 border-t border-slate-200"><span>Result:</span> <span>${visual.house.score}/3 (${visual.house.score === 3 ? 'pass' : 'fail'})</span></div>
                                     </div>
                                 </div>
@@ -210,7 +208,7 @@ class THPSReportCard extends HTMLElement {
                                     <div class="space-y-1 text-xs text-slate-600">
                                         <div class="flex justify-between"><span>Time:</span> <span class="font-bold">${visual.imagination.time}s (${visual.imagination.timePass ? 'pass' : 'fail'})</span></div>
                                         <div class="flex justify-between"><span>Pace:</span> <span class="font-bold">${visual.imagination.pace} wpm (${visual.imagination.pacePass ? 'pass' : 'fail'})</span></div>
-                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${visual.imagination.vis}% (${visual.imagination.visPass ? 'pass' : 'fail'})</span></div>
+                                        <div class="flex justify-between"><span>Visual:</span> <span class="font-bold">${Math.round(visual.imagination.vis)}% (${visual.imagination.visPass ? 'pass' : 'fail'})</span></div>
                                         <div class="flex justify-between text-slate-900 font-black pt-2 border-t border-slate-200"><span>Result:</span> <span>${visual.imagination.score}/3 (${visual.imagination.score === 3 ? 'pass' : 'fail'})</span></div>
                                     </div>
                                 </div>
@@ -225,17 +223,17 @@ class THPSReportCard extends HTMLElement {
                                 ${this.data.repeatCount.map(round => `
                                     <div class="border rounded-lg p-2.5 bg-slate-50 flex justify-between items-center">
                                         <span class="font-sans font-bold text-slate-700">${round.name} Map</span>
-                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 | V:${round.voice}/5</span>
+                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 \vert{} V:${round.voice}/5</span>
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <!-- TOTAL SCORE FOOTER -->
+                    <!-- TOTAL SCORE FOOTER (Strictly Test 5) -->
                     <div class="border-t-2 border-slate-900 pt-4 flex justify-between items-center">
-                        <h3 class="font-black text-lg text-slate-900">Total Score: <span class="text-indigo-600">${total.score} / 90</span></h3>
-                        <span class="px-4 py-1.5 bg-indigo-100 text-indigo-800 font-black rounded-full uppercase tracking-wider text-xs">${total.grade}</span>
+                        <h3 class="font-black text-lg text-slate-900">Total Score: <span class="text-indigo-600">${category.total} / 90</span></h3>
+                        <span class="px-4 py-1.5 bg-indigo-100 text-indigo-800 font-black rounded-full uppercase tracking-wider text-xs">${category.grade}</span>
                     </div>
                 </div>
             </div>
