@@ -27,9 +27,11 @@ class THPSCourseWidget extends HTMLElement {
 
         // Repeat + Count Specific State
         this.rcData = null;
-        this.rcMenuIndex = 0; // Tracks the level shown in the carousel
-        this.rcActiveLevel = 0; // The level they actually clicked into
-        this.rcSetIndex = 0; // The set of prompts (0 to 9) inside the level
+        this.rcMenuIndex = 0;
+        this.rcActiveLevel = 0; 
+        this.rcSetIndex = 0; 
+        this.rcState = 'prompt'; // 'prompt' or 'grade'
+        this.rcLatestTelemetry = null; // Caches the 9 metrics
     }
 
     connectedCallback() {
@@ -45,7 +47,6 @@ class THPSCourseWidget extends HTMLElement {
         window.removeEventListener('thps-dashboard-update', this.payloadHandler);
     }
 
-    // STATE 0: THE COURSE SELECTION MENU
     renderCourseSelector() {
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-8 font-sans">
@@ -66,7 +67,6 @@ class THPSCourseWidget extends HTMLElement {
                         <i data-lucide="mic-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
                     </button>
 
-                    <!-- REPEAT + COUNT 10-LEVEL BUTTON -->
                     <button class="thps-course-btn group flex items-center justify-between bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-bold py-4 px-6 rounded-xl transition-all shadow-sm active:scale-95" data-type="repeat-count" data-url="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/repeat-count/repeat-count-levels.json">
                         <span class="group-hover:text-indigo-700 transition-colors pointer-events-none">Repeat + Count</span>
                         <i data-lucide="gamepad-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors pointer-events-none"></i>
@@ -155,7 +155,6 @@ class THPSCourseWidget extends HTMLElement {
                     <p class="text-slate-500 text-sm md:text-base mt-2">Select your difficulty level to begin.</p>
                 </div>
 
-                <!-- CAROUSEL -->
                 <div class="flex items-center justify-between w-full max-w-3xl mx-auto px-2 md:px-6">
                     <button id="rc-menu-prev" class="p-3 bg-white border-2 border-slate-200 hover:border-indigo-400 text-slate-400 hover:text-indigo-600 rounded-full transition-all active:scale-90 shadow-sm shrink-0">
                         <i data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
@@ -200,6 +199,7 @@ class THPSCourseWidget extends HTMLElement {
         this.querySelector('#rc-menu-select').addEventListener('click', () => {
             this.rcActiveLevel = this.rcMenuIndex;
             this.rcSetIndex = 0;
+            this.rcState = 'prompt'; 
             this.currentStep = 'rc-drill';
             this.renderRepeatCountDrill();
         });
@@ -208,8 +208,17 @@ class THPSCourseWidget extends HTMLElement {
     renderRepeatCountDrill() {
         const level = this.rcData[this.rcActiveLevel];
         const set = level.sets[this.rcSetIndex];
+        const isFlipped = this.rcState === 'grade';
 
         this.innerHTML = `
+            <style>
+                .rc-flip-card { perspective: 1000px; }
+                .rc-flip-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform-style: preserve-3d; }
+                .rc-flipped .rc-flip-inner { transform: rotateY(180deg); }
+                .rc-flip-front, .rc-flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; }
+                .rc-flip-back { transform: rotateY(180deg); }
+            </style>
+            
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
                 
                 <!-- TOP HEADER -->
@@ -226,35 +235,108 @@ class THPSCourseWidget extends HTMLElement {
                     </button>
                 </div>
 
-                <!-- THREE SET PROMPT FIELDS -->
+                <!-- 3D FLIPPABLE CARDS -->
                 <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 mt-6 px-4 md:px-0 justify-center">
                     
-                    <div class="flex-1 max-h-[110px] min-h-[90px] bg-white border-2 border-indigo-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 relative">
-                        <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2.5 left-4">Question Prompt</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${set.question}</span>
+                    <!-- CARD 1: QUESTION / MANUAL GRADING -->
+                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-1">
+                        <div class="rc-flip-inner">
+                            <div class="rc-flip-front bg-white border-2 border-indigo-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
+                                <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-3 left-4">Question Prompt</span>
+                                <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug w-[90%] mx-auto line-clamp-3">${set.question}</span>
+                            </div>
+                            <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col items-start justify-center p-5">
+                                <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-3 w-full text-center">Manual Adherence Check</span>
+                                <label class="flex items-center gap-3 cursor-pointer mb-2 w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                    <input type="checkbox" id="chk-question" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
+                                    <span class="text-sm font-bold text-white">Answered Question</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer mb-2 w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                    <input type="checkbox" id="chk-repeat" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
+                                    <span class="text-sm font-bold text-white">Followed Repeat Rule</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                    <input type="checkbox" id="chk-count" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
+                                    <span class="text-sm font-bold text-white">Followed Count Rule</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex-1 max-h-[110px] min-h-[90px] bg-white border-2 border-emerald-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 relative">
-                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-2.5 left-4">Repeat Framework</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${set.repeat}</span>
+                    <!-- CARD 2: REPEAT / CONTENT & DELIVERY -->
+                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-2">
+                        <div class="rc-flip-inner">
+                            <div class="rc-flip-front bg-white border-2 border-emerald-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
+                                <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-3 left-4">Repeat Framework</span>
+                                <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug w-[90%] mx-auto line-clamp-3">${set.repeat}</span>
+                            </div>
+                            <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col justify-center p-4">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-left w-full h-full content-center">
+                                    <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Personal</span>
+                                        <span class="text-sm font-black text-emerald-400" id="rc-val-pers">--%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">WPM</span>
+                                        <span class="text-sm font-black text-amber-400" id="rc-val-wpm">--</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Visual</span>
+                                        <span class="text-sm font-black text-emerald-400" id="rc-val-vis">--%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">SPS</span>
+                                        <span class="text-sm font-black text-amber-400" id="rc-val-sps">--</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Intangible</span>
+                                        <span class="text-sm font-black text-slate-200" id="rc-val-intg">--%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Pause</span>
+                                        <span class="text-sm font-black text-amber-400" id="rc-val-pause">--%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex-1 max-h-[110px] min-h-[90px] bg-white border-2 border-amber-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4 relative">
-                        <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-2.5 left-4">Count Sequence</span>
-                        <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${set.count}</span>
+                    <!-- CARD 3: COUNT / SIMPLICITY & ACTIONS -->
+                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-3">
+                        <div class="rc-flip-inner">
+                            <div class="rc-flip-front bg-white border-2 border-amber-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
+                                <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-3 left-4">Count Sequence</span>
+                                <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug w-[90%] mx-auto line-clamp-3">${set.count}</span>
+                            </div>
+                            <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col p-4 justify-between">
+                                <div class="grid grid-cols-3 gap-2 mb-4 mt-1">
+                                    <div class="text-center">
+                                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Runtime</span>
+                                        <span class="text-sm font-black text-cyan-400" id="rc-val-run">--</span>
+                                    </div>
+                                    <div class="text-center border-l border-slate-700">
+                                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Grade</span>
+                                        <span class="text-sm font-black text-cyan-400" id="rc-val-grade">--</span>
+                                    </div>
+                                    <div class="text-center border-l border-slate-700">
+                                        <span class="block text-[9px] font-bold text-slate-400 uppercase">Simple</span>
+                                        <span class="text-sm font-black text-cyan-400" id="rc-val-simp">--%</span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 w-full mt-auto">
+                                    <button id="btn-rc-retry" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors border border-slate-600">Retry</button>
+                                    <button id="btn-rc-save" class="flex-[2] py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors shadow-md flex items-center justify-center gap-1">
+                                        <i data-lucide="check" class="w-3 h-3"></i> Save to CRM
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SLEEK ARCADE TIMER BAR PANEL (Recycles Arcade IDs for sync) -->
+                <!-- SLEEK ARCADE TIMER BAR PANEL -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-4 px-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
-                    
-                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;">
-                        <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
-                    </div>
-                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;">
-                        <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
-                    </div>
                     
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
@@ -294,6 +376,8 @@ class THPSCourseWidget extends HTMLElement {
             if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
             const len = level.sets.length;
             this.rcSetIndex = (this.rcSetIndex - 1 + len) % len;
+            this.rcState = 'prompt';
+            this.rcLatestTelemetry = null;
             this.renderRepeatCountDrill();
         });
 
@@ -301,12 +385,117 @@ class THPSCourseWidget extends HTMLElement {
             if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
             const len = level.sets.length;
             this.rcSetIndex = (this.rcSetIndex + 1) % len;
+            this.rcState = 'prompt';
+            this.rcLatestTelemetry = null;
             this.renderRepeatCountDrill();
         });
 
         this.querySelector('#arcade-record-btn').addEventListener('click', () => {
+            // Prevent recording if currently in grading view
+            if (this.rcState === 'grade') return;
             if (typeof window.toggleRecording === 'function') window.toggleRecording();
         });
+
+        // Retry & Save Action Listeners (Only active when flipped)
+        const btnRetry = this.querySelector('#btn-rc-retry');
+        if (btnRetry) {
+            btnRetry.addEventListener('click', () => {
+                this.rcState = 'prompt';
+                this.rcLatestTelemetry = null;
+                this.renderRepeatCountDrill();
+            });
+        }
+
+        const btnSave = this.querySelector('#btn-rc-save');
+        if (btnSave) {
+            btnSave.addEventListener('click', () => this.saveRcAttemptToCRM(btnSave));
+        }
+        
+        // Auto-hydrate the telemetry numbers if rendering in flipped state
+        if (this.rcState === 'grade' && this.rcLatestTelemetry) {
+            this.updateRcTelemetryUI();
+        }
+    }
+
+    updateRcTelemetryUI() {
+        if (!this.rcLatestTelemetry) return;
+        const d = this.rcLatestTelemetry;
+        
+        const setVal = (id, val) => {
+            const el = this.querySelector(id);
+            if (el) el.innerText = val;
+        };
+
+        setVal('#rc-val-pers', `${Math.round(d.personal)}%`);
+        setVal('#rc-val-vis', `${Math.round(d.visual)}%`);
+        setVal('#rc-val-intg', `${Math.round(d.intangible)}%`);
+        setVal('#rc-val-wpm', Math.round(d.wpm));
+        setVal('#rc-val-sps', d.sps.toFixed(1));
+        setVal('#rc-val-pause', `${Math.round(d.pause)}%`);
+        setVal('#rc-val-run', `${d.runtime.toFixed(1)}s`);
+        setVal('#rc-val-grade', d.compGrade.toFixed(1));
+        setVal('#rc-val-simp', `${Math.round(d.simple)}%`);
+    }
+
+    async saveRcAttemptToCRM(btnEl) {
+        const clientId = localStorage.getItem('thps_crm_client_id');
+        if (!clientId) {
+            alert("No CRM Client ID linked! Click 'Guest' at the top left to link a session first.");
+            return;
+        }
+
+        const chkQuestion = this.querySelector('#chk-question')?.checked || false;
+        const chkRepeat = this.querySelector('#chk-repeat')?.checked || false;
+        const chkCount = this.querySelector('#chk-count')?.checked || false;
+
+        const payload = {
+            clientId: clientId,
+            levelId: this.rcData[this.rcActiveLevel].id,
+            setIndex: this.rcSetIndex,
+            timestamp: new Date().toISOString(),
+            manualGrades: {
+                questionAdherence: chkQuestion,
+                repeatAdherence: chkRepeat,
+                countAdherence: chkCount
+            },
+            telemetry: this.rcLatestTelemetry
+        };
+
+        // UI Loading State
+        const originalHtml = btnEl.innerHTML;
+        btnEl.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Saving...`;
+        if (window.lucide) window.lucide.createIcons({ root: btnEl });
+        btnEl.disabled = true;
+
+        try {
+            const response = await fetch('/api/save-rc-attempt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('CRM Sync Failed');
+
+            // Success State - Automatically progress to the next set
+            btnEl.classList.replace('bg-emerald-600', 'bg-blue-600');
+            btnEl.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3"></i> Saved!`;
+            if (window.lucide) window.lucide.createIcons({ root: btnEl });
+            
+            setTimeout(() => {
+                const len = this.rcData[this.rcActiveLevel].sets.length;
+                this.rcSetIndex = (this.rcSetIndex + 1) % len;
+                this.rcState = 'prompt';
+                this.rcLatestTelemetry = null;
+                this.renderRepeatCountDrill();
+            }, 800);
+
+        } catch (error) {
+            console.error(error);
+            alert("Failed to save to CRM. Please check your connection.");
+            btnEl.innerHTML = originalHtml;
+            btnEl.disabled = false;
+            if (window.lucide) window.lucide.createIcons({ root: btnEl });
+        }
     }
 
     // ==========================================
@@ -422,13 +611,6 @@ class THPSCourseWidget extends HTMLElement {
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
-                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;" title="20 Second Milestone">
-                        <i data-lucide="star" id="star-marker-20" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
-                    </div>
-                    <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;" title="60 Second Target Goal">
-                        <i data-lucide="star" id="star-marker-60" class="w-4 h-4 text-slate-400/50 transition-colors"></i>
-                    </div>
-                    
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
@@ -438,7 +620,6 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         
-        // Navigation & Interaction Listeners
         const exitBtn = this.querySelector('.thps-exit-course');
         if (exitBtn) {
             exitBtn.addEventListener('click', () => {
@@ -535,7 +716,6 @@ class THPSCourseWidget extends HTMLElement {
     renderVoiceChoicePrompter() {
         const speech = this.courseData.speeches[this.vcActiveSpeechIndex];
         
-        // Updated Color Palette
         const getStyle = (intensity) => {
             switch(parseInt(intensity)) {
                 case 0: return { bg: 'bg-slate-200', text: 'text-slate-600', ring: 'ring-slate-200' };
@@ -580,15 +760,12 @@ class THPSCourseWidget extends HTMLElement {
 
                 <!-- GLIDING PROMPTER AREA -->
                 <div class="flex-1 relative flex flex-col min-h-0">
-                    
-                    <!-- Scroll Viewport -->
                     <div id="vc-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative px-4 md:px-12 py-10">
                         <div class="max-w-2xl mx-auto flex flex-col pb-48"> 
                             ${linesHTML}
                         </div>
                     </div>
                     
-                    <!-- Overlay Gradients to focus the center/top view -->
                     <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none z-10"></div>
                     <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
                 </div>
@@ -627,7 +804,6 @@ class THPSCourseWidget extends HTMLElement {
             const viewport = this.querySelector('#vc-scroll-viewport');
             const lines = this.querySelectorAll('.vc-line-content');
             
-            // Update visual styles (opacity and highlight)
             lines.forEach((line, idx) => {
                 if (idx === this.vcLineIndex) {
                     line.classList.remove('opacity-40');
@@ -638,16 +814,11 @@ class THPSCourseWidget extends HTMLElement {
                 }
             });
 
-            // Smooth glide to the wrapper
             const targetWrapper = this.querySelector(`#vc-line-${this.vcLineIndex}`);
             if (targetWrapper && viewport) {
-                viewport.scrollTo({
-                    top: targetWrapper.offsetTop - 40,
-                    behavior: 'smooth'
-                });
+                viewport.scrollTo({ top: targetWrapper.offsetTop - 40, behavior: 'smooth' });
             }
 
-            // Update button states
             this.querySelector('.thps-vc-up').disabled = this.vcLineIndex === 0;
             this.querySelector('.thps-vc-down').disabled = this.vcLineIndex === speech.lines.length - 1;
         };
@@ -773,19 +944,16 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest">${this.eslCategory} PRACTICE</span>
                         <span class="block text-sm font-bold">Drill ${this.eslIndex + 1} of ${this.eslSentences.length}</span>
                     </div>
-                    <div class="w-16"></div> <!-- Spacer for flex alignment -->
+                    <div class="w-16"></div> <!-- Spacer -->
                 </div>
 
                 <!-- MAIN DRILL AREA -->
                 <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
-                    
-                    <!-- Target Sentence -->
                     <div class="w-full max-w-2xl bg-white border-2 border-indigo-100 rounded-2xl p-6 md:p-8 shadow-sm text-center mb-8">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Target Sentence</span>
                         <p class="text-2xl md:text-3xl font-bold text-slate-800 leading-tight w-[95%] mx-auto line-clamp-3">${sentence}</p>
                     </div>
 
-                    <!-- Precision Timer & Controls -->
                     <div class="flex flex-col items-center justify-center mb-8">
                         <div class="thps-esl-timer text-5xl md:text-6xl font-mono font-black text-slate-800 tracking-wider mb-4 drop-shadow-sm transition-colors">0.00<span class="text-2xl text-slate-400">s</span></div>
                         <button id="esl-record-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-16 h-16 rounded-full font-black flex items-center justify-center transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] active:scale-90">
@@ -794,7 +962,6 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3" id="esl-record-text">Tap to Start</span>
                     </div>
 
-                    <!-- Live Transcript Output -->
                     <div class="w-full max-w-md bg-slate-100 border border-slate-200 rounded-xl p-4 relative">
                         <span class="absolute -top-2.5 left-4 bg-slate-100 px-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">What we heard:</span>
                         <p id="esl-transcript" class="text-sm font-medium text-slate-600 text-center min-h-[1.25rem] italic">...</p>
@@ -815,9 +982,8 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         
-        // Listeners
         this.querySelector('.thps-esl-back').addEventListener('click', () => {
-            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording(); // Safety stop
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording(); 
             this.currentStep = 'esl-menu';
             this.renderEslMenu();
         });
@@ -841,7 +1007,6 @@ class THPSCourseWidget extends HTMLElement {
         this.querySelector('#esl-record-btn').addEventListener('click', () => {
             if (typeof window.toggleRecording === 'function') {
                 window.toggleRecording();
-                // Clear the transcript box manually on new start
                 if (!window.isActive) {
                     const tBox = this.querySelector('#esl-transcript');
                     if (tBox) tBox.innerText = 'Listening...';
@@ -870,18 +1035,12 @@ class THPSCourseWidget extends HTMLElement {
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
-                <!-- Header removed. mt-12 added to flex container to clear the Exit button -->
                 <div class="flex-1 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-center mb-6 mt-12 w-full max-w-5xl mx-auto">
-                    
-                    <!-- LEFT COLUMN: Image & Mask -->
-                    <!-- Negative margins (-mx-5, -ml-6) pull the image flush to the container boundaries -->
                     <div class="relative w-full md:flex-1 aspect-video bg-slate-200 rounded-none md:rounded-r-2xl overflow-hidden shadow-md group shrink-0 -mx-5 sm:-mx-6 md:mx-0 md:-ml-6">
                         <img src="${currentImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" id="swys-img-el">
                         
-                        <!-- The Dynamic Black Mask -->
                         <div id="swys-mask-el" class="absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none z-10 ${getMaskClass(this.swysLevel)}"></div>
                         
-                        <!-- Navigation Chevrons -->
                         <button id="swys-prev-img" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900/90 text-white p-2 rounded-full backdrop-blur-md transition-all z-20 active:scale-90 shadow-md">
                             <i data-lucide="chevron-left" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i>
                         </button>
@@ -890,7 +1049,6 @@ class THPSCourseWidget extends HTMLElement {
                         </button>
                     </div>
 
-                    <!-- RIGHT COLUMN: Controls -->
                     <div class="flex flex-col w-full max-w-[300px] gap-4 shrink-0 px-4 md:px-0">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Difficulty Level</label>
@@ -905,10 +1063,8 @@ class THPSCourseWidget extends HTMLElement {
                             <p id="swys-instruction-text" class="text-sm font-bold text-slate-600 leading-relaxed">${currentInstruction}</p>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- BOTTOM PANEL: Live Mic Timer -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
                     <div id="swys-progress" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
@@ -928,7 +1084,6 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
 
-        // Event Listeners
         this.querySelector('.thps-exit-course').addEventListener('click', () => {
             if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
             this.courseData = null;
@@ -976,7 +1131,6 @@ class THPSCourseWidget extends HTMLElement {
             this.courseData = await response.json();
             this.evaluations = {}; 
 
-            // THE ROUTER SECTION
             if (this.courseData.mode === 'esl') {
                 this.currentStep = 'esl-menu';
                 this.renderEslMenu();
@@ -1205,13 +1359,32 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     processPayload(e) {
-        if (!this.courseData && !this.micCheckFullData || this.currentStep === 0) return;
+        if (!this.courseData && !this.micCheckFullData && !this.rcData || this.currentStep === 0) return;
         
+        const payload = e.detail;
+
+        // Catch and process the Repeat+Count Telemetry
+        if (this.currentStep === 'rc-drill' && payload.text && payload.text.trim() !== '') {
+            this.rcLatestTelemetry = {
+                personal: payload.personal || 0,
+                visual: payload.visual || 0,
+                intangible: payload.intangible || 0,
+                wpm: payload.wpm || 0,
+                sps: payload.sps || 0,
+                pause: payload.pause || 0,
+                runtime: payload.runtime || 0,
+                compGrade: payload.grade || 0,
+                simple: payload.simple || 0
+            };
+            this.rcState = 'grade';
+            this.renderRepeatCountDrill(); // Re-render triggers the flip animation
+            return;
+        }
+
         // Bypass grading metrics if inside independent modules
         const bypassModes = ['rc-menu', 'rc-drill', 'mic-check', 'esl-menu', 'esl-drill', 'vc-menu', 'vc-prompter', 'swys-main'];
         if (bypassModes.includes(this.currentStep)) return;
 
-        const payload = e.detail;
         const isHistoryLoad = payload.id !== undefined; 
 
         if (isHistoryLoad) {
@@ -1270,7 +1443,6 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     updateTimerUI() {
-        // 1. Sync Linear Course UI Timer elements
         const timerDisplay = this.querySelector('.thps-course-timer');
         const recordBtn = this.querySelector('.thps-course-record-btn');
         const recordText = this.querySelector('.thps-course-record-text');
@@ -1306,7 +1478,6 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 2. Sync Independent Repeat+Count Drill & Mic-Check Timer Elements
         const arcadeProgress = this.querySelector('#arcade-progress');
         const arcadeBtn = this.querySelector('#arcade-record-btn');
         const arcadeIcon = this.querySelector('#arcade-record-icon');
@@ -1341,7 +1512,6 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 3. Sync ESL Level 1 Timer & Transcript
         const eslTimer = this.querySelector('.thps-esl-timer');
         const eslRecordBtn = this.querySelector('#esl-record-btn');
         const eslRecordIcon = this.querySelector('#esl-record-icon');
@@ -1388,7 +1558,6 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 4. Sync Voice Choice Timer
         const vcTimer = this.querySelector('.thps-vc-timer');
         const vcRecordBtn = this.querySelector('#vc-record-btn');
         const vcRecordIcon = this.querySelector('#vc-record-icon');
@@ -1431,7 +1600,6 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        // 5. Sync Say What You See Timer
         const swysProgress = this.querySelector('#swys-progress');
         const swysBtn = this.querySelector('#swys-record-btn');
         const swysIcon = this.querySelector('#swys-record-icon');
