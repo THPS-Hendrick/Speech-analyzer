@@ -79,18 +79,24 @@
     <!-- UI OVERLAYS -->
     <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
 
-    <!-- NEW: COSMETIC AUTH MODAL -->
+    <!-- UPDATED: CRM CLIENT LINK MODAL -->
     <div id="auth-modal" class="hidden fixed inset-0 z-[10002] bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-center px-4 transition-all duration-300">
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm w-full flex flex-col items-center relative">
             <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
-                <i data-lucide="fingerprint" class="w-8 h-8"></i>
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                <i data-lucide="link" class="w-8 h-8"></i>
             </div>
-            <h3 class="text-xl font-black text-slate-800 uppercase tracking-widest mb-2 text-center">Google Firebase Auth</h3>
-            <p class="text-sm text-slate-500 text-center mb-6 font-medium leading-relaxed">Sign in to track your historical progress, access leaderboards, and sync your data across devices. (Coming Soon)</p>
-            <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-md">Continue as Guest</button>
+            <h3 class="text-xl font-black text-slate-800 uppercase tracking-widest mb-2 text-center">Link CRM Session</h3>
+            <p class="text-sm text-slate-500 text-center mb-5 font-medium leading-relaxed">Enter the Client ID to route this session's telemetry and performance data to their CRM profile.</p>
+            
+            <input type="text" id="crm-client-input" placeholder="e.g., cli_9f82a1b..." class="w-full p-3 border-2 border-slate-200 rounded-xl mb-4 text-center font-mono text-sm text-slate-700 outline-none focus:border-indigo-500 transition-colors">
+            
+            <div class="flex gap-2 w-full">
+                <button onclick="window.clearCrmClient()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors">Unlink</button>
+                <button onclick="window.saveCrmClient()" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-md">Connect ID</button>
+            </div>
         </div>
     </div>
 
@@ -981,7 +987,7 @@
 // NEW: EXPLICITLY PASSING TELEMETRY ARRAYS
                     pauseEvents: masterData.pauseEvents || [],
                     runPaces: masterData.runPaces || [],
-                    runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, // <-- THIS WAS MISSING
+                    runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, 
                     volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
                     volumeLabels: masterData.volumeLabels || [],
                     volumeChunks: masterData.volumeChunks || []
@@ -1225,6 +1231,48 @@
             }
             fetchExplanations();
         };
+
+        // ==========================================
+        // CRM CLIENT AUTHENTICATION LOGIC
+        // ==========================================
+        window.saveCrmClient = function() {
+            const input = document.getElementById('crm-client-input').value.trim();
+            if (!input) return alert("Please enter a valid Client ID.");
+            
+            localStorage.setItem('thps_crm_client_id', input);
+            window.updateAuthUI(input);
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.clearCrmClient = function() {
+            localStorage.removeItem('thps_crm_client_id');
+            document.getElementById('crm-client-input').value = '';
+            window.updateAuthUI(null);
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.updateAuthUI = function(clientId) {
+            const authBtn = document.querySelector('button[onclick="document.getElementById(\'auth-modal\').classList.remove(\'hidden\')"]');
+            if (!authBtn) return;
+
+            if (clientId) {
+                // Truncate long UUIDs for the UI (e.g., "cli_9f82...")
+                const displayId = clientId.length > 10 ? clientId.substring(0, 10) + '...' : clientId;
+                authBtn.innerHTML = `<i data-lucide="user-check" class="w-6 h-6 text-indigo-600"></i> <span class="text-indigo-600">${displayId}</span>`;
+            } else {
+                authBtn.innerHTML = `<i data-lucide="user-circle" class="w-6 h-6"></i> Guest`;
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Check for active client on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            const activeClient = localStorage.getItem('thps_crm_client_id');
+            if (activeClient) {
+                document.getElementById('crm-client-input').value = activeClient;
+                window.updateAuthUI(activeClient);
+            }
+        });
 
         // ==========================================
         // FULL SCREEN LOGIC
