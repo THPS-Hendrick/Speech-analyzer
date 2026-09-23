@@ -55,19 +55,6 @@ class THPSReportCard extends HTMLElement {
     }
 
     render() {
-        if (!this.data) {
-            this.innerHTML = `
-                <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
-                    <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-file-text text-2xl"></i>
-                    </div>
-                    <h3 class="font-black text-xl text-slate-800 tracking-tight">Awaiting Diagnostic Data</h3>
-                    <p class="text-sm text-slate-500 mt-2 max-w-md mx-auto">Please complete all stages of the Diagnostic Course and click "Generate PDF Report Card" to populate this document.</p>
-                </div>
-            `;
-            return; 
-        }
-
         if (this.isLoading) {
             this.innerHTML = `
                 <div class="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-sm w-full font-sans">
@@ -78,7 +65,27 @@ class THPSReportCard extends HTMLElement {
             return;
         }
 
-        // Invoke Scoring Matrix Engine (Failsafe fallback if engine not loaded)
+        // 1. Fallback Scaffolding: Renders the blank template if no diagnostic data has been generated yet
+        const reportData = this.data || {
+            client: { name: "[Awaiting Diagnostic]", date: "[Pending]", goals: "No goals recorded yet." },
+            nervesScore: 0,
+            phantasia: "Pending Profile",
+            vocalInhibition: { recorded: false },
+            visualAssociation: {
+                A: { time: 0, wpm: 0, visual: 0, recorded: false },
+                B: { time: 0, wpm: 0, visual: 0, recorded: false }
+            },
+            repeatCount: [
+                { name: "Underline", correct: 0, noDelay: 0, voice: 0 },
+                { name: "No Underline", correct: 0, noDelay: 0, voice: 0 },
+                { name: "Question", correct: 0, noDelay: 0, voice: 0 },
+                { name: "Statement", correct: 0, noDelay: 0, voice: 0 },
+                { name: "Small Big", correct: 0, noDelay: 0, voice: 0 },
+                { name: "Opposites", correct: 0, noDelay: 0, voice: 0 }
+            ]
+        };
+
+        // 2. Invoke Scoring Matrix Engine
         const scoring = window.THPS_ReportScoring || {
             scoreVocalInhibition: () => ({ hasInhibition: false, label: "No Inhibition", pauseVariety: "med", voiceVariety: "med", runVariety: "med", bars: { pause: [20,20,20,20,20], voice: [20,20,20,20,20], run: [20,20,20,20,20] } }),
             scoreVisualInhibition: () => ({ label: "Not Inhibited", house: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 }, imagination: { time: 0, timePass: false, pace: 0, pacePass: false, vis: 0, visPass: false, score: 0 } }),
@@ -86,14 +93,14 @@ class THPSReportCard extends HTMLElement {
             sortStrengthsAndGaps: () => ({ strengths: [], gaps: [] })
         };
 
-        const vocal = scoring.scoreVocalInhibition(this.data.vocalInhibition);
-        const visual = scoring.scoreVisualInhibition(this.data.visualAssociation);
-        const category = scoring.scoreCategoryInhibition(this.data.repeatCount);
-        const splitData = scoring.sortStrengthsAndGaps(this.data, this.explainerData.strengthsGaps);
+        const vocal = scoring.scoreVocalInhibition(reportData.vocalInhibition);
+        const visual = scoring.scoreVisualInhibition(reportData.visualAssociation);
+        const category = scoring.scoreCategoryInhibition(reportData.repeatCount);
+        const splitData = scoring.sortStrengthsAndGaps(reportData, this.explainerData.strengthsGaps);
 
-        const phantasiaText = (this.explainerData.phantasia && this.explainerData.phantasia[this.data.phantasia]) 
-            ? this.explainerData.phantasia[this.data.phantasia] 
-            : `Selected profile: ${this.data.phantasia}`;
+        const phantasiaText = (this.explainerData.phantasia && this.explainerData.phantasia[reportData.phantasia]) 
+            ? this.explainerData.phantasia[reportData.phantasia] 
+            : `Awaiting Phantasia Mind Eye Test selection.`;
 
         this.innerHTML = `
         <style>
@@ -103,7 +110,7 @@ class THPSReportCard extends HTMLElement {
 
         <div class="a4-container font-['Inter',sans-serif] text-slate-800">
             <div class="flex justify-end mb-4">
-                <button id="btn-download-pdf" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow flex items-center gap-2 transition cursor-pointer">
+                <button id="btn-download-pdf" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow flex items-center gap-2 transition cursor-pointer disabled:opacity-50" ${!this.data ? 'disabled' : ''}>
                     <i class="fas fa-file-pdf"></i> Download PDF Report
                 </button>
             </div>
@@ -115,15 +122,15 @@ class THPSReportCard extends HTMLElement {
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-4 mb-6">
                             <div>
                                 <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">THPS SPEECH ASSESSMENT</h1>
-                                <p class="text-sm font-semibold text-slate-700 mt-1">Speaker Name: <span class="font-normal text-slate-900">${this.data.client.name}</span></p>
-                                <p class="text-sm font-semibold text-slate-700">Assessment Date: <span class="font-normal text-slate-900">${this.data.client.date}</span></p>
+                                <p class="text-sm font-semibold text-slate-700 mt-1">Speaker Name: <span class="font-normal text-slate-900">${reportData.client.name}</span></p>
+                                <p class="text-sm font-semibold text-slate-700">Assessment Date: <span class="font-normal text-slate-900">${reportData.client.date}</span></p>
                             </div>
                             <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Confidential</div>
                         </div>
 
                         <div class="mb-6">
                             <h3 class="font-bold text-base text-slate-900 mb-2">Speaker Goals:</h3>
-                            <p class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">${this.data.client.goals}</p>
+                            <p class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">${reportData.client.goals}</p>
                         </div>
 
                         <div class="mb-6">
@@ -220,10 +227,10 @@ class THPSReportCard extends HTMLElement {
                             <h3 class="font-bold text-base text-slate-900 mb-3">Is your speaking inhibited by Rules or Category prompts? <span class="text-indigo-600">[${category.label}]</span></h3>
                             
                             <div class="grid grid-cols-2 gap-3 text-xs font-mono">
-                                ${this.data.repeatCount.map(round => `
+                                ${reportData.repeatCount.map(round => `
                                     <div class="border rounded-lg p-2.5 bg-slate-50 flex justify-between items-center">
                                         <span class="font-sans font-bold text-slate-700">${round.name} Map</span>
-                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 | V:${round.voice}/5</span>
+                                        <span class="text-slate-500 text-[11px]">C: ${round.correct}/5 | D: ${round.noDelay}/5 \vert{} V:${round.voice}/5</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -241,7 +248,9 @@ class THPSReportCard extends HTMLElement {
         `;
 
         const downloadBtn = this.querySelector('#btn-download-pdf');
-        if (downloadBtn) downloadBtn.addEventListener('click', () => this.downloadPDF());
+        if (downloadBtn && this.data) {
+            downloadBtn.addEventListener('click', () => this.downloadPDF());
+        }
     }
 }
 customElements.define('thps-report-card', THPSReportCard);
