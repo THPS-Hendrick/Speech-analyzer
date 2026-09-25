@@ -80,13 +80,13 @@ window.THPS_ReportScoring = {
         // House Test Thresholds
         const hTimePass = h.time > 59; 
         const hPacePass = h.wpm > 0 && h.wpm < 100;
-        const hVisPass = h.visual > 50;
+        const hVisPass = h.visual > 40;
         const hScore = (hTimePass ? 1 : 0) + (hPacePass ? 1 : 0) + (hVisPass ? 1 : 0);
 
         // Imagination Test Thresholds
         const iTimePass = i.time > 59;
         const iPacePass = i.wpm > 170;
-        const iVisPass = i.visual > 50;
+        const iVisPass = i.visual > 40;
         const iScore = (iTimePass ? 1 : 0) + (iPacePass ? 1 : 0) + (iVisPass ? 1 : 0);
 
         let label = "Not Inhibited";
