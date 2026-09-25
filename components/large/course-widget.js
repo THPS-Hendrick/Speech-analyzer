@@ -236,26 +236,27 @@ class THPSCourseWidget extends HTMLElement {
                 </div>
 
                 <!-- 3D FLIPPABLE CARDS -->
-                <div class="flex-1 flex flex-col gap-3.5 max-w-lg mx-auto w-full mb-6 mt-6 px-4 md:px-0 justify-center">
+                <!-- FIX: Reduced margins (mb-3/mt-3) and gap (gap-2) to prevent flexbox overflow -->
+                <div class="flex-1 flex flex-col gap-2 max-w-lg mx-auto w-full mb-3 mt-3 px-4 md:px-0 justify-center min-h-0">
                     
                     <!-- CARD 1: QUESTION / MANUAL GRADING -->
-                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-1">
+                    <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-1">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-indigo-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
                                 <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-3 left-4">Question Prompt</span>
                                 <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug w-[90%] mx-auto line-clamp-3">${set.question}</span>
                             </div>
-                            <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col items-start justify-center p-5">
-                                <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-3 w-full text-center">Manual Adherence Check</span>
-                                <label class="flex items-center gap-3 cursor-pointer mb-2 w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                            <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col items-start justify-center p-4 sm:p-5">
+                                <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2 w-full text-center">Manual Adherence Check</span>
+                                <label class="flex items-center gap-3 cursor-pointer mb-1 w-full hover:bg-slate-700 p-1.5 sm:p-2 rounded-lg transition-colors">
                                     <input type="checkbox" id="chk-question" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
                                     <span class="text-sm font-bold text-white">Answered Question</span>
                                 </label>
-                                <label class="flex items-center gap-3 cursor-pointer mb-2 w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <label class="flex items-center gap-3 cursor-pointer mb-1 w-full hover:bg-slate-700 p-1.5 sm:p-2 rounded-lg transition-colors">
                                     <input type="checkbox" id="chk-repeat" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
                                     <span class="text-sm font-bold text-white">Followed Repeat Rule</span>
                                 </label>
-                                <label class="flex items-center gap-3 cursor-pointer w-full hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <label class="flex items-center gap-3 cursor-pointer w-full hover:bg-slate-700 p-1.5 sm:p-2 rounded-lg transition-colors">
                                     <input type="checkbox" id="chk-count" class="w-4 h-4 text-indigo-500 rounded focus:ring-indigo-500 bg-slate-700 border-slate-600">
                                     <span class="text-sm font-bold text-white">Followed Count Rule</span>
                                 </label>
@@ -264,7 +265,7 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
 
                     <!-- CARD 2: REPEAT / CONTENT & DELIVERY -->
-                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-2">
+                    <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-2">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-emerald-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
                                 <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest absolute top-3 left-4">Repeat Framework</span>
@@ -302,14 +303,14 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
 
                     <!-- CARD 3: COUNT / SIMPLICITY & ACTIONS -->
-                    <div class="rc-flip-card flex-1 min-h-[140px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-3">
+                    <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-3">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-amber-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
                                 <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest absolute top-3 left-4">Count Sequence</span>
                                 <span class="text-sm md:text-base font-bold text-slate-700 text-center leading-snug w-[90%] mx-auto line-clamp-3">${set.count}</span>
                             </div>
                             <div class="rc-flip-back bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-sm flex flex-col p-4 justify-between">
-                                <div class="grid grid-cols-3 gap-2 mb-4 mt-1">
+                                <div class="grid grid-cols-3 gap-2 mb-3 mt-1">
                                     <div class="text-center">
                                         <span class="block text-[9px] font-bold text-slate-400 uppercase">Runtime</span>
                                         <span class="text-sm font-black text-cyan-400" id="rc-val-run">--</span>
@@ -335,7 +336,8 @@ class THPSCourseWidget extends HTMLElement {
                 </div>
 
                 <!-- SLEEK ARCADE TIMER BAR PANEL -->
-                <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-4 px-2">
+                <!-- FIX: Shrunk height slightly to guarantee vertical fit -->
+                <div class="w-full max-w-lg mx-auto relative h-[60px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-3 px-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
                     
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
@@ -344,7 +346,8 @@ class THPSCourseWidget extends HTMLElement {
                 </div>
 
                 <!-- BOTTOM MASTER NAVIGATION -->
-                <div class="bg-white border-t border-slate-200 p-4 flex justify-between items-center shrink-0 z-20">
+                <!-- FIX: Now guaranteed to display within the 650px container -->
+                <div class="bg-white border-t border-slate-200 p-3 flex justify-between items-center shrink-0 z-20">
                     <button id="rc-drill-prev" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2 active:scale-95 shadow-sm">
                         <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i> Prev Set
                     </button>
