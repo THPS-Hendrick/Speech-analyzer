@@ -69,7 +69,7 @@
   },
   {
     "id": 5,
-    "title": "Repeat Small+Big",
+    "title": "Repeat Wrong+Right",
     "description": "Repeat then give a Wrong + Right example",
     "sets": [
       { "question": "What's better: city or country?", "repeat": "Word", "count": "Wrong+Right" },
