@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mic-Check JSON Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-8 font-sans min-h-screen flex items-center justify-center">
+
+    <div class="max-w-3xl w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+        <h1 class="text-3xl font-black text-slate-800 mb-2">Daily JSON Generator</h1>
+        <p class="text-slate-500 mb-8">Creates perfectly randomized 100-day schedules with a 7-day strict no-repeat rule.</p>
+
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Start Date</label>
+                <input type="date" id="startDate" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Number of Days</label>
+                <input type="number" id="numDays" value="100" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+        </div>
+
+        <button onclick="generateJSON()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md active:scale-95 mb-6 text-lg">
+            Generate 100 Days of Cards
+        </button>
+
+        <div class="relative">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Generated JSON Data (Copy this to GitHub)</label>
+            <textarea id="output" class="w-full h-96 p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm bg-slate-50" readonly placeholder="Your generated JSON will appear here..."></textarea>
+            
+            <button onclick="copyToClipboard()" id="copyBtn" class="absolute top-9 right-4 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition-all shadow text-sm">
+                Copy to Clipboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to today
+        document.getElementById('startDate').valueAsDate = new Date();
+
+        const decks = {
+            challenge: ["Entertain us", "Convince us", "Educate us", "Sell us", "Roast us", "Hype us", "Scare us", "Rally us", "Bore us", "Charm us", "Traumatize us", "Comfort us", "Confuse us", "Expose us", "Debunk us", "Philosophize us"],
+            sponsor: ["Socks", "Food Containers", "Pigeons", "Cardboard Boxes", "Leftovers", "Bubble-wrap", "Pencils", "Umbrellas", "The Gym", "Flowers", "Bakeries", "Chocolate Factories", "Sugary Beverages", "Salad", "Fast Food", "Astronauts", "Breakfast", "Decaf Coffee", "Sushi", "Theme Parks", "Dream Jobs", "Airline Travel", "Cruise Ships", "Traffic Jams", "The Moon", "Trains", "Hot Air Balloons", "Camping", "Supermarkets", "Escalators", "Online Shopping", "Clouds", "Bureaucracy", "AI", "ID", "Working from Home", "Coffee", "Conferences", "HR", "Work Trips", "Gravity", "Entrepreneurship", "Books", "Video Games", "Influencers", "Cats", "Graphic Designers", "Lawn Mowers", "Naps", "Scammers"],
+            script: ["Near Far", "Small Big", "Cheap Expensive", "Head Heart", "Emotion Logic", "Home Away", "Inside Outside", "Wrong Right", "Past Present Future", "Bad Better Best", "Left Right Centre", "Problem Options Solution", "Extreme Extreme Sensible", "Small Medium Large", "Static Dynamic", "Chaos Order", "Public Private", "Theory Practice", "Too much Not Enough", "Serious Sarcastic", "Fast Good Cheap", "Hot Cold", "Short Long", "Together Apart", "Light Dark", "Internal External", "Hungry Full", "First Second Third", "Winning Losing", "Genuine Fake", "Save Spend", "Input Output", "Start Finish", "Virtual Physical", "Strong Weak", "Fast Slow", "One Many", "Land Sea Sky", "Simple Complex", "Morning Night", "High Low", "True False", "Easy Hard", "Clean Dirty", "Quiet Loud", "Old New", "Direct Indirect", "Win Lose", "Top Bottom", "Before After"],
+            micCheck: ["No hands at all", "Act like you're at a protest", "Move around faster and faster", "You're very sleepy", "Act like you're trying to escape handcuffs", "Project your voice to the far side of the room", "Draw a diagram while talking", "People have to come closer to hear you", "Play with your hair", "Act like you've been shrunk down", "Pat an imaginary cat", "Speak faster and faster", "You're a motivational speaker", "You're a boring speaker", "You're a knowledgeable professor", "You're a documentary voice over", "You're the best teacher in high school", "You're a bit sarcastic sometimes", "Your hands must move in small circles", "Act in a serious way at least 3 times", "Collect 3 objects and use them", "Hiccup at least 3 times", "Make yourself wide and long 3 times", "Include a whisper, a pause, and a loud voice", "Hands must only illustrate what you're saying", "Say \"does that make sense\" 3 times", "Adjust an object slightly 3 times", "Interrupt yourself by yelling out a random object", "Pretend to step in something wet", "Yell at some point", "Jump for joy at some point", "Say \"oh no\" at some point", "Clap at some point", "Pause for great effect", "Go find a prop and use it", "Wander off at some point", "Make a confusing gesture", "Spin around once", "Cough loudly", "Close your eyes for 5 seconds", "Sing one line of a song", "Talk to an imaginary person", "Sit on the floor", "Stand on one leg", "Look shocked", "Whisper your next sentence", "Check your non-existent watch", "Point at nothing", "Laugh for no reason", "Wave goodbye then hello"]
+        };
+
+        function generateJSON() {
+            const startDateStr = document.getElementById('startDate').value;
+            const numDays = parseInt(document.getElementById('numDays').value);
+            
+            if (!startDateStr) {
+                alert("Please select a start date.");
+                return;
+            }
+
+            // Parse date manually to avoid timezone shifting issues
+            const parts = startDateStr.split('-');
+            let currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            
+            let results = {};
+            
+            // Memory tracking to prevent repeats
+            let history = { challenge: [], sponsor: [], script: [], micCheck: [] };
+            
+            for (let i = 0; i < numDays; i++) {
+                const y = currentDate.getFullYear();
+                const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const d = String(currentDate.getDate()).padStart(2, '0');
+                const dateKey = `${y}-${m}-${d}`;
+                
+                let dailyDraw = {};
+                
+                for (const deckKey in decks) {
+                    const fullDeck = decks[deckKey];
+                    
+                    // Filter out items that are currently in the 7-day memory history
+                    let available = fullDeck.filter(item => !history[deckKey].includes(item));
+                    
+                    // Failsafe (Will not trigger due to deck sizes, but good practice)
+                    if (available.length === 0) available = fullDeck; 
+                    
+                    // Pick random item from available
+                    const randomIndex = Math.floor(Math.random() * available.length);
+                    const pickedCard = available[randomIndex];
+                    
+                    dailyDraw[deckKey] = pickedCard;
+                    
+                    // Add to memory history
+                    history[deckKey].push(pickedCard);
+                    
+                    // If memory is longer than 6 days (meaning the 7th day back), forget the oldest card
+                    if (history[deckKey].length >= 7) {
+                        history[deckKey].shift(); 
+                    }
+                }
+                
+                results[dateKey] = dailyDraw;
+                
+                // Add 1 day
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            document.getElementById('output').value = JSON.stringify(results, null, 2);
+        }
+
+        function copyToClipboard() {
+            const outputEl = document.getElementById('output');
+            if (!outputEl.value) return;
+            
+            outputEl.select();
+            document.execCommand('copy');
+            
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.classList.replace('bg-slate-800', 'bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-green-600', 'bg-slate-800');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
