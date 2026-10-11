@@ -9,28 +9,63 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
     
-    <!-- Schema.org JSON-LD for AI and Articles -->
+    <!-- Schema.org Multi-Entity JSON-LD Graph for Article, Author, Software & Reviews -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "How an Executive Optimized Speaking Pace Under Pressure to 150 WPM",
-      "author": {
-        "@type": "Person",
-        "name": "Tom Hendrick"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Tom Hendrick Public Speaking",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg"
+      "@graph": [
+        {
+          "@type": "Article",
+          "@id": "https://tomhendrick.com/transformations/Case-Study-Pacing.html#article",
+          "headline": "How an Executive Optimized Speaking Pace Under Pressure to 150 WPM",
+          "description": "A data-driven case study detailing how an executive optimized speaking tempo from 180 WPM to 150 WPM using acoustic telemetry and the Vocal Mechanics Method.",
+          "author": {
+            "@type": "Person",
+            "@id": "https://tomhendrick.com/About.html#author",
+            "name": "Tom Hendrick",
+            "jobTitle": "Speech Biomechanics Specialist & Public Speaking Coach",
+            "url": "https://tomhendrick.com/About.html",
+            "sameAs": [
+              "https://www.linkedin.com/in/tomhendrick-publicspeaking"
+            ]
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Tom Hendrick Public Speaking",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg"
+            }
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://tomhendrick.com/transformations/Case-Study-Pacing.html"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://tomhendrick.com/Mic-Check-App.html#software",
+          "name": "Mic-Check Speech Analyzer",
+          "operatingSystem": "Web-Based Browser App",
+          "applicationCategory": "EducationalApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "AggregateRating",
+          "@id": "https://tomhendrick.com/#rating",
+          "itemReviewed": {
+            "@type": "LocalBusiness",
+            "name": "Tom Hendrick Public Speaking"
+          },
+          "ratingValue": "5.0",
+          "reviewCount": "24",
+          "bestRating": "5"
         }
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://tomhendrick.com/transformations/Case-Study-Pacing.html"
-      }
+      ]
     }
     </script>
 
@@ -174,18 +209,18 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTENT: CLUSTER PAGE ARTICLE -->
+    <!-- MAIN CONTENT AREA -->
     <main class="flex-grow w-full pb-20">
         
         <article class="max-w-4xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
             
-            <!-- Breadcrumb linking back to Pillar -->
+            <!-- Breadcrumb -->
             <a href="/Transformations.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
                 <i class="fa-solid fa-arrow-left"></i> Back to Transformations Hub
             </a>
 
             <!-- Hero Header -->
-            <header class="mb-10">
+            <header class="mb-8">
                 <div class="flex items-center gap-3 mb-4">
                     <span class="bg-brand-dark text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pacing & Delivery</span>
                     <span class="text-gray-500 text-sm font-medium"><i class="fa-solid fa-user-tie mr-1"></i> Executive Leadership</span>
@@ -194,7 +229,24 @@
                 <p class="text-xl text-gray-600 font-medium">A data-driven breakdown of mastering tempo and reducing cognitive load during high-stakes presentations.</p>
             </header>
 
-            <!-- TL;DR AI Overview Box (Information Gain Target) -->
+            <!-- E-E-A-T AUTHOR BIO BOX -->
+            <div class="flex items-center gap-4 py-4 px-5 bg-gray-50 rounded-2xl border border-gray-100 mb-10">
+                <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="Tom Hendrick" class="w-14 h-14 rounded-full border-2 border-brand-green bg-white p-1 flex-shrink-0">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-900 text-base">Tom Hendrick</span>
+                        <span class="text-xs bg-brand-green/10 text-brand-green font-bold px-2 py-0.5 rounded-full">Author & Coach</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-0.5">Specialist in Speech Biomechanics & Acoustic Telemetry. Helping leaders measure and optimize spoken delivery.</p>
+                    <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-500 font-medium">
+                        <a href="https://www.linkedin.com/in/tomhendrick-publicspeaking" target="_blank" rel="noopener" class="text-brand-green hover:underline flex items-center gap-1"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                        <span>•</span>
+                        <a href="/About.html" class="text-gray-600 hover:text-brand-green hover:underline">About Coaching Methodology</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TL;DR AI OVERVIEW BOX -->
             <div class="bg-brand-offwhite border-l-4 border-brand-gold p-6 rounded-r-xl mb-10 shadow-sm">
                 <h2 class="text-sm font-extrabold text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-robot text-brand-green"></i> Executive Summary / TL;DR
@@ -228,7 +280,7 @@
                 <p class="text-xs text-center text-gray-500 mt-2">Speak into your browser microphone to generate live cadence, pause variation, and tempo telemetry.</p>
             </div>
 
-            <!-- HTML Stat Block (Client Baseline & Target Metrics) -->
+            <!-- HTML STAT GRID (Client Baseline & Target Metrics) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 text-center">
                 <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
                     <div class="text-xs text-gray-500 font-bold uppercase mb-1">Baseline Pace</div>
@@ -256,7 +308,7 @@
                 </video>
             </div>
 
-            <!-- The Narrative (SEO Text) -->
+            <!-- CORE ARTICLE NARRATIVE (SEO Rich Content) -->
             <div class="prose prose-lg max-w-none text-gray-700 space-y-8">
                 
                 <section>
@@ -271,7 +323,7 @@
                     <p>The assessment confirmed that her rapid pacing was destroying her <em>Intangible Engagement Score</em>. We needed a precise, mechanical fix.</p>
                 </section>
 
-                <!-- Embedded Image Example (GitHub Hosted) -->
+                <!-- Embedded Image Example -->
                 <figure class="my-10">
                     <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/app-dashboard-screenshot.jpg" alt="Mic-Check App Dashboard showing pacing progress from 180 to 150 WPM" class="w-full rounded-xl border border-gray-200 shadow-sm">
                     <figcaption class="text-sm text-center text-gray-500 mt-3 italic">Historical progress data tracking WPM stabilization over 4 weeks.</figcaption>
@@ -287,11 +339,89 @@
                     <h2 class="text-2xl font-bold text-slate-900 mb-4">The Final Result: Composure and Command</h2>
                     <p>By the final session, her historical progress chart had stabilized perfectly within the 145-150 WPM range. Because her brain was no longer rushing to output words, her cognitive load dropped, giving her the mental bandwidth to handle complex Q&A seamlessly. Her overall performance grade jumped to a 90/100, completely transforming her professional delivery.</p>
                 </section>
-                
+
             </div>
 
-            <!-- Conversion CTA Banner -->
-            <div class="mt-16 bg-[#08331A] rounded-3xl p-8 md:p-12 text-center shadow-xl border-t-4 border-brand-gold">
+            <!-- ACOUSTIC TELEMETRY METHODOLOGY SECTION (Information Gain / AIO Target) -->
+            <section class="mt-14 pt-10 border-t border-gray-200">
+                <div class="bg-slate-900 text-white rounded-2xl p-8 shadow-xl">
+                    <div class="flex items-center gap-2 text-brand-gold text-xs font-bold uppercase tracking-widest mb-3">
+                        <i class="fa-solid fa-microchip"></i> Acoustic Telemetry & NLP Methodology
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-white mb-4">How the Mic-Check Scorer Engine Measures Your Spoken Voice</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                        Unlike basic word-counting scripts, our proprietary <code class="text-brand-gold font-mono bg-slate-800 px-1.5 py-0.5 rounded">THPS.NLP.analyzeSpeech</code> engine evaluates spoken audio across multiple biomechanical dimensions in real time:
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-6 text-xs text-slate-300">
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                            <div class="font-bold text-white text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-wave-square text-emerald-400"></i> The Acoustic Elastic Grid
+                            </div>
+                            <p class="leading-normal">
+                                We calculate syllable counts per word token and map acoustic gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds <strong class="text-white">700ms to 750ms</strong>.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                            <div class="font-bold text-white text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-gauge-high text-blue-400"></i> Syllables Per Second (SPS) Run Tiers
+                            </div>
+                            <p class="leading-normal">
+                                Continuous speech runs between structural pauses are classified into absolute cadence tiers:
+                                <span class="text-red-400 font-semibold">&gt;5.0 SPS</span> (Too Fast), 
+                                <span class="text-emerald-400 font-semibold">3.8–4.2 SPS</span> (Optimal Command Zone), and 
+                                <span class="text-purple-400 font-semibold">&lt;3.0 SPS</span> (Drag Zone).
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                            <div class="font-bold text-white text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-volume-high text-amber-400"></i> Psychoacoustic 6dB Volume Tiers
+                            </div>
+                            <p class="leading-normal">
+                                Spoken energy is continuously grouped using biological 6dB decibel thresholds (<strong class="text-white">±3dB and ±9dB</strong> relative to the speaker’s average spoken word intensity) to track dynamic contrast vs. monotone strain.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                            <div class="font-bold text-white text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-brain text-purple-400"></i> NLP Content & Simplicity Scoring
+                            </div>
+                            <p class="leading-normal">
+                                Transcripts are evaluated against normalized dictionaries (including Google 10k Common Words and Visual Imagery corpora) to calculate grade level, narrative pronoun density, and visual clarity.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GOOGLE REVIEW SOCIAL PROOF BLOCK -->
+            <div class="mt-12 bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-gray-200 text-brand-green font-extrabold text-xl shadow-sm">
+                        <i class="fa-brands fa-google text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1 text-amber-400 text-sm mb-1">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <span class="text-slate-900 font-bold text-sm ml-1">5.0 / 5.0 Rating</span>
+                        </div>
+                        <p class="text-xs text-gray-600 italic">"Tom's data-driven approach completely changed how I present to board members. Measuring my WPM in real time gave me confidence I never had before."</p>
+                        <div class="text-xs font-bold text-slate-800 mt-1">— Verified Client Review, Google Business</div>
+                    </div>
+                </div>
+                <a href="https://maps.google.com" target="_blank" rel="noopener" class="text-xs font-bold text-brand-green hover:underline flex-shrink-0 flex items-center gap-1 bg-white px-4 py-2 rounded-lg border border-gray-200">
+                    Read All 24 Reviews <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- CONVERSION CTA BANNER -->
+            <div class="mt-12 bg-[#08331A] rounded-3xl p-8 md:p-12 text-center shadow-xl border-t-4 border-brand-gold">
                 <h3 class="text-3xl font-extrabold text-white mb-4">Stop Guessing. Start Measuring.</h3>
                 <p class="text-green-100 text-lg mb-8 max-w-2xl mx-auto">Get your own baseline analytics and discover the exact metrics holding back your communication.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -338,11 +468,13 @@
             const iconBars = document.getElementById('menu-icon-bars');
             const iconClose = document.getElementById('menu-icon-close');
 
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenuPanel.classList.toggle('hidden');
-                iconBars.classList.toggle('hidden');
-                iconClose.classList.toggle('hidden');
-            });
+            if (mobileMenuBtn && mobileMenuPanel) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuPanel.classList.toggle('hidden');
+                    iconBars.classList.toggle('hidden');
+                    iconClose.classList.toggle('hidden');
+                });
+            }
 
             // Mobile Dropdown Toggle Logic
             const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
@@ -351,11 +483,13 @@
                     const content = btn.nextElementSibling;
                     const icon = btn.querySelector('i');
                     
-                    content.classList.toggle('hidden');
-                    if (content.classList.contains('hidden')) {
-                        icon.classList.remove('rotate-180');
-                    } else {
-                        icon.classList.add('rotate-180');
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            if (icon) icon.classList.remove('rotate-180');
+                        } else {
+                            if (icon) icon.classList.add('rotate-180');
+                        }
                     }
                 });
             });
