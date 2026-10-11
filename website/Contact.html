@@ -9,6 +9,32 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
     
+    <!-- Local Business NAP Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+    </script>
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -238,22 +264,73 @@
         </div>
     </main>
 
+    <!-- GLOBAL FOOTER (Updated with 3-Column Layout containing Nav, Crawlable NAP Data, and Map Iframe) -->
     <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="flex items-center gap-3">
-                    <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
-                    <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="#" class="hover:text-brand-gold transition-colors">Services</a>
+                        <a href="#" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
                 </div>
-                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-green-100">
-                    <a href="Home.html" class="hover:text-brand-gold transition-colors">Home</a>
-                    <a href="#" class="hover:text-brand-gold transition-colors">Services</a>
-                    <a href="#" class="hover:text-brand-gold transition-colors">Articles</a>
-                    <a href="About.html" class="hover:text-brand-gold transition-colors">About</a>
-                    <a href="Contact.html" class="text-brand-gold transition-colors">Contact</a>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
+                        <div>
+                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick</span>
+                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: <span itemprop="vatID">56 949 157 639</span>
+                            </div>
+                        </div>
+                        
+                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
+                        </div>
+                        
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
+                        </div>
+                    </address>
                 </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Office Location Map for Tom Hendrick">
+                        </iframe>
+                    </div>
+                </div>
+
             </div>
-            <div class="mt-8 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
                 <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
             </div>
         </div>
