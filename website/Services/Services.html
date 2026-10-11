@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Speaking Services & Coaching | Tom Hendrick</title>
+    <meta name="description" content="Discover the THPS Communication Ecosystem. Access the Mic-Check App, book a Free Speech Assessment, join online classes, or unlock the Performance Plan.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Local Business NAP Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "24",
+        "bestRating": "5"
+      }
+    }
+    </script>
+
+    <!-- FAQ Schema for AI Overviews and Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "How do I enroll in the THPS Performance Plan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Because the Performance Plan is highly tailored to your specific biomechanical and cognitive gaps, it cannot be purchased directly. All clients must first complete the Free 1-Hour THPS Speech Assessment to establish their baseline data."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Do I need a paid subscription to try the Mic-Check App?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, you can test a free browser demo of the Mic-Check App immediately. The full version, which includes historical progress tracking, courses, and daily games, is $9 per month or $99 per year."
+        }
+      }, {
+        "@type": "Question",
+        "name": "When are the free online practice classes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We host a free online class every Friday at lunchtime. It is a low-pressure environment designed to help you practice your public speaking skills on camera."
+        }
+      }]
+    }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center py-2">
+                    <a href="/Home.html" class="flex items-center h-full">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-16 md:h-20 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-brand-green font-bold text-sm transition-colors py-10">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Services.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Services Hub</a>
+                                <a href="/Mic-Check-App.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="/Services/THPS-Speech-Assessment.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Speech Assessment</a>
+                                <a href="/THPS-Performance-Plan.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Transformations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Transformations Hub</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the App works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Method works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Services Works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="/Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
+                    
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="/Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Services.html" class="block py-2 text-sm font-bold text-brand-green">Services Hub</a>
+                        <a href="/Mic-Check-App.html" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="/Services/THPS-Speech-Assessment.html" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
+                        <a href="/THPS-Performance-Plan.html" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Online Classes</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Transformations.html" class="block py-2 text-sm text-gray-600">Transformations Hub</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Case Studies</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Communication Concepts</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="/About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="/Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
+                
+                <div class="pt-6 px-3">
+                    <a href="#" class="block w-full bg-brand-green text-center text-white px-5 py-3 rounded-full font-bold text-base hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow w-full pb-20">
+
+        <!-- The AI-Optimized Ecosystem Workflow -->
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-16 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
+                <i class="fa-solid fa-layer-group"></i> Services Hub
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">The THPS Communication Ecosystem</h1>
+            <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+                A completely integrated approach to public speaking. We combine live acoustic telemetry, cognitive diagnostics, and expert coaching to permanently upgrade your delivery under pressure.
+            </p>
+            
+            <!-- Visual Workflow for AIO -->
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-sm font-bold text-brand-dark uppercase tracking-wide">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-brand-green text-xl"><i class="fa-solid fa-stethoscope"></i></div>
+                    1. Diagnose
+                </div>
+                <i class="fa-solid fa-arrow-right text-gray-300 hidden md:block text-lg"></i>
+                <i class="fa-solid fa-arrow-down text-gray-300 md:hidden text-lg"></i>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 rounded-full bg-brand-gold/20 flex items-center justify-center text-yellow-600 text-xl"><i class="fa-solid fa-bolt"></i></div>
+                    2. Accelerate
+                </div>
+                <i class="fa-solid fa-arrow-right text-gray-300 hidden md:block text-lg"></i>
+                <i class="fa-solid fa-arrow-down text-gray-300 md:hidden text-lg"></i>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xl"><i class="fa-solid fa-microphone-lines"></i></div>
+                    3. Measure & Practice
+                </div>
+            </div>
+        </section>
+
+        <!-- The 2x2 Service Grid -->
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 mb-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Card 1: Speech Assessment -->
+            <div class="bg-white rounded-3xl p-8 md:p-10 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="text-xs font-extrabold uppercase tracking-widest text-brand-green mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-stethoscope"></i> Step 1: The Diagnostic
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">THPS Speech Assessment</h3>
+                <p class="text-gray-600 mb-8 flex-grow leading-relaxed">
+                    A 1-hour 1-on-1 session to baseline your speaking skills. We use the SAMS, VVIQ, and Vocal Inhibition tests to uncover your exact communication gaps and build your roadmap.
+                </p>
+                <a href="/Services/THPS-Speech-Assessment.html" class="w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                    Book Free 1-Hour Session
+                </a>
+            </div>
+
+            <!-- Card 2: Mic-Check App -->
+            <div class="bg-white rounded-3xl p-8 md:p-10 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="text-xs font-extrabold uppercase tracking-widest text-brand-green mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-laptop-code"></i> The Technology
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Mic-Check App</h3>
+                <p class="text-gray-600 mb-8 flex-grow leading-relaxed">
+                    Like a Trackman for your presentations. Access specialized courses, daily challenges, and live acoustic telemetry to measure your WPM and engagement scores effortlessly.
+                </p>
+                <a href="/Mic-Check-App.html" class="w-full text-center bg-transparent border-2 border-brand-green text-brand-green font-bold py-3.5 px-6 rounded-full hover:bg-green-50 transition-colors">
+                    Launch Free Demo
+                </a>
+                <div class="text-center text-xs text-gray-500 mt-4 font-medium uppercase tracking-wide">Full Access: $9/mo or $99/yr</div>
+            </div>
+
+            <!-- Card 3: Performance Plan (GATED) -->
+            <div class="bg-slate-900 rounded-3xl p-8 md:p-10 border border-slate-800 shadow-xl flex flex-col h-full relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-bl-full pointer-events-none"></div>
+                <div class="text-xs font-extrabold uppercase tracking-widest text-brand-gold mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> The Premium Solution
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-4">THPS Performance Plan</h3>
+                <p class="text-slate-300 mb-8 flex-grow leading-relaxed">
+                    The fastest, most tailored way to improve. 4x intensive 1-on-1 weekly sessions utilizing your diagnostic data and the Mic-Check App to rapidly close your gaps.
+                </p>
+                <div class="bg-slate-800/80 rounded-xl p-4 mb-8 border border-slate-700/50">
+                    <p class="text-xs text-slate-400 font-medium text-center leading-relaxed">
+                        <i class="fa-solid fa-lock text-brand-gold mr-1"></i> This tailored program requires a baseline diagnostic to ensure a perfect fit.
+                    </p>
+                </div>
+                <a href="/Services/THPS-Speech-Assessment.html" class="w-full text-center bg-brand-gold text-brand-dark font-extrabold py-3.5 px-6 rounded-full hover:bg-yellow-400 transition-colors shadow-lg">
+                    Complete Assessment to Unlock
+                </a>
+            </div>
+
+            <!-- Card 4: Online Classes -->
+            <div class="bg-white rounded-3xl p-8 md:p-10 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="text-xs font-extrabold uppercase tracking-widest text-brand-green mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> The Community
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Online Practice Classes</h3>
+                <p class="text-gray-600 mb-8 flex-grow leading-relaxed">
+                    A low-pressure, flexible environment to practice your public speaking. Join our community sessions to test new skills and get comfortable on camera with live feedback.
+                </p>
+                <a href="#" class="w-full text-center bg-transparent border-2 border-brand-green text-brand-green font-bold py-3.5 px-6 rounded-full hover:bg-green-50 transition-colors">
+                    Join Free Friday Class
+                </a>
+            </div>
+
+        </section>
+
+        <!-- Native HTML FAQ Accordion -->
+        <section class="max-w-3xl mx-auto px-4 sm:px-6 mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Frequently Asked Questions</h2>
+                <p class="text-gray-600">Everything you need to know about getting started.</p>
+            </div>
+            
+            <div class="space-y-4">
+                
+                <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                        How do I enroll in the THPS Performance Plan?
+                        <span class="relative size-5 shrink-0 text-brand-green">
+                            <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                            <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                        </span>
+                    </summary>
+                    <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                        Because the Performance Plan is highly tailored to your specific biomechanical and cognitive gaps, it cannot be purchased directly. All clients must first complete the Free 1-Hour THPS Speech Assessment to establish their baseline data and ensure the coaching is a perfect fit.
+                    </p>
+                </details>
+                
+                <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                        Do I need a paid subscription to try the Mic-Check App?
+                        <span class="relative size-5 shrink-0 text-brand-green">
+                            <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                            <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                        </span>
+                    </summary>
+                    <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                        No, you can test a free browser demo of the Mic-Check App immediately. The full version, which includes historical progress tracking, courses, and daily games, is available as an upgrade for $9 per month or $99 per year.
+                    </p>
+                </details>
+                
+                <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                        When are the free online practice classes?
+                        <span class="relative size-5 shrink-0 text-brand-green">
+                            <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                            <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                        </span>
+                    </summary>
+                    <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                        We host a free online class every Friday at lunchtime. It is a low-pressure environment designed to help you practice your public speaking skills on camera, test new strategies, and get live feedback from the community.
+                    </p>
+                </details>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="/Services.html" class="text-brand-gold transition-colors">Services</a>
+                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
+                        <div>
+                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick Public Speaking</span>
+                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: <span itemprop="vatID">56 949 157 639</span>
+                            </div>
+                        </div>
+                        
+                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
+                        </div>
+                        
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
+                        </div>
+                    </address>
+                </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Office Location Map for Tom Hendrick">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+            const iconBars = document.getElementById('menu-icon-bars');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            if (mobileMenuBtn && mobileMenuPanel) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuPanel.classList.toggle('hidden');
+                    iconBars.classList.toggle('hidden');
+                    iconClose.classList.toggle('hidden');
+                });
+            }
+
+            // Mobile Dropdown Toggle Logic
+            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            if (icon) icon.classList.remove('rotate-180');
+                        } else {
+                            if (icon) icon.classList.add('rotate-180');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
