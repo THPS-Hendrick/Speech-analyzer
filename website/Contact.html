@@ -1,1 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Tom Hendrick | Book Your Speech Assessment</title>
+    <meta name="description" content="Ready to master your delivery? Contact Tom Hendrick to book a THPS Speech Assessment, corporate training, or for Mic-Check App support.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-10 md:h-12 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-8">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Speech Assessment</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-8">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the App works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Method works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Services Works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="Contact.html" class="text-brand-green font-bold text-sm transition-colors">Contact</a>
+                    
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-80px)] overflow-y-auto">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="index.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <!-- Mobile Services Toggle -->
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="#" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Online Classes</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Articles Toggle -->
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the App works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the Method works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the Services Works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Case Studies</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Communication Concepts</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="Contact.html" class="block px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">Contact</a>
+                
+                <div class="pt-6 px-3">
+                    <a href="#" class="block w-full bg-brand-green text-center text-white px-5 py-3 rounded-full font-bold text-base hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center py-16 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            
+            <!-- SEO Hero Section -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Start Your Data-Driven Communication Training</h1>
+                <p class="text-lg md:text-xl text-gray-600 leading-relaxed">Reach out to book a THPS Speech Assessment, inquire about corporate training, or get Mic-Check App support.</p>
+            </div>
+
+            <!-- Grid Layout: Left Info & Right Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start max-w-5xl mx-auto">
+                
+                <!-- Left Side: SEO H2s and Contact Info -->
+                <div class="bg-brand-offwhite p-8 md:p-10 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col justify-center">
+                    <div class="mb-10">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-green mb-5 shadow-sm border border-gray-100">
+                            <i class="fa-solid fa-microphone-lines text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Book Your THPS Speech Assessment</h2>
+                        <p class="text-gray-600 text-lg leading-relaxed">Get a baseline analysis of your speaking metrics to identify critical areas for improvement before beginning a comprehensive performance plan.</p>
+                    </div>
+                    
+                    <div class="pt-8 border-t border-gray-200">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-gold mb-5 shadow-sm border border-gray-100">
+                            <i class="fa-solid fa-briefcase text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Corporate Inquiries & Online Classes</h2>
+                        <h3 class="text-lg font-bold text-brand-green mb-3 tracking-wide uppercase">Global Coaching from Adelaide</h3>
+                        <p class="text-gray-600 text-lg leading-relaxed">Bring the Vocal Mechanics Method to your executive team. Our scalable software and 1-on-1 coaching are available globally via Zoom.</p>
+                    </div>
+                </div>
+                
+                <!-- Right Side: The Form -->
+                <div>
+                    <form id="enquiry-form" class="space-y-6 bg-white p-8 md:p-10 rounded-3xl border border-gray-100 shadow-xl">
+                        
+                        <div>
+                            <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="name" required placeholder="Jane Doe" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                            <input type="email" id="email" required placeholder="jane@company.com" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all">
+                        </div>
+
+                        <!-- Inquiry Type Dropdown -->
+                        <div>
+                            <label for="inquiry-type" class="block text-sm font-bold text-gray-700 mb-2">How can I help you?</label>
+                            <select id="inquiry-type" required class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all appearance-none cursor-pointer">
+                                <option value="" disabled selected>Select an option...</option>
+                                <option value="Speech Assessment">Book a THPS Speech Assessment</option>
+                                <option value="Corporate Training">Corporate Inquiries & Classes</option>
+                                <option value="App Support">Mic-Check App Support</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-sm font-bold text-gray-700 mb-2">Message</label>
+                            <textarea id="message" rows="4" required placeholder="Tell me a bit about your goals..." class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 transition-all resize-y"></textarea>
+                        </div>
+                        
+                        <!-- Error Message Container (Hidden by default to avoid alerts) -->
+                        <div id="error-message" class="hidden bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-medium">
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full bg-brand-gold text-brand-green font-extrabold text-lg py-4 px-6 rounded-xl hover:brightness-105 shadow-md transition-all transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                            Send Message <i class="fa-solid fa-paper-plane text-sm"></i>
+                        </button>
+                    </form>
+
+                    <!-- Success Message (Hidden by default) -->
+                    <div id="success-message" class="hidden bg-brand-offwhite text-slate-900 p-10 rounded-3xl border border-gray-100 text-center shadow-xl flex flex-col items-center justify-center h-full min-h-[400px]">
+                        <div class="w-20 h-20 bg-brand-green text-brand-gold rounded-full flex items-center justify-center mb-6 shadow-md">
+                            <i class="fa-solid fa-check text-4xl"></i>
+                        </div>
+                        <h3 class="text-3xl font-extrabold mb-4">Message Sent!</h3>
+                        <p class="text-lg text-gray-600 leading-relaxed">Thank you for reaching out. Your data has been securely processed, and Tom will be in touch shortly.</p>
+                        <button onclick="window.location.reload()" class="mt-8 text-brand-green font-bold hover:underline">Send another message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-auto">
+                    <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-green-100">
+                    <a href="index.html" class="hover:text-brand-gold transition-colors">Home</a>
+                    <a href="#" class="hover:text-brand-gold transition-colors">Services</a>
+                    <a href="#" class="hover:text-brand-gold transition-colors">Articles</a>
+                    <a href="About.html" class="hover:text-brand-gold transition-colors">About</a>
+                    <a href="Contact.html" class="text-brand-gold transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Menu Toggle Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+            const iconBars = document.getElementById('menu-icon-bars');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenuPanel.classList.toggle('hidden');
+                iconBars.classList.toggle('hidden');
+                iconClose.classList.toggle('hidden');
+            });
+
+            // Mobile Dropdown Toggle Logic
+            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    
+                    content.classList.toggle('hidden');
+                    if (content.classList.contains('hidden')) {
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+
+            // CRM Form Submission Logic
+            const form = document.getElementById('enquiry-form');
+            const errorBox = document.getElementById('error-message');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Stop page from refreshing
+                
+                const submitBtn = document.getElementById('submit-btn');
+                const originalBtnContent = submitBtn.innerHTML;
+                
+                // Set loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                errorBox.classList.add('hidden'); // Hide any previous errors
+
+                // 1. Grab all the values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const inquiryType = document.getElementById('inquiry-type').value; 
+                const rawMessage = document.getElementById('message').value;
+
+                // 2. Combine the dropdown choice with the message for your CRM notes
+                const combinedMessage = `[Inquiry Type: ${inquiryType}]\n\n${rawMessage}`;
+
+                // 3. Prepare payload for Vercel backend
+                const payload = {
+                    name: name,
+                    email: email,
+                    message: combinedMessage
+                };
+
+                try {
+                    // Send the data to Vercel backend
+                    const res = await fetch('/api/submit-enquiry', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await res.json();
+
+                    if (result.success || res.ok) { // fallback to res.ok in case backend format changes
+                        // Hide the form and show the success message
+                        form.classList.add('hidden');
+                        document.getElementById('success-message').classList.remove('hidden');
+                    } else {
+                        // Display error in UI instead of alert()
+                        errorBox.textContent = 'Submission failed: ' + (result.error || result.message || 'Unknown error');
+                        errorBox.classList.remove('hidden');
+                        resetButton(submitBtn, originalBtnContent);
+                    }
+                } catch (err) {
+                    console.error("Fetch error:", err);
+                    // Display network/generic error in UI instead of alert()
+                    errorBox.textContent = 'A network error occurred. Please try again or email us directly.';
+                    errorBox.classList.remove('hidden');
+                    resetButton(submitBtn, originalBtnContent);
+                }
+            });
+            
+            function resetButton(btn, content) {
+                btn.disabled = false;
+                btn.innerHTML = content;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    </script>
+</body>
+</html>
