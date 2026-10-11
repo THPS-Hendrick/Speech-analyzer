@@ -1,1 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free THPS Speech Assessment | Data-Driven Communication Diagnostic</title>
+    <meta name="description" content="Book your free 1-hour acoustic and cognitive baseline diagnostic. Discover your specific speaking gaps using the SAMS, VVIQ, and Vocal Inhibition tests.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Local Business NAP Schema (Base) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+    </script>
 
+    <!-- Schema.org Multi-Entity JSON-LD Graph for Service, Provider, Software & Reviews -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Service",
+          "@id": "https://tomhendrick.com/Services/THPS-Speech-Assessment.html#service",
+          "name": "Free 1-Hour THPS Speech Assessment",
+          "description": "A 5-step data-driven acoustic and cognitive diagnostic to measure presentation anxiety, unscripted fluency, and vocal inhibition.",
+          "provider": {
+            "@type": "Person",
+            "@id": "https://tomhendrick.com/About.html#author",
+            "name": "Tom Hendrick",
+            "jobTitle": "Speech Biomechanics Specialist & Public Speaking Coach",
+            "url": "https://tomhendrick.com/About.html",
+            "sameAs": [
+              "https://www.linkedin.com/in/tomhendrick-publicspeaking"
+            ]
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "AUD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://tomhendrick.com/Mic-Check-App.html#software",
+          "name": "Mic-Check Speech Analyzer",
+          "operatingSystem": "Web-Based Browser App",
+          "applicationCategory": "EducationalApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "AUD"
+          }
+        },
+        {
+          "@type": "AggregateRating",
+          "@id": "https://tomhendrick.com/#rating",
+          "itemReviewed": {
+            "@type": "LocalBusiness",
+            "name": "Tom Hendrick Public Speaking"
+          },
+          "ratingValue": "5.0",
+          "reviewCount": "24",
+          "bestRating": "5"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center py-2">
+                    <a href="/Home.html" class="flex items-center h-full">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-16 md:h-20 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-brand-green font-bold text-sm transition-colors py-10">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Mic-Check-App.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="/Services/THPS-Speech-Assessment.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">THPS Speech Assessment</a>
+                                <a href="/THPS-Performance-Plan.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Transformations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Transformations Hub</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the App works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Method works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Services Works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="/Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
+                    
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="/Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Mic-Check-App.html" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="/Services/THPS-Speech-Assessment.html" class="block py-2 text-sm font-bold text-brand-green">THPS Speech Assessment</a>
+                        <a href="/THPS-Performance-Plan.html" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Online Classes</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Transformations.html" class="block py-2 text-sm text-gray-600">Transformations Hub</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Case Studies</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Communication Concepts</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="/About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="/Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
+                
+                <div class="pt-6 px-3">
+                    <a href="#" class="block w-full bg-brand-green text-center text-white px-5 py-3 rounded-full font-bold text-base hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16 bg-white">
+        
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            
+            <!-- Hero Header & Interactive Hook -->
+            <header class="mb-16 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-solid fa-stethoscope"></i> Diagnostic Phase 1
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">Stop Guessing. Start Measuring.</h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                    Nerves can strip away your speaking skills under pressure. Discover exactly why your delivery breaks down—and how to fix it—with a free 1-hour acoustic and cognitive baseline diagnostic.
+                </p>
+                
+                <!-- Interactive Teaser iFrame -->
+                <div class="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-slate-900 relative">
+                    <iframe 
+                      src="https://mic-check-backend.vercel.app/analyzer-app.html" 
+                      title="Mic-Check Speech Analyzer Tool Teaser"
+                      style="width: 100%; height: 100%; border: none; background: transparent;" 
+                      allow="camera; microphone; autoplay; playsinline"
+                      loading="lazy"
+                      scrolling="no">
+                    </iframe>
+                </div>
+                <p class="text-xs text-center text-gray-500 mt-3 font-medium">Test a live preview of the acoustic telemetry software used during your assessment.</p>
+            </header>
+
+            <!-- Introduction -->
+            <div class="prose prose-lg max-w-none text-gray-700 mb-16 text-center">
+                <p>Capable professionals often know their material intimately but find preparing for presentations exhausting. Over-relying on clunky scripts takes away natural delivery, while speaking unscripted brings the fear of going off-track or blanking completely.</p>
+                <p><strong>The THPS Speech Assessment</strong> replaces subjective feedback with clinical, data-driven insights. Before you book a <a href="/THPS-Performance-Plan.html" class="text-brand-green font-bold hover:underline">Performance Plan</a>, we spend 1 hour (online or in-person) running you through 5 core diagnostic tests to map your unique communication gaps.</p>
+            </div>
+
+            <!-- THE 5-STEP SEO FUNNEL -->
+            <div class="space-y-8 mb-16">
+                
+                <!-- Step 1 -->
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">1</div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Nerve Profiling</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The SAMS Test (Sympathetic Adreno-medullary System)</h3>
+                        <p class="text-gray-700 leading-relaxed">Pinpoint exactly when and why your body triggers presentation anxiety. By measuring your neuro-hormonal response to speaking cues, we identify your specific <strong>Preparation Dysregulation gap</strong> compared to hundreds of benchmarked executives.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">2</div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Unscripted Fluency</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The VVIQ (Vividness of Visual Imagery Questionnaire)</h3>
+                        <p class="text-gray-700 leading-relaxed">Discover why memorizing clunky scripts is holding you back. We plot your cognitive imagery profile on the spectrum from Aphantasia to Hyperphantasia, revealing whether your brain relies on vivid visual concepts or rigid structural rules when speaking off-the-cuff.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">3</div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Vocal Range Diagnostic</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Vocal Inhibition Test</h3>
+                        <p class="text-gray-700 leading-relaxed">Measure the psychological blocks causing a monotone delivery under pressure. You will attempt to deliver a script using extreme vocal ranges (fast, slow, loud, quiet). This benchmarks your ability to modulate pitch and volume on command, identifying your exact <strong>Vocal Inhibition Gap</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">4</div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Visual Communication Strength</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Image-Based Speaking Test</h3>
+                        <p class="text-gray-700 leading-relaxed">Benchmark your natural ability to speak vividly. Using the Mic-Check App, we capture your baseline Words Per Minute (WPM) and visual descriptor percentages when prompted solely by imagery or imagination, measuring your core fluency strengths.</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">5</div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Cognitive Load Testing</div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Rules-Based Speaking Test</h3>
+                        <p class="text-gray-700 leading-relaxed">Find out exactly when your speaking fluency breaks down. We impose progressive constraints across 6 rounds of questioning to test how quickly you lose composure under complex Q&A rules and high cognitive load.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outcome / Transition -->
+            <div class="text-center mb-16 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">Your Blueprint for Effortless Speaking</h3>
+                <p class="text-gray-600">
+                    The resulting data from your free assessment allows us to build your highly personalized <strong>4-week Performance Plan</strong>. By integrating targeted rules, progressive constraints, and daily tracking via the Mic-Check App, we close your exact gaps so you can speak with composure under immense pressure.
+                </p>
+            </div>
+
+            <!-- GOOGLE REVIEW SOCIAL PROOF BLOCK -->
+            <div class="mb-16 bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 max-w-4xl mx-auto">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center border border-gray-200 text-brand-green shadow-sm flex-shrink-0">
+                        <i class="fa-brands fa-google text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1 text-amber-400 text-sm mb-1">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            <span class="text-slate-900 font-bold text-sm ml-2">5.0 / 5.0 Rating</span>
+                        </div>
+                        <p class="text-sm text-gray-700 italic">"The initial assessment revealed a massive rules-based communication gap I didn't even know I had. Measuring my WPM in real time completely changed how I approach hostile Q&A."</p>
+                        <div class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wide">Verified Client Review, Google Business</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONVERSION CTA BANNER -->
+            <div class="bg-[#08331A] rounded-[2rem] p-8 md:p-14 text-center shadow-2xl border-t-4 border-brand-gold relative overflow-hidden">
+                <!-- Background Decoration -->
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white/5 text-9xl pointer-events-none">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+                
+                <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-4 relative z-10">Ready to Map Your Metrics?</h3>
+                <p class="text-green-100 text-lg mb-10 max-w-2xl mx-auto relative z-10">Book your free 1-hour session online or in-person at our Adelaide clinic.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+                    <a href="/Contact.html" class="bg-brand-gold text-brand-dark font-extrabold text-lg py-4 px-8 rounded-full hover:bg-yellow-400 transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
+                        Book Your Free Assessment <i class="fa-solid fa-calendar-check"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="#" class="hover:text-brand-gold transition-colors">Services</a>
+                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
+                        <div>
+                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick</span>
+                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: <span itemprop="vatID">56 949 157 639</span>
+                            </div>
+                        </div>
+                        
+                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
+                        </div>
+                        
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
+                        </div>
+                    </address>
+                </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Office Location Map for Tom Hendrick">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+            const iconBars = document.getElementById('menu-icon-bars');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            if (mobileMenuBtn && mobileMenuPanel) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuPanel.classList.toggle('hidden');
+                    iconBars.classList.toggle('hidden');
+                    iconClose.classList.toggle('hidden');
+                });
+            }
+
+            // Mobile Dropdown Toggle Logic
+            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            if (icon) icon.classList.remove('rotate-180');
+                        } else {
+                            if (icon) icon.classList.add('rotate-180');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
