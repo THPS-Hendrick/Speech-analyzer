@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data-Driven Public Speaking Transformations | Tom Hendrick</title>
+    <meta name="description" content="See how global executives and professionals use speech biometrics and the Mic-Check App to master pacing, reduce pressure, and increase engagement.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Schema.org JSON-LD for AI and Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "LocalBusiness",
+      "name": "Tom Hendrick Public Speaking",
+      "image": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg",
+      "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "68"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center py-2">
+                    <a href="Home.html" class="flex items-center h-full">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-32 md:h-40 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Speech Assessment</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-brand-green font-bold text-sm transition-colors py-10">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="Transformations.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Transformations Hub</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the App works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Method works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">How the Services Works</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
+                    
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="#" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Online Classes</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="Transformations.html" class="block py-2 text-sm font-bold text-brand-green">Transformations Hub</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the App works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the Method works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">How the Services Works</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Communication Concepts</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
+                
+                <div class="pt-6 px-3">
+                    <a href="#" class="block w-full bg-brand-green text-center text-white px-5 py-3 rounded-full font-bold text-base hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT: PILLAR PAGE -->
+    <main class="flex-grow w-full bg-brand-offwhite pb-20">
+        
+        <!-- Hero Section -->
+        <div class="bg-white border-b border-gray-200 pt-16 pb-12 mb-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-50 border border-yellow-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-solid fa-star text-brand-gold"></i> 5.0 Average (68 Reviews)
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Data-Driven Public Speaking Transformations</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
+                </p>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- JavaScript Filter UI -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12" id="filter-container">
+                <button class="filter-btn active bg-brand-green text-white px-6 py-2.5 rounded-full font-bold border-2 border-brand-green transition-all shadow-sm" data-filter="all">All Transformations</button>
+                <button class="filter-btn bg-white text-gray-700 hover:text-brand-green px-6 py-2.5 rounded-full font-semibold border-2 border-gray-200 hover:border-brand-green transition-all shadow-sm" data-filter="pacing">Pacing & Delivery (WPM)</button>
+                <button class="filter-btn bg-white text-gray-700 hover:text-brand-green px-6 py-2.5 rounded-full font-semibold border-2 border-gray-200 hover:border-brand-green transition-all shadow-sm" data-filter="pressure">Pressure & Q&A Mastery</button>
+                <button class="filter-btn bg-white text-gray-700 hover:text-brand-green px-6 py-2.5 rounded-full font-semibold border-2 border-gray-200 hover:border-brand-green transition-all shadow-sm" data-filter="engagement">Content & Engagement</button>
+            </div>
+
+            <!-- Case Study Grid (Masonry / Teaser Style) -->
+            <div class="grid grid-cols-1 md:grid-cols-2
