@@ -3,144 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JFIF to PNG Converter</title>
+    <title>Image Converter & Resizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 500px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #f9fafb;
-            color: #1f2937;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-        h2 { text-align: center; margin-top: 0; }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        input[type="file"], input[type="number"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        button:hover { background-color: #1d4ed8; }
-        .error { color: #dc2626; font-size: 0.875rem; margin-top: 0.5rem; display: none; }
-        #preview {
-            max-width: 100%;
-            margin-top: 1rem;
-            border-radius: 4px;
-            display: none;
-            border: 1px dashed #d1d5db;
+        .drag-active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen text-gray-800 flex items-center justify-center p-4">
 
-    <h2>JFIF to PNG Converter</h2>
+    <main class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-2xl font-bold mb-2">Image Converter & Resizer</h1>
+            <p class="text-blue-100 text-sm">Resize and convert images (PNG, JPEG, WEBP) directly in your browser.</p>
+        </div>
 
-    <div class="form-group">
-        <label for="imageInput">Upload JFIF Image:</label>
-        <!-- Browsers often treat JFIF files under the JPEG MIME type -->
-        <input type="file" id="imageInput" accept=".jfif, image/jpeg">
-        <div id="errorMsg" class="error">Please select an image file first.</div>
-    </div>
+        <div class="p-6 md:p-8 space-y-6">
+            
+            <!-- Upload Area -->
+            <div id="dropzone" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-colors hover:bg-gray-50 flex flex-col items-center justify-center min-h-[160px]">
+                <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <p class="text-gray-600 font-medium mb-1">Click to upload or drag and drop</p>
+                <p class="text-gray-400 text-sm">PNG, JPG, JPEG, JFIF, WEBP</p>
+                <input type="file" id="file-input" class="hidden" accept="image/png, image/jpeg, image/webp">
+            </div>
 
-    <div class="form-group">
-        <label for="widthInput">Target Width (px):</label>
-        <input type="number" id="widthInput" placeholder="e.g. 800" min="1">
-        <small style="color: #6b7280;">Leave blank to keep original size. Height will scale automatically to keep the aspect ratio.</small>
-    </div>
+            <!-- Workspace (Hidden by default) -->
+            <div id="workspace" class="hidden space-y-6">
+                
+                <!-- Image Preview -->
+                <div class="bg-gray-100 rounded-xl p-4 flex justify-center items-center overflow-hidden">
+                    <img id="image-preview" class="max-h-64 object-contain rounded border border-gray-200 shadow-sm" src="" alt="Preview">
+                </div>
 
-    <button id="convertBtn">Convert & Download PNG</button>
-    
-    <!-- A hidden canvas used for the actual image processing -->
-    <canvas id="canvas" style="display: none;"></canvas>
-    
-    <img id="preview" alt="Converted Image Preview">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Original Info -->
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h3 class="text-sm font-semibold text-blue-800 mb-3 uppercase tracking-wider">Original File</h3>
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <p>Width: <span id="orig-width" class="font-medium text-gray-900">-</span> px</p>
+                            <p>Height: <span id="orig-height" class="font-medium text-gray-900">-</span> px</p>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">New Settings</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Resize Inputs -->
+                            <div class="flex items-center space-x-2">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Width (px)</label>
+                                    <input type="number" id="new-width" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" min="1">
+                                </div>
+                                <div class="flex items-center pt-5 text-gray-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Height (px) - Auto</label>
+                                    <input type="number" id="new-height" class="w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm bg-gray-100 text-gray-500 sm:text-sm cursor-not-allowed" disabled>
+                                </div>
+                            </div>
+
+                            <!-- Format Selection -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Output Format</label>
+                                <select id="output-format" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white">
+                                    <option value="image/webp" selected>WEBP (Recommended)</option>
+                                    <option value="image/png">PNG</option>
+                                    <option value="image/jpeg">JPEG</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message Container -->
+                <div id="error-message" class="hidden bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200"></div>
+
+                <!-- Action Button -->
+                <button id="download-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow transition duration-200 flex justify-center items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Convert & Download
+                </button>
+            </div>
+        </div>
+    </main>
 
     <script>
-        const imageInput = document.getElementById('imageInput');
-        const widthInput = document.getElementById('widthInput');
-        const convertBtn = document.getElementById('convertBtn');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const preview = document.getElementById('preview');
-        const errorMsg = document.getElementById('errorMsg');
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const workspace = document.getElementById('workspace');
+        const imagePreview = document.getElementById('image-preview');
+        const origWidthEl = document.getElementById('orig-width');
+        const origHeightEl = document.getElementById('orig-height');
+        const newWidthInput = document.getElementById('new-width');
+        const newHeightInput = document.getElementById('new-height');
+        const outputFormatSelect = document.getElementById('output-format');
+        const downloadBtn = document.getElementById('download-btn');
+        const errorMessage = document.getElementById('error-message');
 
-        convertBtn.addEventListener('click', () => {
-            const file = imageInput.files[0];
-            
-            if (!file) {
-                errorMsg.style.display = 'block';
+        // State
+        let currentImage = null;
+        let aspectRatio = 1;
+        let originalFileName = 'image';
+
+        // Event Listeners for UI interaction
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-active');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-active');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-active');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            hideError();
+            if (!file.type.match('image.*')) {
+                showError("Please upload a valid image file.");
                 return;
             }
-            errorMsg.style.display = 'none';
 
-            // Create a URL for the uploaded file
-            const objectURL = URL.createObjectURL(file);
-            const img = new Image();
+            // Extract original filename without extension
+            const lastDot = file.name.lastIndexOf('.');
+            originalFileName = lastDot === -1 ? file.name : file.name.substring(0, lastDot);
 
-            img.onload = () => {
-                let newWidth = img.width;
-                let newHeight = img.height;
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Store image object and properties
+                    currentImage = img;
+                    aspectRatio = img.width / img.height;
 
-                // Calculate new dimensions if a custom width was provided
-                const targetWidth = parseInt(widthInput.value);
-                if (targetWidth && targetWidth > 0) {
-                    newWidth = targetWidth;
-                    // Keep aspect ratio by scaling height by the same percentage
-                    const ratio = newWidth / img.width;
-                    newHeight = img.height * ratio;
-                }
+                    // Update UI with original stats
+                    origWidthEl.textContent = img.width;
+                    origHeightEl.textContent = img.height;
+                    
+                    // Set default new width to original width
+                    newWidthInput.value = img.width;
+                    updateHeightInput(img.width);
 
-                // Set canvas to the new dimensions
-                canvas.width = newWidth;
-                canvas.height = newHeight;
-
-                // Draw the resized image onto the canvas
-                ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
-                // Convert the canvas drawing to a PNG data URL
-                const pngDataUrl = canvas.toDataURL('image/png');
-
-                // Show a preview of the new image
-                preview.src = pngDataUrl;
-                preview.style.display = 'block';
-
-                // Create a temporary link to force the download
-                const downloadLink = document.createElement('a');
-                downloadLink.href = pngDataUrl;
+                    // Show preview
+                    imagePreview.src = e.target.result;
+                    
+                    // Reveal workspace, hide dropzone border visual slightly
+                    workspace.classList.remove('hidden');
+                    dropzone.classList.replace('border-2', 'border');
+                    dropzone.classList.replace('min-h-[160px]', 'min-h-0');
+                    dropzone.classList.remove('p-8');
+                    dropzone.classList.add('p-4');
+                };
                 
-                // Get original filename without extension and append .png
-                const originalName = file.name.split('.')[0];
-                downloadLink.download = `${originalName}-converted.png`;
-                
-                // Trigger download
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+                img.onerror = () => {
+                    showError("Failed to load the image. The file might be corrupted.");
+                };
 
-                // Clean up the object URL to free memory
-                URL.revokeObjectURL(objectURL);
+                img.src = e.target.result;
             };
 
-            // Start loading the image
-            img.src = objectURL;
+            reader.readAsDataURL(file);
+        }
+
+        // Handle width change to maintain aspect ratio
+        newWidthInput.addEventListener('input', (e) => {
+            const width = parseInt(e.target.value);
+            if (!isNaN(width) && width > 0) {
+                updateHeightInput(width);
+            } else {
+                newHeightInput.value = '';
+            }
         });
+
+        function updateHeightInput(width) {
+            const height = Math.round(width / aspectRatio);
+            newHeightInput.value = height;
+        }
+
+        // Process and Download logic
+        downloadBtn.addEventListener('click', () => {
+            if (!currentImage) return;
+
+            try {
+                const targetWidth = parseInt(newWidthInput.value);
+                if (isNaN(targetWidth) || targetWidth <= 0) {
+                    showError("Please enter a valid width greater than 0.");
+                    return;
+                }
+
+                const targetHeight = Math.round(targetWidth / aspectRatio);
+                const format = outputFormatSelect.value;
+                const extension = format.split('/')[1];
+
+                // Create an off-screen canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                
+                const ctx = canvas.getContext('2d');
+                
+                // For PNGs/JPEGs with transparency being converted to JPEG, fill white background
+                if (format === 'image/jpeg') {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                // Draw the resized image onto the canvas
+                ctx.drawImage(currentImage, 0, 0, targetWidth, targetHeight);
+
+                // Convert to blob for better memory management on large files
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        showError("Failed to process image. It might be too large.");
+                        return;
+                    }
+
+                    // Create object URL and download link
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    
+                    // Generate new filename
+                    link.download = `${originalFileName}_${targetWidth}x${targetHeight}.${extension}`;
+                    link.href = url;
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    // Cleanup
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                }, format, 0.92); // 0.92 quality for formats that support it (JPEG/WEBP)
+
+            } catch (err) {
+                console.error(err);
+                showError("An error occurred while processing the image.");
+            }
+        });
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            errorMessage.textContent = '';
+        }
     </script>
 </body>
 </html>
