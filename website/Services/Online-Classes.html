@@ -1,1 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Online Public Speaking Classes | THPS Fun Fridays</title>
+    <meta name="description" content="Join our free Friday online public speaking classes. A fun, data-driven environment using the Mic-Check App for live peer and professional feedback.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Local Business NAP Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+    </script>
 
+    <!-- EducationEvent Schema for Recurring Friday Classes -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationEvent",
+      "name": "THPS Fun Fridays: Online Public Speaking Class",
+      "description": "A free, weekly interactive group practice session combining improv mechanics with live acoustic telemetry feedback using the Mic-Check App.",
+      "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+      "eventSchedule": {
+        "@type": "Schedule",
+        "byDay": "https://schema.org/Friday",
+        "scheduleTimezone": "Australia/Adelaide"
+      },
+      "location": {
+        "@type": "VirtualLocation",
+        "url": "https://tomhendrick.com/Online-Classes.html"
+      },
+      "organizer": {
+        "@type": "Person",
+        "name": "Tom Hendrick",
+        "url": "https://tomhendrick.com/About.html"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "AUD",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center py-2">
+                    <a href="/Home.html" class="flex items-center h-full">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-16 md:h-20 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-brand-green font-bold text-sm transition-colors py-10">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Services.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Services Hub</a>
+                                <a href="/Mic-Check-App.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="/Services/THPS-Speech-Assessment.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Speech Assessment</a>
+                                <a href="/THPS-Performance-Plan.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="/Online-Classes.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Transformations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Transformations Hub</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="/Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
+                    
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="/Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Services.html" class="block py-2 text-sm text-gray-600">Services Hub</a>
+                        <a href="/Mic-Check-App.html" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="/Services/THPS-Speech-Assessment.html" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
+                        <a href="/THPS-Performance-Plan.html" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="/Online-Classes.html" class="block py-2 text-sm font-bold text-brand-green">Online Classes</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Transformations.html" class="block py-2 text-sm text-gray-600">Transformations Hub</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Case Studies</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Communication Concepts</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="/About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="/Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
+                
+                <div class="pt-6 px-3">
+                    <a href="#" class="block w-full bg-brand-green text-center text-white px-5 py-3 rounded-full font-bold text-base hover:bg-brand-dark transition-colors">
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16">
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+            <!-- Breadcrumb -->
+            <a href="/Services.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
+                <i class="fa-solid fa-arrow-left"></i> Back to Services Hub
+            </a>
+            
+            <!-- Hero Header with Community Proof -->
+            <header class="mb-16 text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-solid fa-users text-emerald-600"></i> Free Weekly Community Event
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">Your Weekly Public Speaking Workout</h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
+                    Join our <strong>"Fun Fridays"</strong> online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
+                </p>
+
+                <!-- Hero Review -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left max-w-2xl mx-auto mb-10">
+                    <div class="flex items-center gap-1 text-brand-gold text-xs mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-sm md:text-base text-gray-700 italic mb-4 font-medium">"I've been attending Tom's Fun Fridays Public Speaking classes... The sessions have been helping me deliver messages and presentations in a more structured, clear and engaging way, while also building up my confidence in professional settings."</p>
+                    <div class="text-xs font-bold text-slate-900 uppercase tracking-wide">— Long-term Class Attendee</div>
+                </div>
+
+                <a href="#join" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-extrabold text-lg py-4 px-10 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-1 shadow-lg">
+                    Join This Friday's Free Class <i class="fa-solid fa-video"></i>
+                </a>
+            </header>
+
+            <!-- Section Title -->
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-4">The Class Menu: What We Do Every Friday</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Each 60-minute session is a mix of improv agility, data-driven feedback, and famous script readings designed to break your speaking inhibitions.</p>
+            </div>
+
+            <!-- The Workout Menu Grid (2x2) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
+                
+                <!-- Menu Item 1: Cognitive Agility -->
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex items-center justify-center overflow-hidden">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-daily-online-class.webp" alt="Tom Hendrick demonstrating Mic-Check Daily prompt cards" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                        <div class="absolute bottom-4 left-6 text-white font-bold tracking-widest text-xs uppercase"><i class="fa-solid fa-shuffle mr-1 text-brand-gold"></i> Improv Warm-Up</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Thinking on Your Feet</h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Like <em>Cards Against Humanity</em> meets executive coaching. We use randomized prompts (e.g., combining a "Knowledgeable Professor" persona with a "Problem Options Solution" structure) to force you to structure your thoughts instantly without a script.</p>
+                        
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
+                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-gray-700 italic mb-2">"Tom's ability to think on his feet and cater to my learning style is next level. Where was this kind of mentoring early in my learning journey?"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 2: Measured Accountability -->
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-slate-100 relative border-b border-gray-200 flex items-center justify-center overflow-hidden p-6">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/THPS-public-speaking-daily-mic-check-game.webp" alt="Daily Mic-Check Scorecard showing pace, pause, and vocabulary metrics" class="h-full w-auto object-contain group-hover:scale-105 transition-transform duration-500 shadow-lg rounded-xl">
+                        <div class="absolute bottom-4 left-6 text-brand-dark font-bold tracking-widest text-xs uppercase bg-white/90 px-3 py-1 rounded-full"><i class="fa-solid fa-laptop-code mr-1 text-brand-green"></i> Measured Feedback</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Measured Accountability</h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">You will jump into breakout rooms to deliver your prompts. Instead of vague, subjective feedback, the Mic-Check App gives you an immediate scorecard grading your Pace, Pause Percentage, and Vocabulary Mix.</p>
+                        
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
+                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-gray-700 italic mb-2">"Tom uses a structured and practical approach to identify my speaking habits. He breaks down the issues systematically and provides practical techniques."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 3: De-Inhibiting the Voice -->
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex items-center justify-center overflow-hidden p-6">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-app-voice-intensity-online-class.webp" alt="Mic-Check App showing Jack Nicholson movie script" class="w-full h-auto object-cover opacity-90 group-hover:scale-105 transition-transform duration-500 rounded-xl shadow-lg border border-slate-700">
+                        <div class="absolute bottom-4 left-6 text-white font-bold tracking-widest text-xs uppercase"><i class="fa-solid fa-masks-theater mr-1 text-brand-gold"></i> Famous Scripts</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">De-Inhibiting the Voice</h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">To break out of a monotone comfort zone, we regularly practice performing intense, famous speeches (like *A Few Good Men* or *Any Given Sunday*). It teaches you how to confidently make bold volume and intensity choices under pressure.</p>
+                        
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
+                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-gray-700 italic mb-2">"The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Item 4: Visualizing Transformation -->
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
+                    <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex flex-col items-center justify-center overflow-hidden p-4 gap-2">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-app-online-class-low-confidence-voice.webp" alt="Low confidence voice timeline with blue bars" class="w-full h-auto object-cover opacity-80 rounded shadow-md border border-slate-700">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-app-online-class-high-confidence-voice.webp" alt="High confidence voice timeline with red intensity bars" class="w-full h-auto object-cover opacity-100 rounded shadow-md border border-slate-700">
+                        <div class="absolute bottom-4 left-6 text-white font-bold tracking-widest text-xs uppercase"><i class="fa-solid fa-wave-square mr-1 text-brand-gold"></i> Live Telemetry</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Visualizing Transformation</h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.</p>
+                        
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
+                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-gray-700 italic mb-2">"I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Single Strong Call to Action -->
+            <div id="join" class="bg-[#08331A] rounded-[2rem] p-8 md:p-14 text-center shadow-2xl border-t-4 border-brand-gold relative overflow-hidden max-w-4xl mx-auto">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white/5 text-9xl pointer-events-none">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                
+                <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-4 relative z-10">Ready to Join the Community?</h3>
+                <p class="text-green-100 text-lg mb-8 max-w-2xl mx-auto relative z-10">Whether you are a nervous first-timer or an experienced speaker looking to stay sharp, the Friday lunchtime class is the perfect environment to practice.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+                    <a href="/Contact.html" class="bg-brand-gold text-brand-dark font-extrabold text-lg py-4 px-10 rounded-full hover:bg-yellow-400 transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
+                        RSVP for Friday's Session <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="/Services.html" class="text-brand-gold transition-colors">Services</a>
+                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
+                        <div>
+                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick Public Speaking</span>
+                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: <span itemprop="vatID">56 949 157 639</span>
+                            </div>
+                        </div>
+                        
+                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
+                        </div>
+                        
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
+                        </div>
+                    </address>
+                </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Office Location Map for Tom Hendrick">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+            const iconBars = document.getElementById('menu-icon-bars');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            if (mobileMenuBtn && mobileMenuPanel) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuPanel.classList.toggle('hidden');
+                    iconBars.classList.toggle('hidden');
+                    iconClose.classList.toggle('hidden');
+                });
+            }
+
+            // Mobile Dropdown Toggle Logic
+            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            if (icon) icon.classList.remove('rotate-180');
+                        } else {
+                            if (icon) icon.classList.add('rotate-180');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
