@@ -15,8 +15,10 @@
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
       "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
       "url": "https://tomhendrick.com",
       "telephone": "+61419499331",
+      "vatID": "56949157639",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Suite 110, 147 Pirie Street",
@@ -24,6 +26,11 @@
         "addressRegion": "SA",
         "postalCode": "5000",
         "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
       }
     }
     </script>
@@ -337,15 +344,79 @@
         </div>
     </main>
 
-    <!-- GLOBAL FOOTER -->
+    <!-- CORRECTED GLOBAL FOOTER -->
     <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-green-300 text-xs">
-            <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="/Services.html" class="text-brand-gold transition-colors">Services</a>
+                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
+                        <div>
+                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick Public Speaking</span>
+                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: <span itemprop="vatID">56 949 157 639</span>
+                            </div>
+                        </div>
+                        
+                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
+                        </div>
+                        
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
+                        </div>
+                    </address>
+                </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Office Location Map for Tom Hendrick">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
         </div>
     </footer>
 
     <!-- FULLSCREEN MOBILE APP OVERLAY (POC) -->
-    <!-- Position fixed to cover the entire viewport. On mobile, this creates an edge-to-edge native app feel -->
     <div id="fullscreen-app-overlay" class="fixed inset-0 z-[100] bg-slate-100 hidden flex-col w-full h-full">
         
         <!-- App Header (Navbar) -->
@@ -366,13 +437,11 @@
         </div>
 
         <!-- Snap Carousel Container -->
-        <!-- Center constrained on large desktop, edge-to-edge on mobile -->
         <div class="flex-1 w-full max-w-md mx-auto relative overflow-hidden bg-slate-100">
             <div id="app-carousel" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
                 
                 <!-- SLIDE 1: OVERVIEW -->
                 <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center">
                         <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-2">Total Grade / 100</div>
                         <div class="text-7xl font-extrabold text-slate-900 tracking-tighter mb-1">98.5</div>
@@ -400,12 +469,10 @@
                             <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="w-[60%] h-full bg-blue-500 rounded-full"></div></div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- SLIDE 2: CONTENT -->
                 <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                         <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Personal Balance</div>
                         <div class="flex items-end gap-1 mb-4">
@@ -440,12 +507,10 @@
                             <span class="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">High</span>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- SLIDE 3: DELIVERY & NEW RUNTIME CONSISTENCY -->
                 <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
                         <div>
                             <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Mumble Meter (SPS)</div>
@@ -464,34 +529,28 @@
                         </div>
                     </div>
 
-                    <!-- NEW: Runtime Consistency Widget -->
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                         <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-4">Runtime Consistency</div>
-                        
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <div class="text-xs font-bold text-slate-700"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Optimal (3-6s)</div>
                                 <div class="text-sm font-black text-slate-900">14 Runs</div>
                             </div>
                             <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="w-[73%] h-full bg-emerald-500"></div></div>
-                            
                             <div class="flex items-center justify-between pt-2">
                                 <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></span>Choppy (<3s)</div>
                                 <div class="text-sm font-black text-slate-600">3 Runs</div>
                             </div>
-                            
                             <div class="flex items-center justify-between pt-1">
                                 <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></span>Rushing (>6s)</div>
                                 <div class="text-sm font-black text-slate-600">2 Runs</div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- SLIDE 4: SIMPLICITY -->
                 <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                         <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Comprehension Grade</div>
                         <div class="flex items-end gap-1 mb-4">
@@ -513,7 +572,6 @@
                             <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Optimal</span>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- SLIDE 5: TRANSCRIPT -->
@@ -541,7 +599,6 @@
     <!-- UI INTERACTION SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
             // --- Hero Teaser Logic ---
             const recordBtn = document.getElementById('btn-start-record');
             const recordingProgress = document.getElementById('recording-progress');
@@ -551,15 +608,12 @@
             const micIcon = document.getElementById('mic-icon');
 
             recordBtn.addEventListener('click', () => {
-                // Disable button during sim
                 recordBtn.disabled = true;
                 recordBtn.classList.add('mic-ring-anim', 'bg-rose-600');
                 recordBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 
                 recordingStatus.innerText = "Listening...";
                 recordingSubtext.innerText = "Analyzing acoustic telemetry...";
-                
-                // Animate SVG ring (5 seconds)
                 recordingProgress.style.strokeDashoffset = "0";
                 
                 setTimeout(() => {
@@ -583,14 +637,12 @@
                 appOverlay.classList.remove('hidden');
                 appOverlay.classList.add('flex');
                 
-                // Try Fullscreen API for desktop/Android
                 if (appOverlay.requestFullscreen) {
                     appOverlay.requestFullscreen().catch(err => {
                         console.log("Fullscreen API blocked, using fixed overlay instead.");
                     });
                 }
-                
-                updatePagination(); // Recalculate widths
+                updatePagination(); 
             });
 
             closeAppBtn.addEventListener('click', () => {
@@ -624,7 +676,6 @@
                 carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
             });
             
-            // Recalculate on resize
             window.addEventListener('resize', updatePagination);
         });
     </script>
