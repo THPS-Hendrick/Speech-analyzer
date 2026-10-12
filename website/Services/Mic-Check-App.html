@@ -46,7 +46,7 @@
     }
     </script>
 
-    <!-- FAQPage Schema for Search & AI Overviews -->
+    <!-- FAQPage Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -76,39 +76,38 @@
     }
     </script>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom CSS for Hidden Scrollbar Carousel -->
     <style>
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        /* Pulse animation for the live mic ring */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         @keyframes ring-pulse {
             0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 0; }
+            50% { transform: scale(1.4); opacity: 0; }
             100% { transform: scale(1); opacity: 0; }
         }
-        .mic-ring::after {
+        .mic-ring-anim::after {
             content: '';
             position: absolute;
             inset: -4px;
             border-radius: 50%;
-            border: 3px solid #3b82f6;
-            animation: ring-pulse 2s infinite ease-out;
+            border: 4px solid #3b82f6;
+            animation: ring-pulse 1.5s infinite ease-out;
+        }
+
+        /* App-like transitions */
+        .app-slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 
@@ -128,7 +127,7 @@
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
     <!-- GLOBAL NAVIGATION -->
-    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+    <nav class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-24">
                 <div class="flex items-center py-2">
@@ -140,13 +139,11 @@
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="/Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
-                    
-                    <!-- Services Dropdown -->
                     <div class="relative group">
                         <button class="flex items-center gap-1 text-brand-green font-bold text-sm transition-colors py-10">
                             Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
                         </button>
-                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                             <div class="py-2">
                                 <a href="/Services.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Services Hub</a>
                                 <a href="/Mic-Check-App.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Mic-Check App</a>
@@ -156,212 +153,65 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Articles Dropdown -->
                     <div class="relative group">
                         <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
                             Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
                         </button>
-                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                             <div class="py-2">
                                 <a href="/Transformations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Transformations Hub</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Communication Concepts</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
                             </div>
                         </div>
                     </div>
-
                     <a href="/About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
                     <a href="/Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
-                    
-                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">
-                        Member Login
-                    </a>
+                    <a href="#" class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors">Member Login</a>
                 </div>
-
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
-                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
-                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto">
-            <div class="px-4 pt-2 pb-6 space-y-1">
-                <a href="/Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
-                
-                <div>
-                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
-                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
-                    </button>
-                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
-                        <a href="/Services.html" class="block py-2 text-sm text-gray-600">Services Hub</a>
-                        <a href="/Mic-Check-App.html" class="block py-2 text-sm font-bold text-brand-green">Mic-Check App</a>
-                        <a href="/Services/THPS-Speech-Assessment.html" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
-                        <a href="/THPS-Performance-Plan.html" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
-                        <a href="/Online-Classes.html" class="block py-2 text-sm text-gray-600">Online Classes</a>
-                    </div>
-                </div>
-
-                <a href="/About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
-                <a href="/Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT AREA -->
     <main class="flex-grow w-full pb-20 pt-12 md:pt-16">
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <!-- Breadcrumb -->
             <a href="/Services.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
                 <i class="fa-solid fa-arrow-left"></i> Back to Services
             </a>
             
-            <!-- Hero Header -->
             <header class="mb-12 text-center max-w-4xl mx-auto">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
                     <i class="fa-solid fa-laptop-code text-blue-600"></i> SaaS Technology
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">The Trackman for Public Speaking</h1>
                 <p class="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
-                    Stop guessing how you sound. Swipe through the interactive demo below to see exactly how our acoustic telemetry engine measures your pace, pause ratio, and vocabulary.
+                    Stop guessing how you sound. Tap the microphone below to record a brief baseline, then view your full acoustic telemetry and NLP report.
                 </p>
             </header>
 
-            <!-- PROOF OF CONCEPT: UI CAROUSEL DEMO -->
-            <div class="max-w-5xl mx-auto bg-slate-100 border border-slate-300 rounded-[2rem] p-4 md:p-8 shadow-2xl mb-24 relative overflow-hidden">
-                <!-- Mock Device Header -->
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 text-xl font-bold"><i class="fa-solid fa-microphone"></i></div>
-                        <div>
-                            <h3 class="text-slate-900 font-extrabold text-lg leading-none">Mic-Check Demo</h3>
-                            <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">UI Proof of Concept</p>
-                        </div>
-                    </div>
-                    <!-- Navigation Controls -->
-                    <div class="flex items-center gap-3 bg-white rounded-full p-1.5 shadow-sm border border-slate-200">
-                        <button id="btn-prev" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors focus:outline-none">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        <span id="page-indicator" class="text-xs font-bold text-slate-600 tracking-wider w-20 text-center">Page 1 of 5</span>
-                        <button id="btn-next" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors focus:outline-none">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                    </div>
+            <!-- INTERACTIVE HERO: RECORDING WIDGET -->
+            <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl mb-24 relative overflow-hidden flex flex-col items-center">
+                <div class="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-8">Baseline Assessment</div>
+                
+                <!-- Mic Button -->
+                <div class="flex justify-center items-center mb-8 relative w-40 h-40">
+                    <svg class="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#f1f5f9" stroke-width="6"></circle>
+                        <circle id="recording-progress" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="283" class="transition-all duration-1000 ease-linear"></circle>
+                    </svg>
+                    <button id="btn-start-record" class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg relative cursor-pointer hover:bg-blue-700 transition-colors z-10">
+                        <i id="mic-icon" class="fa-solid fa-microphone text-3xl"></i>
+                    </button>
                 </div>
+                
+                <div id="recording-status" class="text-center font-extrabold text-2xl text-slate-800 tracking-tight mb-2">Tap to Start</div>
+                <p id="recording-subtext" class="text-sm text-slate-500 text-center mb-6">Speak for 5 seconds to generate your report.</p>
 
-                <!-- Horizontal Snap Carousel -->
-                <div id="demo-carousel" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing">
-                    
-                    <!-- WIDGET 1: Live Timer -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[45%] lg:min-w-[31%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                        <div class="text-center font-bold text-xs uppercase tracking-widest text-slate-600 mb-6">Live Timer</div>
-                        <div class="flex justify-center items-center flex-grow mb-6 relative">
-                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="45" fill="none" stroke="#f1f5f9" stroke-width="6"></circle>
-                                <!-- Simulated progress ring -->
-                                <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="140"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <button class="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg relative mic-ring cursor-pointer hover:bg-blue-700 transition-colors">
-                                    <i class="fa-solid fa-microphone text-xl relative z-10"></i>
-                                </button>
-                            </div>
-                            <!-- Side stars as seen in screenshot -->
-                            <i class="fa-solid fa-star text-slate-200 absolute left-4 text-sm"></i>
-                            <i class="fa-solid fa-star text-slate-200 absolute right-4 text-sm"></i>
-                        </div>
-                        <div class="text-center font-extrabold text-3xl font-mono text-slate-800 tracking-tight">00:42</div>
-                    </div>
-
-                    <!-- WIDGET 2: Speaking Pace -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[45%] lg:min-w-[31%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="font-bold text-xs uppercase tracking-widest text-slate-600">Speaking Pace</div>
-                            <i class="fa-solid fa-chevron-down text-slate-300"></i>
-                        </div>
-                        <div class="flex items-end gap-2 mb-2">
-                            <div class="text-6xl font-extrabold text-blue-600 tracking-tighter">132</div>
-                            <div class="text-sm font-bold text-slate-500 mb-2">WPM Avg</div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="flex justify-between text-[10px] font-bold text-slate-400 mb-1"><span>0</span><span>150 (Green)</span><span>250+</span></div>
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="w-[60%] h-full bg-blue-500 rounded-full"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET 3: Personal Balance -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[45%] lg:min-w-[31%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                        <div class="font-bold text-xs uppercase tracking-widest text-slate-600 mb-4">Personal Balance</div>
-                        <div class="flex items-end gap-2 mb-6">
-                            <div class="text-5xl font-extrabold text-slate-400 tracking-tighter">34<span class="text-3xl">%</span></div>
-                            <div class="text-sm font-bold text-slate-500 mb-1.5">of text</div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full relative mb-2">
-                                <!-- Target tick mark -->
-                                <div class="absolute left-[40%] top-1/2 transform -translate-y-1/2 w-0.5 h-3 bg-slate-300"></div>
-                                <div class="w-[34%] h-full bg-slate-400 rounded-full"></div>
-                            </div>
-                            <div class="text-xs text-slate-500 font-medium">Measuring storytelling...</div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET 4: Visual Balance -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[45%] lg:min-w-[31%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                        <div class="font-bold text-xs uppercase tracking-widest text-slate-600 mb-4">Visual Balance</div>
-                        <div class="flex items-end gap-2 mb-6">
-                            <div class="text-5xl font-extrabold text-emerald-500 tracking-tighter">28<span class="text-3xl">%</span></div>
-                            <div class="text-sm font-bold text-slate-500 mb-1.5">of text</div>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full relative mb-2">
-                                <div class="absolute left-[35%] top-1/2 transform -translate-y-1/2 w-0.5 h-3 bg-slate-300"></div>
-                                <div class="w-[28%] h-full bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="text-xs text-slate-500 font-medium">Measuring sensory words...</div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET 5: Score Summary -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[45%] lg:min-w-[31%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="font-bold text-xs uppercase tracking-widest text-slate-600">Score Summary</div>
-                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">9 Greens</span>
-                        </div>
-                        <div class="text-center py-4">
-                            <div class="text-6xl font-extrabold text-slate-900 tracking-tighter mb-2">98.5</div>
-                            <div class="text-sm font-bold text-slate-500 uppercase tracking-widest">Total Grade / 100</div>
-                        </div>
-                    </div>
-
-                    <!-- WIDGET 6: Edit Mode Placeholder -->
-                    <div class="carousel-item min-w-[85vw] sm:min-w-[90%] lg:min-w-[64%] shrink-0 snap-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col">
-                        <div class="font-bold text-xs uppercase tracking-widest text-slate-600 mb-4 flex justify-between">
-                            <span>Transcript Preview</span>
-                            <span class="text-blue-500"><i class="fa-solid fa-pen"></i> Edit Mode</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl text-sm leading-relaxed text-slate-700 flex-grow border border-slate-100 font-medium">
-                            <span class="text-blue-600 font-bold">I</span> think <span class="text-blue-600 font-bold">we</span> need to <span class="text-red-500 font-bold underline decoration-2 underline-offset-4">look</span> at the <span class="text-red-500 font-bold">big picture</span> here. <span class="text-blue-600 font-bold">He</span> <span class="text-red-500 font-bold">walked</span> into the <span class="text-red-500 font-bold">room</span> and immediately started talking about the quarterly projections. <span class="text-purple-600 font-bold">I saw</span> exactly what was happening...
-                        </div>
-                        <div class="mt-4 flex gap-4 text-xs font-bold text-slate-500">
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-blue-500 mr-1"></span>Personal</span>
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-red-500 mr-1"></span>Visual</span>
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-purple-500 mr-1"></span>Both</span>
-                        </div>
-                    </div>
-
-                </div>
+                <!-- Hidden Report Button -->
+                <button id="btn-view-report" class="hidden w-full bg-brand-green text-white font-extrabold py-4 px-6 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
+                    Click here to see your voice report <i class="fa-solid fa-expand"></i>
+                </button>
             </div>
 
             <!-- PREMIUM UPGRADE FUNNEL -->
@@ -378,7 +228,6 @@
                             <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Unlimited Sessions & Cloud Storage</li>
                             <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Advanced Psychoacoustic Voice Timelines</li>
                             <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Access to Famous Speech Prompter Courses</li>
-                            <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> CRM Linking for Coaching Clients</li>
                         </ul>
                     </div>
                     
@@ -388,9 +237,7 @@
                             <div class="text-5xl font-black text-slate-900 mb-1">$9.90<span class="text-lg text-slate-500 font-medium">/mo</span></div>
                             <div class="text-xs font-bold text-brand-green mb-8">Or save 20% at $99/year</div>
                             
-                            <a href="/Contact.html" class="block w-full bg-brand-green text-white font-bold py-3.5 rounded-full hover:bg-brand-dark transition-colors shadow-md">
-                                Subscribe Now
-                            </a>
+                            <a href="#" class="block w-full bg-brand-green text-white font-bold py-3.5 rounded-full hover:bg-brand-dark transition-colors shadow-md">Subscribe Now</a>
                         </div>
                     </div>
                 </div>
@@ -402,54 +249,44 @@
                 <p class="text-gray-600 text-center mb-12 max-w-2xl mx-auto">Our proprietary Natural Language Processing (NLP) and acoustic engine breaks your communication down into three distinct, measurable categories.</p>
 
                 <div class="space-y-12">
-                    
                     <!-- Content -->
                     <div class="border-l-4 border-purple-500 pl-6 md:pl-8">
                         <h3 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600"><i class="fa-solid fa-quote-left"></i></div> Content (What You Say)</h3>
-                        <p class="text-gray-600 mb-6">The substance of your speech is measured by scanning for exact pronouns and cross-referencing our custom sensory dictionaries.</p>
-                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
                                 <h4 class="font-bold text-slate-900 mb-2">Personal Balance (Target: 30-60%)</h4>
-                                <p class="text-sm text-gray-600">Measures storytelling. We scan for personal pronouns to ensure you are talking about specific people doing specific things, rather than abstract corporate jargon.</p>
+                                <p class="text-sm text-gray-600">Measures storytelling. We scan for personal pronouns to ensure you are talking about specific people doing specific things, rather than abstract jargon.</p>
                             </div>
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
                                 <h4 class="font-bold text-slate-900 mb-2">Visual Balance (Target: 20-50%)</h4>
-                                <p class="text-sm text-gray-600">Measures sensory words that paint a picture in the listener's mind. Low visual scores correlate directly with low audience retention.</p>
+                                <p class="text-sm text-gray-600">Measures sensory words that paint a picture. Low visual scores correlate directly with low audience retention.</p>
                             </div>
                         </div>
                     </div>
-
                     <!-- Delivery -->
                     <div class="border-l-4 border-blue-500 pl-6 md:pl-8">
                         <h3 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-wave-square"></i></div> Delivery (How You Sound)</h3>
-                        <p class="text-gray-600 mb-6">Our acoustic engine processes live audio to map out your pacing, pausing, and psychoacoustic volume in exact 6dB biological tiers.</p>
-                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
                                 <h4 class="font-bold text-slate-900 mb-2">Speaking Pace (Target: 100-150 WPM)</h4>
-                                <p class="text-sm text-gray-600">Anything over 150 Words Per Minute triggers the listener's cognitive strain. The app tracks your absolute pacing in real-time.</p>
+                                <p class="text-sm text-gray-600">Anything over 150 Words Per Minute triggers cognitive strain. The app tracks your absolute pacing in real-time.</p>
                             </div>
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
                                 <h4 class="font-bold text-slate-900 mb-2">Mumble Meter (Target: 3.5-4.5 SPS)</h4>
-                                <p class="text-sm text-gray-600">By calculating absolute Syllables Per Second (SPS), we detect when you are rushing through words or failing to enunciate clearly.</p>
+                                <p class="text-sm text-gray-600">By calculating absolute Syllables Per Second (SPS), we detect when you are rushing through words or failing to enunciate.</p>
                             </div>
                         </div>
                     </div>
-
                     <!-- Simplicity -->
                     <div class="border-l-4 border-brand-green pl-6 md:pl-8">
                         <h3 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-brand-green"><i class="fa-solid fa-check-double"></i></div> Simplicity (How Easily You Are Understood)</h3>
-                        <p class="text-gray-600 mb-6">We calculate comprehension by averaging the Flesch, Gunning Fog, SMOG, and Coleman-Liau indices against a 10,000 common-word dictionary.</p>
-                        
                         <div class="grid grid-cols-1 gap-6">
                             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200">
                                 <h4 class="font-bold text-slate-900 mb-2">Speech Runtime (Target: 3.0s - 6.0s)</h4>
-                                <p class="text-sm text-gray-600">This is the most critical metric. Runtime is the average seconds you speak continuously before taking a meaningful pause (silence exceeding 0.70 seconds). Runtimes over 9 seconds indicate severe nervous rushing and a lack of breath control.</p>
+                                <p class="text-sm text-gray-600">Runtime is the average seconds you speak continuously before taking a meaningful pause (silence > 0.70s). High runtimes indicate severe nervous rushing.</p>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
@@ -457,11 +294,8 @@
             <section class="max-w-3xl mx-auto mb-20">
                 <div class="text-center mb-10">
                     <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Frequently Asked Questions</h2>
-                    <p class="text-gray-600">Detailed explanations of our core scoring metrics.</p>
                 </div>
-                
                 <div class="space-y-4">
-                    
                     <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
                         <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
                             What is the Green Score?
@@ -474,7 +308,6 @@
                             The Green Score counts how many of the 9 core metrics hit their perfect target zone (+10 points). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, resulting in a perfect 10/10.
                         </p>
                     </details>
-                    
                     <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
                         <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
                             What is a good Speaking Pace (Words/min)?
@@ -484,10 +317,9 @@
                             </span>
                         </summary>
                         <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
-                            Your speaking pace is critical to being understood. The sweet spot (Green Zone) is 100-150 words per minute. Going faster risks confusing your audience, while speaking slower can lose their attention.
+                            Your speaking pace is critical to being understood. The sweet spot (Green Zone) is 100-150 words per minute.
                         </p>
                     </details>
-                    
                     <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
                         <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
                             What does Runtime mean in public speaking?
@@ -497,183 +329,303 @@
                             </span>
                         </summary>
                         <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
-                            Runtime is the average seconds you speak continuously before taking a meaningful pause. The optimal target is between 3.0 and 6.0 seconds. A high runtime indicates a lack of breath control and run-on sentences.
+                            Runtime is the average seconds you speak continuously before taking a meaningful pause. The optimal target is between 3.0 and 6.0 seconds.
                         </p>
                     </details>
-
-                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
-                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
-                            What is the ideal Pause Percentage?
-                            <span class="relative size-5 shrink-0 text-blue-600">
-                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
-                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
-                            </span>
-                        </summary>
-                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
-                            Pause Percentage is the total amount of time you spend silent during your speech. You should aim for 15-35%. Pausing allows your audience to process the information and gives you time to think about your next point.
-                        </p>
-                    </details>
-
                 </div>
             </section>
-
         </div>
     </main>
 
     <!-- GLOBAL FOOTER -->
     <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
-                
-                <!-- Column 1: Brand & Links -->
-                <div class="flex flex-col gap-5">
-                    <div class="flex items-center gap-3">
-                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
-                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
-                    </div>
-                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
-                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
-                        <a href="/Services.html" class="text-brand-gold transition-colors">Services</a>
-                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
-                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
-                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
-                    </div>
-                </div>
-
-                <!-- Column 2: Crawlable NAP Data -->
-                <div class="flex flex-col gap-4">
-                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
-                    
-                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed" itemscope itemtype="https://schema.org/ProfessionalService">
-                        <div>
-                            <span itemprop="name" class="font-bold text-base text-white block">Tom Hendrick Public Speaking</span>
-                            <span itemprop="legalName" class="hidden">Thomas Geoffrey Hendrick</span>
-                            <div class="mt-1 text-xs text-green-300">
-                                Legal Name: Thomas Geoffrey Hendrick<br>
-                                ABN: <span itemprop="vatID">56 949 157 639</span>
-                            </div>
-                        </div>
-                        
-                        <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
-                            <span itemprop="streetAddress">Suite 110, 147 Pirie Street</span><br>
-                            <span class="ml-6"><span itemprop="addressLocality">Adelaide</span>, <span itemprop="addressRegion">SA</span>, <span itemprop="postalCode">5000</span></span>
-                        </div>
-                        
-                        <div>
-                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
-                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors" itemprop="telephone">0419 499 331</a>
-                        </div>
-                    </address>
-                </div>
-
-                <!-- Column 3: Lazy Loaded Google Map Iframe -->
-                <div class="flex flex-col gap-4">
-                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
-                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
-                        <iframe 
-                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-                            width="100%" 
-                            height="100%" 
-                            style="border:0;" 
-                            allowfullscreen="" 
-                            loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="Office Location Map for Tom Hendrick">
-                        </iframe>
-                    </div>
-                </div>
-
-            </div>
-            
-            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
-                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-green-300 text-xs">
+            <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
         </div>
     </footer>
 
-    <!-- SCRIPTS -->
+    <!-- FULLSCREEN MOBILE APP OVERLAY (POC) -->
+    <!-- Position fixed to cover the entire viewport. On mobile, this creates an edge-to-edge native app feel -->
+    <div id="fullscreen-app-overlay" class="fixed inset-0 z-[100] bg-slate-100 hidden flex-col w-full h-full">
+        
+        <!-- App Header (Navbar) -->
+        <div class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-4 flex-shrink-0 shadow-sm">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></div>
+                <span class="font-black text-slate-800 tracking-tight">Mic-Check Report</span>
+            </div>
+            
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-3">
+                <button id="app-prev" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="app-page-indicator" class="text-[10px] font-bold text-slate-500 tracking-widest uppercase w-16 text-center">1 of 5</span>
+                <button id="app-next" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="w-px h-6 bg-slate-300 mx-1"></div>
+                <button id="btn-close-app" class="text-slate-400 hover:text-red-500 px-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+        </div>
+
+        <!-- Snap Carousel Container -->
+        <!-- Center constrained on large desktop, edge-to-edge on mobile -->
+        <div class="flex-1 w-full max-w-md mx-auto relative overflow-hidden bg-slate-100">
+            <div id="app-carousel" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
+                
+                <!-- SLIDE 1: OVERVIEW -->
+                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-2">Total Grade / 100</div>
+                        <div class="text-7xl font-extrabold text-slate-900 tracking-tighter mb-1">98.5</div>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">+9 Green Bonuses</span>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Runtime Average</div>
+                            <div class="text-3xl font-extrabold text-indigo-600">4.2<span class="text-lg">s</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 3-6s</div>
+                            <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden flex"><div class="w-1/3 bg-transparent"></div><div class="w-1/3 bg-indigo-500 rounded-full"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Speaking Pace</div>
+                            <div class="text-3xl font-extrabold text-blue-600">132 <span class="text-xs text-slate-400">WPM</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 100-150</div>
+                            <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="w-[60%] h-full bg-blue-500 rounded-full"></div></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SLIDE 2: CONTENT -->
+                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Personal Balance</div>
+                        <div class="flex items-end gap-1 mb-4">
+                            <div class="text-5xl font-extrabold text-slate-700 tracking-tighter">34<span class="text-2xl">%</span></div>
+                        </div>
+                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
+                            <div class="absolute left-[30%] right-[40%] top-0 bottom-0 bg-green-50 rounded-full border-x border-green-200"></div>
+                            <div class="absolute top-0 bottom-0 left-0 w-[34%] bg-slate-500 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] font-bold text-slate-400 uppercase mt-1"><span>0</span><span>Target 30-60%</span><span>100</span></div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Visual Balance</div>
+                        <div class="flex items-end gap-1 mb-4">
+                            <div class="text-5xl font-extrabold text-emerald-500 tracking-tighter">28<span class="text-2xl">%</span></div>
+                        </div>
+                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
+                            <div class="absolute left-[20%] right-[50%] top-0 bottom-0 bg-green-50 rounded-full border-x border-green-200"></div>
+                            <div class="absolute top-0 bottom-0 left-0 w-[28%] bg-emerald-500 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] font-bold text-slate-400 uppercase mt-1"><span>0</span><span>Target 20-50%</span><span>100</span></div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Intangible Jargon</div>
+                            <div class="text-3xl font-extrabold text-rose-500">38<span class="text-lg">%</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: < 30%</div>
+                            <span class="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">High</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SLIDE 3: DELIVERY & NEW RUNTIME CONSISTENCY -->
+                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Mumble Meter (SPS)</div>
+                            <div class="text-3xl font-extrabold text-blue-600">3.8 <span class="text-xs text-slate-400">Syllables/s</span></div>
+                        </div>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Optimal</span>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Pause Percentage</div>
+                            <div class="text-3xl font-extrabold text-indigo-600">22<span class="text-lg">%</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 15-35%</div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Runtime Consistency Widget -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-4">Runtime Consistency</div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs font-bold text-slate-700"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Optimal (3-6s)</div>
+                                <div class="text-sm font-black text-slate-900">14 Runs</div>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="w-[73%] h-full bg-emerald-500"></div></div>
+                            
+                            <div class="flex items-center justify-between pt-2">
+                                <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></span>Choppy (<3s)</div>
+                                <div class="text-sm font-black text-slate-600">3 Runs</div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between pt-1">
+                                <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></span>Rushing (>6s)</div>
+                                <div class="text-sm font-black text-slate-600">2 Runs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SLIDE 4: SIMPLICITY -->
+                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
+                    
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Comprehension Grade</div>
+                        <div class="flex items-end gap-1 mb-4">
+                            <div class="text-5xl font-extrabold text-teal-600 tracking-tighter">7.4</div>
+                        </div>
+                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
+                            <div class="absolute top-0 bottom-0 left-0 w-[60%] bg-teal-500 rounded-full"></div>
+                        </div>
+                        <div class="text-[9px] font-bold text-slate-400 uppercase mt-2">Target Grade: 5.0 - 10.0</div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Simple Language</div>
+                            <div class="text-3xl font-extrabold text-cyan-600">86<span class="text-lg">%</span></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 80-90%</div>
+                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Optimal</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SLIDE 5: TRANSCRIPT -->
+                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex-grow flex flex-col">
+                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-4 flex justify-between items-center">
+                            <span>Transcript Preview</span>
+                            <span class="text-blue-500 bg-blue-50 px-2 py-1 rounded"><i class="fa-solid fa-pen"></i> Edit</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl text-sm leading-relaxed text-slate-700 flex-grow border border-slate-100 font-medium">
+                            <span class="text-blue-600 font-bold">I</span> think <span class="text-blue-600 font-bold">we</span> need to <span class="text-red-500 font-bold underline decoration-2 underline-offset-4">look</span> at the <span class="text-red-500 font-bold">big picture</span> here. <span class="text-blue-600 font-bold">He</span> <span class="text-red-500 font-bold">walked</span> into the <span class="text-red-500 font-bold">room</span> and immediately started talking about the quarterly projections. <span class="text-purple-600 font-bold">I saw</span> exactly what was happening...
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-4 text-xs font-bold text-slate-500">
+                            <span><span class="w-2 h-2 inline-block rounded-full bg-blue-500 mr-1"></span>Personal</span>
+                            <span><span class="w-2 h-2 inline-block rounded-full bg-red-500 mr-1"></span>Visual</span>
+                            <span><span class="w-2 h-2 inline-block rounded-full bg-purple-500 mr-1"></span>Both</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- UI INTERACTION SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Mobile Menu Toggle Logic
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
-            const iconBars = document.getElementById('menu-icon-bars');
-            const iconClose = document.getElementById('menu-icon-close');
+            
+            // --- Hero Teaser Logic ---
+            const recordBtn = document.getElementById('btn-start-record');
+            const recordingProgress = document.getElementById('recording-progress');
+            const recordingStatus = document.getElementById('recording-status');
+            const recordingSubtext = document.getElementById('recording-subtext');
+            const viewReportBtn = document.getElementById('btn-view-report');
+            const micIcon = document.getElementById('mic-icon');
 
-            if (mobileMenuBtn && mobileMenuPanel) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    mobileMenuPanel.classList.toggle('hidden');
-                    iconBars.classList.toggle('hidden');
-                    iconClose.classList.toggle('hidden');
-                });
-            }
-
-            // Mobile Dropdown Toggle Logic
-            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
-            dropdownBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const content = btn.nextElementSibling;
-                    const icon = btn.querySelector('i');
+            recordBtn.addEventListener('click', () => {
+                // Disable button during sim
+                recordBtn.disabled = true;
+                recordBtn.classList.add('mic-ring-anim', 'bg-rose-600');
+                recordBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                
+                recordingStatus.innerText = "Listening...";
+                recordingSubtext.innerText = "Analyzing acoustic telemetry...";
+                
+                // Animate SVG ring (5 seconds)
+                recordingProgress.style.strokeDashoffset = "0";
+                
+                setTimeout(() => {
+                    recordBtn.classList.remove('mic-ring-anim', 'bg-rose-600');
+                    recordBtn.classList.add('bg-slate-200', 'text-slate-400');
+                    micIcon.classList.replace('fa-microphone', 'fa-check');
                     
-                    if (content) {
-                        content.classList.toggle('hidden');
-                        if (content.classList.contains('hidden')) {
-                            if (icon) icon.classList.remove('rotate-180');
-                        } else {
-                            if (icon) icon.classList.add('rotate-180');
-                        }
-                    }
-                });
+                    recordingStatus.innerText = "Analysis Complete";
+                    recordingSubtext.classList.add('hidden');
+                    
+                    viewReportBtn.classList.remove('hidden');
+                    viewReportBtn.classList.add('app-slide-up');
+                }, 5000);
             });
 
-            // Proof of Concept Carousel Logic
-            const carousel = document.getElementById('demo-carousel');
-            const prevBtn = document.getElementById('btn-prev');
-            const nextBtn = document.getElementById('btn-next');
-            const pageIndicator = document.getElementById('page-indicator');
+            // --- Fullscreen App Logic ---
+            const appOverlay = document.getElementById('fullscreen-app-overlay');
+            const closeAppBtn = document.getElementById('btn-close-app');
             
-            if (carousel && prevBtn && nextBtn && pageIndicator) {
-                const items = carousel.querySelectorAll('.carousel-item');
+            viewReportBtn.addEventListener('click', () => {
+                appOverlay.classList.remove('hidden');
+                appOverlay.classList.add('flex');
                 
-                const updatePagination = () => {
-                    if (items.length === 0) return;
-                    
-                    // Gap is 16px (gap-4)
-                    const itemWidth = items[0].offsetWidth + 16; 
-                    const visibleItems = Math.floor(carousel.offsetWidth / itemWidth) || 1;
-                    const totalPages = Math.ceil(items.length / visibleItems);
-                    
-                    // Calculate current page based on scroll position
-                    let currentPage = Math.round(carousel.scrollLeft / (itemWidth * visibleItems)) + 1;
-                    if (currentPage > totalPages) currentPage = totalPages;
-                    if (currentPage < 1) currentPage = 1;
-                    
-                    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
-                };
+                // Try Fullscreen API for desktop/Android
+                if (appOverlay.requestFullscreen) {
+                    appOverlay.requestFullscreen().catch(err => {
+                        console.log("Fullscreen API blocked, using fixed overlay instead.");
+                    });
+                }
+                
+                updatePagination(); // Recalculate widths
+            });
 
-                // Listen to scroll events to update numbers dynamically
-                carousel.addEventListener('scroll', () => {
-                    // Use a small timeout to debounce slightly if needed, but native is usually fine
-                    updatePagination();
-                });
+            closeAppBtn.addEventListener('click', () => {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+                appOverlay.classList.add('hidden');
+                appOverlay.classList.remove('flex');
+            });
 
-                nextBtn.addEventListener('click', () => {
-                    const itemWidth = items[0].offsetWidth + 16;
-                    const visibleItems = Math.floor(carousel.offsetWidth / itemWidth) || 1;
-                    carousel.scrollBy({ left: itemWidth * visibleItems, behavior: 'smooth' });
-                });
+            // --- Fullscreen Carousel Pagination Logic ---
+            const carousel = document.getElementById('app-carousel');
+            const prevBtn = document.getElementById('app-prev');
+            const nextBtn = document.getElementById('app-next');
+            const pageIndicator = document.getElementById('app-page-indicator');
+            
+            const updatePagination = () => {
+                const itemWidth = carousel.offsetWidth; 
+                const currentPage = Math.round(carousel.scrollLeft / itemWidth) + 1;
+                const totalPages = carousel.children.length;
+                pageIndicator.innerText = `${currentPage} of ${totalPages}`;
+            };
 
-                prevBtn.addEventListener('click', () => {
-                    const itemWidth = items[0].offsetWidth + 16;
-                    const visibleItems = Math.floor(carousel.offsetWidth / itemWidth) || 1;
-                    carousel.scrollBy({ left: -(itemWidth * visibleItems), behavior: 'smooth' });
-                });
+            carousel.addEventListener('scroll', updatePagination);
 
-                // Init calculation
-                window.addEventListener('resize', updatePagination);
-                updatePagination();
-            }
+            nextBtn.addEventListener('click', () => {
+                carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
+            });
+            
+            // Recalculate on resize
+            window.addEventListener('resize', updatePagination);
         });
     </script>
 </body>
