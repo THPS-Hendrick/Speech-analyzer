@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const websiteDir = path.join(__dirname, 'website');
+// Because build.js is inside the 'website' folder, __dirname is already the root
+const websiteDir = __dirname;
 const headerPath = path.join(websiteDir, 'partials', 'header.html');
 const footerPath = path.join(websiteDir, 'partials', 'footer.html');
 
@@ -17,7 +18,7 @@ function stitchPages(directory) {
         const fullPath = path.join(directory, file);
         const stat = fs.statSync(fullPath);
         
-        // Ignore the partials folder itself, dive into other folders (like /members)
+        // Ignore the partials folder itself, dive into other folders
         if (stat.isDirectory() && file !== 'partials') {
             stitchPages(fullPath);
         } else if (fullPath.endsWith('.html')) {
