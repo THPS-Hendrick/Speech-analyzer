@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In or Sign Up | Mic-Check App by Tom Hendrick</title>
+    <meta name="description" content="Access your THPS Mic-Check App dashboard. Log in to track your public speaking history, view voice timelines, and access premium courses.">
+    
+    <!-- SEO Protection: Keep utility pages out of search indexes to concentrate semantic value on pillar pages -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
+    <!-- SEALED FUNNEL HEADER -->
+    <!-- Removed full navigation to prevent users from abandoning the login/signup process -->
+    <nav class="bg-white border-b border-gray-200 shadow-sm py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center md:justify-start">
+            <a href="/Home.html" class="inline-block transition-transform transform hover:scale-105">
+                <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-10 md:h-12 w-auto">
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN SPLIT-SCREEN LAYOUT -->
+    <main class="flex-grow flex items-center justify-center p-4 md:p-8">
+        
+        <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-gray-200">
+            
+            <!-- LEFT COLUMN: Utility & Form -->
+            <div class="w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center order-2 md:order-1 bg-white">
+                
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight">Log in or create an account</h1>
+                
+                <div class="mb-8">
+                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                        By continuing, you agree to the <a href="#" class="text-brand-green font-bold underline hover:text-brand-dark">Terms of Service</a> and <a href="#" class="text-brand-green font-bold underline hover:text-brand-dark">Privacy Policy</a>.
+                    </p>
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <div class="relative flex items-center justify-center mt-1">
+                            <input type="checkbox" checked class="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded cursor-pointer checked:bg-brand-green checked:border-brand-green transition-colors">
+                            <i class="fa-solid fa-check absolute text-white text-xs opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
+                        </div>
+                        <span class="text-sm text-gray-600 group-hover:text-slate-900 transition-colors">You agree to receive updates and offers from Tom Hendrick. You may opt out anytime.</span>
+                    </label>
+                </div>
+
+                <!-- OAuth Buttons -->
+                <div class="space-y-3 mb-6">
+                    <button class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-slate-700 font-bold py-3.5 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="w-5 h-5">
+                        Continue with Google
+                    </button>
+                    <button class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-slate-700 font-bold py-3.5 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                        <i class="fa-brands fa-apple text-xl mb-0.5"></i>
+                        Continue with Apple
+                    </button>
+                </div>
+
+                <!-- Divider -->
+                <div class="flex items-center mb-6">
+                    <div class="flex-grow h-px bg-gray-200"></div>
+                    <span class="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">or</span>
+                    <div class="flex-grow h-px bg-gray-200"></div>
+                </div>
+
+                <!-- Email Input Form -->
+                <form onsubmit="event.preventDefault();" class="flex flex-col gap-4">
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-slate-900 mb-2">Email address</label>
+                        <input type="email" id="email" required placeholder="Enter your email" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors text-slate-900 placeholder-gray-400 font-medium">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-brand-green text-white font-extrabold text-lg py-4 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-0.5 shadow-lg mt-2">
+                        Continue
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Value Proposition -->
+            <div class="w-full md:w-1/2 bg-[#08331A] p-8 md:p-12 lg:p-16 flex flex-col justify-center order-1 md:order-2 relative overflow-hidden">
+                <!-- Decorative background flare -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/30 rounded-full blur-3xl pointer-events-none transform -translate-x-1/2 translate-y-1/2"></div>
+
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/20 border border-brand-gold/50 text-brand-gold text-xs font-bold uppercase tracking-widest mb-6">
+                        <i class="fa-solid fa-crown"></i> Premium Access
+                    </div>
+                    
+                    <h2 class="text-3xl lg:text-4xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                        Unlock Mic-Check Pro for <span class="text-brand-gold">$9.90/mo</span>
+                    </h2>
+                    
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-cloud-arrow-up text-brand-gold mt-1 text-lg"></i>
+                            <span class="text-green-50 font-medium leading-relaxed">Save unlimited session history to the cloud and track your longitudinal progress.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-wave-square text-brand-gold mt-1 text-lg"></i>
+                            <span class="text-green-50 font-medium leading-relaxed">Unlock advanced psychoacoustic voice timelines to visualize volume and pacing.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-graduation-cap text-brand-gold mt-1 text-lg"></i>
+                            <span class="text-green-50 font-medium leading-relaxed">Access the interactive famous speech prompter courses and guided drills.</span>
+                        </li>
+                    </ul>
+
+                    <!-- Social Proof / Testimonial Block -->
+                    <div class="bg-black/20 backdrop-blur-sm p-6 rounded-2xl border border-white/10 shadow-inner">
+                        <div class="flex items-center gap-1 text-brand-gold text-[10px] mb-3">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-sm text-green-100 italic mb-4 font-medium leading-relaxed">
+                            "Tom uses a structured and practical approach to identify my speaking habits... The sessions have been helping me deliver messages in a more structured, clear and engaging way."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold font-bold text-xs">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <span class="text-xs font-bold text-white uppercase tracking-wide">Verified Member</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+
+    </main>
+
+    <!-- MINIMALIST LOGISTICAL FOOTER -->
+    <footer class="bg-white py-8 border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-gray-500">
+            <p>&copy; 2026 Tom Hendrick Public Speaking. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-brand-green transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-brand-green transition-colors">Privacy Policy</a>
+                <a href="/Contact.html" class="hover:text-brand-green transition-colors">Support</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
