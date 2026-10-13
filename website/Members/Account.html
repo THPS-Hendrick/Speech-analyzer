@@ -1,1 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Management | THPS Member Portal</title>
+    <meta name="description" content="Manage your THPS Mic-Check App subscription, profile details, and account settings.">
+    
+    <!-- SEO Protection: Utility pages should not be indexed -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbars for mobile tab menu */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
+    <!-- GLOBAL NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center py-2">
+                    <a href="/Home.html" class="flex items-center h-full">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg" alt="Tom Hendrick Public Speaking" class="h-16 md:h-20 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/Home.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Home</a>
+                    
+                    <!-- Services Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Services <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Services.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Services Hub</a>
+                                <a href="/Mic-Check-App.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check App</a>
+                                <a href="/Services/THPS-Speech-Assessment.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Speech Assessment</a>
+                                <a href="/THPS-Performance-Plan.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">THPS Performance Plan</a>
+                                <a href="/Online-Classes.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Online Classes</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Articles Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 text-gray-600 hover:text-brand-green font-medium text-sm transition-colors py-10">
+                            Articles <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute top-[80%] left-0 w-64 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left -translate-y-2 group-hover:translate-y-0">
+                            <div class="py-2">
+                                <a href="/Transformations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Transformations Hub</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Case Studies</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Glossary</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/About.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">About</a>
+                    <a href="/Contact.html" class="text-gray-600 hover:text-brand-green font-medium text-sm transition-colors">Contact</a>
+                    
+                    <!-- Dynamic Member Dropdown -->
+                    <div class="relative group">
+                        <button class="bg-brand-green text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-brand-dark transition-colors flex items-center gap-2">
+                            Member Portal <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute top-[100%] right-0 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right -translate-y-2 group-hover:translate-y-0 mt-2">
+                            <div class="py-2">
+                                <a href="/Members/Mic-Check.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check Dashboard</a>
+                                <a href="/Members/Progress.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Historical Progress</a>
+                                <a href="/Members/Account.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Account Management</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none p-2">
+                        <i id="menu-icon-bars" class="fa-solid fa-bars text-2xl"></i>
+                        <i id="menu-icon-close" class="fa-solid fa-xmark text-2xl hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu-panel" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg h-[calc(100vh-96px)] overflow-y-auto z-50">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="/Home.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Home</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Services <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Services.html" class="block py-2 text-sm text-gray-600">Services Hub</a>
+                        <a href="/Mic-Check-App.html" class="block py-2 text-sm text-gray-600">Mic-Check App</a>
+                        <a href="/Services/THPS-Speech-Assessment.html" class="block py-2 text-sm text-gray-600">THPS Speech Assessment</a>
+                        <a href="/THPS-Performance-Plan.html" class="block py-2 text-sm text-gray-600">THPS Performance Plan</a>
+                        <a href="/Online-Classes.html" class="block py-2 text-sm text-gray-600">Online Classes</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">
+                        Articles <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Transformations.html" class="block py-2 text-sm text-gray-600">Transformations Hub</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Case Studies</a>
+                        <a href="#" class="block py-2 text-sm text-gray-600">Glossary</a>
+                    </div>
+                </div>
+
+                <a href="/About.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">About</a>
+                <a href="/Contact.html" class="block px-3 py-3 text-base font-semibold text-gray-900 border-b border-gray-50">Contact</a>
+                
+                <div>
+                    <button class="mobile-dropdown-btn flex items-center justify-between w-full px-3 py-3 text-base font-bold text-brand-green border-b border-gray-50">
+                        Member Portal <i class="fa-solid fa-chevron-down transform transition-transform"></i>
+                    </button>
+                    <div class="mobile-dropdown-content hidden bg-gray-50 px-4 py-2 space-y-1">
+                        <a href="/Members/Mic-Check.html" class="block py-2 text-sm text-gray-600">Mic-Check Dashboard</a>
+                        <a href="/Members/Progress.html" class="block py-2 text-sm text-gray-600">Historical Progress</a>
+                        <a href="/Members/Account.html" class="block py-2 text-sm font-bold text-brand-green">Account Management</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN DASHBOARD AREA -->
+    <main class="flex-grow w-full pb-20 pt-8 md:pt-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <header class="mb-8">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Account Management</h1>
+                <p class="text-gray-500 mt-2">Manage your subscription, profile details, and integration settings.</p>
+            </header>
+
+            <!-- Dashboard Layout Grid -->
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+                
+                <!-- NAVIGATION TABS -->
+                <!-- Mobile: Horizontal scrolling | Desktop: Vertical Sidebar -->
+                <div class="w-full lg:w-64 shrink-0">
+                    <div class="flex lg:flex-col overflow-x-auto snap-x no-scrollbar lg:overflow-visible border-b lg:border-b-0 border-gray-200 lg:space-y-2 pb-1 lg:pb-0">
+                        
+                        <button data-target="panel-profile" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-bold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 bg-green-50 text-brand-green border-brand-green">
+                            <i class="fa-solid fa-user fa-fw"></i> Profile Details
+                        </button>
+                        
+                        <button data-target="panel-billing" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
+                            <i class="fa-solid fa-credit-card fa-fw"></i> Billing & Plan
+                        </button>
+                        
+                        <button data-target="panel-crm" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
+                            <i class="fa-solid fa-link fa-fw"></i> CRM Link
+                        </button>
+                        
+                        <button data-target="panel-legal" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
+                            <i class="fa-solid fa-shield-halved fa-fw"></i> Legal & Session
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- CONTENT PANELS -->
+                <div class="w-full flex-grow bg-white border border-gray-200 rounded-3xl shadow-sm p-6 md:p-10 min-h-[500px]">
+                    
+                    <!-- PANEL 1: PROFILE DETAILS -->
+                    <div id="panel-profile" class="account-tab-panel block animate-fade-in">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Profile Details</h2>
+                        
+                        <div class="space-y-6 max-w-lg">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-900 mb-2">Full Name</label>
+                                <input type="text" value="Executive Client" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors text-slate-900 font-medium">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-900 mb-2">Account Email</label>
+                                <div class="relative">
+                                    <input type="email" value="client@example.com" readonly disabled class="w-full border border-gray-200 bg-gray-100 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed font-medium select-none">
+                                    <i class="fa-solid fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Need to change your email? <a href="/Contact.html" class="text-brand-green font-bold hover:underline">Contact Support</a> to securely migrate your history.</p>
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-100">
+                                <label class="block text-sm font-bold text-slate-900 mb-2">Security</label>
+                                <button class="bg-white border border-gray-300 text-slate-700 font-semibold py-2.5 px-6 rounded-full hover:bg-gray-50 transition-colors shadow-sm text-sm">
+                                    Send Password Reset Link
+                                </button>
+                            </div>
+
+                            <div class="pt-6">
+                                <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium">
+                                    <i class="fa-regular fa-calendar"></i> Member Since: October 2026
+                                </span>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <button class="bg-brand-green text-white font-bold py-3 px-8 rounded-full hover:bg-brand-dark transition-colors shadow-md">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: BILLING & PLAN -->
+                    <div id="panel-billing" class="account-tab-panel hidden animate-fade-in">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Billing & Plan</h2>
+                        
+                        <div class="bg-brand-dark rounded-2xl p-6 md:p-8 relative overflow-hidden mb-8 shadow-inner">
+                            <div class="absolute top-0 right-0 w-40 h-40 bg-brand-gold/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                            
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                                <div>
+                                    <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Current Plan</div>
+                                    <h3 class="text-2xl font-bold text-white mb-2">Mic-Check Pro</h3>
+                                    <p class="text-green-100 text-sm"><i class="fa-solid fa-rotate text-xs mr-1"></i> Billed $9.90 AUD monthly</p>
+                                    <p class="text-green-200 text-xs mt-3 font-medium">Next billing date: 14 Nov 2026</p>
+                                </div>
+                                <div class="shrink-0">
+                                    <!-- External portal link -->
+                                    <a href="#" class="bg-brand-gold text-brand-dark font-bold py-3 px-6 rounded-full hover:bg-yellow-400 transition-colors shadow-lg inline-flex items-center gap-2 text-sm">
+                                        Manage Subscription <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-75"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-4">Billing History</h3>
+                            <div class="overflow-x-auto rounded-xl border border-gray-200">
+                                <table class="w-full text-left text-sm text-gray-600">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr class="text-xs uppercase text-gray-500 font-bold tracking-wider">
+                                            <th class="px-6 py-4">Date</th>
+                                            <th class="px-6 py-4">Amount</th>
+                                            <th class="px-6 py-4">Status</th>
+                                            <th class="px-6 py-4 text-right">Receipt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 bg-white">
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4 font-medium text-slate-900">14 Oct 2026</td>
+                                            <td class="px-6 py-4">$9.90 AUD</td>
+                                            <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">Paid</span></td>
+                                            <td class="px-6 py-4 text-right"><a href="#" class="text-blue-600 hover:text-blue-800 font-semibold"><i class="fa-solid fa-download"></i> PDF</a></td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4 font-medium text-slate-900">14 Sep 2026</td>
+                                            <td class="px-6 py-4">$9.90 AUD</td>
+                                            <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">Paid</span></td>
+                                            <td class="px-6 py-4 text-right"><a href="#" class="text-blue-600 hover:text-blue-800 font-semibold"><i class="fa-solid fa-download"></i> PDF</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3: CRM LINK -->
+                    <div id="panel-crm" class="account-tab-panel hidden animate-fade-in">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Coaching Integration (CRM)</h2>
+                        <p class="text-gray-600 mb-8 max-w-2xl text-sm leading-relaxed">
+                            Linking your account allows your Mic-Check App telemetry to automatically route to your coach's dashboard for professional review during your Performance Plan sessions.
+                        </p>
+                        
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 max-w-lg mb-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900">Status: Linked</h4>
+                                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Active Connection</p>
+                                </div>
+                            </div>
+                            
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Active Coach ID</label>
+                            <input type="text" value="cli_9f82a1b74x99z" readonly disabled class="w-full border border-blue-200 bg-white rounded-xl px-4 py-3 text-slate-700 font-mono text-sm shadow-sm cursor-not-allowed select-all">
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6 max-w-lg">
+                            <h4 class="font-bold text-slate-900 mb-2 text-sm">Disconnect Integration</h4>
+                            <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+                                Unlinking your account will immediately stop sending diagnostic data to your coach. Only do this if your 4-week program has concluded.
+                            </p>
+                            <button class="bg-white border border-red-200 text-red-600 font-bold py-2.5 px-6 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors shadow-sm text-sm inline-flex items-center gap-2">
+                                <i class="fa-solid fa-unlink"></i> Unlink Account
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 4: LEGAL & SESSION -->
+                    <div id="panel-legal" class="account-tab-panel hidden animate-fade-in">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Legal & Session</h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mb-10">
+                            <a href="#" class="flex items-center justify-between bg-gray-50 border border-gray-200 p-4 rounded-xl hover:bg-gray-100 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-file-contract text-gray-400 group-hover:text-brand-green"></i>
+                                    <span class="font-semibold text-sm text-slate-700">Terms of Service</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                            </a>
+                            <a href="#" class="flex items-center justify-between bg-gray-50 border border-gray-200 p-4 rounded-xl hover:bg-gray-100 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-shield-halved text-gray-400 group-hover:text-brand-green"></i>
+                                    <span class="font-semibold text-sm text-slate-700">Privacy Policy</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                            </a>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-8 max-w-lg">
+                            <h4 class="font-bold text-slate-900 mb-4">Device Session</h4>
+                            <button class="w-full sm:w-auto bg-red-600 text-white font-bold py-3 px-10 rounded-full hover:bg-red-700 transition-colors shadow-md flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="bg-[#08331A] py-12 border-t-4 border-brand-gold mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
+                
+                <!-- Column 1: Brand & Links -->
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg" alt="THPS Logo" class="h-10 w-10">
+                        <span class="font-bold text-xl text-white tracking-tight">Tom Hendrick</span>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm font-medium text-green-100 mt-2">
+                        <a href="/Home.html" class="hover:text-brand-gold transition-colors">Home</a>
+                        <a href="/Services.html" class="text-brand-gold transition-colors">Services</a>
+                        <a href="/Transformations.html" class="hover:text-brand-gold transition-colors">Articles</a>
+                        <a href="/About.html" class="hover:text-brand-gold transition-colors">About</a>
+                        <a href="/Contact.html" class="hover:text-brand-gold transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Crawlable NAP Data -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Contact Information</h4>
+                    <address class="not-italic text-sm text-green-100 space-y-3 leading-relaxed">
+                        <div>
+                            <span class="font-bold text-base text-white block">Tom Hendrick Public Speaking</span>
+                            <div class="mt-1 text-xs text-green-300">
+                                Legal Name: Thomas Geoffrey Hendrick<br>
+                                ABN: 56 949 157 639
+                            </div>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-location-dot w-4 text-center mr-1"></i> 
+                            <span>Suite 110, 147 Pirie Street</span><br>
+                            <span class="ml-6">Adelaide, SA, 5000</span>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-phone w-4 text-center mr-1"></i> 
+                            <a href="tel:+61419499331" class="hover:text-brand-gold transition-colors">0419 499 331</a>
+                        </div>
+                    </address>
+                </div>
+
+                <!-- Column 3: Lazy Loaded Google Map Iframe -->
+                <div class="flex flex-col gap-4">
+                    <h4 class="font-bold text-brand-gold uppercase tracking-wider text-sm">Office Location</h4>
+                    <div class="w-full h-48 rounded-lg overflow-hidden shadow-lg border border-brand-green bg-white">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Suite+110,+147+Pirie+Street,+Adelaide,+SA,+5000&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Office Location Map">
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-10 pt-8 border-t border-white/10 text-center text-green-300 text-xs">
+                <p>&copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTION SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Mobile Menu Toggle ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+            const iconBars = document.getElementById('menu-icon-bars');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            if (mobileMenuBtn && mobileMenuPanel) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuPanel.classList.toggle('hidden');
+                    iconBars.classList.toggle('hidden');
+                    iconClose.classList.toggle('hidden');
+                });
+            }
+
+            const dropdownBtns = document.querySelectorAll('.mobile-dropdown-btn');
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            if (icon) icon.classList.remove('rotate-180');
+                        } else {
+                            if (icon) icon.classList.add('rotate-180');
+                        }
+                    }
+                });
+            });
+
+            // --- Tab Switching Logic ---
+            const tabBtns = document.querySelectorAll('.account-tab-btn');
+            const tabPanels = document.querySelectorAll('.account-tab-panel');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-target');
+
+                    // Reset all buttons
+                    tabBtns.forEach(b => {
+                        b.classList.remove('text-brand-green', 'border-brand-green', 'bg-green-50');
+                        b.classList.add('text-gray-500', 'border-transparent');
+                    });
+
+                    // Hide all panels
+                    tabPanels.forEach(p => p.classList.add('hidden'));
+
+                    // Activate clicked button
+                    btn.classList.remove('text-gray-500', 'border-transparent');
+                    btn.classList.add('text-brand-green', 'border-brand-green', 'bg-green-50');
+
+                    // Show target panel
+                    const targetPanel = document.getElementById(targetId);
+                    if (targetPanel) {
+                        targetPanel.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
