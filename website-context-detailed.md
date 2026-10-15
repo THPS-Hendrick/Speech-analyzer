@@ -1,0 +1,474 @@
+# THPS Website Detailed Blueprint
+*Auto-generated snapshot of body text, buttons, and media alt-text.*
+
+---
+
+## File: /website/about.html
+
+### Body Text:
+- Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick approaches public speaking differently. Instead of relying on gut feelings or traditional theater exercises, he analyzes speech delivery the exact same way a biomechanist analyzes a golf swing.
+- By looking for measurable, mechanical efficiencies in how a speaker uses pauses, pacing, volume, vocabulary, and variety, Tom helps corporate professionals build unshakable, predictable confidence on any stage.
+- Recognized as one of the 10 Best Speech Coaches in Australia and New Zealand by Yoodli. Tom is highlighted for his unique methodology that focuses on tangible results and diagnosing mechanical flaws to help speakers effectively eliminate "presentation dead space."
+- Subjective feedback like "just be more engaging" or "speak with more confidence" is frustrating and unhelpful. It leaves professionals guessing what actually needs to change, leading to inconsistent performance and lingering stage fright.
+- By tracking objective metrics like your cadence (words-per-minute), pause ratios, and vocabulary simplicity, we bring science to the stage. When you understand your mechanical baseline—exactly how fast you speak when you are nervous, or how often you fail to pause—you gain total control. It is about building predictable mechanics, not faking confidence.
+- To make this data-driven methodology accessible worldwide, Tom created the Mic-Check App, a real-time vocal diagnostic tool for professionals.
+- The app was built out of necessity. No existing software measured the specific, nuanced metrics that actually matter for executive presence. Standard tools simply counted filler words, but the Mic-Check App was engineered to map the holistic biomechanics of speech—allowing users to track their progress daily, drill their weaknesses, and eliminate nerves with hard, undeniable data.
+
+### Interactables (Links/Buttons):
+- [A] Book a Speech Assessment
+- [A] 10 Best Speech Coaches in Australia and New Zealand
+- [A] Explore the Mic-Check App
+
+### Image Alt Text:
+- Tom Hendrick - Top 10 Public Speaking Coach Australia
+
+---
+
+## File: /website/articles/case-studies.html
+
+### Body Text:
+- A data-driven breakdown of mastering tempo and reducing cognitive load during high-stakes presentations.
+- Specialist in Speech Biomechanics & Acoustic Telemetry. Helping leaders measure and optimize spoken delivery.
+- The Challenge: An executive speaker was struggling with high cognitive load, rushing through material at 180 Words Per Minute (WPM), resulting in poor audience retention. 
+                    The Solution: Following a baseline THPS Speech Assessment, we implemented Repeat-Count training over a 4-week THPS Performance Plan, tracked in real-time via the Mic-Check App.
+                    The Result: The client optimized their pace to a sustainable 145-150 WPM, achieving a 90/100 engagement score and complete composure during Q&A.
+- Speak into your browser microphone to generate live cadence, pause variation, and tempo telemetry.
+- In corporate environments, pressure often manifests physically through a speaker's tempo. For Sumeena, an executive leader presenting highly technical information to stakeholders, this pressure caused her average speaking rate to spike to 180 Words Per Minute (WPM).
+- At 180 WPM, a speaker sacrifices the ability to pause, breathe, or process the room's reaction. "When I started, I was just blank and juggling words," she noted. This speed severely limited her Information Gain retention with the audience and increased her own cognitive load during hostile Q&A sessions.
+- You cannot manage what you do not measure. The turning point began by booking a THPS Speech Assessment. Instead of subjective feedback like "slow down," we analyzed her baseline audio data.
+- The assessment confirmed that her rapid pacing was destroying her Intangible Engagement Score. We needed a precise, mechanical fix.
+- Moving into a 4-week THPS Performance Plan, we utilized the Vocal Mechanics Method—specifically "Repeat-Count" training—to rebuild her muscle memory.
+- Between our 1-on-1 Zoom sessions, she utilized the Mic-Check App (which you can try via a free demo here) to practice her material. The app provided real-time, on-screen visual feedback if her tempo drifted above the 150 WPM threshold, ensuring her solo practice was scientifically grounded.
+- By the final session, her historical progress chart had stabilized perfectly within the 145-150 WPM range. Because her brain was no longer rushing to output words, her cognitive load dropped, giving her the mental bandwidth to handle complex Q&A seamlessly. Her overall performance grade jumped to a 90/100, completely transforming her professional delivery.
+- Unlike basic word-counting scripts, our proprietary THPS.NLP.analyzeSpeech engine evaluates spoken audio across multiple biomechanical dimensions in real time:
+- We calculate syllable counts per word token and map acoustic gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds 700ms to 750ms.
+- Continuous speech runs between structural pauses are classified into absolute cadence tiers:
+                                &gt;5.0 SPS (Too Fast), 
+                                3.8–4.2 SPS (Optimal Command Zone), and 
+                                &lt;3.0 SPS (Drag Zone).
+- Spoken energy is continuously grouped using biological 6dB decibel thresholds (±3dB and ±9dB relative to the speaker’s average spoken word intensity) to track dynamic contrast vs. monotone strain.
+- Transcripts are evaluated against normalized dictionaries (including Google 10k Common Words and Visual Imagery corpora) to calculate grade level, narrative pronoun density, and visual clarity.
+- "Tom's data-driven approach completely changed how I present to board members. Measuring my WPM in real time gave me confidence I never had before."
+- Get your own baseline analytics and discover the exact metrics holding back your communication.
+
+### Interactables (Links/Buttons):
+- [A] Back to Transformations Hub
+- [A] LinkedIn
+- [A] About Coaching Methodology
+- [A] THPS Speech Assessment
+- [A] THPS Performance Plan
+- [A] Mic-Check App
+- [A] try via a free demo here
+- [A] Read All 24 Reviews
+- [A] Book a Speech Assessment
+- [A] Try the App Demo
+
+### Image Alt Text:
+- Tom Hendrick
+- Mic-Check App Dashboard showing pacing progress from 180 to 150 WPM
+
+---
+
+## File: /website/articles/glossary.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/transformations-hub.html
+
+### Body Text:
+- Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
+- "When I started, I was juggling words and rushing. Using the Mic-Check App, we tracked my pace from 180 down to the ideal 145-150 WPM range, completely transforming my delivery."
+- "Tom was incredibly knowledgeable teaching professional pitching. Utilizing Repeat-Count training drastically reduced cognitive load, allowing for confident, measured answers under pressure."
+- "For financial brokers, data can be dry. We used the app's content analyzer to ensure 60% of the speech relied on visual and personal framing, completely shifting audience retention."
+
+### Interactables (Links/Buttons):
+- [BUTTON] All Transformations
+- [BUTTON] Pacing & Delivery (WPM)
+- [BUTTON] Pressure & Q&A Mastery
+- [BUTTON] Content & Engagement
+- [A] Read Data
+- [A] Read Data
+- [A] Read Data
+
+### Image Alt Text:
+
+---
+
+## File: /website/contact.html
+
+### Body Text:
+- Reach out to book a THPS Speech Assessment, inquire about corporate training, or get Mic-Check App support.
+- Get a baseline analysis of your speaking metrics to identify critical areas for improvement before beginning a comprehensive performance plan.
+- Bring the Vocal Mechanics Method to your executive team. Our scalable software and 1-on-1 coaching are available globally via Zoom.
+- Thank you for reaching out. Your data has been securely processed, and Tom will be in touch shortly.
+
+### Interactables (Links/Buttons):
+- [BUTTON] Send Message
+- [BUTTON] Send another message
+
+### Image Alt Text:
+
+---
+
+## File: /website/home.html
+
+### Body Text:
+- Traditional training relies on subjective opinions. When you speak, the Mic-Check App measures data about every word you say, when you said it, how loudly, how quickly and more. This helps measures your progress, and build unshakable professional confidence.
+- Recognized Industry Leader
+- Methodology
+- Data-Backed Diagnostics
+- Telling a professional to "just be more confident" does not work. True communication skills training requires measuring the actual mechanics of your voice to identify exactly where you lose your audience under pressure.
+- Similar to how a biomechanist analyzes a golf swing, we measure your exact words-per-minute pacing, pause ratios, and vocabulary simplicity. When you can see your data, you gain the mechanical control needed to eliminate nerves.
+- Select the feedback style that best fits your schedule and learning preferences.
+- Self-paced, private practice powered by real-time acoustic feedback. Track your Words Per Minute and runtime consistency.
+- The fastest route. A 4-week, 1-on-1 intensive guided by expert clinical feedback to permanently break skill inhibition.
+- Learn dynamically through community exercises. Join our free weekly "Fun Fridays" classes for peer review and gamified prompts.
+- Stop guessing. Start measuring. The ultimate tool for modern speakers.
+- Track your progress with the Mic-Check App, a real-time vocal diagnostic tool for professionals. Instantly see your Pace, Mumble rate, and Pause percentages on a live Voice Graph.
+- Access specialized modules like "Mic-Check Daily," "Repeat + Count," and "ESL Level 1: Pronunciation" to build permanent muscle memory.
+- Backed by 68+ Five-Star Google Reviews
+- "The Mic-Check data completely changed how I approach board meetings. My confidence is through the roof."
+- — Corporate Executive
+- "Tom uses a structured and practical approach to identify my speaking habits... He breaks down the issues systematically."
+- — Technology Manager
+- "I am amazed by the rapid improvement in my speaking and confidence under pressure."
+- — Financial Broker
+- According to Mic-Check data, the ideal pace for a corporate presentation is between 130 and 150 words per minute. Anything faster triggers cognitive strain for both the speaker and the audience, while dropping below 110 WPM risks disengagement.
+- The Premium membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
+- Subjective coaching relies on a trainer's personal opinion of your delivery. A THPS Speech Assessment uses software to map your vocal biometrics, providing hard data on your pace, filler words, and vocal variance so we know exactly what mechanical flaws to fix.
+- No. While we have a physical Training Centre in Adelaide (Suite 110, 147 Pirie Street), the THPS Performance Plan and all diagnostic assessments can be conducted globally via Zoom, utilizing live screen-sharing of the Mic-Check App.
+
+### Interactables (Links/Buttons):
+- [A] App
+- [A] Coach
+- [A] Class
+- [A] You
+- [BUTTON] 
+- [A] Book Free Assessment
+- [A] Try the Free App
+- [A] Explore the Mic-Check App
+- [A] View Performance Plan
+- [A] Join a Free Class
+- [A] Unlock Premium for $9.90/mo
+- [A] Read Detailed Case Studies
+- [BUTTON] What is a good words-per-minute pace for a business presentation?
+- [BUTTON] How does the Mic-Check Premium membership work?
+- [BUTTON] What is the difference between subjective coaching and a THPS Speech Assessment?
+- [BUTTON] Do I need to be in Adelaide for coaching?
+
+### Image Alt Text:
+- Mic-Check App Dashboard analyzing executive acoustic telemetry
+- Data-driven Executive Coaching Session
+- Client Testimonial
+- Client Testimonial
+- Client Testimonial
+
+---
+
+## File: /website/members/account.html
+
+### Body Text:
+- Manage your subscription, profile details, and integration settings.
+- Need to change your email? Contact Support to securely migrate your history.
+- Billed $9.90 AUD monthly
+- Next billing date: 14 Nov 2026
+- Linking your account allows your Mic-Check App telemetry to automatically route to your coach's dashboard for professional review during your Performance Plan sessions.
+- Active Connection
+- Unlinking your account will immediately stop sending diagnostic data to your coach. Only do this if your 4-week program has concluded.
+
+### Interactables (Links/Buttons):
+- [BUTTON] Profile Details
+- [BUTTON] Billing & Plan
+- [BUTTON] CRM Link
+- [BUTTON] Legal & Session
+- [A] Contact Support
+- [BUTTON] Send Password Reset Link
+- [BUTTON] Save Changes
+- [A] Manage Subscription
+- [A] PDF
+- [A] PDF
+- [BUTTON] Unlink Account
+- [A] Terms of Service
+- [A] Privacy Policy
+- [BUTTON] Log Out
+
+### Image Alt Text:
+
+---
+
+## File: /website/members/login.html
+
+### Body Text:
+- By continuing, you agree to the Terms of Service and Privacy Policy.
+- "Tom uses a structured and practical approach to identify my speaking habits... The sessions have been helping me deliver messages in a more structured, clear and engaging way."
+- &copy; 2026 Tom Hendrick Public Speaking. All rights reserved.
+
+### Interactables (Links/Buttons):
+- [A] 
+- [A] Terms of Service
+- [A] Privacy Policy
+- [BUTTON] Continue with Google
+- [BUTTON] Continue with Apple
+- [BUTTON] Continue
+- [A] Terms of Service
+- [A] Privacy Policy
+- [A] Support
+
+### Image Alt Text:
+- Tom Hendrick Public Speaking
+- Google Logo
+
+---
+
+## File: /website/members/mic-check.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
+## File: /website/members/progress.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
+## File: /website/partials/footer.html
+
+### Body Text:
+- &copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.
+
+### Interactables (Links/Buttons):
+- [A] Home
+- [A] Services
+- [A] Articles
+- [A] About
+- [A] Contact
+- [A] Tom Hendrick Public Speaking
+                        Legal Name: Thomas Geoffrey HendrickABN: 56 949 157 639
+                    
+                    
+                         
+                        Suite 110, 147 Pirie Street
+                        Adelaide, SA, 5000
+                    
+                    
+                         
+                        0419 499 331
+
+### Image Alt Text:
+- THPS Logo
+
+---
+
+## File: /website/partials/header.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+- [A] 
+- [A] Home
+- [BUTTON] Services
+- [A] Services Hub
+- [A] Mic-Check App
+- [A] THPS Speech Assessment
+- [A] THPS Performance Plan
+- [A] Online Classes
+- [BUTTON] Articles
+- [A] Transformations Hub
+- [A] Case Studies
+- [A] Glossary
+- [A] About
+- [A] Contact
+- [A] Sign in
+- [BUTTON] Member Portal
+- [A] Login / Sign-up
+- [A] Mic-Check Dashboard
+- [A] Historical Progress
+- [A] Account Management
+- [BUTTON] Log Out
+- [BUTTON] 
+- [A] Home
+- [BUTTON] Services
+- [A] Services Hub
+- [A] Mic-Check App
+- [A] THPS Speech Assessment
+- [A] THPS Performance Plan
+- [A] Online Classes
+- [BUTTON] Articles
+- [A] Transformations Hub
+- [A] Case Studies
+- [A] Glossary
+- [A] About
+- [A] Contact
+- [BUTTON] Member Portal Sign in
+- [A] Login / Sign-up
+- [A] Mic-Check Dashboard
+- [A] Historical Progress
+- [A] Account Management
+- [BUTTON] Log Out
+
+### Image Alt Text:
+- Tom Hendrick Public Speaking
+
+---
+
+## File: /website/services/mic-check-app.html
+
+### Body Text:
+- Stop guessing how you sound. Tap the microphone below to record a brief baseline, then view your full acoustic telemetry and NLP report.
+- Speak for 5 seconds to generate your report.
+- The free demo resets after every use. Subscribe to unlock cloud history, detailed PDF reports, and advanced psychoacoustic voice timelines.
+- Our proprietary Natural Language Processing (NLP) and acoustic engine breaks your communication down into three distinct, measurable categories.
+- Measures storytelling. We scan for personal pronouns to ensure you are talking about specific people doing specific things, rather than abstract jargon.
+- Measures sensory words that paint a picture. Low visual scores correlate directly with low audience retention.
+- Anything over 150 Words Per Minute triggers cognitive strain. The app tracks your absolute pacing in real-time.
+- By calculating absolute Syllables Per Second (SPS), we detect when you are rushing through words or failing to enunciate.
+- Runtime is the average seconds you speak continuously before taking a meaningful pause (silence > 0.70s). High runtimes indicate severe nervous rushing.
+- The Green Score counts how many of the 9 core metrics hit their perfect target zone (+10 points). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, resulting in a perfect 10/10.
+- Your speaking pace is critical to being understood. The sweet spot (Green Zone) is 100-150 words per minute.
+- Runtime is the average seconds you speak continuously before taking a meaningful pause. The optimal target is between 3.0 and 6.0 seconds.
+
+### Interactables (Links/Buttons):
+- [A] Back to Services
+- [BUTTON] 
+- [BUTTON] Click here to see your voice report
+- [A] Subscribe Now
+- [SUMMARY] What is the Green Score?
+- [SUMMARY] What is a good Speaking Pace (Words/min)?
+- [SUMMARY] What does Runtime mean in public speaking?
+- [BUTTON] 
+- [BUTTON] 
+- [BUTTON] 
+
+### Image Alt Text:
+
+---
+
+## File: /website/services/online-classes.html
+
+### Body Text:
+- Join our "Fun Fridays" online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
+- "I've been attending Tom's Fun Fridays Public Speaking classes... The sessions have been helping me deliver messages and presentations in a more structured, clear and engaging way, while also building up my confidence in professional settings."
+- Each 60-minute session is a mix of improv agility, data-driven feedback, and famous script readings designed to break your speaking inhibitions.
+- Like Cards Against Humanity meets executive coaching. We use randomized prompts (e.g., combining a "Knowledgeable Professor" persona with a "Problem Options Solution" structure) to force you to structure your thoughts instantly without a script.
+- "Tom's ability to think on his feet and cater to my learning style is next level. Where was this kind of mentoring early in my learning journey?"
+- You will jump into breakout rooms to deliver your prompts. Instead of vague, subjective feedback, the Mic-Check App gives you an immediate scorecard grading your Pace, Pause Percentage, and Vocabulary Mix.
+- "Tom uses a structured and practical approach to identify my speaking habits. He breaks down the issues systematically and provides practical techniques."
+- To break out of a monotone comfort zone, we regularly practice performing intense, famous speeches (like *A Few Good Men* or *Any Given Sunday*). It teaches you how to confidently make bold volume and intensity choices under pressure.
+- "The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."
+- Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.
+- "I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."
+- Whether you are a nervous first-timer or an experienced speaker looking to stay sharp, the Friday lunchtime class is the perfect environment to practice.
+
+### Interactables (Links/Buttons):
+- [A] Back to Services Hub
+- [A] Join This Friday's Free Class
+- [A] RSVP for Friday's Session
+
+### Image Alt Text:
+- Tom Hendrick demonstrating Mic-Check Daily prompt cards
+- Daily Mic-Check Scorecard showing pace, pause, and vocabulary metrics
+- Mic-Check App showing Jack Nicholson movie script
+- Low confidence voice timeline with blue bars
+- High confidence voice timeline with red intensity bars
+
+---
+
+## File: /website/services/services.html
+
+### Body Text:
+- There is no single way to become a master communicator. Whether you prefer community interaction, clinical 1-on-1 coaching, or data-driven software, select the type of feedback that best fits your learning style.
+- Learn dynamically through community exercises and real-time peer feedback.
+- "I've been attending Tom's Fun Fridays Public Speaking classes... The sessions have been helping me deliver messages and presentations in a more structured, clear and engaging way."
+- The fastest route. 1-on-1 intensive practice guided by expert clinical feedback.
+- "I chose to do the Diagnostic session... The Coaching Plan has vastly improved my confidence under pressure in only 3 sessions. I highly recommend taking Tom up on his offer."
+- Self-paced, private practice powered by data-driven acoustic feedback.
+- "Tom uses a structured and practical approach to identify my speaking habits... He breaks down the issues systematically and provides practical techniques."
+- A free 1-hour 1-on-1 session to baseline your speaking skills. We use the SAMS, VVIQ, and Vocal Inhibition tests to uncover your exact communication gaps and build your roadmap.
+- Like a Trackman for your presentations. Access specialized courses, daily challenges, and live acoustic telemetry to measure your WPM and engagement scores effortlessly in private.
+- The fastest, most tailored way to improve. 4x intensive 1-on-1 weekly sessions utilizing your diagnostic data and the Mic-Check App to rapidly close your gaps.
+- This tailored program requires a baseline diagnostic to ensure a perfect fit.
+- A low-pressure, flexible environment to practice your public speaking. Join our community sessions to test new skills and get comfortable on camera with live peer feedback.
+- Everything you need to know about getting started.
+- Because the Performance Plan is highly tailored to your specific biomechanical and cognitive gaps, it cannot be purchased directly. All clients must first complete the Free 1-Hour THPS Speech Assessment to establish their baseline data and ensure the coaching is a perfect fit.
+- No, you can test a free browser demo of the Mic-Check App immediately. The full version, which includes historical progress tracking, courses, and daily games, is available as an upgrade for $9 per month or $99 per year.
+- We host a free online class every Friday at lunchtime. It is a low-pressure environment designed to help you practice your public speaking skills on camera, test new strategies, and get live feedback from the community.
+
+### Interactables (Links/Buttons):
+- [A] Book Free 1-Hour Session
+- [A] Launch Free Demo
+- [A] Complete Assessment to Unlock
+- [A] Join Free Friday Class
+- [SUMMARY] How do I enroll in the THPS Performance Plan?
+- [SUMMARY] Do I need a paid subscription to try the Mic-Check App?
+- [SUMMARY] When are the free online practice classes?
+
+### Image Alt Text:
+
+---
+
+## File: /website/services/thps-performance-plan.html
+
+### Body Text:
+- The THPS Performance Plan is a 4-week, data-driven intensive that moves you from cognitive strain to effortless, autonomous speaking under pressure.
+- Skill Inhibition: The speaker is rushing at an unsustainable 197 WPM with massive 18.8-second runtimes, resulting in a failing engagement score.
+- Skill Acquisition: After 4 sessions, pacing optimizes to 112 WPM. The historical progress chart stabilizes at 100/100 across multiple high-pressure attempts.
+- When you face a high-stakes pitch, an involuntary part of your brain called the amygdala detects a threat. It floods your body with adrenaline, triggering Flight, Freeze, Fawn, or Fight responses. This is why you go blank, rush your words, or lose your structure.
+- You cannot "choose" not to be nervous. But through deliberate, constraint-based practice (like the Repeat & Count framework), we can train your brain to execute familiar routines under pressure, bypassing the amygdala's panic alarms entirely.
+- Four 1-hour intensive sessions. Delivered online or in-person at our Adelaide Training Centre.
+- In this initial stage, mental effort is high as we override your biological panic response. We introduce rigid constraint frameworks like Repeat & Count, forcing your brain to declare structure upfront before you are allowed to speak, preventing rambling and rapid pacing.
+- We transition into real-time self-correction. You will learn to use familiar structural prompts (like Problem, Options, Solution) to send calming signals back to your own nervous system (Self-Regulation) while projecting absolute certainty to your audience (Co-Regulation).
+- We drastically increase the cognitive load. By utilizing advanced storytelling constraints (like Say What You See), we train your brain to rapidly "zip-file" thousands of relevant thoughts from a single visual prompt, allowing you to handle hostile Q&A effortlessly without a script.
+- This is the holy grail of public speaking. The attention required to structure your thoughts drops to near zero. Your delivery is composed, your pacing is flawless, and your Mic-Check App historical progress chart consistently locks in at 100/100.
+- The Performance Plan is delivered as 4x 1-Hour Private Sessions.
+- The THPS Performance Plan is a $990 AUD investment. Because it is highly tailored to your specific biomechanical and cognitive gaps, it cannot be purchased directly. All clients must complete a baseline diagnostic first.
+- Book your Free 1-Hour THPS Speech Assessment today to establish your data baseline. At the end of your assessment, Tom will review your eligibility for the 4-week program.
+
+### Interactables (Links/Buttons):
+- [A] Back to Services Hub
+- [A] Book Your Free Assessment
+
+### Image Alt Text:
+- Mic-Check App showing 51 out of 100 grade, 197 WPM, and 18.8s runtime
+- Mic-Check App showing 100 out of 100 grade, 112 WPM, and historic progress reaching perfection
+
+---
+
+## File: /website/services/thps-speech-assessment.html
+
+### Body Text:
+- Nerves can strip away your speaking skills under pressure. Discover exactly why your delivery breaks down—and how to fix it—with a free 1-hour acoustic and cognitive baseline diagnostic.
+- Test a live preview of the acoustic telemetry software used during your assessment.
+- Capable professionals often know their material intimately but find preparing for presentations exhausting. Over-relying on clunky scripts takes away natural delivery, while speaking unscripted brings the fear of going off-track or blanking completely.
+- The THPS Speech Assessment replaces subjective feedback with clinical, data-driven insights. Before you book a Performance Plan, we spend 1 hour (online or in-person) running you through 5 core diagnostic tests to map your unique communication gaps.
+- Pinpoint exactly when and why your body triggers presentation anxiety. By measuring your neuro-hormonal response to speaking cues, we identify your specific Preparation Dysregulation gap compared to hundreds of benchmarked executives.
+- Discover why memorizing clunky scripts is holding you back. We plot your cognitive imagery profile on the spectrum from Aphantasia to Hyperphantasia, revealing whether your brain relies on vivid visual concepts or rigid structural rules when speaking off-the-cuff.
+- Measure the psychological blocks causing a monotone delivery under pressure. You will attempt to deliver a script using extreme vocal ranges (fast, slow, loud, quiet). This benchmarks your ability to modulate pitch and volume on command, identifying your exact Vocal Inhibition Gap.
+- Benchmark your natural ability to speak vividly. Using the Mic-Check App, we capture your baseline Words Per Minute (WPM) and visual descriptor percentages when prompted solely by imagery or imagination, measuring your core fluency strengths.
+- Find out exactly when your speaking fluency breaks down. We impose progressive constraints across 6 rounds of questioning to test how quickly you lose composure under complex Q&A rules and high cognitive load.
+- The resulting data from your free assessment allows us to build your highly personalized 4-week Performance Plan. By integrating targeted rules, progressive constraints, and daily tracking via the Mic-Check App, we close your exact gaps so you can speak with composure under immense pressure.
+- "The initial assessment revealed a massive rules-based communication gap I didn't even know I had. Measuring my WPM in real time completely changed how I approach hostile Q&A."
+- Book your free 1-hour session online or in-person at our Adelaide clinic.
+
+### Interactables (Links/Buttons):
+- [A] Performance Plan
+- [A] Book Your Free Assessment
+
+### Image Alt Text:
+
+---
+

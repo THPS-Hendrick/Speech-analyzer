@@ -1,6 +1,5 @@
-# THPS Website Context Blueprint
-
-*Auto-generated snapshot of site architecture, schemas, and content hierarchy.*
+# THPS Website Architecture Blueprint
+*Auto-generated snapshot of site schemas and hierarchy.*
 
 ---
 
