@@ -72,8 +72,41 @@
 ## File: /website/articles/glossary.html
 
 ### Body Text:
+- Public speaking improves when you replace subjective feedback with objective data. Browse our standardized definitions for speech delivery metrics, diagnostic tests, and coaching frameworks.
+- THPS stands for Tom Hendrick Public Speaking, and is the overarching brand and legal entity (Thomas Geoffrey Hendrick) headquartered at Suite 110, 147 Pirie Street, Adelaide and providing online public speaking assessment and coaching globally.
+- A free, 1-hour, 5-step data-driven diagnostic session used to measure presentation anxiety, unscripted fluency, and vocal inhibition.
+- A premium 4-week, 1-on-1 intensive coaching program ($990 AUD) designed to move executives from cognitive strain to effortless delivery.
+- An app to turn public speaking practice into measurable data that provides insights on how to improve your speaking skills. The Mic-Check App is akin to a golf launch monitor for public speaking, as it is a web browser-based educational application able to process live and recorded audio data into natural language displayed on a dashboard of insightful speaking metrics.
+- The premium subscription tier ($9.90 AUD/month) for the full Mic-Check app that unlocks historical tracking, speaking courses and games, and other advanced features.
+- A free, weekly online group practice class focusing on unscripted speaking and measured accountability.
+- A gamified aggregate score out of 10 in the Mic-Check App, where hitting all 9 metric targets awards a perfect 10/10.
+- A metric measured on the Mic-Check App, WPM stands for Words Per Minute and is about how many words the speaker says per minute on average (including time speaking and time pausing). There is an upper limit on how many words audiences can process effectively in a minute. Our database of measured professional speakers suggests the best speakers range between 100 to 150 WPM.
+- A metric measured on the Mic-Check App, SPS stands for Syllables Per Second and is about how many syllables the speaker said in an average second (excluding any time pausing). There is an upper limit on how many syllables audiences can process effectively in a second before words sound like they are incoherent mumbles. Our database of measured professional speakers suggests the best speakers range between 3.5 to 4.5 syllables per second.
+- A metric measured on the Mic-Check App, Pause % is the amount of time the speaker paused compared to their active speaking time. Too much Pause % suggests hesitation, not enough Pause % suggests rushing. Our database of measured professional speakers suggests the best speakers range between 15 to 35% Pause %.
+- A metric measured on the Mic-Check App about how long a speaker talks on average until they take a Noticeable Pause (a pause longer than 700 milliseconds). Our database of measured professional speakers suggests the best speakers range between 3 to 6 seconds of runtime until they take a Noticeable Pause.
+- A metric measured on the Mic-Check App about pauses with a duration longer than 700 milliseconds. Our database of measured professional speakers suggests the best speakers include pauses between 700ms to 2 seconds on average every 3 to 6 seconds of Runtime.
+- A metric measured on the Mic-Check App about how much of your content describes a specific person’s thoughts and actions (e.g., “I think”, “he said”, “she won”, etc.). A lack of personal content is at risk of being unengaging or vague. Our database of measured professional speakers suggests the best speakers range between 10 to 30% Intangible content.
+- A metric measured on the Mic-Check App about how much of your content describes words people are capable of visualising (e.g., colours, sizes, locations, objects, etc.). A lack of Visual content is at risk of being unengaging or vague. Our database of measured professional speakers suggests the best speakers range between 10 to 30% Intangible content.
+- A metric measured on the Mic-Check App about how much of your content describes non-Personal and non-Visual words (e.g., general concepts, mere grammar, filler words). Too much intangible content is at risk of being overly technical, dry or unmemorable. Our database of measured professional speakers suggests the best speakers range between 10 to 30% Intangible content.
+- A metric measured on the Mic-Check App about the complexity of the speaker’s average sentence, in terms of word length and syllable count. Comp-Grade compares the speaker’s sentence complexity against reading comprehension indexes like Flesch Kinkaid, Fog, Smog, or Coleman-Liau. Our database of measured professional speakers suggests the best speakers range between 5th to 10th grade reading levels (plain english).
+- A metric measured on the Mic-Check App about how many words matched a database of the 10,000 most commonly used English words by non-native English speakers. Too much Simple % is at risk of not introducing technically correct concepts or novel engaging words. Too little Simple % is at risk of being overly technical, inaccessible language. Our database of measured professional speakers suggests the best speakers range between 80 to 90% Simple %.
+- The foundational premise of THPS coaching. Skill Inhibition is the concept of how much perceived pressure causes one’s speaking skills to decline. Skill Inhibition in speaking is akin to a professional golfer hitting a bad shot under pressure.
+- A diagnostic component of the Speech Assessment evaluating physiological stress and fight-or-flight responses.
+- A psychological assessment tool used to measure a speaker's capacity for visual thinking.
+- A diagnostic exercise used to measure the physical or mental barriers restricting a speaker's natural voice.
+- An assessment exercise testing unscripted fluency by having the client speak prompted by visual cues.
+- An assessment exercise designed to measure a speaker's cognitive load and delivery mechanics while adhering to specific constraints.
+- Stop guessing about your pacing, pauses, and clarity. Book your free 1-hour assessment to map your exact baseline data.
 
 ### Interactables (Links/Buttons):
+- [A] Book Assessment
+- [A] Explore Program
+- [A] Try the App
+- [A] Unlock Pro
+- [A] Join Next Class
+- [A] Mic-Check App
+- [A] Speech Assessment
+- [A] Book Your Free Assessment
 
 ### Image Alt Text:
 

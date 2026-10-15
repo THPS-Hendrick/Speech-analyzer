@@ -147,8 +147,101 @@
 
 ## File: /website/articles/glossary.html
 
+**Title:** Public Speaking Glossary & Metrics Directory | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "DefinedTermSet",
+      "@id": "https://tomhendrick.com/articles/glossary.html#termset",
+      "name": "THPS Public Speaking & Speech Biometrics Glossary",
+      "description": "Master terminology dictionary for speech biometrics, objective presentation metrics, and vocal diagnostic tools.",
+      "hasDefinedTerm": [
+        {
+          "@type": "DefinedTerm",
+          "name": "THPS Speech Assessment",
+          "description": "A free, 1-hour, 5-step data-driven diagnostic session used to measure presentation anxiety, unscripted fluency, and vocal inhibition."
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "THPS Performance Plan",
+          "description": "A premium 4-week, 1-on-1 intensive coaching program ($990 AUD) designed to move executives from cognitive strain to effortless delivery."
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Mic-Check App",
+          "description": "A web browser-based educational application able to process live and recorded audio data into natural language displayed on a dashboard of insightful speaking metrics."
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "WPM",
+          "description": "Words Per Minute. Measures how many words the speaker says per minute on average. The ideal target range is between 100 to 150 WPM."
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "SPS",
+          "description": "Syllables Per Second. Measures speaking speed excluding pauses to prevent mumbles. Target range is 3.5 to 4.5 syllables per second."
+        }
+      ]
+    }
+```
+
 **Headings:**
-- None found
+- H1: THPS Glossary: Speech Biometrics & Delivery Metrics
+- H2: Core Brand Entities & Coaching Programs
+- H3: THPS
+- H3: THPS Speech Assessment
+- H3: THPS Performance Plan
+- H3: Mic-Check App
+- H3: Mic-Check Pro
+- H3: Fun Fridays
+- H2: Mic-Check App Delivery Metrics
+- H3: Green Score
+- H3: WPM
+- H3: SPS
+- H3: Pause %
+- H3: Runtime
+- H3: Noticeable Pause
+- H3: Personal
+- H3: Visual
+- H3: Intangible
+- H3: Comp-Grade
+- H3: Simple %
+- H2: Diagnostic Frameworks & Tests
+- H3: Skill Inhibition
+- H3: SAMS Test (Sympathetic Adreno-medullary System)
+- H3: VVIQ (Vividness of Visual Imagery Questionnaire)
+- H3: Vocal Inhibition Test
+- H3: Image-Based Speaking Test
+- H3: Rules-Based Speaking Test
+- H2: Ready to Benchmark Your Speech Metrics?
 
 ---
 
