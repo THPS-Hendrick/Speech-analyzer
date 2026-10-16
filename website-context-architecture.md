@@ -5,7 +5,7 @@
 
 ## File: /website/about.html
 
-**Title:** About Tom Hendrick | Data-Driven Presentation Coach
+**Title:** Top-Rated Online Public Speaking Coach | Tom Hendrick
 
 **Schema 1:**
 ```json
@@ -34,10 +34,10 @@
 ```
 
 **Headings:**
-- H1: Meet Tom Hendrick: Pioneering Data-Driven Public Speaking
-- H3: Industry Recognition
-- H2: Why Traditional Speech Coaching is Broken
-- H3: The Shift to Speech Biometrics
+- H1: Meet Tom Hendrick: Top-Rated Online Public Speaking Coach
+- H3: Recognized as a Top 10 Speech Coach in AUS & NZ
+- H2: Replacing Subjective Coaching with the Vocal Mechanics Method
+- H3: The Shift to Objective Biometrics
 - H2: The Origin of the Mic-Check App
 
 ---

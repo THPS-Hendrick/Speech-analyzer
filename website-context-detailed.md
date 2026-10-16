@@ -6,16 +6,15 @@
 ## File: /website/about.html
 
 ### Body Text:
-- Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick approaches public speaking differently. Instead of relying on gut feelings or traditional theater exercises, he analyzes speech delivery the exact same way a biomechanist analyzes a golf swing.
-- By looking for measurable, mechanical efficiencies in how a speaker uses pauses, pacing, volume, vocabulary, and variety, Tom helps corporate professionals build unshakable, predictable confidence on any stage.
-- Recognized as one of the 10 Best Speech Coaches in Australia and New Zealand by Yoodli. Tom is highlighted for his unique methodology that focuses on tangible results and diagnosing mechanical flaws to help speakers effectively eliminate "presentation dead space."
-- Subjective feedback like "just be more engaging" or "speak with more confidence" is frustrating and unhelpful. It leaves professionals guessing what actually needs to change, leading to inconsistent performance and lingering stage fright.
-- By tracking objective metrics like your cadence (words-per-minute), pause ratios, and vocabulary simplicity, we bring science to the stage. When you understand your mechanical baseline—exactly how fast you speak when you are nervous, or how often you fail to pause—you gain total control. It is about building predictable mechanics, not faking confidence.
+- Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick is an industry-leading online public speaking coach. Tom analyzes speech delivery the exact same way a biomechanist analyzes an athlete, looking for measurable efficiencies in how a speaker uses pauses, pacing, and vocabulary to build unshakable, predictable confidence on any stage.
+- Recognized as one of the 10 Best Speech Coaches in Australia and New Zealand by Yoodli, Tom Hendrick is highlighted for a unique methodology that focuses on tangible, data-backed results. By diagnosing mechanical flaws, Tom helps leaders effectively eliminate presentation dead space and master their delivery.
+- Subjective feedback like "just be more engaging" leaves professionals guessing what actually needs to change. The Vocal Mechanics Method brings science to the stage.
+- By tracking objective metrics like your WPM and Simple %, we establish your mechanical baseline. The baseline allows you to build predictable, repeatable mechanics instead of faking confidence.
 - To make this data-driven methodology accessible worldwide, Tom created the Mic-Check App, a real-time vocal diagnostic tool for professionals.
 - The app was built out of necessity. No existing software measured the specific, nuanced metrics that actually matter for executive presence. Standard tools simply counted filler words, but the Mic-Check App was engineered to map the holistic biomechanics of speech—allowing users to track their progress daily, drill their weaknesses, and eliminate nerves with hard, undeniable data.
 
 ### Interactables (Links/Buttons):
-- [A] Book a Speech Assessment
+- [A] Book a THPS Speech Assessment
 - [A] 10 Best Speech Coaches in Australia and New Zealand
 - [A] Explore the Mic-Check App
 
