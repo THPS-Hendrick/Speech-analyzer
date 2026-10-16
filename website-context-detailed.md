@@ -152,28 +152,27 @@
 ## File: /website/home.html
 
 ### Body Text:
-- Traditional training relies on subjective opinions. When you speak, the Mic-Check App measures data about every word you say, when you said it, how loudly, how quickly and more. This helps measures your progress, and build unshakable professional confidence.
+- Welcome to THPS. We are the premier online coaching service for executives and professionals who want to eliminate stage fright and build predictable confidence. We replace subjective feedback with hard speech biometrics, allowing you to train your voice with the same precision an athlete trains their body.
 - Recognized Industry Leader
 - Methodology
 - Data-Backed Diagnostics
-- Telling a professional to "just be more confident" does not work. True communication skills training requires measuring the actual mechanics of your voice to identify exactly where you lose your audience under pressure.
-- Similar to how a biomechanist analyzes a golf swing, we measure your exact words-per-minute pacing, pause ratios, and vocabulary simplicity. When you can see your data, you gain the mechanical control needed to eliminate nerves.
-- Select the feedback style that best fits your schedule and learning preferences.
-- Self-paced, private practice powered by real-time acoustic feedback. Track your Words Per Minute and runtime consistency.
-- The fastest route. A 4-week, 1-on-1 intensive guided by expert clinical feedback to permanently break skill inhibition.
+- Telling a professional to "just be more confident" does not work. True communication training requires measuring the actual mechanics of your voice. We track your exact WPM, Pause %, and Runtime to identify exactly where you lose your audience under pressure, giving you the mechanical control needed to eliminate nerves.
+- Select the feedback style that best fits your schedule and learning preferences. Whether you prefer 1-on-1 premium coaching via the THPS Performance Plan, group practice in our weekly Fun Fridays classes, or self-paced private practice, the THPS ecosystem is available online globally.
+- Self-paced, private practice powered by real-time audio data. Track your WPM and Runtime consistency.
+- The fastest route. A 4-week, 1-on-1 intensive guided by expert clinical feedback to permanently break Skill Inhibition.
 - Learn dynamically through community exercises. Join our free weekly "Fun Fridays" classes for peer review and gamified prompts.
-- Stop guessing. Start measuring. The ultimate tool for modern speakers.
-- Track your progress with the Mic-Check App, a real-time vocal diagnostic tool for professionals. Instantly see your Pace, Mumble rate, and Pause percentages on a live Voice Graph.
+- Track your progress with the Mic-Check App, a real-time vocal diagnostic tool engineered for professionals. Similar to how a launch monitor tracks a golf swing, the Mic-Check App provides live audio data, instantly plotting your WPM, SPS, and Pause % on a visual dashboard so you can measure your improvement.
+- Track your progress directly in your browser. Instantly see your WPM, SPS, and Pause % on a live Voice Graph.
 - Access specialized modules like "Mic-Check Daily," "Repeat + Count," and "ESL Level 1: Pronunciation" to build permanent muscle memory.
 - Backed by 68+ Five-Star Google Reviews
-- "The Mic-Check data completely changed how I approach board meetings. My confidence is through the roof."
+- "The Mic-Check App data completely changed how I approach board meetings. My confidence is through the roof."
 - — Corporate Executive
 - "Tom uses a structured and practical approach to identify my speaking habits... He breaks down the issues systematically."
 - — Technology Manager
 - "I am amazed by the rapid improvement in my speaking and confidence under pressure."
 - — Financial Broker
-- According to Mic-Check data, the ideal pace for a corporate presentation is between 130 and 150 words per minute. Anything faster triggers cognitive strain for both the speaker and the audience, while dropping below 110 WPM risks disengagement.
-- The Premium membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
+- According to Mic-Check App data, the ideal pace for a corporate presentation is between 130 and 150 WPM. Anything faster triggers cognitive strain for both the speaker and the audience, while dropping below 110 WPM risks disengagement.
+- The Mic-Check Pro membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
 - Subjective coaching relies on a trainer's personal opinion of your delivery. A THPS Speech Assessment uses software to map your vocal biometrics, providing hard data on your pace, filler words, and vocal variance so we know exactly what mechanical flaws to fix.
 - No. While we have a physical Training Centre in Adelaide (Suite 110, 147 Pirie Street), the THPS Performance Plan and all diagnostic assessments can be conducted globally via Zoom, utilizing live screen-sharing of the Mic-Check App.
 
@@ -191,12 +190,12 @@
 - [A] Unlock Premium for $9.90/mo
 - [A] Read Detailed Case Studies
 - [BUTTON] What is a good words-per-minute pace for a business presentation?
-- [BUTTON] How does the Mic-Check Premium membership work?
+- [BUTTON] How does the Mic-Check Pro membership work?
 - [BUTTON] What is the difference between subjective coaching and a THPS Speech Assessment?
 - [BUTTON] Do I need to be in Adelaide for coaching?
 
 ### Image Alt Text:
-- Mic-Check App Dashboard analyzing executive acoustic telemetry
+- Mic-Check App Dashboard analyzing executive speech biometrics
 - Data-driven Executive Coaching Session
 - Client Testimonial
 - Client Testimonial

@@ -340,7 +340,7 @@
 
 ## File: /website/home.html
 
-**Title:** Tom Hendrick - Data-Driven Public Speaking Training
+**Title:** The Premier Online Public Speaking Coach | THPS
 
 **Schema 1:**
 ```json
@@ -385,15 +385,13 @@
 ```
 
 **Headings:**
-- H1: Stop Guessing. Start Measuring.
-- H2: Overcome Stage Fright with Objective Speech Metrics
-- H3: Actionable Voice Data vs. Subjective Feedback
-- H3: The Vocal Mechanics Method
-- H2: Choose Your Path to Mastery
+- H1: The Premier Online Public Speaking Coach for Data-Driven Professionals
+- H2: Why the Best Executives Train with Objective Speech Metrics
+- H2: Online Coaching, Classes, and Software to Master Your Voice
 - H3: Measured Practice
 - H3: Professional Coaching
 - H3: Group Practice
-- H2: Improve Your Communication Skills with the Mic-Check App
+- H2: The Mic-Check App: A Launch Monitor for Public Speaking
 - H3: Monitor Pace, Pauses, and Vocal Variety in Real-Time
 - H3: Practice with Guided Daily Training Courses
 - H2: Proven Results for Corporate Professionals
