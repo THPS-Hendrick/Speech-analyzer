@@ -455,17 +455,17 @@
 ## File: /website/services/thps-performance-plan.html
 
 ### Body Text:
-- The THPS Performance Plan is a 4-week, data-driven intensive that moves you from cognitive strain to effortless, autonomous speaking under pressure.
-- Skill Inhibition: The speaker is rushing at an unsustainable 197 WPM with massive 18.8-second runtimes, resulting in a failing engagement score.
+- The THPS Performance Plan is a premium 4-week, 1-on-1 online coaching program ($990 AUD). The program is designed specifically to move executives from cognitive strain to effortless, autonomous speaking under pressure using live audio data and structured constraints.
+- Skill Inhibition: The speaker is rushing at an unsustainable 197 WPM with massive 18.8-second Runtimes, resulting in a failing engagement score.
 - Skill Acquisition: After 4 sessions, pacing optimizes to 112 WPM. The historical progress chart stabilizes at 100/100 across multiple high-pressure attempts.
-- When you face a high-stakes pitch, an involuntary part of your brain called the amygdala detects a threat. It floods your body with adrenaline, triggering Flight, Freeze, Fawn, or Fight responses. This is why you go blank, rush your words, or lose your structure.
-- You cannot "choose" not to be nervous. But through deliberate, constraint-based practice (like the Repeat & Count framework), we can train your brain to execute familiar routines under pressure, bypassing the amygdala's panic alarms entirely.
-- Four 1-hour intensive sessions. Delivered online or in-person at our Adelaide Training Centre.
+- You do not have a skill acquisition problem; you have a Skill Inhibition problem. When facing a high-stakes pitch, your amygdala detects a threat, causing you to rush your words or lose your structure.
+- Through deliberate, constraint-based practice like the Repeat & Count framework, we train your brain to execute familiar routines under pressure, bypassing the panic response entirely.
+- Delivered globally via Zoom, the THPS Performance Plan transitions you from high mental effort to real-time self-correction. We utilize advanced storytelling constraints to drastically increase your cognitive load in practice, meaning the attention required to structure your thoughts during a real presentation drops to near zero. Your delivery becomes composed, and your WPM stabilizes flawlessly.
 - In this initial stage, mental effort is high as we override your biological panic response. We introduce rigid constraint frameworks like Repeat & Count, forcing your brain to declare structure upfront before you are allowed to speak, preventing rambling and rapid pacing.
 - We transition into real-time self-correction. You will learn to use familiar structural prompts (like Problem, Options, Solution) to send calming signals back to your own nervous system (Self-Regulation) while projecting absolute certainty to your audience (Co-Regulation).
 - We drastically increase the cognitive load. By utilizing advanced storytelling constraints (like Say What You See), we train your brain to rapidly "zip-file" thousands of relevant thoughts from a single visual prompt, allowing you to handle hostile Q&A effortlessly without a script.
 - This is the holy grail of public speaking. The attention required to structure your thoughts drops to near zero. Your delivery is composed, your pacing is flawless, and your Mic-Check App historical progress chart consistently locks in at 100/100.
-- The Performance Plan is delivered as 4x 1-Hour Private Sessions.
+- The THPS Performance Plan is delivered as 4x 1-Hour Private Sessions.
 - The THPS Performance Plan is a $990 AUD investment. Because it is highly tailored to your specific biomechanical and cognitive gaps, it cannot be purchased directly. All clients must complete a baseline diagnostic first.
 - Book your Free 1-Hour THPS Speech Assessment today to establish your data baseline. At the end of your assessment, Tom will review your eligibility for the 4-week program.
 
@@ -474,7 +474,7 @@
 - [A] Book Your Free Assessment
 
 ### Image Alt Text:
-- Mic-Check App showing 51 out of 100 grade, 197 WPM, and 18.8s runtime
+- Mic-Check App showing 51 out of 100 grade, 197 WPM, and 18.8s Runtime
 - Mic-Check App showing 100 out of 100 grade, 112 WPM, and historic progress reaching perfection
 
 ---

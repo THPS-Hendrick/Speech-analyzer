@@ -695,7 +695,7 @@
 
 ## File: /website/services/thps-performance-plan.html
 
-**Title:** THPS Performance Plan | 4-Week Public Speaking Coaching
+**Title:** The THPS Performance Plan | Premium Online Speech Coaching
 
 **Schema 1:**
 ```json
@@ -757,9 +757,9 @@
 ```
 
 **Headings:**
-- H1: Transform Your Delivery in 4 Weeks
-- H2: You Don't Have a Skill Acquisition Problem. You Have a Skill Inhibition Problem.
-- H2: The 4-Week Path to Effortless Delivery
+- H1: The THPS Performance Plan: Premium Online Speech Coaching
+- H2: Overcome Skill Inhibition with Data-Driven Executive Training
+- H2: A 4-Week Online Path to Effortless Delivery Under Pressure
 - H3: Breaking Inhibition & Building Constraints
 - H3: Self-Regulation & Co-Regulation
 - H3: Mastering Word Association
