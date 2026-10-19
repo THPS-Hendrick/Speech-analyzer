@@ -51,6 +51,19 @@
     }
     </script>
 
+    <!-- VideoObject Schema for AIO Validation -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": "Live Executive Coaching: Overcoming Skill Inhibition",
+      "description": "Top-rated online public speaking coach Tom Hendrick uses live audio data from the Mic-Check App to help a corporate executive reduce their pacing to the optimal WPM zone.",
+      "thumbnailUrl": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/thps-executive-coaching-online-mic-check-app-progress.webp",
+      "uploadDate": "2026-10-19T08:00:00+08:00",
+      "embedUrl": "https://www.youtube.com/embed/VHKt58SrD1Q"
+    }
+    </script>
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,7 +234,7 @@
             </div>
         </section>
 
-        <!-- Product Pillars (Mapped to the exact URLs) -->
+        <!-- Product Pillars -->
         <section class="py-20 bg-brand-offwhite">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
@@ -297,9 +310,9 @@
                                 <span>Pause %</span>
                             </div>
                             <div class="flex justify-between items-center font-extrabold text-2xl text-slate-900">
-                                <span class="text-brand-green">127</span>
-                                <span class="text-red-500">3.9</span>
-                                <span class="text-blue-600">22%</span>
+                                <span id="wpm-live" class="text-brand-green">127</span>
+                                <span id="sps-live" class="text-red-500">3.9</span>
+                                <span id="pause-live" class="text-blue-600">22%</span>
                             </div>
                         </div>
                     </div>
@@ -332,7 +345,7 @@
             </div>
         </section>
 
-        <!-- Testimonials Section -->
+        <!-- DYNAMIC TRUST HUB: Video Evidence & Live Reviews -->
         <section class="bg-brand-dark py-20 lg:py-28">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-3xl mx-auto mb-16">
@@ -343,45 +356,48 @@
                         Proven Results for Corporate Professionals
                     </h2>
                     <h3 class="mt-4 text-xl text-green-100 font-medium">See How Data Transforms Delivery</h3>
-                    <p class="mt-4 text-sm text-green-400 uppercase tracking-widest font-bold">Backed by 68+ Five-Star Google Reviews</p>
+                    <p class="mt-4 text-sm text-green-400 uppercase tracking-widest font-bold">Backed by Verified Google Reviews</p>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-6">
-                    <!-- Review 1 -->
-                    <div class="bg-white/5 rounded-2xl p-2 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group flex flex-col h-full">
-                        <div class="aspect-video bg-black rounded-xl relative overflow-hidden flex items-center justify-center">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Client Testimonial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500">
-                            <i class="fa-solid fa-circle-play text-4xl text-white relative z-10 group-hover:text-brand-gold transition-colors"></i>
-                        </div>
-                        <div class="p-4 flex-grow flex flex-col justify-between">
-                            <p class="text-white italic text-sm mb-3">"The Mic-Check App data completely changed how I approach board meetings. My confidence is through the roof."</p>
-                            <p class="text-brand-gold font-bold text-sm">— Corporate Executive</p>
-                        </div>
-                    </div>
+                <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                     
-                    <!-- Review 2 -->
-                    <div class="bg-white/5 rounded-2xl p-2 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group flex flex-col h-full">
-                        <div class="aspect-video bg-black rounded-xl relative overflow-hidden flex items-center justify-center">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80" alt="Client Testimonial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500">
-                            <i class="fa-solid fa-circle-play text-4xl text-white relative z-10 group-hover:text-brand-gold transition-colors"></i>
+                    <!-- Left: Concentrated Video Evidence -->
+                    <div class="lg:col-span-7">
+                        <div class="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
+                            <!-- Lazy-loaded YouTube iframe protects page speed -->
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src="https://www.youtube.com/embed/VHKt58SrD1Q?rel=0" 
+                                title="Live Executive Coaching: Overcoming Skill Inhibition" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                loading="lazy"
+                                class="absolute inset-0 w-full h-full">
+                            </iframe>
                         </div>
-                        <div class="p-4 flex-grow flex flex-col justify-between">
-                            <p class="text-white italic text-sm mb-3">"Tom uses a structured and practical approach to identify my speaking habits... He breaks down the issues systematically."</p>
-                            <p class="text-brand-gold font-bold text-sm">— Technology Manager</p>
+                        <p class="text-green-400 text-sm font-bold mt-4 flex items-center justify-center lg:justify-start gap-2">
+                            <i class="fa-solid fa-circle-play"></i> Watch a live THPS Performance Plan session
+                        </p>
+                    </div>
+
+                    <!-- Right: Live Google Reviews API Container -->
+                    <div class="lg:col-span-5 flex flex-col h-full">
+                        <div class="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 h-full flex flex-col">
+                            <div class="flex items-center justify-center lg:justify-start gap-3 mb-6">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="w-8 h-8">
+                                <h3 class="text-2xl font-bold text-white">Verified Reviews</h3>
+                            </div>
+                            
+                            <!-- INJECT YOUR GOOGLE REVIEWS API SCRIPT/WIDGET HERE -->
+                            <div id="google-reviews-widget-container" class="flex-grow min-h-[300px] w-full bg-black/20 rounded-xl border border-white/5 flex items-center justify-center">
+                                <p class="text-slate-400 text-sm">[Live Reviews Feed Loading...]</p>
+                            </div>
+                            
                         </div>
                     </div>
 
-                    <!-- Review 3 -->
-                    <div class="bg-white/5 rounded-2xl p-2 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group flex flex-col h-full">
-                        <div class="aspect-video bg-black rounded-xl relative overflow-hidden flex items-center justify-center">
-                            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80" alt="Client Testimonial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500">
-                            <i class="fa-solid fa-circle-play text-4xl text-white relative z-10 group-hover:text-brand-gold transition-colors"></i>
-                        </div>
-                        <div class="p-4 flex-grow flex flex-col justify-between">
-                            <p class="text-white italic text-sm mb-3">"I am amazed by the rapid improvement in my speaking and confidence under pressure."</p>
-                            <p class="text-brand-gold font-bold text-sm">— Financial Broker</p>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="mt-12 text-center">
@@ -460,8 +476,6 @@
     <!-- PAGE-SPECIFIC INTERACTION SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Note: The Header auth toggle and mobile menu scripts are now baked into the INJECT_HEADER block.
-
             // --- Floating Bottom Panel Dismiss Logic ---
             const floatingPanel = document.getElementById('floating-panel');
             const dismissBtn = document.getElementById('btn-dismiss-panel');
@@ -482,6 +496,28 @@
                     icon.classList.toggle('open');
                 });
             });
+
+            // --- App Spotlight: Live Metrics Ticking Animation ---
+            const wpmEl = document.getElementById('wpm-live');
+            const spsEl = document.getElementById('sps-live');
+            const pauseEl = document.getElementById('pause-live');
+
+            if (wpmEl && spsEl && pauseEl) {
+                // Creates a realistic subtle fluctuation every 1.5 seconds to simulate a live diagnostic
+                setInterval(() => {
+                    const baseWPM = 127;
+                    const wpmFluctuation = Math.floor(Math.random() * 5) - 2; // -2 to +2 variation
+                    wpmEl.innerText = baseWPM + wpmFluctuation;
+                    
+                    const baseSPS = 3.9;
+                    const spsFluctuation = (Math.random() * 0.2 - 0.1).toFixed(1); // -0.1 to +0.1 variation
+                    spsEl.innerText = (baseSPS + parseFloat(spsFluctuation)).toFixed(1);
+
+                    const basePause = 22;
+                    const pauseFluctuation = Math.floor(Math.random() * 3) - 1; // -1 to +1 variation
+                    pauseEl.innerText = (basePause + pauseFluctuation) + '%';
+                }, 1500);
+            }
         });
     </script>
 </body>
