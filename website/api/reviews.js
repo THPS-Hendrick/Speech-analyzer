@@ -1,31 +1,46 @@
 export default async function handler(req, res) {
-  // Pulls the secure API key from Vercel's Environment Variables
+  // Ensure this exact variable name is saved in Vercel Settings > Environment Variables
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  const placeId = 'ChIJ53WcipXPsGoRUNlQs7FYfE4';
   
-  // PASTE YOUR GOOGLE PLACE ID HERE
-  const placeId = 'ChIJ53WcipXPsGoRUNlQs7FYfE4'; 
-  
-  const endpoint = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews&key=${apiKey}`;
+  // Use the Places API (New) endpoint
+  const endpoint = `https://places.googleapis.com/v1/places/${placeId}`;
 
   try {
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'X-Goog-Api-Key': apiKey,
+        // The FieldMask is strictly required for the New Places API
+        'X-Goog-FieldMask': 'rating,userRatingCount,reviews'
+      }
+    });
+
     const data = await response.json();
 
-    if (data.status !== 'OK') {
-      return res.status(400).json({ error: data.error_message || 'Google API Error' });
+    // The New API returns standard HTTP status codes
+    if (!response.ok) {
+      return res.status(400).json({ error: data.error?.message || 'Google API Error' });
     }
 
-    // THE MAGIC: Instructs Vercel's CDN to cache this response at the edge for 24 hours (86400 seconds)
-    // This makes the frontend load instantly and protects your API billing limit.
+    // Cache the response at the edge for 24 hours
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=86400');
     
-    // Return only the 5-star reviews to ensure maximum E-E-A-T impact
-    const fiveStarReviews = data.result.reviews.filter(review => review.rating === 5);
+    // Filter for 5-star reviews
+    const fiveStarReviews = (data.reviews || []).filter(review => review.rating === 5);
+    
+    // Map the new API structure to match your existing frontend code
+    const formattedReviews = fiveStarReviews.map(review => ({
+      author_name: review.authorAttribution?.displayName,
+      profile_photo_url: review.authorAttribution?.photoUri,
+      text: review.text?.text,
+      rating: review.rating
+    }));
     
     res.status(200).json({
-        rating: data.result.rating,
-        total: data.result.user_ratings_total,
-        reviews: fiveStarReviews
+        rating: data.rating,
+        total: data.userRatingCount,
+        reviews: formattedReviews
     });
     
   } catch (error) {
