@@ -21,7 +21,7 @@
       "vatID": "56949157639",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Suite 110, 147 Pirie Street",
+        "streetAddress": "147 Pirie Street",
         "addressLocality": "Adelaide",
         "addressRegion": "SA",
         "postalCode": "5000",
@@ -484,6 +484,47 @@
                     floatingPanel.style.transform = 'translate(-50%, 150%)';
                     setTimeout(() => { floatingPanel.remove(); }, 300);
                 });
+            }
+
+            // --- Live Google Reviews Fetch ---
+            const reviewsContainer = document.getElementById('google-reviews-widget-container');
+            
+            if (reviewsContainer) {
+                fetch('/api/reviews')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) throw new Error(data.error);
+                        
+                        // Limit to top 3 recent reviews for the UI
+                        const topReviews = data.reviews.slice(0, 3);
+                        
+                        let reviewsHTML = `<div class="flex flex-col gap-4 w-full">`;
+                        
+                        topReviews.forEach(review => {
+                            reviewsHTML += `
+                                <div class="bg-black/30 p-5 rounded-xl border border-white/5 flex flex-col gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <img src="${review.profile_photo_url}" alt="${review.author_name}" class="w-10 h-10 rounded-full">
+                                        <div>
+                                            <p class="text-white font-bold text-sm">${review.author_name}</p>
+                                            <div class="flex text-brand-gold text-xs">
+                                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-slate-300 text-sm italic leading-relaxed line-clamp-3">"${review.text}"</p>
+                                </div>
+                            `;
+                        });
+                        
+                        reviewsHTML += `</div>`;
+                        
+                        reviewsContainer.innerHTML = reviewsHTML;
+                    })
+                    .catch(error => {
+                        console.error('Error loading reviews:', error);
+                        reviewsContainer.innerHTML = `<p class="text-slate-500 text-sm">Review feed currently unavailable.</p>`;
+                    });
             }
 
             // --- FAQ Accordion Logic ---
