@@ -354,7 +354,7 @@
       "vatID": "56949157639",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Suite 110, 147 Pirie Street",
+        "streetAddress": "147 Pirie Street",
         "addressLocality": "Adelaide",
         "addressRegion": "SA",
         "postalCode": "5000",

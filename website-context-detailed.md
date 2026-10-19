@@ -170,6 +170,9 @@
 - The Mic-Check Pro membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
 - Subjective coaching relies on a trainer's personal opinion of your delivery. A THPS Speech Assessment uses software to map your vocal biometrics, providing hard data on your pace, filler words, and vocal variance so we know exactly what mechanical flaws to fix.
 - No. While we have a physical Training Centre in Adelaide (Suite 110, 147 Pirie Street), the THPS Performance Plan and all diagnostic assessments can be conducted globally via Zoom, utilizing live screen-sharing of the Mic-Check App.
+- ${review.author_name}
+- "${review.text}"
+- Review feed currently unavailable.
 
 ### Interactables (Links/Buttons):
 - [A] App
@@ -193,6 +196,7 @@
 - Mic-Check App Dashboard analyzing executive speech biometrics
 - Data-driven Executive Coaching Session
 - Google Logo
+- ${review.author_name}
 
 ---
 
