@@ -163,13 +163,9 @@
 - Track your progress with the Mic-Check App, a real-time vocal diagnostic tool engineered for professionals. Similar to how a launch monitor tracks a golf swing, the Mic-Check App provides live audio data, instantly plotting your WPM, SPS, and Pause % on a visual dashboard so you can measure your improvement.
 - Track your progress directly in your browser. Instantly see your WPM, SPS, and Pause % on a live Voice Graph.
 - Access specialized modules like "Mic-Check Daily," "Repeat + Count," and "ESL Level 1: Pronunciation" to build permanent muscle memory.
-- Backed by 68+ Five-Star Google Reviews
-- "The Mic-Check App data completely changed how I approach board meetings. My confidence is through the roof."
-- — Corporate Executive
-- "Tom uses a structured and practical approach to identify my speaking habits... He breaks down the issues systematically."
-- — Technology Manager
-- "I am amazed by the rapid improvement in my speaking and confidence under pressure."
-- — Financial Broker
+- Backed by Verified Google Reviews
+- Watch a live THPS Performance Plan session
+- [Live Reviews Feed Loading...]
 - According to Mic-Check App data, the ideal pace for a corporate presentation is between 130 and 150 WPM. Anything faster triggers cognitive strain for both the speaker and the audience, while dropping below 110 WPM risks disengagement.
 - The Mic-Check Pro membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
 - Subjective coaching relies on a trainer's personal opinion of your delivery. A THPS Speech Assessment uses software to map your vocal biometrics, providing hard data on your pace, filler words, and vocal variance so we know exactly what mechanical flaws to fix.
@@ -196,9 +192,7 @@
 ### Image Alt Text:
 - Mic-Check App Dashboard analyzing executive speech biometrics
 - Data-driven Executive Coaching Session
-- Client Testimonial
-- Client Testimonial
-- Client Testimonial
+- Google Logo
 
 ---
 
