@@ -165,14 +165,16 @@
 - Access specialized modules like "Mic-Check Daily," "Repeat + Count," and "ESL Level 1: Pronunciation" to build permanent muscle memory.
 - Backed by Verified Google Reviews
 - Watch a live THPS Performance Plan session
-- [Live Reviews Feed Loading...]
+- Cameron's Partner
+- "Tom measures absolutely everything about what goes into a speech. This gave my husband an assessment of exactly what his strengths and gaps were. His practice was so personalised and it was encouraging to “see” his speech get better..."
+- Corporate Executive
+- "The Mic-Check App data completely changed how I approach board meetings. My confidence is through the roof."
 - According to Mic-Check App data, the ideal pace for a corporate presentation is between 130 and 150 WPM. Anything faster triggers cognitive strain for both the speaker and the audience, while dropping below 110 WPM risks disengagement.
 - The Mic-Check Pro membership operates on a compounding model. For $9.90 per month (or $99 per year), you get full access to the live analyzer, advanced voice graphing, cloud history tracking, and all structured daily training modules.
 - Subjective coaching relies on a trainer's personal opinion of your delivery. A THPS Speech Assessment uses software to map your vocal biometrics, providing hard data on your pace, filler words, and vocal variance so we know exactly what mechanical flaws to fix.
 - No. While we have a physical Training Centre in Adelaide (Suite 110, 147 Pirie Street), the THPS Performance Plan and all diagnostic assessments can be conducted globally via Zoom, utilizing live screen-sharing of the Mic-Check App.
 - ${review.author_name}
 - "${review.text}"
-- Review feed currently unavailable.
 
 ### Interactables (Links/Buttons):
 - [A] App
@@ -186,6 +188,7 @@
 - [A] View Performance Plan
 - [A] Join a Free Class
 - [A] Unlock Premium for $9.90/mo
+- [A] Read our 24+ Verified Google Reviews
 - [A] Read Detailed Case Studies
 - [BUTTON] What is a good words-per-minute pace for a business presentation?
 - [BUTTON] How does the Mic-Check Pro membership work?
