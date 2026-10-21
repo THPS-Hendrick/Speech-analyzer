@@ -1,9 +1,8 @@
 const { initializeApp } = require("firebase/app");
 const { getFirestore, collection, addDoc } = require("firebase/firestore");
 
-// Use your existing Firebase Config
 const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY, // Ensure this is added to Vercel Env Vars
+    apiKey: process.env.FIREBASE_API_KEY, 
     authDomain: "thps-crm.firebaseapp.com",
     projectId: "thps-crm",
     storageBucket: "thps-crm.firebasestorage.app",
@@ -17,28 +16,28 @@ const db = getFirestore(app);
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const { name, email, selectedIso } = req.body;
+    // Frontend now sends an array of ISO strings: selectedIsos
+    const { name, email, selectedIsos } = req.body;
 
     try {
-        // 1. Add directly to CRM Kanban Board
+        // Save to CRM, appending the array of booked dates so you know exactly which classes they are attending
         await addDoc(collection(db, "Clients"), {
             name: name,
             email: email,
             tags: ["Fun Fridays Class"],
-            stage: "Friday Class RSVP", // Native kanban routing column
-            bookedDateIso: selectedIso,
+            stage: "Friday Class RSVP", 
+            bookedDates: selectedIsos, // Array of ISO strings
             createdAt: new Date().toISOString(),
             last_contact_date: new Date().toISOString()
         });
 
-        // 2. Return Success with the Static Group Meet Link
         res.status(200).json({ 
             success: true, 
-            meetLink: "https://meet.google.com/YOUR-STATIC-LINK-HERE" // Replace with your recurring Meet link
+            meetLink: "https://meet.google.com/YOUR-STATIC-LINK-HERE" // Replace with your static Friday Meet link
         });
 
     } catch (error) {
         console.error("CRM Error:", error);
-        res.status(500).json({ success: false, error: "Failed to save booking to CRM." });
+        res.status(500).json({ success: false, error: "Failed to save bookings to CRM." });
     }
 }
