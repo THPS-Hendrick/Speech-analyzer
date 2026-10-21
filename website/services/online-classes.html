@@ -112,7 +112,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Back to Services Hub
             </a>
             
-            <!-- Hero Header with Community Proof -->
+            <!-- Hero Header -->
             <header class="mb-16 text-center max-w-4xl mx-auto">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
                     <i class="fa-solid fa-users text-emerald-600"></i> Free Weekly Community Event
@@ -122,63 +122,58 @@
                     Join our <strong>"Fun Fridays"</strong> online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
                 </p>
 
-
-            <!-- NATIVE BOOKING WIDGET -->
-            <div id="join" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left max-w-4xl mx-auto flex flex-col md:flex-row mt-8">
-                
-                <!-- Left Panel -->
-                <div class="bg-emerald-50 p-6 md:p-8 md:w-1/3 md:border-r border-emerald-100 flex flex-col justify-center md:justify-start">
-                    <h2 class="text-emerald-700 font-bold uppercase tracking-wider text-xs mb-2">Fun Fridays</h2>
-                    <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 md:mb-4">Live Class RSVP</h3>
-                    <div class="flex flex-row md:flex-col gap-4 md:gap-3">
-                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-emerald-500"></i> 60 Min</div>
-                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-users mr-2 text-emerald-500"></i> Group Session</div>
-                    </div>
-                </div>
-
-                <!-- Right Panel -->
-                <div class="p-6 md:p-8 md:w-2/3 w-full bg-white relative min-h-[400px]">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-                        <h3 class="text-lg font-bold text-slate-800" id="current-month-label">Select Date</h3>
-                        <div class="flex gap-2">
-                            <button id="btn-prev-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                            <button id="btn-next-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                <!-- NATIVE MULTI-SELECT BOOKING WIDGET -->
+                <div id="join" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left w-full mx-auto flex flex-col mb-12">
+                    
+                    <!-- Top Header Panel -->
+                    <div class="bg-emerald-50 p-6 border-b border-emerald-100 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
+                        <div>
+                            <h2 class="text-emerald-700 font-bold uppercase tracking-wider text-xs mb-1">Fun Fridays</h2>
+                            <h3 class="text-xl md:text-2xl font-extrabold text-slate-900">Live Class RSVP</h3>
+                        </div>
+                        <div class="flex flex-row gap-6">
+                            <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-emerald-500"></i> 60 Min</div>
+                            <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-users mr-2 text-emerald-500"></i> Group Session</div>
                         </div>
                     </div>
-                    
-                    <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
-                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
-                        <span class="text-sm font-bold uppercase tracking-wider">Syncing Schedule...</span>
-                    </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
+                    <!-- Body Panel -->
+                    <div class="p-6 md:p-8 w-full bg-white relative min-h-[300px]">
+                        
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4 gap-2">
+                            <h3 class="text-lg font-bold text-slate-800">Select Upcoming Classes</h3>
+                            <p class="text-xs text-brand-green font-bold bg-green-50 px-3 py-1 rounded-full border border-green-200" id="timezone-label">Auto-detecting local time...</p>
+                        </div>
+                        
+                        <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
+                            <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                            <span class="text-sm font-bold uppercase tracking-wider">Syncing Schedule...</span>
+                        </div>
 
-                    <div id="time-section" class="hidden">
-                        <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">Class Time</h3>
-                        <p class="text-xs text-brand-green font-medium mb-3" id="timezone-label">Auto-detected local time</p>
-                        <div class="grid grid-cols-1 gap-3 mb-6" id="time-grid"></div>
-                    </div>
+                        <!-- 5x2 Desktop / 2x5 Mobile Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8 hidden" id="date-grid"></div>
 
-                    <!-- Form -->
-                    <form id="booking-form" class="hidden bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                        <h3 class="font-extrabold text-slate-800 mb-4">Confirm Your Spot</h3>
-                        <input type="hidden" id="selected-iso" name="selectedIso">
-                        <input type="text" id="client-name" placeholder="First & Last Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
-                        <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
-                        <button type="submit" id="submit-btn" class="w-full bg-brand-green text-white font-extrabold py-4 px-4 rounded-xl hover:bg-brand-dark transition-all shadow-sm flex justify-center items-center gap-2">RSVP Now <i class="fa-solid fa-check"></i></button>
-                    </form>
+                        <!-- Form -->
+                        <form id="booking-form" class="hidden bg-emerald-50 p-6 rounded-2xl border border-emerald-100 mt-4 max-w-2xl mx-auto">
+                            <h3 class="font-extrabold text-slate-800 mb-1 text-center" id="selection-count">Confirm Your Spots</h3>
+                            <p class="text-xs text-gray-500 text-center mb-5">You will be RSVP'd for all selected dates.</p>
+                            
+                            <input type="text" id="client-name" placeholder="First & Last Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                            <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                            <button type="submit" id="submit-btn" class="w-full bg-brand-green text-white font-extrabold py-4 px-4 rounded-xl hover:bg-brand-dark transition-all shadow-sm flex justify-center items-center gap-2">Confirm Mass RSVP <i class="fa-solid fa-check"></i></button>
+                        </form>
 
-                    <!-- Success -->
-                    <div id="success-message" class="hidden bg-emerald-50 text-brand-green p-8 rounded-2xl border border-emerald-200 text-center h-full flex flex-col justify-center items-center">
-                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
-                        <h3 class="text-xl font-extrabold mb-2">You're on the list!</h3>
-                        <p class="text-sm font-medium text-emerald-800/80 mb-4">Your spot is secured. Save the link below to join the class.</p>
-                        <a id="dynamic-meet-link" href="#" target="_blank" class="text-sm font-bold bg-white px-4 py-2 rounded-lg shadow-sm border border-emerald-200 text-brand-dark hover:text-brand-green">Join Google Meet</a>
+                        <!-- Success -->
+                        <div id="success-message" class="hidden bg-emerald-50 text-brand-green p-8 rounded-2xl border border-emerald-200 text-center h-full flex flex-col justify-center items-center">
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
+                            <h3 class="text-xl font-extrabold mb-2">You're on the lists!</h3>
+                            <p class="text-sm font-medium text-emerald-800/80 mb-4">Your spots are secured. Save the link below to join the classes at your local time.</p>
+                            <a id="dynamic-meet-link" href="#" target="_blank" class="text-sm font-bold bg-white px-6 py-3 rounded-xl shadow-sm border border-emerald-200 text-brand-dark hover:text-brand-green">Join Google Meet Link</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-                
-                <!-- Hero Review -->
+
+                <!-- Hero Review (Moved below widget) -->
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left max-w-2xl mx-auto mb-10">
                     <div class="flex items-center gap-1 text-brand-gold text-xs mb-3">
                         <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
@@ -196,8 +191,9 @@
 
             <!-- The Workout Menu Grid (2x2) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
+                <!-- Keep existing 4 cards here (Cognitive Agility, Measured Accountability, De-Inhibiting the Voice, Visualizing Transformation) -->
                 
-                <!-- Menu Item 1: Cognitive Agility -->
+                <!-- Menu Item 1 -->
                 <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
                     <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex items-center justify-center overflow-hidden">
                         <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-daily-online-class.webp" alt="Tom Hendrick demonstrating Mic-Check Daily prompt cards" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
@@ -207,17 +203,10 @@
                     <div class="p-8 flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-slate-900 mb-3">Thinking on Your Feet</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Like <em>Cards Against Humanity</em> meets executive coaching. We use randomized prompts (e.g., combining a "Knowledgeable Professor" persona with a "Problem Options Solution" structure) to force you to structure your thoughts instantly without a script.</p>
-                        
-                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
-                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-xs text-gray-700 italic mb-2">"Tom's ability to think on his feet and cater to my learning style is next level. Where was this kind of mentoring early in my learning journey?"</p>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Menu Item 2: Measured Accountability -->
+                <!-- Menu Item 2 -->
                 <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
                     <div class="h-64 bg-slate-100 relative border-b border-gray-200 flex items-center justify-center overflow-hidden p-6">
                         <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/THPS-public-speaking-daily-mic-check-game.webp" alt="Daily Mic-Check Scorecard showing pace, pause, and vocabulary metrics" class="h-full w-auto object-contain group-hover:scale-105 transition-transform duration-500 shadow-lg rounded-xl">
@@ -226,17 +215,10 @@
                     <div class="p-8 flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-slate-900 mb-3">Measured Accountability</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">You will jump into breakout rooms to deliver your prompts. Instead of vague, subjective feedback, the Mic-Check App gives you an immediate scorecard grading your Pace, Pause Percentage, and Vocabulary Mix.</p>
-                        
-                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
-                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-xs text-gray-700 italic mb-2">"Tom uses a structured and practical approach to identify my speaking habits. He breaks down the issues systematically and provides practical techniques."</p>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Menu Item 3: De-Inhibiting the Voice -->
+                <!-- Menu Item 3 -->
                 <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
                     <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex items-center justify-center overflow-hidden p-6">
                         <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-app-voice-intensity-online-class.webp" alt="Mic-Check App showing Jack Nicholson movie script" class="w-full h-auto object-cover opacity-90 group-hover:scale-105 transition-transform duration-500 rounded-xl shadow-lg border border-slate-700">
@@ -245,17 +227,10 @@
                     <div class="p-8 flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-slate-900 mb-3">De-Inhibiting the Voice</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">To break out of a monotone comfort zone, we regularly practice performing intense, famous speeches (like *A Few Good Men* or *Any Given Sunday*). It teaches you how to confidently make bold volume and intensity choices under pressure.</p>
-                        
-                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
-                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-xs text-gray-700 italic mb-2">"The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."</p>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Menu Item 4: Visualizing Transformation -->
+                <!-- Menu Item 4 -->
                 <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full group hover:shadow-md transition-shadow">
                     <div class="h-64 bg-slate-900 relative border-b border-gray-200 flex flex-col items-center justify-center overflow-hidden p-4 gap-2">
                         <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-mic-check-app-online-class-low-confidence-voice.webp" alt="Low confidence voice timeline with blue bars" class="w-full h-auto object-cover opacity-80 rounded shadow-md border border-slate-700">
@@ -265,74 +240,56 @@
                     <div class="p-8 flex flex-col flex-grow">
                         <h3 class="text-2xl font-bold text-slate-900 mb-3">Visualizing Transformation</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.</p>
-                        
-                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 mt-auto">
-                            <div class="flex items-center gap-1 text-brand-gold text-xs mb-2">
-                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="text-xs text-gray-700 italic mb-2">"I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."</p>
-                        </div>
-                    <a href="#join" class="inline-flex items-center justify-center gap-2 bg-brand-green text-white font-extrabold text-lg py-4 px-10 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-1 shadow-lg">
-                    Join This Friday's Free Class <i class="fa-solid fa-video"></i>
-                    </a>
                     </div>
                 </div>
-
             </div>
+
+            <!-- Bottom CTA Button (Scrolls up to Widget) -->
+            <div class="text-center mb-16 max-w-2xl mx-auto">
+                <h3 class="text-3xl font-extrabold text-slate-900 mb-6">Ready to Join the Community?</h3>
+                <button onclick="document.getElementById('join').scrollIntoView({behavior: 'smooth'})" class="bg-brand-green text-white font-extrabold text-lg py-4 px-10 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2 mx-auto">
+                    Select Your Upcoming Classes <i class="fa-solid fa-arrow-up"></i>
+                </button>
+            </div>
+
         </div>
     </main>
 
     <!-- INJECT_FOOTER -->
 
-    <!-- Frontend Local Time Logic -->
+    <!-- Multi-Select Booking Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             let slotsData = [];
-            let currentDate = new Date(); 
-            const maxLookaheadMonths = 3; 
-
-            // Auto-detect timezone
+            let selectedIsos = new Set();
             const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            document.getElementById('timezone-label').innerText = `Showing times in your local timezone (${userTimezone})`;
-
-            const btnPrev = document.getElementById('btn-prev-month');
-            const btnNext = document.getElementById('btn-next-month');
-            const monthLabel = document.getElementById('current-month-label');
+            
             const loadingState = document.getElementById('loading-state');
             const dateGrid = document.getElementById('date-grid');
-            const timeSection = document.getElementById('time-section');
             const bookingForm = document.getElementById('booking-form');
+            const selectionCount = document.getElementById('selection-count');
 
-            updateMonthLabel();
-            fetchMonthSlots();
+            fetchUpcomingClasses();
 
-            btnPrev.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); updateMonthLabel(); fetchMonthSlots(); });
-            btnNext.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); updateMonthLabel(); fetchMonthSlots(); });
-
-            function updateMonthLabel() {
-                monthLabel.innerText = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                const now = new Date();
-                btnPrev.disabled = (currentDate.getMonth() === now.getMonth() && currentDate.getFullYear() === now.getFullYear());
-                const maxDate = new Date();
-                maxDate.setMonth(now.getMonth() + maxLookaheadMonths);
-                btnNext.disabled = (currentDate >= maxDate);
-            }
-
-            async function fetchMonthSlots() {
+            async function fetchUpcomingClasses() {
                 loadingState.classList.remove('hidden');
                 dateGrid.classList.add('hidden');
-                timeSection.classList.add('hidden');
                 bookingForm.classList.add('hidden');
                 
                 try {
-                    const res = await fetch(`/api/get-class-slots?month=${currentDate.getMonth()}&year=${currentDate.getFullYear()}`);
+                    // Fetch directly without month/year to grab the next 10 classes
+                    const res = await fetch(`/api/get-class-slots`);
                     const data = await res.json();
+                    
                     if (!data.success) {
                         dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-red-600 text-sm font-bold">API Error: ${data.error}</div>`;
                     } else if (!data.slots.length) {
-                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm font-medium">No upcoming classes found for this month.</div>`;
+                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm font-medium">No upcoming classes found.</div>`;
                     } else {
                         slotsData = data.slots;
+                        // Display the user's localized start time once at the top
+                        const localTimeStr = new Date(slotsData[0].iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        document.getElementById('timezone-label').innerText = `All classes start at ${localTimeStr} (${userTimezone})`;
                         renderDates();
                     }
                 } catch (err) {
@@ -345,44 +302,40 @@
 
             function renderDates() {
                 dateGrid.innerHTML = '';
-                slotsData.forEach((slot, index) => {
+                slotsData.forEach((slot) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = `border rounded-xl p-3 text-center text-sm font-bold transition-all ${index === 0 ? 'border-brand-green bg-emerald-50 text-brand-dark' : 'border-gray-200 text-gray-600'}`;
+                    btn.className = 'border border-gray-200 text-gray-600 rounded-xl p-3 md:p-4 text-center text-sm font-bold transition-all hover:border-brand-green hover:bg-emerald-50 hover:text-brand-dark';
                     btn.innerHTML = slot.date.replace(',', '<br>');
-                    btn.onclick = () => selectDate(slot, btn);
+                    
+                    btn.onclick = () => {
+                        if(selectedIsos.has(slot.iso)) {
+                            selectedIsos.delete(slot.iso);
+                            btn.className = 'border border-gray-200 text-gray-600 rounded-xl p-3 md:p-4 text-center text-sm font-bold transition-all hover:border-brand-green hover:bg-emerald-50 hover:text-brand-dark';
+                        } else {
+                            selectedIsos.add(slot.iso);
+                            btn.className = 'border-2 border-brand-green bg-emerald-50 text-brand-dark rounded-xl p-3 md:p-4 text-center text-sm font-bold shadow-sm';
+                        }
+                        toggleForm();
+                    };
                     dateGrid.appendChild(btn);
                 });
-                if (slotsData.length > 0) selectDate(slotsData[0], dateGrid.firstChild);
             }
 
-            function selectDate(slot, clickedBtn) {
-                document.querySelectorAll('#date-grid button').forEach(b => b.className = 'border border-gray-200 text-gray-600 rounded-xl p-3 text-center text-sm font-bold transition-all');
-                clickedBtn.className = 'border border-brand-green bg-emerald-50 text-brand-dark rounded-xl p-3 text-center text-sm font-bold';
-                
-                timeSection.classList.remove('hidden');
-                bookingForm.classList.add('hidden');
-                const timeGrid = document.getElementById('time-grid');
-                timeGrid.innerHTML = '';
-
-                // NATIVE TIMEZONE TRANSLATION
-                const localTimeStr = new Date(slot.iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'border border-brand-green py-3 rounded-xl font-bold transition-all text-sm bg-brand-green text-white shadow-md';
-                btn.innerText = localTimeStr;
-                
-                document.getElementById('selected-iso').value = slot.iso;
-                bookingForm.classList.remove('hidden');
-                timeGrid.appendChild(btn);
+            function toggleForm() {
+                if(selectedIsos.size > 0) {
+                    bookingForm.classList.remove('hidden');
+                    selectionCount.innerText = `Confirm Your Spots (${selectedIsos.size} Selected)`;
+                } else {
+                    bookingForm.classList.add('hidden');
+                }
             }
 
             bookingForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitBtn = document.getElementById('submit-btn');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Securing Spot...';
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Securing Spots...';
 
                 try {
                     const res = await fetch('/api/book-class', {
@@ -391,7 +344,8 @@
                         body: JSON.stringify({
                             name: document.getElementById('client-name').value,
                             email: document.getElementById('client-email').value,
-                            selectedIso: document.getElementById('selected-iso').value
+                            // Send the Set as a standard array to the backend
+                            selectedIsos: Array.from(selectedIsos) 
                         })
                     });
                     const result = await res.json();
@@ -399,19 +353,18 @@
                     if (result.success) {
                         bookingForm.classList.add('hidden');
                         dateGrid.classList.add('hidden');
-                        timeSection.classList.add('hidden');
-                        document.querySelector('.flex.justify-between.items-center.mb-4').classList.add('hidden');
+                        document.querySelector('.flex.justify-between.items-start').classList.add('hidden');
                         document.getElementById('dynamic-meet-link').href = result.meetLink;
                         document.getElementById('success-message').classList.remove('hidden');
                     } else {
                         alert('RSVP failed: ' + result.error);
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'RSVP Now <i class="fa-solid fa-check"></i>';
+                        submitBtn.innerHTML = 'Confirm Mass RSVP <i class="fa-solid fa-check"></i>';
                     }
                 } catch (err) {
                     alert('An error occurred. Please try again.');
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'RSVP Now <i class="fa-solid fa-check"></i>';
+                    submitBtn.innerHTML = 'Confirm Mass RSVP <i class="fa-solid fa-check"></i>';
                 }
             });
         });
