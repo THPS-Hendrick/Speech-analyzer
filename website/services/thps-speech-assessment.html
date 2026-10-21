@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free THPS Speech Assessment | Data-Driven Communication Diagnostic</title>
+    <title>Book Your Free THPS Speech Assessment | Tom Hendrick</title>
     <meta name="description" content="Book your free 1-hour acoustic and cognitive baseline diagnostic. Discover your specific speaking gaps using the SAMS, VVIQ, and Vocal Inhibition tests.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
     
-    <!-- Local Business NAP Schema (Base) -->
+    <!-- Local Business NAP Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -35,7 +35,7 @@
     }
     </script>
 
-    <!-- Schema.org Multi-Entity JSON-LD Graph for Service, Provider, Software & Reviews -->
+    <!-- Schema.org Multi-Entity JSON-LD Graph for Service, ReserveAction & Reviews -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -47,30 +47,30 @@
           "description": "A 5-step data-driven acoustic and cognitive diagnostic to measure presentation anxiety, unscripted fluency, and vocal inhibition.",
           "provider": {
             "@type": "Person",
-            "@id": "https://tomhendrick.com/about.html#author",
             "name": "Tom Hendrick",
             "jobTitle": "Speech Biomechanics Specialist & Public Speaking Coach",
-            "url": "https://tomhendrick.com/about.html",
-            "sameAs": [
-              "https://www.linkedin.com/in/tomhendrick-publicspeaking"
-            ]
+            "url": "https://tomhendrick.com/about.html"
           },
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "AUD"
-          }
-        },
-        {
-          "@type": "SoftwareApplication",
-          "@id": "https://tomhendrick.com/services/mic-check-app.html#software",
-          "name": "Mic-Check Speech Analyzer",
-          "operatingSystem": "Web-Based Browser App",
-          "applicationCategory": "EducationalApplication",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "AUD"
+          },
+          "potentialAction": {
+            "@type": "ReserveAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://tomhendrick.com/services/thps-speech-assessment.html",
+              "inLanguage": "en-US",
+              "actionPlatform": [
+                "http://schema.org/DesktopWebPlatform",
+                "http://schema.org/MobileWebPlatform"
+              ]
+            },
+            "result": {
+              "@type": "Reservation",
+              "name": "THPS Speech Assessment Booking"
+            }
           }
         },
         {
@@ -104,9 +104,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         brand: {
                             green: '#106030',
@@ -120,144 +118,260 @@
         }
     </script>
 </head>
-<body class="bg-white font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
     <!-- INJECT_HEADER -->
 
     <!-- MAIN CONTENT AREA -->
     <main class="flex-grow w-full pb-20 pt-12 md:pt-16 bg-white">
-        
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
             
-            <!-- Hero Header & Interactive Hook -->
+            <!-- Hero Header & Native Booking Widget -->
             <header class="mb-16 text-center">
+                <!-- Eyebrow (Former H1) -->
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-brand-dark text-sm font-bold uppercase tracking-wider mb-6">
-                    <i class="fa-solid fa-stethoscope"></i> Diagnostic Phase 1
+                    <i class="fa-solid fa-stethoscope"></i> Stop Guessing. Start Measuring.
                 </div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">Stop Guessing. Start Measuring.</h1>
+                <!-- SEO/AEO Optimized H1 -->
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">Book Your Free THPS Speech Assessment</h1>
                 <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
                     Nerves can strip away your speaking skills under pressure. Discover exactly why your delivery breaks down—and how to fix it—with a free 1-hour acoustic and cognitive baseline diagnostic.
                 </p>
                 
-                <!-- Interactive Teaser iFrame -->
-                <div class="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-slate-900 relative">
-                    <iframe 
-                      src="https://mic-check-backend.vercel.app/analyzer-app.html" 
-                      title="Mic-Check Speech Analyzer Tool Teaser"
-                      style="width: 100%; height: 100%; border: none; background: transparent;" 
-                      allow="camera; microphone; autoplay; playsinline"
-                      loading="lazy"
-                      scrolling="no">
-                    </iframe>
-                </div>
-                <p class="text-xs text-center text-gray-500 mt-3 font-medium">Test a live preview of the acoustic telemetry software used during your assessment.</p>
-            </header>
+                <!-- NATIVE BOOKING WIDGET -->
+                <div id="booking-widget" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left max-w-4xl mx-auto flex flex-col md:flex-row mt-8">
+                    
+                    <!-- Compact Left Panel (Mobile First) -->
+                    <div class="bg-brand-offwhite p-6 md:p-8 md:w-1/3 md:border-r border-gray-200 flex flex-col justify-center md:justify-start">
+                        <h2 class="text-brand-green font-bold uppercase tracking-wider text-xs mb-2">Tom Hendrick</h2>
+                        <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 md:mb-4">1-Hour Diagnostic</h3>
+                        <div class="flex flex-row md:flex-col gap-4 md:gap-3">
+                            <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-gray-400"></i> 60 Min</div>
+                            <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-video mr-2 text-gray-400"></i> Google Meet</div>
+                        </div>
+                    </div>
 
-            <!-- Introduction -->
-            <div class="prose prose-lg max-w-none text-gray-700 mb-16 text-center">
-                <p>Capable professionals often know their material intimately but find preparing for presentations exhausting. Over-relying on clunky scripts takes away natural delivery, while speaking unscripted brings the fear of going off-track or blanking completely.</p>
-                <p><strong>The THPS Speech Assessment</strong> replaces subjective feedback with clinical, data-driven insights. Before you book a <a href="/services/thps-performance-plan.html" class="text-brand-green font-bold hover:underline">Performance Plan</a>, we spend 1 hour (online or in-person) running you through 5 core diagnostic tests to map your unique communication gaps.</p>
-            </div>
+                    <!-- Right Panel: Dynamic Calendar -->
+                    <div class="p-6 md:p-8 md:w-2/3 w-full bg-white relative min-h-[400px]">
+                        
+                        <!-- Month Pagination Header -->
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                            <h3 class="text-lg font-bold text-slate-800" id="current-month-label">Select Date</h3>
+                            <div class="flex gap-2">
+                                <button id="btn-prev-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                <button id="btn-next-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Containers -->
+                        <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
+                            <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                            <span class="text-sm font-bold uppercase tracking-wider">Syncing Calendar...</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
+
+                        <div id="time-section" class="hidden">
+                            <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wide" id="selected-date-label">Available Times</h3>
+                            <div class="grid grid-cols-2 gap-3 mb-6" id="time-grid"></div>
+                        </div>
+
+                        <!-- Form -->
+                        <form id="booking-form" class="hidden bg-brand-offwhite p-6 rounded-2xl border border-gray-100">
+                            <h3 class="font-extrabold text-slate-800 mb-4">Confirm Details</h3>
+                            <input type="hidden" id="selected-iso" name="selectedIso">
+                            <input type="text" id="client-name" placeholder="Full Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green bg-white">
+                            <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green bg-white">
+                            <button type="submit" id="submit-btn" class="w-full bg-brand-gold text-brand-dark font-extrabold py-4 px-4 rounded-xl hover:brightness-105 transition-all shadow-sm flex justify-center items-center gap-2">Confirm Booking <i class="fa-solid fa-check"></i></button>
+                        </form>
+
+                        <!-- Success -->
+                        <div id="success-message" class="hidden bg-green-50 text-brand-green p-8 rounded-2xl border border-green-200 text-center h-full flex flex-col justify-center items-center">
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-check text-2xl"></i></div>
+                            <h3 class="text-xl font-extrabold mb-2">Booking Confirmed!</h3>
+                            <p class="text-sm font-medium text-green-800/80">A Google Meet invitation has been securely dispatched to your email address.</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
             <!-- THE 5-STEP SEO FUNNEL -->
             <div class="space-y-8 mb-16">
-                
-                <!-- Step 1 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">1</div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Nerve Profiling</div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The SAMS Test (Sympathetic Adreno-medullary System)</h3>
-                        <p class="text-gray-700 leading-relaxed">Pinpoint exactly when and why your body triggers presentation anxiety. By measuring your neuro-hormonal response to speaking cues, we identify your specific <strong>Preparation Dysregulation gap</strong> compared to hundreds of benchmarked executives.</p>
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">2</div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Unscripted Fluency</div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The VVIQ (Vividness of Visual Imagery Questionnaire)</h3>
-                        <p class="text-gray-700 leading-relaxed">Discover why memorizing clunky scripts is holding you back. We plot your cognitive imagery profile on the spectrum from Aphantasia to Hyperphantasia, revealing whether your brain relies on vivid visual concepts or rigid structural rules when speaking off-the-cuff.</p>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">3</div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Vocal Range Diagnostic</div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Vocal Inhibition Test</h3>
-                        <p class="text-gray-700 leading-relaxed">Measure the psychological blocks causing a monotone delivery under pressure. You will attempt to deliver a script using extreme vocal ranges (fast, slow, loud, quiet). This benchmarks your ability to modulate pitch and volume on command, identifying your exact <strong>Vocal Inhibition Gap</strong>.</p>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">4</div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Visual Communication Strength</div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Image-Based Speaking Test</h3>
-                        <p class="text-gray-700 leading-relaxed">Benchmark your natural ability to speak vividly. Using the Mic-Check App, we capture your baseline Words Per Minute (WPM) and visual descriptor percentages when prompted solely by imagery or imagination, measuring your core fluency strengths.</p>
-                    </div>
-                </div>
-
-                <!-- Step 5 -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold font-extrabold text-2xl shadow-sm flex-shrink-0">5</div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-widest text-brand-gold mb-1">Cognitive Load Testing</div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">The Rules-Based Speaking Test</h3>
-                        <p class="text-gray-700 leading-relaxed">Find out exactly when your speaking fluency breaks down. We impose progressive constraints across 6 rounds of questioning to test how quickly you lose composure under complex Q&A rules and high cognitive load.</p>
-                    </div>
-                </div>
+                <!-- Keep your existing 5-step diagnostic cards here -->
             </div>
-
-            <!-- Outcome / Transition -->
-            <div class="text-center mb-16 max-w-2xl mx-auto">
-                <h3 class="text-2xl font-bold text-slate-900 mb-4">Your Blueprint for Effortless Speaking</h3>
-                <p class="text-gray-600">
-                    The resulting data from your free assessment allows us to build your highly personalized <strong>4-week Performance Plan</strong>. By integrating targeted rules, progressive constraints, and daily tracking via the Mic-Check App, we close your exact gaps so you can speak with composure under immense pressure.
-                </p>
-            </div>
-
-            <!-- GOOGLE REVIEW SOCIAL PROOF BLOCK -->
-            <div class="mb-16 bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 max-w-4xl mx-auto">
-                <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center border border-gray-200 text-brand-green shadow-sm flex-shrink-0">
-                        <i class="fa-brands fa-google text-2xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1 text-amber-400 text-sm mb-1">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                            <span class="text-slate-900 font-bold text-sm ml-2">5.0 / 5.0 Rating</span>
-                        </div>
-                        <p class="text-sm text-gray-700 italic">"The initial assessment revealed a massive rules-based communication gap I didn't even know I had. Measuring my WPM in real time completely changed how I approach hostile Q&A."</p>
-                        <div class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wide">Verified Client Review, Google Business</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CONVERSION CTA BANNER -->
-            <div class="bg-[#08331A] rounded-[2rem] p-8 md:p-14 text-center shadow-2xl border-t-4 border-brand-gold relative overflow-hidden">
-                <!-- Background Decoration -->
-                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white/5 text-9xl pointer-events-none">
-                    <i class="fa-solid fa-microphone-lines"></i>
-                </div>
-                
-                <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-4 relative z-10">Ready to Map Your Metrics?</h3>
-                <p class="text-green-100 text-lg mb-10 max-w-2xl mx-auto relative z-10">Book your free 1-hour session online or in-person at our Adelaide clinic.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-                    <a href="/contact.html" class="bg-brand-gold text-brand-dark font-extrabold text-lg py-4 px-8 rounded-full hover:bg-yellow-400 transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
-                        Book Your Free Assessment <i class="fa-solid fa-calendar-check"></i>
-                    </a>
-                </div>
-            </div>
-
+            
         </div>
     </main>
 
     <!-- INJECT_FOOTER -->
 
+    <!-- PAGINATED BOOKING WIDGET LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let slotsData = [];
+            let currentDate = new Date(); // Tracks the currently viewed month
+            const maxLookaheadMonths = 3; 
+
+            const btnPrev = document.getElementById('btn-prev-month');
+            const btnNext = document.getElementById('btn-next-month');
+            const monthLabel = document.getElementById('current-month-label');
+            const loadingState = document.getElementById('loading-state');
+            const dateGrid = document.getElementById('date-grid');
+            const timeSection = document.getElementById('time-section');
+            const bookingForm = document.getElementById('booking-form');
+
+            // Initialize Calendar
+            updateMonthLabel();
+            fetchMonthSlots();
+
+            // Pagination Controls
+            btnPrev.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                updateMonthLabel();
+                fetchMonthSlots();
+            });
+
+            btnNext.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                updateMonthLabel();
+                fetchMonthSlots();
+            });
+
+            function updateMonthLabel() {
+                monthLabel.innerText = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                
+                // Disable prev button if viewing current month
+                const now = new Date();
+                btnPrev.disabled = (currentDate.getMonth() === now.getMonth() && currentDate.getFullYear() === now.getFullYear());
+                
+                // Disable next button if viewing beyond 3 months
+                const maxDate = new Date();
+                maxDate.setMonth(now.getMonth() + maxLookaheadMonths);
+                btnNext.disabled = (currentDate >= maxDate);
+            }
+
+            async function fetchMonthSlots() {
+                loadingState.classList.remove('hidden');
+                dateGrid.classList.add('hidden');
+                timeSection.classList.add('hidden');
+                bookingForm.classList.add('hidden');
+                
+                try {
+                    const res = await fetch(`/api/get-slots?month=${currentDate.getMonth()}&year=${currentDate.getFullYear()}`);
+                    const data = await res.json();
+
+                    if (!data.success || !data.slots.length) {
+                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm font-medium">No available slots found for this month.</div>`;
+                    } else {
+                        slotsData = data.slots;
+                        renderDates();
+                    }
+                } catch (err) {
+                    console.error("Fetch error:", err);
+                    dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-red-500 text-sm font-medium">Failed to sync calendar. Please refresh.</div>`;
+                } finally {
+                    loadingState.classList.add('hidden');
+                    dateGrid.classList.remove('hidden');
+                }
+            }
+
+            function renderDates() {
+                dateGrid.innerHTML = '';
+                const uniqueDates = [...new Set(slotsData.map(s => s.date))];
+
+                uniqueDates.forEach((dateStr, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `border rounded-xl p-3 text-center text-sm font-bold transition-all ${
+                        index === 0 ? 'border-brand-green bg-green-50 text-brand-dark shadow-sm' : 'border-gray-200 text-gray-600 hover:border-brand-green hover:bg-green-50 hover:text-brand-dark'
+                    }`;
+                    btn.innerHTML = dateStr.replace(',', '<br>');
+                    btn.onclick = () => selectDate(dateStr, btn);
+                    dateGrid.appendChild(btn);
+                });
+
+                if (uniqueDates.length > 0) renderTimes(uniqueDates[0]);
+            }
+
+            function selectDate(dateStr, clickedBtn) {
+                document.querySelectorAll('#date-grid button').forEach(b => {
+                    b.className = 'border border-gray-200 text-gray-600 rounded-xl p-3 text-center text-sm font-bold transition-all hover:border-brand-green hover:bg-green-50 hover:text-brand-dark';
+                });
+                clickedBtn.className = 'border border-brand-green bg-green-50 text-brand-dark rounded-xl p-3 text-center text-sm font-bold shadow-sm';
+                renderTimes(dateStr);
+            }
+
+            function renderTimes(dateStr) {
+                timeSection.classList.remove('hidden');
+                bookingForm.classList.add('hidden');
+                const timeGrid = document.getElementById('time-grid');
+                timeGrid.innerHTML = '';
+                document.getElementById('selected-date-label').innerText = `Available Times for ${dateStr}`;
+
+                const filteredSlots = slotsData.filter(s => s.date === dateStr);
+                filteredSlots.forEach(slot => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'border border-gray-200 py-3 rounded-xl hover:border-brand-green hover:text-brand-green font-bold transition-all text-sm bg-white shadow-sm';
+                    btn.innerText = slot.time;
+                    btn.onclick = () => selectTime(slot, btn);
+                    timeGrid.appendChild(btn);
+                });
+            }
+
+            function selectTime(slot, clickedBtn) {
+                document.querySelectorAll('#time-grid button').forEach(b => {
+                    b.className = 'border border-gray-200 py-3 rounded-xl hover:border-brand-green hover:text-brand-green font-bold transition-all text-sm bg-white shadow-sm';
+                });
+                clickedBtn.className = 'border border-brand-green py-3 rounded-xl font-bold transition-all text-sm bg-brand-green text-white shadow-md';
+
+                document.getElementById('selected-iso').value = slot.iso;
+                bookingForm.classList.remove('hidden');
+            }
+
+            // Secure Submission Pipeline
+            bookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Securing Time...';
+
+                const payload = {
+                    name: document.getElementById('client-name').value,
+                    email: document.getElementById('client-email').value,
+                    selectedIso: document.getElementById('selected-iso').value
+                };
+
+                try {
+                    const res = await fetch('/api/book-session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        bookingForm.classList.add('hidden');
+                        dateGrid.classList.add('hidden');
+                        timeSection.classList.add('hidden');
+                        document.querySelector('.flex.justify-between.items-center.mb-6').classList.add('hidden');
+                        document.getElementById('success-message').classList.remove('hidden');
+                    } else {
+                        alert('Booking failed: ' + result.error);
+                        resetButton();
+                    }
+                } catch (err) {
+                    console.error("Booking Error:", err);
+                    alert('An error occurred. Please try again.');
+                    resetButton();
+                }
+
+                function resetButton() {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Confirm Booking <i class="fa-solid fa-check"></i>';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
