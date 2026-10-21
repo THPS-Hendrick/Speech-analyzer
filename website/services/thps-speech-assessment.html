@@ -357,7 +357,11 @@
                     const res = await fetch(`/api/get-slots?month=${currentDate.getMonth()}&year=${currentDate.getFullYear()}`);
                     const data = await res.json();
 
-                    if (!data.success || !data.slots.length) {
+                    // Reveal true backend errors instead of masking them
+                    if (!data.success) {
+                        console.error("Backend API Error:", data.error);
+                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-red-600 text-sm font-bold">API Error: ${data.error}</div>`;
+                    } else if (!data.slots.length) {
                         dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm font-medium">No available slots found for this month.</div>`;
                     } else {
                         slotsData = data.slots;
