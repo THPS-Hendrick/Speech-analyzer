@@ -122,6 +122,62 @@
                     Join our <strong>"Fun Fridays"</strong> online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
                 </p>
 
+
+            <!-- NATIVE BOOKING WIDGET -->
+            <div id="join" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left max-w-4xl mx-auto flex flex-col md:flex-row mt-8">
+                
+                <!-- Left Panel -->
+                <div class="bg-emerald-50 p-6 md:p-8 md:w-1/3 md:border-r border-emerald-100 flex flex-col justify-center md:justify-start">
+                    <h2 class="text-emerald-700 font-bold uppercase tracking-wider text-xs mb-2">Fun Fridays</h2>
+                    <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 md:mb-4">Live Class RSVP</h3>
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-3">
+                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-emerald-500"></i> 60 Min</div>
+                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-users mr-2 text-emerald-500"></i> Group Session</div>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="p-6 md:p-8 md:w-2/3 w-full bg-white relative min-h-[400px]">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
+                        <h3 class="text-lg font-bold text-slate-800" id="current-month-label">Select Date</h3>
+                        <div class="flex gap-2">
+                            <button id="btn-prev-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button id="btn-next-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                        <span class="text-sm font-bold uppercase tracking-wider">Syncing Schedule...</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
+
+                    <div id="time-section" class="hidden">
+                        <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">Class Time</h3>
+                        <p class="text-xs text-brand-green font-medium mb-3" id="timezone-label">Auto-detected local time</p>
+                        <div class="grid grid-cols-1 gap-3 mb-6" id="time-grid"></div>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="booking-form" class="hidden bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                        <h3 class="font-extrabold text-slate-800 mb-4">Confirm Your Spot</h3>
+                        <input type="hidden" id="selected-iso" name="selectedIso">
+                        <input type="text" id="client-name" placeholder="First & Last Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                        <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                        <button type="submit" id="submit-btn" class="w-full bg-brand-green text-white font-extrabold py-4 px-4 rounded-xl hover:bg-brand-dark transition-all shadow-sm flex justify-center items-center gap-2">RSVP Now <i class="fa-solid fa-check"></i></button>
+                    </form>
+
+                    <!-- Success -->
+                    <div id="success-message" class="hidden bg-emerald-50 text-brand-green p-8 rounded-2xl border border-emerald-200 text-center h-full flex flex-col justify-center items-center">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
+                        <h3 class="text-xl font-extrabold mb-2">You're on the list!</h3>
+                        <p class="text-sm font-medium text-emerald-800/80 mb-4">Your spot is secured. Save the link below to join the class.</p>
+                        <a id="dynamic-meet-link" href="#" target="_blank" class="text-sm font-bold bg-white px-4 py-2 rounded-lg shadow-sm border border-emerald-200 text-brand-dark hover:text-brand-green">Join Google Meet</a>
+                    </div>
+                </div>
+            </div>
+                
                 <!-- Hero Review -->
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left max-w-2xl mx-auto mb-10">
                     <div class="flex items-center gap-1 text-brand-gold text-xs mb-3">
@@ -224,62 +280,6 @@
                 </div>
 
             </div>
-
-            <!-- NATIVE BOOKING WIDGET -->
-            <div id="join" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left max-w-4xl mx-auto flex flex-col md:flex-row mt-8">
-                
-                <!-- Left Panel -->
-                <div class="bg-emerald-50 p-6 md:p-8 md:w-1/3 md:border-r border-emerald-100 flex flex-col justify-center md:justify-start">
-                    <h2 class="text-emerald-700 font-bold uppercase tracking-wider text-xs mb-2">Fun Fridays</h2>
-                    <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 md:mb-4">Live Class RSVP</h3>
-                    <div class="flex flex-row md:flex-col gap-4 md:gap-3">
-                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-emerald-500"></i> 60 Min</div>
-                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-users mr-2 text-emerald-500"></i> Group Session</div>
-                    </div>
-                </div>
-
-                <!-- Right Panel -->
-                <div class="p-6 md:p-8 md:w-2/3 w-full bg-white relative min-h-[400px]">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-                        <h3 class="text-lg font-bold text-slate-800" id="current-month-label">Select Date</h3>
-                        <div class="flex gap-2">
-                            <button id="btn-prev-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                            <button id="btn-next-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
-                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
-                        <span class="text-sm font-bold uppercase tracking-wider">Syncing Schedule...</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
-
-                    <div id="time-section" class="hidden">
-                        <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">Class Time</h3>
-                        <p class="text-xs text-brand-green font-medium mb-3" id="timezone-label">Auto-detected local time</p>
-                        <div class="grid grid-cols-1 gap-3 mb-6" id="time-grid"></div>
-                    </div>
-
-                    <!-- Form -->
-                    <form id="booking-form" class="hidden bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                        <h3 class="font-extrabold text-slate-800 mb-4">Confirm Your Spot</h3>
-                        <input type="hidden" id="selected-iso" name="selectedIso">
-                        <input type="text" id="client-name" placeholder="First & Last Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
-                        <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
-                        <button type="submit" id="submit-btn" class="w-full bg-brand-green text-white font-extrabold py-4 px-4 rounded-xl hover:bg-brand-dark transition-all shadow-sm flex justify-center items-center gap-2">RSVP Now <i class="fa-solid fa-check"></i></button>
-                    </form>
-
-                    <!-- Success -->
-                    <div id="success-message" class="hidden bg-emerald-50 text-brand-green p-8 rounded-2xl border border-emerald-200 text-center h-full flex flex-col justify-center items-center">
-                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
-                        <h3 class="text-xl font-extrabold mb-2">You're on the list!</h3>
-                        <p class="text-sm font-medium text-emerald-800/80 mb-4">Your spot is secured. Save the link below to join the class.</p>
-                        <a id="dynamic-meet-link" href="#" target="_blank" class="text-sm font-bold bg-white px-4 py-2 rounded-lg shadow-sm border border-emerald-200 text-brand-dark hover:text-brand-green">Join Google Meet</a>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </main>
 
