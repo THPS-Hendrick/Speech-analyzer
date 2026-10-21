@@ -547,12 +547,19 @@
 
 **Headings:**
 - H1: The Trackman for Public Speaking
+- H3: Baseline Assessment
 - H2: Track Your History & Save Your Progress
 - H2: How the Mic-Check App Scores Your Speech
 - H3: Content (What You Say)
 - H3: Delivery (How You Sound)
 - H3: Simplicity (How Easily You Are Understood)
 - H2: Frequently Asked Questions
+- H2: Mic-Check Demo
+- H3: Capture Your Voice
+- H3: Performance Metrics
+- H3: Acoustic Telemetry
+- H3: Stop Guessing.Start Measuring.
+- H2: Analyzing...
 
 ---
 

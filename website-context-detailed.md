@@ -362,7 +362,7 @@
 
 ### Body Text:
 - Stop guessing how you sound. Tap the microphone below to record a brief baseline, then view your full acoustic telemetry and NLP report.
-- Speak for 5 seconds to generate your report.
+- Launch the free demo below to record your voice and generate your immediate acoustic report.
 - The free demo resets after every use. Subscribe to unlock cloud history, detailed PDF reports, and advanced psychoacoustic voice timelines.
 - Our proprietary Natural Language Processing (NLP) and acoustic engine breaks your communication down into three distinct, measurable categories.
 - Measures storytelling. We scan for personal pronouns to ensure you are talking about specific people doing specific things, rather than abstract jargon.
@@ -373,18 +373,23 @@
 - The Green Score counts how many of the 9 core metrics hit their perfect target zone (+10 points). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, resulting in a perfect 10/10.
 - Your speaking pace is critical to being understood. The sweet spot (Green Zone) is 100-150 words per minute.
 - Runtime is the average seconds you speak continuously before taking a meaningful pause. The optimal target is between 3.0 and 6.0 seconds.
+- Use the Live Timer for unscripted practice, or upload an audio file to analyze an existing speech.
+- You've seen the baseline. Now unlock your full potential. Join Mic-Check Pro to save your session history, track your progress graphs, unlock the AI Vocal Coach, and access all 16 advanced metrics.
+- Processing acoustic metrics.
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services
-- [BUTTON] 
-- [BUTTON] Click here to see your voice report
+- [BUTTON] Launch Mic-Check App
 - [A] Subscribe Now
 - [SUMMARY] What is the Green Score?
 - [SUMMARY] What is a good Speaking Pace (Words/min)?
 - [SUMMARY] What does Runtime mean in public speaking?
-- [BUTTON] 
-- [BUTTON] 
-- [BUTTON] 
+- [BUTTON] Exit
+- [BUTTON] Analyze My Speech
+- [BUTTON] Next: Timeline
+- [BUTTON] Unlock Pro
+- [A] Get Mic-Check Pro
+- [BUTTON] Back to Free Demo
 
 ### Image Alt Text:
 
