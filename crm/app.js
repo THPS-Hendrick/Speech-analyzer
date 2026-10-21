@@ -16,16 +16,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// 2. Auth Guard: Check Login Status Before Loading Data
+// 2. Auth Guard: Check Login Status & Admin Email
 onAuthStateChanged(auth, (user) => {
     if (!user) {
-        // Kick unauthenticated users to the login screen
+        // Not logged in
         window.location.href = "login.html";
+    } else if (user.email !== "tom@tomhendrick.com") {
+        // Logged in, but WRONG account
+        alert("Unauthorized Access: Admin privileges required.");
+        signOut(auth).then(() => {
+            window.location.href = "login.html";
+        });
     } else {
-        // User is verified, load the CRM
+        // Logged in AND verified as Admin
         loadClients();
         
-        // Setup Logout functionality
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
