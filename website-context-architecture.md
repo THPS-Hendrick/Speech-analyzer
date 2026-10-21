@@ -874,6 +874,13 @@
 - H3: Available Times
 - H3: Confirm Details
 - H3: Booking Confirmed!
+- H3: The SAMS Test (Sympathetic Adreno-medullary System)
+- H3: The VVIQ (Vividness of Visual Imagery Questionnaire)
+- H3: The Vocal Inhibition Test
+- H3: The Image-Based Speaking Test
+- H3: The Rules-Based Speaking Test
+- H3: Your Blueprint for Effortless Speaking
+- H3: Ready to Map Your Metrics?
 
 ---
 
