@@ -338,7 +338,7 @@
 
 ---
 
-## File: /website/home.html
+## File: /website/index.html
 
 **Title:** The Premier Online Public Speaking Coach | THPS
 

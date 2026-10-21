@@ -148,7 +148,7 @@
 
 ---
 
-## File: /website/home.html
+## File: /website/index.html
 
 ### Body Text:
 - Welcome to THPS. We are the premier online coaching service for executives and professionals who want to eliminate stage fright and build predictable confidence. We replace subjective feedback with hard speech biometrics, allowing you to train your voice with the same precision an athlete trains their body.
