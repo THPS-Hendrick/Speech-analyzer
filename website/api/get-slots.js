@@ -1,5 +1,8 @@
 const { google } = require('googleapis');
 
+// 1. Force the serverless execution context into Adelaide time
+process.env.TZ = 'Australia/Adelaide';
+
 module.exports = async function handler(req, res) {
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
@@ -11,7 +14,9 @@ module.exports = async function handler(req, res) {
 
     try {
         const timeZone = 'Australia/Adelaide';
-        const now = new Date();
+        
+        // Because of process.env.TZ, this now evaluates using Adelaide's local time rules
+        const now = new Date(); 
         
         let targetMonth = req.query.month ? parseInt(req.query.month) : now.getMonth();
         let targetYear = req.query.year ? parseInt(req.query.year) : now.getFullYear();
@@ -35,17 +40,19 @@ module.exports = async function handler(req, res) {
             }
         });
         
-        // Safety Patch: Fallback to an empty array if Google omits the busy object
         const busySlots = freeBusyResponse.data.calendars.primary.busy || [];
 
         let availableSlots = [];
         let currentDay = new Date(timeMin);
+        currentDay.setHours(0, 0, 0, 0); // Reset to midnight to avoid skipping early slots on the first day
         
         while (currentDay <= timeMax) {
             if (currentDay.getDay() !== 0 && currentDay.getDay() !== 6) {
+                // hour = 9 to 16 represents 9 AM to 4 PM Adelaide time (ending at 5 PM)
                 for (let hour = 9; hour <= 16; hour++) {
                     let slotStart = new Date(currentDay);
                     slotStart.setHours(hour, 0, 0, 0);
+                    
                     let slotEnd = new Date(slotStart);
                     slotEnd.setHours(hour + 1, 0, 0, 0);
 
@@ -61,7 +68,7 @@ module.exports = async function handler(req, res) {
                         availableSlots.push({
                             date: slotStart.toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' }),
                             time: slotStart.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }),
-                            iso: slotStart.toISOString()
+                            iso: slotStart.toISOString() // Make sure your frontend uses this value to display client local time!
                         });
                     }
                 }
