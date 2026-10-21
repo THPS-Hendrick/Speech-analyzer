@@ -1,6 +1,6 @@
 const { google } = require('googleapis');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
@@ -13,24 +13,19 @@ export default async function handler(req, res) {
         const timeZone = 'Australia/Adelaide';
         const now = new Date();
         
-        // 1. Pagination: Determine the requested month/year or default to current
         let targetMonth = req.query.month ? parseInt(req.query.month) : now.getMonth();
         let targetYear = req.query.year ? parseInt(req.query.year) : now.getFullYear();
 
-        // 2. Define the exact boundary for the requested month
-        // If the requested month is the current month, start from 'now'. Otherwise, start at the 1st of the month.
         const isCurrentMonth = (targetMonth === now.getMonth() && targetYear === now.getFullYear());
         const timeMin = isCurrentMonth ? now : new Date(targetYear, targetMonth, 1);
         const timeMax = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59);
 
-        // Limit the lookahead to roughly 90 days (3 months)
         const maxAllowedDate = new Date(now);
         maxAllowedDate.setMonth(now.getMonth() + 3);
         if (timeMin > maxAllowedDate) {
-            return res.status(200).json({ success: true, slots: [] }); // Prevent booking too far ahead
+            return res.status(200).json({ success: true, slots: [] });
         }
 
-        // 3. Query Google Free/Busy for the specific month
         const freeBusyResponse = await calendar.freebusy.query({
             requestBody: {
                 timeMin: timeMin.toISOString(),
@@ -39,23 +34,21 @@ export default async function handler(req, res) {
                 items: [{ id: 'primary' }]
             }
         });
-        const busySlots = freeBusyResponse.data.calendars.primary.busy;
+        
+        // Safety Patch: Fallback to an empty array if Google omits the busy object
+        const busySlots = freeBusyResponse.data.calendars.primary.busy || [];
 
-        // 4. Generate open 1-hour slots
         let availableSlots = [];
         let currentDay = new Date(timeMin);
         
         while (currentDay <= timeMax) {
-            // Skip weekends (0 is Sunday, 6 is Saturday)
             if (currentDay.getDay() !== 0 && currentDay.getDay() !== 6) {
-                // Check 9 AM through 4 PM (for 1-hour sessions ending at 5 PM)
                 for (let hour = 9; hour <= 16; hour++) {
                     let slotStart = new Date(currentDay);
                     slotStart.setHours(hour, 0, 0, 0);
                     let slotEnd = new Date(slotStart);
                     slotEnd.setHours(hour + 1, 0, 0, 0);
 
-                    // Skip slots that have already passed today
                     if (slotStart < now) continue;
 
                     let isBusy = busySlots.some(busy => {
