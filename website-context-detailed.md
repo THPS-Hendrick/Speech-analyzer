@@ -394,26 +394,21 @@
 
 ### Body Text:
 - Join our "Fun Fridays" online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
-- Auto-detected local time
-- Your spot is secured. Save the link below to join the class.
+- Auto-detecting local time...
+- You will be RSVP'd for all selected dates.
+- Your spots are secured. Save the link below to join the classes at your local time.
 - "I've been attending Tom's Fun Fridays Public Speaking classes... The sessions have been helping me deliver messages and presentations in a more structured, clear and engaging way, while also building up my confidence in professional settings."
 - Each 60-minute session is a mix of improv agility, data-driven feedback, and famous script readings designed to break your speaking inhibitions.
 - Like Cards Against Humanity meets executive coaching. We use randomized prompts (e.g., combining a "Knowledgeable Professor" persona with a "Problem Options Solution" structure) to force you to structure your thoughts instantly without a script.
-- "Tom's ability to think on his feet and cater to my learning style is next level. Where was this kind of mentoring early in my learning journey?"
 - You will jump into breakout rooms to deliver your prompts. Instead of vague, subjective feedback, the Mic-Check App gives you an immediate scorecard grading your Pace, Pause Percentage, and Vocabulary Mix.
-- "Tom uses a structured and practical approach to identify my speaking habits. He breaks down the issues systematically and provides practical techniques."
 - To break out of a monotone comfort zone, we regularly practice performing intense, famous speeches (like *A Few Good Men* or *Any Given Sunday*). It teaches you how to confidently make bold volume and intensity choices under pressure.
-- "The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."
 - Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.
-- "I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services Hub
-- [BUTTON] 
-- [BUTTON] 
-- [BUTTON] RSVP Now
-- [A] Join Google Meet
-- [A] Join This Friday's Free Class
+- [BUTTON] Confirm Mass RSVP
+- [A] Join Google Meet Link
+- [BUTTON] Select Your Upcoming Classes
 
 ### Image Alt Text:
 - Tom Hendrick demonstrating Mic-Check Daily prompt cards
