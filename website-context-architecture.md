@@ -619,17 +619,17 @@
 
 **Headings:**
 - H1: Your Weekly Public Speaking Workout
-- H2: The Class Menu: What We Do Every Friday
-- H3: Thinking on Your Feet
-- H3: Measured Accountability
-- H3: De-Inhibiting the Voice
-- H3: Visualizing Transformation
 - H2: Fun Fridays
 - H3: Live Class RSVP
 - H3: Select Date
 - H3: Class Time
 - H3: Confirm Your Spot
 - H3: You're on the list!
+- H2: The Class Menu: What We Do Every Friday
+- H3: Thinking on Your Feet
+- H3: Measured Accountability
+- H3: De-Inhibiting the Voice
+- H3: Visualizing Transformation
 
 ---
 

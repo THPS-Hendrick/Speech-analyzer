@@ -394,6 +394,8 @@
 
 ### Body Text:
 - Join our "Fun Fridays" online classes. It is a modern, high-energy, and data-driven alternative to traditional speaking clubs. We pair you up to tackle gamified challenges using the Mic-Check App.
+- Auto-detected local time
+- Your spot is secured. Save the link below to join the class.
 - "I've been attending Tom's Fun Fridays Public Speaking classes... The sessions have been helping me deliver messages and presentations in a more structured, clear and engaging way, while also building up my confidence in professional settings."
 - Each 60-minute session is a mix of improv agility, data-driven feedback, and famous script readings designed to break your speaking inhibitions.
 - Like Cards Against Humanity meets executive coaching. We use randomized prompts (e.g., combining a "Knowledgeable Professor" persona with a "Problem Options Solution" structure) to force you to structure your thoughts instantly without a script.
@@ -404,16 +406,14 @@
 - "The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."
 - Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.
 - "I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."
-- Auto-detected local time
-- Your spot is secured. Save the link below to join the class.
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services Hub
-- [A] Join This Friday's Free Class
 - [BUTTON] 
 - [BUTTON] 
 - [BUTTON] RSVP Now
 - [A] Join Google Meet
+- [A] Join This Friday's Free Class
 
 ### Image Alt Text:
 - Tom Hendrick demonstrating Mic-Check Daily prompt cards
