@@ -225,19 +225,58 @@
 
             </div>
 
-            <!-- Single Strong Call to Action -->
-            <div id="join" class="bg-[#08331A] rounded-[2rem] p-8 md:p-14 text-center shadow-2xl border-t-4 border-brand-gold relative overflow-hidden max-w-4xl mx-auto">
-                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white/5 text-9xl pointer-events-none">
-                    <i class="fa-solid fa-users"></i>
+            <!-- NATIVE BOOKING WIDGET -->
+            <div id="join" class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden text-left max-w-4xl mx-auto flex flex-col md:flex-row mt-8">
+                
+                <!-- Left Panel -->
+                <div class="bg-emerald-50 p-6 md:p-8 md:w-1/3 md:border-r border-emerald-100 flex flex-col justify-center md:justify-start">
+                    <h2 class="text-emerald-700 font-bold uppercase tracking-wider text-xs mb-2">Fun Fridays</h2>
+                    <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 md:mb-4">Live Class RSVP</h3>
+                    <div class="flex flex-row md:flex-col gap-4 md:gap-3">
+                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-clock mr-2 text-emerald-500"></i> 60 Min</div>
+                        <div class="text-gray-600 flex items-center text-sm font-medium"><i class="fa-solid fa-users mr-2 text-emerald-500"></i> Group Session</div>
+                    </div>
                 </div>
-                
-                <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-4 relative z-10">Ready to Join the Community?</h3>
-                <p class="text-green-100 text-lg mb-8 max-w-2xl mx-auto relative z-10">Whether you are a nervous first-timer or an experienced speaker looking to stay sharp, the Friday lunchtime class is the perfect environment to practice.</p>
-                
-                <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-                    <a href="/contact.html" class="bg-brand-gold text-brand-dark font-extrabold text-lg py-4 px-10 rounded-full hover:bg-yellow-400 transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
-                        RSVP for Friday's Session <i class="fa-solid fa-envelope"></i>
-                    </a>
+
+                <!-- Right Panel -->
+                <div class="p-6 md:p-8 md:w-2/3 w-full bg-white relative min-h-[400px]">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
+                        <h3 class="text-lg font-bold text-slate-800" id="current-month-label">Select Date</h3>
+                        <div class="flex gap-2">
+                            <button id="btn-prev-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button id="btn-next-month" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div id="loading-state" class="absolute inset-0 bg-white/90 z-10 flex flex-col items-center justify-center text-brand-green">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                        <span class="text-sm font-bold uppercase tracking-wider">Syncing Schedule...</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 hidden" id="date-grid"></div>
+
+                    <div id="time-section" class="hidden">
+                        <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">Class Time</h3>
+                        <p class="text-xs text-brand-green font-medium mb-3" id="timezone-label">Auto-detected local time</p>
+                        <div class="grid grid-cols-1 gap-3 mb-6" id="time-grid"></div>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="booking-form" class="hidden bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                        <h3 class="font-extrabold text-slate-800 mb-4">Confirm Your Spot</h3>
+                        <input type="hidden" id="selected-iso" name="selectedIso">
+                        <input type="text" id="client-name" placeholder="First & Last Name" required class="w-full mb-3 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                        <input type="email" id="client-email" placeholder="Email Address" required class="w-full mb-4 p-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-brand-green bg-white">
+                        <button type="submit" id="submit-btn" class="w-full bg-brand-green text-white font-extrabold py-4 px-4 rounded-xl hover:bg-brand-dark transition-all shadow-sm flex justify-center items-center gap-2">RSVP Now <i class="fa-solid fa-check"></i></button>
+                    </form>
+
+                    <!-- Success -->
+                    <div id="success-message" class="hidden bg-emerald-50 text-brand-green p-8 rounded-2xl border border-emerald-200 text-center h-full flex flex-col justify-center items-center">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
+                        <h3 class="text-xl font-extrabold mb-2">You're on the list!</h3>
+                        <p class="text-sm font-medium text-emerald-800/80 mb-4">Your spot is secured. Save the link below to join the class.</p>
+                        <a id="dynamic-meet-link" href="#" target="_blank" class="text-sm font-bold bg-white px-4 py-2 rounded-lg shadow-sm border border-emerald-200 text-brand-dark hover:text-brand-green">Join Google Meet</a>
+                    </div>
                 </div>
             </div>
 
@@ -246,5 +285,137 @@
 
     <!-- INJECT_FOOTER -->
 
+    <!-- Frontend Local Time Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let slotsData = [];
+            let currentDate = new Date(); 
+            const maxLookaheadMonths = 3; 
+
+            // Auto-detect timezone
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('timezone-label').innerText = `Showing times in your local timezone (${userTimezone})`;
+
+            const btnPrev = document.getElementById('btn-prev-month');
+            const btnNext = document.getElementById('btn-next-month');
+            const monthLabel = document.getElementById('current-month-label');
+            const loadingState = document.getElementById('loading-state');
+            const dateGrid = document.getElementById('date-grid');
+            const timeSection = document.getElementById('time-section');
+            const bookingForm = document.getElementById('booking-form');
+
+            updateMonthLabel();
+            fetchMonthSlots();
+
+            btnPrev.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); updateMonthLabel(); fetchMonthSlots(); });
+            btnNext.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); updateMonthLabel(); fetchMonthSlots(); });
+
+            function updateMonthLabel() {
+                monthLabel.innerText = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const now = new Date();
+                btnPrev.disabled = (currentDate.getMonth() === now.getMonth() && currentDate.getFullYear() === now.getFullYear());
+                const maxDate = new Date();
+                maxDate.setMonth(now.getMonth() + maxLookaheadMonths);
+                btnNext.disabled = (currentDate >= maxDate);
+            }
+
+            async function fetchMonthSlots() {
+                loadingState.classList.remove('hidden');
+                dateGrid.classList.add('hidden');
+                timeSection.classList.add('hidden');
+                bookingForm.classList.add('hidden');
+                
+                try {
+                    const res = await fetch(`/api/get-class-slots?month=${currentDate.getMonth()}&year=${currentDate.getFullYear()}`);
+                    const data = await res.json();
+                    if (!data.success) {
+                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-red-600 text-sm font-bold">API Error: ${data.error}</div>`;
+                    } else if (!data.slots.length) {
+                        dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm font-medium">No upcoming classes found for this month.</div>`;
+                    } else {
+                        slotsData = data.slots;
+                        renderDates();
+                    }
+                } catch (err) {
+                    dateGrid.innerHTML = `<div class="col-span-full text-center py-8 text-red-500 text-sm font-medium">Failed to sync schedule. Please refresh.</div>`;
+                } finally {
+                    loadingState.classList.add('hidden');
+                    dateGrid.classList.remove('hidden');
+                }
+            }
+
+            function renderDates() {
+                dateGrid.innerHTML = '';
+                slotsData.forEach((slot, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `border rounded-xl p-3 text-center text-sm font-bold transition-all ${index === 0 ? 'border-brand-green bg-emerald-50 text-brand-dark' : 'border-gray-200 text-gray-600'}`;
+                    btn.innerHTML = slot.date.replace(',', '<br>');
+                    btn.onclick = () => selectDate(slot, btn);
+                    dateGrid.appendChild(btn);
+                });
+                if (slotsData.length > 0) selectDate(slotsData[0], dateGrid.firstChild);
+            }
+
+            function selectDate(slot, clickedBtn) {
+                document.querySelectorAll('#date-grid button').forEach(b => b.className = 'border border-gray-200 text-gray-600 rounded-xl p-3 text-center text-sm font-bold transition-all');
+                clickedBtn.className = 'border border-brand-green bg-emerald-50 text-brand-dark rounded-xl p-3 text-center text-sm font-bold';
+                
+                timeSection.classList.remove('hidden');
+                bookingForm.classList.add('hidden');
+                const timeGrid = document.getElementById('time-grid');
+                timeGrid.innerHTML = '';
+
+                // NATIVE TIMEZONE TRANSLATION
+                const localTimeStr = new Date(slot.iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'border border-brand-green py-3 rounded-xl font-bold transition-all text-sm bg-brand-green text-white shadow-md';
+                btn.innerText = localTimeStr;
+                
+                document.getElementById('selected-iso').value = slot.iso;
+                bookingForm.classList.remove('hidden');
+                timeGrid.appendChild(btn);
+            }
+
+            bookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Securing Spot...';
+
+                try {
+                    const res = await fetch('/api/book-class', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: document.getElementById('client-name').value,
+                            email: document.getElementById('client-email').value,
+                            selectedIso: document.getElementById('selected-iso').value
+                        })
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        bookingForm.classList.add('hidden');
+                        dateGrid.classList.add('hidden');
+                        timeSection.classList.add('hidden');
+                        document.querySelector('.flex.justify-between.items-center.mb-4').classList.add('hidden');
+                        document.getElementById('dynamic-meet-link').href = result.meetLink;
+                        document.getElementById('success-message').classList.remove('hidden');
+                    } else {
+                        alert('RSVP failed: ' + result.error);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'RSVP Now <i class="fa-solid fa-check"></i>';
+                    }
+                } catch (err) {
+                    alert('An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'RSVP Now <i class="fa-solid fa-check"></i>';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
