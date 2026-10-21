@@ -1,5 +1,5 @@
 const { google } = require('googleapis');
-process.env.TZ = 'Australia/Adelaide'; // Force server into Adelaide time
+process.env.TZ = 'Australia/Adelaide'; 
 
 module.exports = async function handler(req, res) {
     const oauth2Client = new google.auth.OAuth2(
@@ -14,18 +14,10 @@ module.exports = async function handler(req, res) {
         const timeZone = 'Australia/Adelaide';
         const now = new Date(); 
         
-        let targetMonth = req.query.month ? parseInt(req.query.month) : now.getMonth();
-        let targetYear = req.query.year ? parseInt(req.query.year) : now.getFullYear();
-
-        const isCurrentMonth = (targetMonth === now.getMonth() && targetYear === now.getFullYear());
-        const timeMin = isCurrentMonth ? now : new Date(targetYear, targetMonth, 1);
-        const timeMax = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59);
-
-        const maxAllowedDate = new Date(now);
-        maxAllowedDate.setMonth(now.getMonth() + 3);
-        if (timeMin > maxAllowedDate) {
-            return res.status(200).json({ success: true, slots: [] });
-        }
+        // Define a 90-day window to ensure we can find 10 Fridays even if you block a few out
+        const timeMin = new Date(now);
+        const timeMax = new Date(now);
+        timeMax.setDate(timeMax.getDate() + 90);
 
         const freeBusyResponse = await calendar.freebusy.query({
             requestBody: {
@@ -41,7 +33,9 @@ module.exports = async function handler(req, res) {
         let currentDay = new Date(timeMin);
         currentDay.setHours(0, 0, 0, 0); 
         
-        while (currentDay <= timeMax) {
+        // Loop until we collect exactly 10 classes, or we hit the 90-day cap
+        while (availableSlots.length < 10 && currentDay <= timeMax) {
+            
             // STRICTLY FRIDAYS ONLY (5 is Friday)
             if (currentDay.getDay() === 5) {
                 let slotStart = new Date(currentDay);
@@ -59,7 +53,6 @@ module.exports = async function handler(req, res) {
 
                     if (!isBusy) {
                         availableSlots.push({
-                            // Pass the raw date so the frontend can manipulate it
                             date: slotStart.toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' }),
                             iso: slotStart.toISOString() 
                         });
