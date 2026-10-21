@@ -90,31 +90,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- MIC-CHECK APP DEPENDENCIES -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    
+    <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/report-scoring-matrix.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    
+    <!-- Required Components Only -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/timer-med.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/upload-med.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-timeline.js"></script>
+
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes ring-pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.4); opacity: 0; }
-            100% { transform: scale(1); opacity: 0; }
-        }
-        .mic-ring-anim::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 4px solid #3b82f6;
-            animation: ring-pulse 1.5s infinite ease-out;
-        }
 
-        /* App-like transitions */
-        .app-slide-up {
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        /* Prevents components from showing the X close button or grab cursor */
+        .thps-close-btn { display: none !important; }
+        .cursor-move { cursor: default !important; }
+        
+        /* Carousel Track Animation */
+        #carousel-track {
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
     </style>
 
@@ -131,7 +134,7 @@
         }
     </script>
 </head>
-<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative">
 
     <!-- INJECT_HEADER -->
 
@@ -152,27 +155,16 @@
                 </p>
             </header>
 
-            <!-- INTERACTIVE HERO: RECORDING WIDGET -->
-            <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl mb-24 relative overflow-hidden flex flex-col items-center">
-                <div class="text-center font-bold text-xs uppercase tracking-widest text-slate-400 mb-8">Baseline Assessment</div>
-                
-                <!-- Mic Button -->
-                <div class="flex justify-center items-center mb-8 relative w-40 h-40">
-                    <svg class="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#f1f5f9" stroke-width="6"></circle>
-                        <circle id="recording-progress" cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="6" stroke-dasharray="283" stroke-dashoffset="283" class="transition-all duration-1000 ease-linear"></circle>
-                    </svg>
-                    <button id="btn-start-record" class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg relative cursor-pointer hover:bg-blue-700 transition-colors z-10">
-                        <i id="mic-icon" class="fa-solid fa-microphone text-3xl"></i>
-                    </button>
+            <!-- INTERACTIVE HERO: NEW LAUNCH BUTTON -->
+            <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-[2rem] p-10 shadow-xl mb-24 relative overflow-hidden flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                    <i class="fa-solid fa-microphone text-3xl text-blue-600"></i>
                 </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Baseline Assessment</h3>
+                <p class="text-sm text-slate-500 mb-8 leading-relaxed">Launch the free demo below to record your voice and generate your immediate acoustic report.</p>
                 
-                <div id="recording-status" class="text-center font-extrabold text-2xl text-slate-800 tracking-tight mb-2">Tap to Start</div>
-                <p id="recording-subtext" class="text-sm text-slate-500 text-center mb-6">Speak for 5 seconds to generate your report.</p>
-
-                <!-- Hidden Report Button -->
-                <button id="btn-view-report" class="hidden w-full bg-brand-green text-white font-extrabold py-4 px-6 rounded-full hover:bg-brand-dark transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-2">
-                    Click here to see your voice report <i class="fa-solid fa-expand"></i>
+                <button onclick="launchApp()" class="w-full bg-blue-600 text-white font-extrabold text-lg py-5 px-6 rounded-xl hover:bg-blue-700 transition-transform transform hover:-translate-y-1 shadow-lg flex items-center justify-center gap-3">
+                    Launch Mic-Check App
                 </button>
             </div>
 
@@ -299,270 +291,258 @@
         </div>
     </main>
 
-    <!-- FULLSCREEN MOBILE APP OVERLAY (POC) -->
-    <div id="fullscreen-app-overlay" class="fixed inset-0 z-[100] bg-slate-100 hidden flex-col w-full h-full">
+    <!-- INJECT_FOOTER -->
+
+
+    <!-- ========================================== -->
+    <!-- MIC-CHECK APP SHELL (HIDDEN UNTIL LAUNCHED) -->
+    <!-- ========================================== -->
+
+    <!-- Hidden Textarea for component communication -->
+    <textarea id="cba-inputText" class="hidden"></textarea>
+
+    <div id="app-shell" class="hidden fixed inset-0 z-[9999] bg-slate-100 flex flex-col overflow-hidden text-left">
         
-        <!-- App Header (Navbar) -->
-        <div class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-4 flex-shrink-0 shadow-sm">
+        <!-- App Header & Close Button -->
+        <header class="bg-white shadow-sm px-4 py-3 flex justify-between items-center z-10 shrink-0">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></div>
-                <span class="font-black text-slate-800 tracking-tight">Mic-Check Report</span>
+                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-bold text-slate-800 tracking-wide uppercase text-sm m-0">Mic-Check Demo</h2>
             </div>
+            <button onclick="closeApp()" class="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-200 p-2 rounded-full transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                Exit <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </header>
+
+        <!-- CSS CAROUSEL CONTAINER (400vw width for 4 slides) -->
+        <div id="carousel-track" class="flex h-full w-[400vw]">
             
-            <!-- Navigation Controls -->
-            <div class="flex items-center gap-3">
-                <button id="app-prev" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-chevron-left"></i></button>
-                <span id="app-page-indicator" class="text-[10px] font-bold text-slate-500 tracking-widest uppercase w-16 text-center">1 of 5</span>
-                <button id="app-next" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-chevron-right"></i></button>
-                <div class="w-px h-6 bg-slate-300 mx-1"></div>
-                <button id="btn-close-app" class="text-slate-400 hover:text-red-500 px-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- SLIDE 1: INPUT -->
+            <div class="w-[100vw] h-full flex flex-col items-center p-4 md:p-8 overflow-y-auto pb-24">
+                <div class="w-full max-w-lg space-y-6">
+                    <div class="text-center mb-6">
+                        <span class="text-xs font-black uppercase tracking-widest text-blue-600 mb-1 block">Step 1</span>
+                        <h3 class="text-2xl font-bold text-slate-800 m-0">Capture Your Voice</h3>
+                        <p class="text-sm text-slate-500 mt-2">Use the Live Timer for unscripted practice, or upload an audio file to analyze an existing speech.</p>
+                    </div>
+
+                    <thps-timer-med></thps-timer-med>
+                    
+                    <div class="flex items-center justify-center gap-4 text-slate-300 font-bold text-xs uppercase my-2">
+                        <span class="w-12 h-px bg-slate-200"></span> OR <span class="w-12 h-px bg-slate-200"></span>
+                    </div>
+
+                    <thps-upload-speech-med></thps-upload-speech-med>
+
+                    <!-- Hidden Analyze Button (Triggered by JS when data is ready) -->
+                    <button id="btn-analyze" onclick="goToSlide(1)" class="opacity-0 pointer-events-none w-full mt-6 bg-emerald-600 text-white font-extrabold text-lg py-4 px-6 rounded-xl hover:bg-emerald-700 transition-all shadow-lg flex items-center justify-center gap-2 transform translate-y-4">
+                        Analyze My Speech <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <!-- Snap Carousel Container -->
-        <div class="flex-1 w-full max-w-md mx-auto relative overflow-hidden bg-slate-100">
-            <div id="app-carousel" class="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth">
-                
-                <!-- SLIDE 1: OVERVIEW -->
-                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-2">Total Grade / 100</div>
-                        <div class="text-7xl font-extrabold text-slate-900 tracking-tighter mb-1">98.5</div>
-                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">+9 Green Bonuses</span>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
+            <!-- SLIDE 2: SCORE SUMMARY -->
+            <div class="w-[100vw] h-full flex flex-col items-center p-4 md:p-8 overflow-y-auto pb-24">
+                <div class="w-full max-w-2xl">
+                    <div class="flex justify-between items-center mb-4">
                         <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Runtime Average</div>
-                            <div class="text-3xl font-extrabold text-indigo-600">4.2<span class="text-lg">s</span></div>
+                            <span class="text-xs font-black uppercase tracking-widest text-emerald-600 mb-1 block">Step 2</span>
+                            <h3 class="text-xl md:text-2xl font-bold text-slate-800 m-0">Performance Metrics</h3>
                         </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 3-6s</div>
-                            <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden flex"><div class="w-1/3 bg-transparent"></div><div class="w-1/3 bg-indigo-500 rounded-full"></div></div>
-                        </div>
+                        <button onclick="goToSlide(2)" class="bg-slate-800 text-white text-xs font-bold uppercase tracking-widest py-2 px-4 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2 shadow-sm">
+                            Next: Timeline <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
                     </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Speaking Pace</div>
-                            <div class="text-3xl font-extrabold text-blue-600">132 <span class="text-xs text-slate-400">WPM</span></div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 100-150</div>
-                            <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="w-[60%] h-full bg-blue-500 rounded-full"></div></div>
-                        </div>
-                    </div>
+                    <thps-score-summary></thps-score-summary>
                 </div>
-
-                <!-- SLIDE 2: CONTENT -->
-                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Personal Balance</div>
-                        <div class="flex items-end gap-1 mb-4">
-                            <div class="text-5xl font-extrabold text-slate-700 tracking-tighter">34<span class="text-2xl">%</span></div>
-                        </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
-                            <div class="absolute left-[30%] right-[40%] top-0 bottom-0 bg-green-50 rounded-full border-x border-green-200"></div>
-                            <div class="absolute top-0 bottom-0 left-0 w-[34%] bg-slate-500 rounded-full"></div>
-                        </div>
-                        <div class="flex justify-between text-[9px] font-bold text-slate-400 uppercase mt-1"><span>0</span><span>Target 30-60%</span><span>100</span></div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Visual Balance</div>
-                        <div class="flex items-end gap-1 mb-4">
-                            <div class="text-5xl font-extrabold text-emerald-500 tracking-tighter">28<span class="text-2xl">%</span></div>
-                        </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
-                            <div class="absolute left-[20%] right-[50%] top-0 bottom-0 bg-green-50 rounded-full border-x border-green-200"></div>
-                            <div class="absolute top-0 bottom-0 left-0 w-[28%] bg-emerald-500 rounded-full"></div>
-                        </div>
-                        <div class="flex justify-between text-[9px] font-bold text-slate-400 uppercase mt-1"><span>0</span><span>Target 20-50%</span><span>100</span></div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Intangible Jargon</div>
-                            <div class="text-3xl font-extrabold text-rose-500">38<span class="text-lg">%</span></div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: < 30%</div>
-                            <span class="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">High</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 3: DELIVERY & NEW RUNTIME CONSISTENCY -->
-                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Mumble Meter (SPS)</div>
-                            <div class="text-3xl font-extrabold text-blue-600">3.8 <span class="text-xs text-slate-400">Syllables/s</span></div>
-                        </div>
-                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Optimal</span>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Pause Percentage</div>
-                            <div class="text-3xl font-extrabold text-indigo-600">22<span class="text-lg">%</span></div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 15-35%</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-4">Runtime Consistency</div>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="text-xs font-bold text-slate-700"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Optimal (3-6s)</div>
-                                <div class="text-sm font-black text-slate-900">14 Runs</div>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="w-[73%] h-full bg-emerald-500"></div></div>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></span>Choppy (<3s)</div>
-                                <div class="text-sm font-black text-slate-600">3 Runs</div>
-                            </div>
-                            <div class="flex items-center justify-between pt-1">
-                                <div class="text-xs font-bold text-slate-500"><span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></span>Rushing (>6s)</div>
-                                <div class="text-sm font-black text-slate-600">2 Runs</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 4: SIMPLICITY -->
-                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-3">Comprehension Grade</div>
-                        <div class="flex items-end gap-1 mb-4">
-                            <div class="text-5xl font-extrabold text-teal-600 tracking-tighter">7.4</div>
-                        </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full relative mb-1">
-                            <div class="absolute top-0 bottom-0 left-0 w-[60%] bg-teal-500 rounded-full"></div>
-                        </div>
-                        <div class="text-[9px] font-bold text-slate-400 uppercase mt-2">Target Grade: 5.0 - 10.0</div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-1">Simple Language</div>
-                            <div class="text-3xl font-extrabold text-cyan-600">86<span class="text-lg">%</span></div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-slate-400 font-bold mb-1">TARGET: 80-90%</div>
-                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Optimal</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 5: TRANSCRIPT -->
-                <div class="min-w-full h-full snap-center px-2 py-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex-grow flex flex-col">
-                        <div class="font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-4 flex justify-between items-center">
-                            <span>Transcript Preview</span>
-                            <span class="text-blue-500 bg-blue-50 px-2 py-1 rounded"><i class="fa-solid fa-pen"></i> Edit</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl text-sm leading-relaxed text-slate-700 flex-grow border border-slate-100 font-medium">
-                            <span class="text-blue-600 font-bold">I</span> think <span class="text-blue-600 font-bold">we</span> need to <span class="text-red-500 font-bold underline decoration-2 underline-offset-4">look</span> at the <span class="text-red-500 font-bold">big picture</span> here. <span class="text-blue-600 font-bold">He</span> <span class="text-red-500 font-bold">walked</span> into the <span class="text-red-500 font-bold">room</span> and immediately started talking about the quarterly projections. <span class="text-purple-600 font-bold">I saw</span> exactly what was happening...
-                        </div>
-                        <div class="mt-4 flex flex-wrap gap-4 text-xs font-bold text-slate-500">
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-blue-500 mr-1"></span>Personal</span>
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-red-500 mr-1"></span>Visual</span>
-                            <span><span class="w-2 h-2 inline-block rounded-full bg-purple-500 mr-1"></span>Both</span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
+            <!-- SLIDE 3: VOICE TIMELINE -->
+            <div class="w-[100vw] h-full flex flex-col items-center p-4 md:p-8 overflow-y-auto pb-24">
+                <div class="w-full max-w-4xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <span class="text-xs font-black uppercase tracking-widest text-blue-600 mb-1 block">Step 3</span>
+                            <h3 class="text-xl md:text-2xl font-bold text-slate-800 m-0">Acoustic Telemetry</h3>
+                        </div>
+                        <button onclick="goToSlide(3)" class="bg-blue-600 text-white text-xs font-bold uppercase tracking-widest py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
+                            Unlock Pro <i data-lucide="unlock" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <thps-voice-timeline></thps-voice-timeline>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: UPSELL (MIC-CHECK PRO) -->
+            <div class="w-[100vw] h-full flex flex-col items-center justify-center p-4 md:p-8 bg-slate-900 overflow-y-auto">
+                <div class="w-full max-w-md text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl rotate-3">
+                        <i data-lucide="crown" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-white mb-4 tracking-tight">Stop Guessing.<br>Start Measuring.</h3>
+                    <p class="text-slate-400 mb-8 leading-relaxed">
+                        You've seen the baseline. Now unlock your full potential. Join Mic-Check Pro to save your session history, track your progress graphs, unlock the AI Vocal Coach, and access all 16 advanced metrics.
+                    </p>
+                    <a href="/members/signup.html" class="block w-full bg-blue-600 text-white font-extrabold text-lg py-4 px-6 rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-900/50 mb-4">
+                        Get Mic-Check Pro
+                    </a>
+                    <button onclick="goToSlide(0)" class="text-slate-500 text-sm font-bold hover:text-slate-300 transition-colors mt-4">
+                        <i data-lucide="arrow-left" class="w-4 h-4 inline align-text-bottom"></i> Back to Free Demo
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- INJECT_FOOTER -->
+    <!-- Processing Panel Overlay -->
+    <div id="cba-processing-panel" class="hidden fixed inset-0 z-[10000] bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center px-4 transition-all duration-300">
+        <div class="p-8 rounded-2xl border-t-4 border-blue-500 shadow-2xl bg-white flex flex-col items-center max-w-sm w-full">
+            <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin mb-4"></i>
+            <h2 class="text-xl font-black uppercase tracking-widest text-slate-800 text-center m-0">Analyzing...</h2>
+            <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Processing acoustic metrics.</p>
+        </div>
+    </div>
 
-    <!-- UI INTERACTION SCRIPTS -->
+    <!-- APP SHELL LOGIC & MATH ENGINE -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Hero Teaser Logic ---
-            const recordBtn = document.getElementById('btn-start-record');
-            const recordingProgress = document.getElementById('recording-progress');
-            const recordingStatus = document.getElementById('recording-status');
-            const recordingSubtext = document.getElementById('recording-subtext');
-            const viewReportBtn = document.getElementById('btn-view-report');
-            const micIcon = document.getElementById('mic-icon');
+        lucide.createIcons();
+        window.isActive = false;
+        
+        // --- PAGINATION / APP SHELL LOGIC ---
+        function launchApp() {
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.getElementById('app-shell').classList.remove('hidden');
+            goToSlide(0);
+        }
 
-            recordBtn.addEventListener('click', () => {
-                recordBtn.disabled = true;
-                recordBtn.classList.add('mic-ring-anim', 'bg-rose-600');
-                recordBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                
-                recordingStatus.innerText = "Listening...";
-                recordingSubtext.innerText = "Analyzing acoustic telemetry...";
-                recordingProgress.style.strokeDashoffset = "0";
-                
-                setTimeout(() => {
-                    recordBtn.classList.remove('mic-ring-anim', 'bg-rose-600');
-                    recordBtn.classList.add('bg-slate-200', 'text-slate-400');
-                    micIcon.classList.replace('fa-microphone', 'fa-check');
-                    
-                    recordingStatus.innerText = "Analysis Complete";
-                    recordingSubtext.classList.add('hidden');
-                    
-                    viewReportBtn.classList.remove('hidden');
-                    viewReportBtn.classList.add('app-slide-up');
-                }, 5000);
-            });
+        function closeApp() {
+            document.body.style.overflow = ''; // Restore background scrolling
+            document.getElementById('app-shell').classList.add('hidden');
+            goToSlide(0);
+            const btnAnalyze = document.getElementById('btn-analyze');
+            btnAnalyze.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            btnAnalyze.classList.remove('opacity-100', 'translate-y-0');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl) hiddenEl.value = '';
+        }
 
-            // --- Fullscreen App Logic ---
-            const appOverlay = document.getElementById('fullscreen-app-overlay');
-            const closeAppBtn = document.getElementById('btn-close-app');
+        function goToSlide(slideIndex) {
+            const track = document.getElementById('carousel-track');
+            track.style.transform = `translateX(-${slideIndex * 100}vw)`;
+        }
+
+        // --- UX REVEAL LOGIC ---
+        window.addEventListener('thps-dashboard-update', (e) => {
+            const payload = e.detail;
+            const btnAnalyze = document.getElementById('btn-analyze');
+            if (payload && (payload.text?.trim() !== '' || payload.time > 0)) {
+                btnAnalyze.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                btnAnalyze.classList.add('opacity-100', 'translate-y-0');
+            }
+        });
+
+        // --- MATH ENGINE LOGIC ---
+        window.getMetricPoints = function(key, val) {
+            const limits = {
+                personal: [10, 30, 60, 80], visual: [10, 20, 50, 60], intangible: [5, 10, 30, 50],
+                wpm: [85, 100, 150, 170], sps: [3.0, 3.5, 4.5, 5.0], pause: [9, 15, 35, 41],
+                runtime: [2.0, 3.0, 6.0, 9.0], grade: [4.0, 5.0, 10.0, 12.0], simple: [70, 80, 90, 96]
+            };
+            if (!limits[key] || val === undefined || val === null) return 0;
+            let [minOuter, minGreen, maxGreen, maxOuter] = limits[key];
+            if (val >= minGreen && val <= maxGreen) return 10;
+            if (val <= minOuter || val >= maxOuter) return 0;
+            if (val > minOuter && val < minGreen) return ((val - minOuter) / (minGreen - minOuter)) * 10;
+            if (val > maxGreen && val < maxOuter) return (1 - ((val - maxGreen) / (maxOuter - maxGreen))) * 10;
+            return 0;
+        };
+
+        window.analyze = function() {
+            try { if (!window.THPS || !window.THPS.NLP) return; } catch(e) { return; }
+            if (!window.THPS.NLP.dictsLoaded) return;
             
-            viewReportBtn.addEventListener('click', () => {
-                appOverlay.classList.remove('hidden');
-                appOverlay.classList.add('flex');
-                
-                if (appOverlay.requestFullscreen) {
-                    appOverlay.requestFullscreen().catch(err => {
-                        console.log("Fullscreen API blocked, using fixed overlay instead.");
-                    });
-                }
-                updatePagination(); 
-            });
-
-            closeAppBtn.addEventListener('click', () => {
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                }
-                appOverlay.classList.add('hidden');
-                appOverlay.classList.remove('flex');
-            });
-
-            // --- Fullscreen Carousel Pagination Logic ---
-            const carousel = document.getElementById('app-carousel');
-            const prevBtn = document.getElementById('app-prev');
-            const nextBtn = document.getElementById('app-next');
-            const pageIndicator = document.getElementById('app-page-indicator');
+            let text = "";
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl) text = hiddenEl.value.trim();
             
-            const updatePagination = () => {
-                const itemWidth = carousel.offsetWidth; 
-                const currentPage = Math.round(carousel.scrollLeft / itemWidth) + 1;
-                const totalPages = carousel.children.length;
-                pageIndicator.innerText = `${currentPage} of ${totalPages}`;
+            if (!text) {
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
+                return;
+            }
+
+            let timestamps = []; let volumeData = []; let elapsedSecs = 0;
+            if (window.THPS.Audio) {
+                if (window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) timestamps = window.THPS.Audio.wordTimestamps;
+                if (window.THPS.Audio.volumeData) volumeData = window.THPS.Audio.volumeData;
+                elapsedSecs = window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
+            }
+            
+            let masterData = {};
+            if (typeof window.THPS.NLP.analyzeSpeech === 'function') {
+                masterData = window.THPS.NLP.analyzeSpeech(text, timestamps, volumeData, elapsedSecs);
+            } else {
+                masterData = window.THPS.NLP.analyzeTranscript(text, timestamps);
+            }
+
+            const { numWords = 0, numSentences = 0, totalSyllables = 0, letterCount = 0, complexWordCount = 0, personalCount = 0, visualCount = 0, unifiedSimpleCount = 0, wordTimestamps = [] } = masterData;
+
+            const mumbleScore = masterData.mumbleScore || 0;
+            const avgWpm = masterData.wpm || 0;
+            const pausePercent = masterData.pausePercent || 0;
+            let coreSimpleScore = numWords > 0 ? Math.round((unifiedSimpleCount / numWords) * 100) : 0;
+            
+            let avgGrade = 0; let readability = null;
+            if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
+                 readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
+                 avgGrade = readability.avgGrade;
+            }
+
+            let personalPercent = numWords > 0 ? Math.round((personalCount / numWords) * 100) : 0;
+            let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
+            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+
+            let totalPoints = 0; let greenCount = 0;
+            let finalRuntime = masterData.runtime || 0;
+
+            const scoreKeys = [
+                {k: 'personal', v: personalPercent}, {k: 'visual', v: visualPercent}, {k: 'intangible', v: intangiblePercent}, 
+                {k: 'wpm', v: avgWpm}, {k: 'sps', v: mumbleScore}, {k: 'pause', v: pausePercent}, 
+                {k: 'runtime', v: finalRuntime}, {k: 'grade', v: avgGrade}, {k: 'simple', v: coreSimpleScore}
+            ];
+
+            scoreKeys.forEach(metric => {
+                let pts = window.getMetricPoints(metric.k, metric.v);
+                totalPoints += pts;
+                if (pts === 10) greenCount++;
+            });
+
+            let greenScore = (greenCount === 9) ? 10 : greenCount;
+            totalPoints += greenScore;
+
+            const payload = { 
+                sps: mumbleScore, wpm: avgWpm, grade: avgGrade, time: elapsedSecs, personal: personalPercent, 
+                visual: visualPercent, text: text, wordTimestamps: wordTimestamps, volumeData: volumeData, 
+                pause: pausePercent, intangible: intangiblePercent, runtime: finalRuntime, simple: coreSimpleScore, 
+                totalPoints: totalPoints, greenScore: greenScore, recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
+                volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
+                volumeLabels: masterData.volumeLabels || [],
+                volumeChunks: masterData.volumeChunks || [],
+                runPaces: masterData.runPaces || []
             };
 
-            carousel.addEventListener('scroll', updatePagination);
+            window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
+        };
 
-            nextBtn.addEventListener('click', () => {
-                carousel.scrollBy({ left: carousel.offsetWidth, behavior: 'smooth' });
-            });
+        window.onload = () => {
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
+                window.THPS.NLP.loadDictionaries();
+            }
+        };
 
-            prevBtn.addEventListener('click', () => {
-                carousel.scrollBy({ left: -carousel.offsetWidth, behavior: 'smooth' });
-            });
-            
-            window.addEventListener('resize', updatePagination);
-        });
+        window.explanationsData = {}; window.explain = function(term) { return; };
     </script>
 </body>
 </html>
