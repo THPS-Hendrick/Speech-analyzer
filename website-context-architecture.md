@@ -785,7 +785,7 @@
 
 ## File: /website/services/thps-speech-assessment.html
 
-**Title:** Free THPS Speech Assessment | Data-Driven Communication Diagnostic
+**Title:** Book Your Free THPS Speech Assessment | Tom Hendrick
 
 **Schema 1:**
 ```json
@@ -825,30 +825,30 @@
           "description": "A 5-step data-driven acoustic and cognitive diagnostic to measure presentation anxiety, unscripted fluency, and vocal inhibition.",
           "provider": {
             "@type": "Person",
-            "@id": "https://tomhendrick.com/about.html#author",
             "name": "Tom Hendrick",
             "jobTitle": "Speech Biomechanics Specialist & Public Speaking Coach",
-            "url": "https://tomhendrick.com/about.html",
-            "sameAs": [
-              "https://www.linkedin.com/in/tomhendrick-publicspeaking"
-            ]
+            "url": "https://tomhendrick.com/about.html"
           },
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "AUD"
-          }
-        },
-        {
-          "@type": "SoftwareApplication",
-          "@id": "https://tomhendrick.com/services/mic-check-app.html#software",
-          "name": "Mic-Check Speech Analyzer",
-          "operatingSystem": "Web-Based Browser App",
-          "applicationCategory": "EducationalApplication",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "AUD"
+          },
+          "potentialAction": {
+            "@type": "ReserveAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://tomhendrick.com/services/thps-speech-assessment.html",
+              "inLanguage": "en-US",
+              "actionPlatform": [
+                "http://schema.org/DesktopWebPlatform",
+                "http://schema.org/MobileWebPlatform"
+              ]
+            },
+            "result": {
+              "@type": "Reservation",
+              "name": "THPS Speech Assessment Booking"
+            }
           }
         },
         {
@@ -867,14 +867,13 @@
 ```
 
 **Headings:**
-- H1: Stop Guessing. Start Measuring.
-- H3: The SAMS Test (Sympathetic Adreno-medullary System)
-- H3: The VVIQ (Vividness of Visual Imagery Questionnaire)
-- H3: The Vocal Inhibition Test
-- H3: The Image-Based Speaking Test
-- H3: The Rules-Based Speaking Test
-- H3: Your Blueprint for Effortless Speaking
-- H3: Ready to Map Your Metrics?
+- H1: Book Your Free THPS Speech Assessment
+- H2: Tom Hendrick
+- H3: 1-Hour Diagnostic
+- H3: Select Date
+- H3: Available Times
+- H3: Confirm Details
+- H3: Booking Confirmed!
 
 ---
 

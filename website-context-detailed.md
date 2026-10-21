@@ -484,21 +484,12 @@
 
 ### Body Text:
 - Nerves can strip away your speaking skills under pressure. Discover exactly why your delivery breaks down—and how to fix it—with a free 1-hour acoustic and cognitive baseline diagnostic.
-- Test a live preview of the acoustic telemetry software used during your assessment.
-- Capable professionals often know their material intimately but find preparing for presentations exhausting. Over-relying on clunky scripts takes away natural delivery, while speaking unscripted brings the fear of going off-track or blanking completely.
-- The THPS Speech Assessment replaces subjective feedback with clinical, data-driven insights. Before you book a Performance Plan, we spend 1 hour (online or in-person) running you through 5 core diagnostic tests to map your unique communication gaps.
-- Pinpoint exactly when and why your body triggers presentation anxiety. By measuring your neuro-hormonal response to speaking cues, we identify your specific Preparation Dysregulation gap compared to hundreds of benchmarked executives.
-- Discover why memorizing clunky scripts is holding you back. We plot your cognitive imagery profile on the spectrum from Aphantasia to Hyperphantasia, revealing whether your brain relies on vivid visual concepts or rigid structural rules when speaking off-the-cuff.
-- Measure the psychological blocks causing a monotone delivery under pressure. You will attempt to deliver a script using extreme vocal ranges (fast, slow, loud, quiet). This benchmarks your ability to modulate pitch and volume on command, identifying your exact Vocal Inhibition Gap.
-- Benchmark your natural ability to speak vividly. Using the Mic-Check App, we capture your baseline Words Per Minute (WPM) and visual descriptor percentages when prompted solely by imagery or imagination, measuring your core fluency strengths.
-- Find out exactly when your speaking fluency breaks down. We impose progressive constraints across 6 rounds of questioning to test how quickly you lose composure under complex Q&A rules and high cognitive load.
-- The resulting data from your free assessment allows us to build your highly personalized 4-week Performance Plan. By integrating targeted rules, progressive constraints, and daily tracking via the Mic-Check App, we close your exact gaps so you can speak with composure under immense pressure.
-- "The initial assessment revealed a massive rules-based communication gap I didn't even know I had. Measuring my WPM in real time completely changed how I approach hostile Q&A."
-- Book your free 1-hour session online or in-person at our Adelaide clinic.
+- A Google Meet invitation has been securely dispatched to your email address.
 
 ### Interactables (Links/Buttons):
-- [A] Performance Plan
-- [A] Book Your Free Assessment
+- [BUTTON] 
+- [BUTTON] 
+- [BUTTON] Confirm Booking
 
 ### Image Alt Text:
 
