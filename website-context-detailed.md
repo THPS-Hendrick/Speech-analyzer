@@ -404,12 +404,16 @@
 - "The course definitely pushed me outside my comfort zone, but at every step I felt supported, guided, and encouraged."
 - Stop wondering how you sound. Our Voice Timeline feature maps your exact delivery. See yourself transform from quiet, hesitant blue blocks into loud, passionate, and commanded red intensity bars in real-time.
 - "I've never seen what my voice and speaking habits under pressure look like... I am amazed by the rapid improvement in my speaking and confidence."
-- Whether you are a nervous first-timer or an experienced speaker looking to stay sharp, the Friday lunchtime class is the perfect environment to practice.
+- Auto-detected local time
+- Your spot is secured. Save the link below to join the class.
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services Hub
 - [A] Join This Friday's Free Class
-- [A] RSVP for Friday's Session
+- [BUTTON] 
+- [BUTTON] 
+- [BUTTON] RSVP Now
+- [A] Join Google Meet
 
 ### Image Alt Text:
 - Tom Hendrick demonstrating Mic-Check Daily prompt cards

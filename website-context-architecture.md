@@ -624,7 +624,12 @@
 - H3: Measured Accountability
 - H3: De-Inhibiting the Voice
 - H3: Visualizing Transformation
-- H3: Ready to Join the Community?
+- H2: Fun Fridays
+- H3: Live Class RSVP
+- H3: Select Date
+- H3: Class Time
+- H3: Confirm Your Spot
+- H3: You're on the list!
 
 ---
 
