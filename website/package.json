@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "node build.js"
+  },
+  "dependencies": {
+    "firebase": "^10.8.0",
+    "googleapis": "^144.0.0"
   }
 }
