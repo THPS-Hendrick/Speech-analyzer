@@ -3,12 +3,12 @@ import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.c
 
 // 1. Your Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
-  authDomain: "thps-crm.firebaseapp.com",
-  projectId: "thps-crm",
-  storageBucket: "thps-crm.firebasestorage.app",
-  messagingSenderId: "297605373498",
-  appId: "1:297605373498:web:606241a173f3150a16df03"
+    apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
+    authDomain: "thps-crm.firebaseapp.com",
+    projectId: "thps-crm",
+    storageBucket: "thps-crm.firebasestorage.app",
+    messagingSenderId: "297605373498",
+    appId: "1:297605373498:web:606241a173f3150a16df03"
 };
 
 // Initialize Firebase and Firestore
@@ -22,15 +22,39 @@ function createClientCard(client) {
         `<span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full font-medium">${tag}</span>`
     ).join('');
 
-    return `
-    <div class="bg-white p-4 rounded-md shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    let cardHtml = `
+    <div class="bg-white p-4 rounded-md shadow-sm border border-gray-200 hover:shadow-md transition-shadow mb-3 cursor-grab">
         <h3 class="font-bold text-gray-800">${client.name}</h3>
-        <p class="text-sm text-gray-500 mt-1">${client.email}</p>
-        <div class="flex flex-wrap gap-2 mt-3">
+        <p class="text-sm text-gray-500 mt-1 mb-3">${client.email}</p>
+        <div class="flex flex-wrap gap-2">
             ${tagsHtml}
         </div>
-    </div>
     `;
+
+    // NEW: Only generate the dropdown if they are an online class attendee and have booked dates
+    if (client.stage === "Friday Class RSVP" && client.bookedDates && client.bookedDates.length > 0) {
+        
+        // Format the raw ISO dates into readable short strings (e.g., "Fri, 23 Oct")
+        const dateListItems = client.bookedDates.map(iso => {
+            const readableDate = new Date(iso).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' });
+            return `<li>${readableDate}</li>`;
+        }).join('');
+        
+        // Use HTML <details> tag for a native, no-javascript-required dropdown
+        cardHtml += `
+        <details class="text-sm border border-gray-200 rounded-md p-2 mt-4 bg-gray-50">
+            <summary class="font-medium text-blue-600 cursor-pointer outline-none select-none">
+                Classes Booked (${client.bookedDates.length})
+            </summary>
+            <ul class="mt-2 pl-4 list-disc text-gray-600 space-y-1">
+                ${dateListItems}
+            </ul>
+        </details>
+        `;
+    }
+
+    cardHtml += `</div>`;
+    return cardHtml;
 }
 
 // 3. Fetch data and place it in columns
@@ -39,8 +63,11 @@ async function loadClients() {
         const querySnapshot = await getDocs(collection(db, "Clients"));
         
         // Clear columns before loading to prevent duplicates if you run this twice
-        document.getElementById("col-enquiry").innerHTML = "";
-        document.getElementById("col-assessment").innerHTML = "";
+        const cols = ["col-enquiry", "col-online-classes", "col-assessment", "col-session1", "col-session2", "col-session3", "col-session4"];
+        cols.forEach(col => {
+            const el = document.getElementById(col);
+            if(el) el.innerHTML = "";
+        });
         
         querySnapshot.forEach((doc) => {
             const clientData = doc.data();
@@ -48,6 +75,7 @@ async function loadClients() {
             // Determine which column this client belongs in
             let colId = "";
             if (clientData.stage === "Enquiry Received") colId = "col-enquiry";
+            if (clientData.stage === "Friday Class RSVP") colId = "col-online-classes"; // NEW CLASS MAPPING
             if (clientData.stage === "Assessment Booked") colId = "col-assessment";
             if (clientData.stage === "Session 1 Booked") colId = "col-session1";
             if (clientData.stage === "Session 2 Booked") colId = "col-session2";
