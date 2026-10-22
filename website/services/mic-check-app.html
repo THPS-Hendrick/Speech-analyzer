@@ -3,12 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mic-Check App | AI Public Speaking Telemetry</title>
+    <title>Mic-Check App | AI Public Speaking Metrics</title>
     <meta name="description" content="Stop guessing how you sound. The Mic-Check App measures your pace, pause ratio, and vocabulary mix in real-time. Try the free demo or subscribe for full access.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
     
+    <!-- Local Business NAP Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+    </script>
+
+    <!-- Software Application Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Mic-Check App",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "EducationalApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "9.90",
+        "priceCurrency": "AUD",
+        "billingIncrement": "P1M"
+      },
+      "description": "The Mic-Check App is akin to a golf launch monitor for public speaking, as it is a web browser-based educational application able to process live and recorded audio data into natural language displayed on a dashboard of insightful speaking metrics."
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What is the Score Summary?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Score Summary measures your Content, Delivery, and Simplicity. Metrics in the green zone get +10 points to formulate your total Grade out of 100."
+        }
+      }, {
+        "@type": "Question",
+        "name": "What is the Green Score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Green Score counts how many of the 9 core metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How is the final Grade calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your final Grade is a score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points)."
+        }
+      }]
+    }
+    </script>
+
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,19 +122,179 @@
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">The Trackman for Public Speaking</h1>
                 <p class="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
-                    Stop guessing how you sound. Use the dashboard below to record a brief baseline, then view your full acoustic telemetry and NLP report.
+                    Stop guessing how you sound. Use the dashboard below to record a brief baseline, then view your full data-driven speaking metrics and vocal performance report.
                 </p>
             </header>
 
             <!-- FULL WORKING APP IFRAME -->
-            <div class="w-full mx-auto rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200 bg-white">
+            <div class="w-full mx-auto rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200 bg-white mb-24 relative">
                 <iframe 
                   src="https://mic-check-backend.vercel.app/analyzer-app.html" 
                   style="width: 100%; height: 7000px; border: none; background: transparent; overflow: hidden;" 
                   allow="camera; microphone; autoplay; playsinline"
-                  scrolling="no">
+                  scrolling="no"
+                  title="Mic-Check App Interface">
                 </iframe>
             </div>
+
+            <!-- UNDER THE HOOD: AIO / SEO HIERARCHY -->
+            <section class="max-w-4xl mx-auto mb-24">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">How the Mic-Check App Scores Your Speech</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto text-lg">Our proprietary engine breaks your communication down into three measurable categories: Content, Delivery, and Simplicity. Here is how your data translates to a better performance.</p>
+                </div>
+
+                <div class="space-y-16">
+                    
+                    <!-- Content Metrics -->
+                    <div class="border-l-4 border-purple-500 pl-6 md:pl-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-xl"><i class="fa-solid fa-quote-left"></i></div>
+                            <h2 class="text-2xl font-bold text-slate-900 m-0">Content (What You Say)</h2>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the Personal metric in public speaking?</h3>
+                                <p class="text-gray-700 leading-relaxed">The Personal metric measures storytelling by tracking how much of your content describes a specific person’s thoughts and actions. A lack of personal content risks being unengaging or vague. Our database of measured professional speakers suggests the best speakers range between 30 to 60% Personal content.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the Visual metric in public speaking?</h3>
+                                <p class="text-gray-700 leading-relaxed">The Visual metric measures how much of your content relies on sensory words people can visualize, like colors, sizes, or objects. Low visual scores limit audience retention. Our database of measured professional speakers suggests the best speakers range between 20 to 50% Visual content.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the Intangible metric in public speaking?</h3>
+                                <p class="text-gray-700 leading-relaxed">The Intangible metric measures how much of your content describes non-Personal and non-Visual words, such as general concepts or filler. Too much intangible content makes speeches dry. Our database of measured professional speakers suggests the best speakers range between 10 to 30% Intangible content.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Metrics -->
+                    <div class="border-l-4 border-blue-500 pl-6 md:pl-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 text-xl"><i class="fa-solid fa-wave-square"></i></div>
+                            <h2 class="text-2xl font-bold text-slate-900 m-0">Delivery (How You Sound)</h2>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is a good speaking pace (WPM)?</h3>
+                                <p class="text-gray-700 leading-relaxed">WPM stands for Words Per Minute and measures how many words the speaker says per minute on average. There is an upper limit on how many words audiences process effectively. Our database of measured professional speakers suggests the best speakers range between 100 to 150 WPM.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the Syllables Per Second (SPS) metric?</h3>
+                                <p class="text-gray-700 leading-relaxed">SPS stands for Syllables Per Second and functions as our Mumble Meter. It measures syllables spoken per active second, excluding pauses. Our database of measured professional speakers suggests the best speakers range between 3.5 to 4.5 SPS before words sound like incoherent mumbles.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the ideal Pause % for a presentation?</h3>
+                                <p class="text-gray-700 leading-relaxed">Pause % is the amount of time the speaker spent completely silent compared to their active speaking time. Too little pause time indicates rushing. Our database of measured professional speakers suggests the best speakers range between 15 to 35% Pause %.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">How do variance metrics affect delivery?</h3>
+                                <p class="text-gray-700 leading-relaxed">Variance metrics track your vocal dynamics. Pause Var evaluates varied pause lengths, Voice Var counts changes in speaking volume, and Pace Var tracks alternating slow and fast sentences. High variation in these three metrics directly correlates with highly engaging and persuasive delivery.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simplicity Metrics -->
+                    <div class="border-l-4 border-brand-green pl-6 md:pl-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-brand-green text-xl"><i class="fa-solid fa-check-double"></i></div>
+                            <h2 class="text-2xl font-bold text-slate-900 m-0">Simplicity (How Easily You Are Understood)</h2>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What does Runtime mean in public speaking?</h3>
+                                <p class="text-gray-700 leading-relaxed">Runtime measures how long a speaker talks on average until they take a Noticeable Pause longer than 700 milliseconds. Extreme runtimes indicate nervous rushing. Our database of measured professional speakers suggests the best speakers average a Runtime between 3.0 to 6.0 seconds.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is a good Comp-Grade for speeches?</h3>
+                                <p class="text-gray-700 leading-relaxed">Comp-Grade measures the complexity of your average sentence against reading comprehension indexes like Flesch Kinkaid or Coleman-Liau. Our database of measured professional speakers suggests the best speakers range between 5.0 to 10.0 Comp-Grade, indicating accessible, plain English.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 mb-2">What is the Simple % metric?</h3>
+                                <p class="text-gray-700 leading-relaxed">Simple % calculates how many words match a database of the 10,000 most commonly used English words. Too little Simple % risks alienating your audience with overly technical language. Our database of measured professional speakers suggests the best speakers range between 80 to 90% Simple %.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- NATIVE HTML FAQ ACCORDION -->
+            <section class="max-w-3xl mx-auto mb-24">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Frequently Asked Questions</h2>
+                </div>
+                <div class="space-y-4">
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
+                            What is the Score Summary?
+                            <span class="relative size-5 shrink-0 text-blue-600">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            The Score Summary measures your Content, Delivery, and Simplicity. Metrics in the green zone get +10 points to formulate your total Grade out of 100.
+                        </p>
+                    </details>
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
+                            What is the Green Score?
+                            <span class="relative size-5 shrink-0 text-blue-600">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            The Green Score counts how many of the 9 core metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10.
+                        </p>
+                    </details>
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-blue-600 transition-colors">
+                            How is the final Grade calculated?
+                            <span class="relative size-5 shrink-0 text-blue-600">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            Your final Grade is a score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+            <!-- PREMIUM UPGRADE FUNNEL -->
+            <section class="max-w-5xl mx-auto mb-20">
+                <div class="bg-slate-900 rounded-[2rem] p-8 md:p-12 shadow-xl border border-slate-800 flex flex-col md:flex-row gap-10 items-center justify-between overflow-hidden relative">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-brand-green/20 rounded-bl-full pointer-events-none blur-3xl"></div>
+                    
+                    <div class="md:w-1/2 relative z-10">
+                        <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-3"><i class="fa-solid fa-unlock"></i> Upgrade to Full Access</div>
+                        <h2 class="text-3xl font-bold text-white mb-4">Track Your History & Save Your Progress</h2>
+                        <p class="text-slate-300 mb-6 leading-relaxed">The free demo resets after every use. Subscribe to unlock cloud history, detailed PDF reports, and advanced speaking courses.</p>
+                        
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Unlimited Sessions & Cloud Storage</li>
+                            <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Save and Download PDF Reports</li>
+                            <li class="flex items-center gap-3 text-sm text-slate-200"><i class="fa-solid fa-check-circle text-brand-green"></i> Access to Famous Speech Prompter Courses</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="md:w-1/2 w-full relative z-10 flex justify-center md:justify-end">
+                        <div class="bg-white rounded-3xl p-8 shadow-2xl border-t-4 border-brand-green text-center w-full max-w-sm">
+                            <div class="text-slate-500 font-bold text-sm uppercase tracking-wider mb-2">Mic-Check Pro</div>
+                            <div class="text-5xl font-black text-slate-900 mb-1">$9.90<span class="text-lg text-slate-500 font-medium">/mo</span></div>
+                            <div class="text-xs font-bold text-brand-green mb-8">Or save 20% at $99/year</div>
+                            
+                            <a href="/members/login.html" class="block w-full bg-brand-green text-white font-bold py-3.5 rounded-full hover:bg-brand-dark transition-colors shadow-md">Subscribe Now</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
         </div>
     </main>
