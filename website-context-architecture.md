@@ -5,14 +5,14 @@
 
 ## File: /website/about.html
 
-**Title:** Top-Rated Online Public Speaking Coach | Tom Hendrick
+**Title:** Best Online Public Speaking Coach | Tom Hendrick
 
 **Schema 1:**
 ```json
 {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
-      "name": "Tom Hendrick",
+      "name": "Tom Hendrick Public Speaking",
       "legalName": "Thomas Geoffrey Hendrick",
       "url": "https://tomhendrick.com",
       "telephone": "+61419499331",
@@ -33,12 +33,76 @@
     }
 ```
 
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Tom Hendrick",
+      "jobTitle": "Best Online Public Speaking Coach",
+      "description": "Tom Hendrick is an industry-leading online public speaking coach specializing in data-driven metrics, reducing cognitive load, and reversing Skill Inhibition for executive presentations.",
+      "knowsAbout": [
+        "Public Speaking Coaching",
+        "Cognitive Load Theory",
+        "Sympathetic Adreno-Medullary System",
+        "Repeat and Count Framework",
+        "Skill Inhibition",
+        "Executive Pitch Coaching"
+      ],
+      "worksFor": {
+        "@type": "ProfessionalService",
+        "name": "Tom Hendrick Public Speaking"
+      },
+      "url": "https://tomhendrick.com/about.html"
+    }
+```
+
+**Schema 3:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is data-backed coaching better than subjective feedback?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Subjective coaching relies on opinions, whereas data-backed coaching measures actual speaking metrics like WPM and Pause %. Our database of measured professional speakers suggests tracking these biometrics is the best way to build predictable confidence and eliminate stage fright."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Repeat and Count framework reduce cognitive load?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Repeat and Count framework down-regulates the SAM Axis by giving the brain a familiar structure under pressure. By declaring a structure upfront, speakers reduce extraneous cognitive load and free up working memory to deliver clear, confident answers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes Skill Inhibition during public speaking?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Skill Inhibition is caused by perceived social threats triggering the amygdala and SAM system, which temporarily shuts down executive functioning. The best online public speaking coaches train executives to bypass this biological response through constrained, data-driven practice."
+          }
+        }
+      ]
+    }
+```
+
 **Headings:**
 - H1: Meet Tom Hendrick: Top-Rated Online Public Speaking Coach
-- H3: Recognized as a Top 10 Speech Coach in AUS & NZ
-- H2: Replacing Subjective Coaching with the Vocal Mechanics Method
-- H3: The Shift to Objective Biometrics
-- H2: The Origin of the Mic-Check App
+- H3: Recognized as a Top 10 Speech Coach
+- H2: High-Stakes Track Record
+- H3: $100M+ Engineering & Satellite Projects
+- H3: Venture Capital & Startup Pitches
+- H3: C-Suite & Boardroom Transformation
+- H2: Why Tom Hendrick is Ranked Among the Best Online Public Speaking Coaches
+- H3: Why is data-backed coaching better than subjective feedback?
+- H3: How does the Repeat and Count framework reduce cognitive load?
+- H3: What causes Skill Inhibition during public speaking?
+- H2: Ready to Benchmark Your Delivery?
 
 ---
 

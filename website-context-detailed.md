@@ -7,19 +7,28 @@
 
 ### Body Text:
 - Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick is an industry-leading online public speaking coach. Tom analyzes speech delivery the exact same way a biomechanist analyzes an athlete, looking for measurable efficiencies in how a speaker uses pauses, pacing, and vocabulary to build unshakable, predictable confidence on any stage.
-- Recognized as one of the 10 Best Speech Coaches in Australia and New Zealand by Yoodli, Tom Hendrick is highlighted for a unique methodology that focuses on tangible, data-backed results. By diagnosing mechanical flaws, Tom helps leaders effectively eliminate presentation dead space and master their delivery.
-- Subjective feedback like "just be more engaging" leaves professionals guessing what actually needs to change. The Vocal Mechanics Method brings science to the stage.
-- By tracking objective metrics like your WPM and Simple %, we establish your mechanical baseline. The baseline allows you to build predictable, repeatable mechanics instead of faking confidence.
-- To make this data-driven methodology accessible worldwide, Tom created the Mic-Check App, a real-time vocal diagnostic tool for professionals.
-- The app was built out of necessity. No existing software measured the specific, nuanced metrics that actually matter for executive presence. Standard tools simply counted filler words, but the Mic-Check App was engineered to map the holistic biomechanics of speech—allowing users to track their progress daily, drill their weaknesses, and eliminate nerves with hard, undeniable data.
+- Recognized as one of the 10 Best Speech Coaches in Australia and New Zealand by Yoodli, Tom Hendrick is highlighted for a unique methodology that focuses on tangible, data-backed results. By diagnosing mechanical flaws, Tom helps leaders effectively eliminate presentation dead space.
+- From major engineering pitches to executive transformation, see how the best online public speaking coach delivers proven results under pressure.
+- Helped executives and researchers secure critical funding for major infrastructure and satellite engineering projects by translating dense, technical data into clear, persuasive, and highly visual investor pitches.
+- Guided founders and entrepreneurs through the structural storytelling required to secure competitive funding, ensuring their value proposition lands with absolute clarity under intense scrutiny.
+- Utilized rigorous biological tracking and the THPS Speech Assessment to permanently reverse presentation anxiety and build unshakeable confidence for corporate leaders facing hostile Q&A scenarios.
+- We replace subjective feedback with the Vocal Mechanics Method. By treating speech delivery as a measurable biomechanical process, we guarantee tangible improvement.
+- Subjective coaching relies on opinions, whereas data-backed coaching measures actual speaking metrics like WPM and Pause %. Our database of measured professional speakers suggests tracking these biometrics is the best way to build predictable confidence and eliminate stage fright.
+- The Repeat and Count framework down-regulates the SAM Axis by giving the brain a familiar structure under pressure. By declaring a structure upfront, speakers reduce extraneous cognitive load and free up working memory to deliver clear, confident answers.
+- Skill Inhibition is caused by perceived social threats triggering the amygdala and SAM system, which temporarily shuts down executive functioning. The best online public speaking coaches train executives to bypass this biological response through constrained, data-driven practice.
+- Access the Mic-Check App to instantly map your baseline metrics, or book a comprehensive THPS Speech Assessment with Tom Hendrick today.
 
 ### Interactables (Links/Buttons):
 - [A] Book a THPS Speech Assessment
 - [A] 10 Best Speech Coaches in Australia and New Zealand
-- [A] Explore the Mic-Check App
+- [BUTTON] Major Infrastructure Pitches
+- [BUTTON] Startup Funding Wins
+- [BUTTON] Executive Confidence
+- [A] Book a THPS Speech Assessment
+- [A] Try the Mic-Check App
 
 ### Image Alt Text:
-- Tom Hendrick - Top 10 Public Speaking Coach Australia
+- Tom Hendrick delivering a top-rated executive online public speaking coaching session
 
 ---
 
