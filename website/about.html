@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top-Rated Online Public Speaking Coach | Tom Hendrick</title>
-    <meta name="description" content="Based in Adelaide but coaching globally, Tom Hendrick is the premier online public speaking coach utilizing objective data and the Vocal Mechanics Method.">
+    <title>Best Online Public Speaking Coach | Tom Hendrick</title>
+    <meta name="description" content="Tom Hendrick is the top-rated online public speaking coach for executives. Learn how data-driven metrics and the Vocal Mechanics Method eliminate presentation anxiety.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
     
-    <!-- Local Business NAP Schema -->
+    <!-- 1. ProfessionalService Schema (NAP Data) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
-      "name": "Tom Hendrick",
+      "name": "Tom Hendrick Public Speaking",
       "legalName": "Thomas Geoffrey Hendrick",
       "url": "https://tomhendrick.com",
       "telephone": "+61419499331",
@@ -35,10 +35,68 @@
     }
     </script>
 
+    <!-- 2. Person Schema (Entity Mapping to Keywords & Frameworks) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Tom Hendrick",
+      "jobTitle": "Best Online Public Speaking Coach",
+      "description": "Tom Hendrick is an industry-leading online public speaking coach specializing in data-driven metrics, reducing cognitive load, and reversing Skill Inhibition for executive presentations.",
+      "knowsAbout": [
+        "Public Speaking Coaching",
+        "Cognitive Load Theory",
+        "Sympathetic Adreno-Medullary System",
+        "Repeat and Count Framework",
+        "Skill Inhibition",
+        "Executive Pitch Coaching"
+      ],
+      "worksFor": {
+        "@type": "ProfessionalService",
+        "name": "Tom Hendrick Public Speaking"
+      },
+      "url": "https://tomhendrick.com/about.html"
+    }
+    </script>
+
+    <!-- 3. FAQPage Schema (AEO/AIO Alignment) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why is data-backed coaching better than subjective feedback?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Subjective coaching relies on opinions, whereas data-backed coaching measures actual speaking metrics like WPM and Pause %. Our database of measured professional speakers suggests tracking these biometrics is the best way to build predictable confidence and eliminate stage fright."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Repeat and Count framework reduce cognitive load?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Repeat and Count framework down-regulates the SAM Axis by giving the brain a familiar structure under pressure. By declaring a structure upfront, speakers reduce extraneous cognitive load and free up working memory to deliver clear, confident answers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What causes Skill Inhibition during public speaking?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Skill Inhibition is caused by perceived social threats triggering the amygdala and SAM system, which temporarily shuts down executive functioning. The best online public speaking coaches train executives to bypass this biological response through constrained, data-driven practice."
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -46,125 +104,162 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            green: '#106030',
-                            dark: '#0c4a25',
-                            gold: '#FFCC00',
-                            offwhite: '#FAF9F5'
-                        }
+                        brand: { green: '#106030', dark: '#0c4a25', gold: '#FFCC00', offwhite: '#FAF9F5' }
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-white font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
     <!-- INJECT_HEADER -->
 
-    <!-- Added flex-grow so the footer gets pushed down -->
-    <main class="flex-grow">
-        <section class="bg-white py-16 lg:py-24">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    
-                    <!-- Left Column: Intro -->
-                    <div class="order-2 lg:order-1">
-                        <span class="inline-block text-brand-green font-bold tracking-widest text-sm uppercase mb-4">About the Founder</span>
-                        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight mb-6">
-                            Meet Tom Hendrick: Top-Rated Online Public Speaking Coach
-                        </h1>
-                        <div class="space-y-6 text-lg text-gray-600 leading-relaxed">
-                            <p>
-                                Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick is an industry-leading online public speaking coach. Tom analyzes speech delivery the exact same way a biomechanist analyzes an athlete, looking for measurable efficiencies in how a speaker uses pauses, pacing, and vocabulary to build unshakable, predictable confidence on any stage.
-                            </p>
-                        </div>
-                        <div class="mt-10">
-                            <a href="contact.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-full text-brand-green bg-brand-gold hover:brightness-105 shadow-md transition-all transform hover:-translate-y-0.5">
-                                Book a THPS Speech Assessment
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Image and E-E-A-T Callout -->
-                    <div class="order-1 lg:order-2 flex flex-col gap-6">
-                        <!-- High-Quality Image -->
-                        <div class="w-full max-w-lg mx-auto rounded-3xl overflow-hidden shadow-xl border-4 border-gray-50 bg-gray-200">
-                            <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/tom-hendrick-top-10-public-speaking-coach-australia.webp" alt="Tom Hendrick - Top 10 Public Speaking Coach Australia" class="w-full h-auto object-cover">
-                        </div>
-                        
-                        <!-- E-E-A-T Trust Box -->
-                        <div class="max-w-lg mx-auto bg-brand-offwhite border border-gray-200 rounded-2xl p-6 shadow-sm relative">
-                            <div class="absolute -top-4 -right-4 w-10 h-10 bg-brand-gold text-brand-green rounded-full flex items-center justify-center shadow-md">
-                                <i class="fa-solid fa-award text-lg"></i>
-                            </div>
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2">Recognized as a Top 10 Speech Coach in AUS & NZ</h3>
-                            <p class="text-sm text-gray-700 leading-relaxed">
-                                Recognized as one of the <a href="https://yoodli.ai/blog/best-speech-coaches-aus-nz" target="_blank" rel="noopener noreferrer" class="text-brand-green font-bold hover:underline transition-all">10 Best Speech Coaches in Australia and New Zealand</a> by Yoodli, Tom Hendrick is highlighted for a unique methodology that focuses on tangible, data-backed results. By diagnosing mechanical flaws, Tom helps leaders effectively eliminate presentation dead space and master their delivery.
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <section class="bg-brand-offwhite py-20 lg:py-28 border-y border-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="max-w-3xl mx-auto text-center mb-16">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-                        Replacing Subjective Coaching with the Vocal Mechanics Method
-                    </h2>
-                    <p class="text-xl text-gray-600 leading-relaxed">
-                        Subjective feedback like "just be more engaging" leaves professionals guessing what actually needs to change. The Vocal Mechanics Method brings science to the stage.
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 max-w-4xl mx-auto">
-                    <div class="w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center text-brand-gold mb-6 shadow-sm">
-                        <i class="fa-solid fa-chart-line text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-brand-green mb-4">The Shift to Objective Biometrics</h3>
-                    <p class="text-gray-600 text-lg leading-relaxed">
-                        By tracking objective metrics like your WPM and Simple %, we establish your mechanical baseline. The baseline allows you to build predictable, repeatable mechanics instead of faking confidence.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section class="bg-white py-20 lg:py-28">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-gold/20 text-brand-green mb-8">
-                    <i class="fa-solid fa-mobile-screen-button text-3xl"></i>
-                </div>
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16 px-4 sm:px-6">
+        
+        <!-- HERO SECTION -->
+        <section class="max-w-7xl mx-auto mb-20">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 
-                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-8">
-                    The Origin of the Mic-Check App
-                </h2>
-                
-                <div class="text-lg md:text-xl text-gray-600 leading-relaxed space-y-6 max-w-3xl mx-auto text-left">
-                    <p>
-                        To make this data-driven methodology accessible worldwide, Tom created <strong class="text-slate-900">the Mic-Check App, a real-time vocal diagnostic tool for professionals.</strong>
+                <div class="order-2 lg:order-1">
+                    <span class="inline-block text-brand-green font-bold tracking-widest text-sm uppercase mb-4">About the Founder</span>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight mb-6">
+                        Meet Tom Hendrick: Top-Rated Online Public Speaking Coach
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 leading-relaxed mb-10">
+                        Based in Adelaide, Australia, but coaching executives globally, Tom Hendrick is an industry-leading online public speaking coach. Tom analyzes speech delivery the exact same way a biomechanist analyzes an athlete, looking for measurable efficiencies in how a speaker uses pauses, pacing, and vocabulary to build unshakable, predictable confidence on any stage.
                     </p>
-                    <p>
-                        The app was built out of necessity. No existing software measured the specific, nuanced metrics that actually matter for executive presence. Standard tools simply counted filler words, but the Mic-Check App was engineered to map the holistic biomechanics of speech—allowing users to track their progress daily, drill their weaknesses, and eliminate nerves with hard, undeniable data.
-                    </p>
-                </div>
-                
-                <div class="mt-12">
-                    <a href="services.html" class="inline-flex items-center justify-center px-8 py-4 border-2 border-brand-green text-base font-bold rounded-full text-brand-green bg-transparent hover:bg-brand-green hover:text-white transition-colors">
-                        Explore the Mic-Check App
+                    <a href="contact.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-full text-brand-green bg-brand-gold hover:brightness-105 shadow-md transition-all transform hover:-translate-y-0.5">
+                        Book a THPS Speech Assessment
                     </a>
                 </div>
+
+                <div class="order-1 lg:order-2 flex flex-col gap-6">
+                    <div class="w-full max-w-lg mx-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-200">
+                        <!-- Corrected Image Path -->
+                        <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/tom-hendrick-top-10-public-speaking-coach-australia.webp" alt="Tom Hendrick delivering a top-rated executive online public speaking coaching session" class="w-full h-auto object-cover">
+                    </div>
+                    
+                    <div class="max-w-lg mx-auto bg-white border border-gray-200 rounded-2xl p-6 shadow-md relative">
+                        <div class="absolute -top-4 -right-4 w-10 h-10 bg-brand-gold text-brand-green rounded-full flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-award text-lg"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2">Recognized as a Top 10 Speech Coach</h3>
+                        <p class="text-sm text-gray-700 leading-relaxed">
+                            Recognized as one of the <a href="https://yoodli.ai/blog/best-speech-coaches-aus-nz" target="_blank" rel="noopener noreferrer" class="text-brand-green font-bold hover:underline transition-all">10 Best Speech Coaches in Australia and New Zealand</a> by Yoodli, Tom Hendrick is highlighted for a unique methodology that focuses on tangible, data-backed results. By diagnosing mechanical flaws, Tom helps leaders effectively eliminate presentation dead space.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE AUTHORITY & ACHIEVEMENTS WIDGET -->
+        <section class="max-w-5xl mx-auto mb-28">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">High-Stakes Track Record</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">From major engineering pitches to executive transformation, see how the best online public speaking coach delivers proven results under pressure.</p>
+            </div>
+
+            <div class="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
+                <div class="flex flex-col md:flex-row border-b border-slate-200">
+                    <button onclick="switchTab('tab1')" id="btn-tab1" class="flex-1 py-4 px-6 font-bold text-sm tracking-wide uppercase transition-colors bg-blue-50 text-blue-700 border-b-2 border-blue-700">Major Infrastructure Pitches</button>
+                    <button onclick="switchTab('tab2')" id="btn-tab2" class="flex-1 py-4 px-6 font-bold text-sm tracking-wide uppercase transition-colors bg-white text-slate-500 hover:bg-slate-50 border-b-2 border-transparent">Startup Funding Wins</button>
+                    <button onclick="switchTab('tab3')" id="btn-tab3" class="flex-1 py-4 px-6 font-bold text-sm tracking-wide uppercase transition-colors bg-white text-slate-500 hover:bg-slate-50 border-b-2 border-transparent">Executive Confidence</button>
+                </div>
+
+                <div class="p-8 md:p-12 min-h-[300px] flex items-center">
+                    <!-- Tab 1 -->
+                    <div id="content-tab1" class="block w-full">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i class="fa-solid fa-satellite-dish text-4xl text-blue-600"></i>
+                            <h3 class="text-2xl font-bold text-slate-900 m-0">$100M+ Engineering & Satellite Projects</h3>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-8">Helped executives and researchers secure critical funding for major infrastructure and satellite engineering projects by translating dense, technical data into clear, persuasive, and highly visual investor pitches.</p>
+                        <blockquote class="border-l-4 border-blue-500 pl-4 italic text-slate-600">
+                            "Tom helped me to prepare for a technical satellite engineering presentation at a high-profile industry event with funders. His communication strategies were incredibly helpful to quickly make the content accessible to a wide audience and increase the 'signal-to-noise' ratio without needing to simplify and dilute the message." <br><span class="font-bold text-slate-900 not-italic mt-2 inline-block">— Ashwin Subramaniam, Verified Client</span>
+                        </blockquote>
+                    </div>
+
+                    <!-- Tab 2 -->
+                    <div id="content-tab2" class="hidden w-full">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i class="fa-solid fa-rocket text-4xl text-brand-green"></i>
+                            <h3 class="text-2xl font-bold text-slate-900 m-0">Venture Capital & Startup Pitches</h3>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-8">Guided founders and entrepreneurs through the structural storytelling required to secure competitive funding, ensuring their value proposition lands with absolute clarity under intense scrutiny.</p>
+                        <blockquote class="border-l-4 border-brand-green pl-4 italic text-slate-600 mb-4">
+                            "Tom is an outstanding speech coach. Our team will forever be grateful... We were able to receive personalised solutions, approach, and strategies that helped us deliver remarkable startup pitches." <br><span class="font-bold text-slate-900 not-italic mt-2 inline-block">— Paul John Legaspi, Verified Client</span>
+                        </blockquote>
+                        <blockquote class="border-l-4 border-brand-green pl-4 italic text-slate-600">
+                            "Fantastic coaching that really changed the way I approached pitching... his insights into the structure and storytelling required were so useful in helping my presentation." <br><span class="font-bold text-slate-900 not-italic mt-2 inline-block">— Lauren Bergamin, Verified Client</span>
+                        </blockquote>
+                    </div>
+
+                    <!-- Tab 3 -->
+                    <div id="content-tab3" class="hidden w-full">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i class="fa-solid fa-user-tie text-4xl text-purple-600"></i>
+                            <h3 class="text-2xl font-bold text-slate-900 m-0">C-Suite & Boardroom Transformation</h3>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-8">Utilized rigorous biological tracking and the THPS Speech Assessment to permanently reverse presentation anxiety and build unshakeable confidence for corporate leaders facing hostile Q&A scenarios.</p>
+                        <blockquote class="border-l-4 border-purple-500 pl-4 italic text-slate-600">
+                            "I chose to do the Tom Hendrick Public Speaking Diagnostic session because of his research into the adrenomedullary system and his robust training methods... The Coaching Plan has vastly improved my confidence under pressure in only 3 sessions." <br><span class="font-bold text-slate-900 not-italic mt-2 inline-block">— Cameron White, Verified Client</span>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AIO DIRECT ANSWER CAPSULES: THE SCIENCE -->
+        <section class="max-w-4xl mx-auto mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Why Tom Hendrick is Ranked Among the Best Online Public Speaking Coaches</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">We replace subjective feedback with the Vocal Mechanics Method. By treating speech delivery as a measurable biomechanical process, we guarantee tangible improvement.</p>
+            </div>
+
+            <div class="space-y-12">
+                
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm border-l-4 border-l-blue-500">
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Why is data-backed coaching better than subjective feedback?</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Subjective coaching relies on opinions, whereas data-backed coaching measures actual speaking metrics like WPM and Pause %. Our database of measured professional speakers suggests tracking these biometrics is the best way to build predictable confidence and eliminate stage fright.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm border-l-4 border-l-brand-green">
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">How does the Repeat and Count framework reduce cognitive load?</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        The Repeat and Count framework down-regulates the SAM Axis by giving the brain a familiar structure under pressure. By declaring a structure upfront, speakers reduce extraneous cognitive load and free up working memory to deliver clear, confident answers.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm border-l-4 border-l-purple-500">
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">What causes Skill Inhibition during public speaking?</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Skill Inhibition is caused by perceived social threats triggering the amygdala and SAM system, which temporarily shuts down executive functioning. The best online public speaking coaches train executives to bypass this biological response through constrained, data-driven practice.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- AEO/SEO CTA -->
+        <section class="max-w-3xl mx-auto text-center mb-16">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Ready to Benchmark Your Delivery?</h2>
+            <p class="text-gray-600 mb-8">Access the Mic-Check App to instantly map your baseline metrics, or book a comprehensive THPS Speech Assessment with Tom Hendrick today.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="contact.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-bold rounded-full text-white bg-brand-green hover:bg-brand-dark shadow-md transition-all">
+                    Book a THPS Speech Assessment
+                </a>
+                <a href="services/mic-check-app.html" class="inline-flex items-center justify-center px-8 py-4 border-2 border-brand-green text-base font-bold rounded-full text-brand-green bg-transparent hover:bg-brand-green hover:text-white transition-all">
+                    Try the Mic-Check App
+                </a>
             </div>
         </section>
 
@@ -172,5 +267,27 @@
 
     <!-- INJECT_FOOTER -->
 
+    <!-- Interactive Widget Script -->
+    <script>
+        function switchTab(tabId) {
+            // Reset all tabs
+            ['tab1', 'tab2', 'tab3'].forEach(id => {
+                document.getElementById('content-' + id).classList.add('hidden');
+                document.getElementById('content-' + id).classList.remove('block');
+                
+                const btn = document.getElementById('btn-' + id);
+                btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-700');
+                btn.classList.add('bg-white', 'text-slate-500', 'border-transparent');
+            });
+
+            // Activate selected tab
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('content-' + tabId).classList.add('block');
+            
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('bg-white', 'text-slate-500', 'border-transparent');
+            activeBtn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-700');
+        }
+    </script>
 </body>
 </html>
