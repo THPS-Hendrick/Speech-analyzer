@@ -361,10 +361,29 @@
 ## File: /website/services/mic-check-app.html
 
 ### Body Text:
-- Stop guessing how you sound. Use the dashboard below to record a brief baseline, then view your full acoustic telemetry and NLP report.
+- Stop guessing how you sound. Use the dashboard below to record a brief baseline, then view your full data-driven speaking metrics and vocal performance report.
+- Our proprietary engine breaks your communication down into three measurable categories: Content, Delivery, and Simplicity. Here is how your data translates to a better performance.
+- The Personal metric measures storytelling by tracking how much of your content describes a specific person’s thoughts and actions. A lack of personal content risks being unengaging or vague. Our database of measured professional speakers suggests the best speakers range between 30 to 60% Personal content.
+- The Visual metric measures how much of your content relies on sensory words people can visualize, like colors, sizes, or objects. Low visual scores limit audience retention. Our database of measured professional speakers suggests the best speakers range between 20 to 50% Visual content.
+- The Intangible metric measures how much of your content describes non-Personal and non-Visual words, such as general concepts or filler. Too much intangible content makes speeches dry. Our database of measured professional speakers suggests the best speakers range between 10 to 30% Intangible content.
+- WPM stands for Words Per Minute and measures how many words the speaker says per minute on average. There is an upper limit on how many words audiences process effectively. Our database of measured professional speakers suggests the best speakers range between 100 to 150 WPM.
+- SPS stands for Syllables Per Second and functions as our Mumble Meter. It measures syllables spoken per active second, excluding pauses. Our database of measured professional speakers suggests the best speakers range between 3.5 to 4.5 SPS before words sound like incoherent mumbles.
+- Pause % is the amount of time the speaker spent completely silent compared to their active speaking time. Too little pause time indicates rushing. Our database of measured professional speakers suggests the best speakers range between 15 to 35% Pause %.
+- Variance metrics track your vocal dynamics. Pause Var evaluates varied pause lengths, Voice Var counts changes in speaking volume, and Pace Var tracks alternating slow and fast sentences. High variation in these three metrics directly correlates with highly engaging and persuasive delivery.
+- Runtime measures how long a speaker talks on average until they take a Noticeable Pause longer than 700 milliseconds. Extreme runtimes indicate nervous rushing. Our database of measured professional speakers suggests the best speakers average a Runtime between 3.0 to 6.0 seconds.
+- Comp-Grade measures the complexity of your average sentence against reading comprehension indexes like Flesch Kinkaid or Coleman-Liau. Our database of measured professional speakers suggests the best speakers range between 5.0 to 10.0 Comp-Grade, indicating accessible, plain English.
+- Simple % calculates how many words match a database of the 10,000 most commonly used English words. Too little Simple % risks alienating your audience with overly technical language. Our database of measured professional speakers suggests the best speakers range between 80 to 90% Simple %.
+- The Score Summary measures your Content, Delivery, and Simplicity. Metrics in the green zone get +10 points to formulate your total Grade out of 100.
+- The Green Score counts how many of the 9 core metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10.
+- Your final Grade is a score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).
+- The free demo resets after every use. Subscribe to unlock cloud history, detailed PDF reports, and advanced speaking courses.
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services
+- [SUMMARY] What is the Score Summary?
+- [SUMMARY] What is the Green Score?
+- [SUMMARY] How is the final Grade calculated?
+- [A] Subscribe Now
 
 ### Image Alt Text:
 

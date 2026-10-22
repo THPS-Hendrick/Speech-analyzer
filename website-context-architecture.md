@@ -469,10 +469,100 @@
 
 ## File: /website/services/mic-check-app.html
 
-**Title:** Mic-Check App | AI Public Speaking Telemetry
+**Title:** Mic-Check App | AI Public Speaking Metrics
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Mic-Check App",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "EducationalApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "9.90",
+        "priceCurrency": "AUD",
+        "billingIncrement": "P1M"
+      },
+      "description": "The Mic-Check App is akin to a golf launch monitor for public speaking, as it is a web browser-based educational application able to process live and recorded audio data into natural language displayed on a dashboard of insightful speaking metrics."
+    }
+```
+
+**Schema 3:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What is the Score Summary?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Score Summary measures your Content, Delivery, and Simplicity. Metrics in the green zone get +10 points to formulate your total Grade out of 100."
+        }
+      }, {
+        "@type": "Question",
+        "name": "What is the Green Score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Green Score counts how many of the 9 core metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How is the final Grade calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your final Grade is a score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points)."
+        }
+      }]
+    }
+```
 
 **Headings:**
 - H1: The Trackman for Public Speaking
+- H2: How the Mic-Check App Scores Your Speech
+- H2: Content (What You Say)
+- H3: What is the Personal metric in public speaking?
+- H3: What is the Visual metric in public speaking?
+- H3: What is the Intangible metric in public speaking?
+- H2: Delivery (How You Sound)
+- H3: What is a good speaking pace (WPM)?
+- H3: What is the Syllables Per Second (SPS) metric?
+- H3: What is the ideal Pause % for a presentation?
+- H3: How do variance metrics affect delivery?
+- H2: Simplicity (How Easily You Are Understood)
+- H3: What does Runtime mean in public speaking?
+- H3: What is a good Comp-Grade for speeches?
+- H3: What is the Simple % metric?
+- H2: Frequently Asked Questions
+- H2: Track Your History & Save Your Progress
 
 ---
 
