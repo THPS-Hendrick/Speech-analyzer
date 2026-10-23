@@ -277,6 +277,28 @@
 
 ---
 
+## File: /website/members/privacy.html
+
+### Body Text:
+- Effective Date: October 23, 2026
+- As the best online public speaking coach, Tom Hendrick Public Speaking processes your vocal performance analytics securely. We never sell your personal information. Our database of measured professional speakers suggests that protecting client confidentiality is essential for building the trust required to eliminate presentation anxiety.
+- The Mic-Check App requires microphone access to measure speaking metrics like WPM and Pause %, but audio processing happens securely on your device. Unless you actively link your CRM account for a THPS Performance Plan, voice recordings are not transmitted to our servers.
+- Yes. All THPS Speech Assessment and coaching sessions are strictly confidential. We do not share your corporate strategies or personal stories. Our database of measured professional speakers suggests a secure environment is critical to safely diagnosing and reversing Skill Inhibition under pressure.
+- This Privacy Policy explains how Tom Hendrick Public Speaking ("Provider", "we", "us", "our") collects, uses, and protects your personal data when you visit tomhendrick.com, use the Mic-Check App, or participate in our coaching services.
+- We collect information that you voluntarily provide to us when you register on the Member Portal, express an interest in obtaining information about us or our products, or otherwise contact us. This may include:
+- The free version of the Mic-Check App processes your audio and text inputs locally within your web browser to generate your real-time speaking metrics.
+- If you upgrade to Mic-Check Pro or actively link your CRM account via the Member Portal, your performance data and historical progress charts are securely transmitted and stored on our cloud servers. This allows your coach to review your progress during your THPS Performance Plan sessions.
+- We do not sell, rent, or trade your personal information to third parties. We treat all information discussed during your THPS Speech Assessment and private coaching sessions as strictly confidential. We only share information with third-party vendors, service providers, and contractors who perform services for us or on our behalf (e.g., payment processing, data hosting) and require access to such information to do that work.
+- We may use cookies and similar tracking technologies to access or store information. This helps us understand how users interact with the Mic-Check App and our website, allowing us to improve the user experience and ensure the platform functions correctly.
+- You have the right to review, change, or terminate your account at any time. You may disconnect your coaching integration via the "CRM Link" tab in the Member Portal, which will immediately stop the transmission of your diagnostic data to your coach. Upon request to terminate your account, we will deactivate or delete your account and information from our active databases.
+- If you have questions or comments about this Privacy Policy, or if you wish to exercise your data rights, please contact us directly via the contact form on our website or email us at our registered business address.
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
 ## File: /website/members/progress.html
 
 ### Body Text:

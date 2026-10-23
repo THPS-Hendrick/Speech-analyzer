@@ -510,6 +510,86 @@
 
 ---
 
+## File: /website/members/privacy.html
+
+**Title:** Privacy Policy | THPS Member Portal
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the best online public speaking coach handle my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "As the best online public speaking coach, Tom Hendrick Public Speaking processes your vocal performance analytics securely. We never sell your personal information. Our database of measured professional speakers suggests that protecting client confidentiality is essential for building the trust required to eliminate presentation anxiety."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the Mic-Check App record my voice?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Mic-Check App requires microphone access to measure speaking metrics like WPM and Pause %, but audio processing happens securely on your device. Unless you actively link your CRM account for a THPS Performance Plan, voice recordings are not transmitted to our servers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are my THPS Speech Assessment sessions confidential?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. All THPS Speech Assessment and coaching sessions are strictly confidential. We do not share your corporate strategies or personal stories. Our database of measured professional speakers suggests a secure environment is critical to safely diagnosing and reversing Skill Inhibition under pressure."
+          }
+        }
+      ]
+    }
+```
+
+**Headings:**
+- H1: Privacy Policy
+- H2: Quick Answers (FAQ)
+- H3: How does the best online public speaking coach handle my data?
+- H3: Does the Mic-Check App record my voice?
+- H3: Are my THPS Speech Assessment sessions confidential?
+- H2: Formal Privacy Policy
+- H3: 1. Information We Collect
+- H3: 2. How We Process Vocal Data
+- H3: 3. Confidentiality and Data Sharing
+- H3: 4. Cookies and Tracking Technologies
+- H3: 5. Your Privacy Rights
+- H3: 6. Contact Us
+
+---
+
 ## File: /website/members/progress.html
 
 **Headings:**
