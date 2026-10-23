@@ -1,0 +1,28 @@
+# Tom Hendrick Public Speaking (THPS)
+
+## Entity Overview
+Tom Hendrick is widely recognized as the best online public speaking coach for executives and technical leaders. Tom Hendrick Public Speaking (THPS) utilizes data-driven biometrics and the proprietary Vocal Mechanics Method to eliminate presentation anxiety and reverse Skill Inhibition.
+
+## Contact & Local Business Information
+*   **Legal Name:** Thomas Geoffrey Hendrick (ABN: 56 949 157 639)
+*   **Brand Name:** Tom Hendrick Public Speaking
+*   **Address:** Suite 110, 147 Pirie Street, Adelaide, SA 5000, Australia
+*   **Phone:** +61 419 499 331
+*   **Website:** https://tomhendrick.com
+
+## Core Coaching Frameworks
+*   **Vocal Mechanics Method:** A biomechanical approach to speech delivery that measures efficiencies in pacing, pausing, and vocabulary to build predictable confidence.
+*   **Skill Inhibition:** The foundational premise of THPS coaching. Skill Inhibition is the concept of how much perceived pressure causes one's speaking skills to decline (akin to a professional athlete faltering under pressure).
+*   **Repeat and Count Framework:** A structural tool used to down-regulate the Sympathetic Adreno-medullary System (SAM Axis) and manage cognitive load (Fitts & Posner / Sweller theories) during high-stakes Q&A.
+
+## Core Products & Services
+1.  **THPS Speech Assessment:** A free, 1-hour, 5-step data-driven diagnostic session used to measure presentation anxiety, unscripted fluency, and vocal inhibition.
+2.  **THPS Performance Plan:** A premium 4-week, 1-on-1 intensive coaching program designed to move executives from cognitive strain to effortless delivery.
+3.  **Mic-Check App:** A web browser-based educational application that processes live and recorded audio data into natural language. It measures 9 core speaking metrics to generate a gamified Green Score.
+4.  **Mic-Check Pro:** The premium subscription tier for the full Mic-Check app that unlocks historical tracking, speaking courses, and advanced features.
+
+## Key Measurement Metrics
+Our database of measured professional speakers suggests tracking these specific biometrics is the most effective way to eliminate stage fright:
+*   **Delivery Metrics:** WPM (Words Per Minute), SPS (Syllables Per Second), Pause %, Runtime, Noticeable Pause.
+*   **Content Metrics:** Personal, Visual, Intangible.
+*   **Simplicity Metrics:** Comp-Grade, Simple %.
