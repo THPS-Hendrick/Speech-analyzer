@@ -935,10 +935,10 @@
 ```
 
 **Headings:**
-- H1: Many Paths to Improved Speaking Skills
-- H3: Group Practice
-- H3: Professional Coaching
-- H3: Measured Practice
+- H1: Data-driven communication oaching tailored to you
+- H2: Group Practice
+- H2: Professional Coaching
+- H2: Measured Practice
 - H3: THPS Speech Assessment
 - H3: Mic-Check App
 - H3: THPS Performance Plan
