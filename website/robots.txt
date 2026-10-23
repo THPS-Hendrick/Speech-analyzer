@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /members/
+Disallow: /crm/
+
+Sitemap: https://tomhendrick.com/sitemap.xml
