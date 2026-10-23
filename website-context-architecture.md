@@ -357,7 +357,7 @@
 
 **Headings:**
 - H1: Data-Driven Public Speaking Transformations
-- H3: Optimized Executive Pace to 150 WPM
+- H2: Optimized Executive Pace to 150 WPM
 - H3: Mastering Professional Pitching & Q&A
 - H3: Hitting the 60% Visual Engagement Rule
 
