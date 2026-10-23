@@ -935,7 +935,7 @@
 ```
 
 **Headings:**
-- H1: Data-driven communication oaching tailored to you
+- H1: Data-driven communication coaching tailored to you
 - H2: Group Practice
 - H2: Professional Coaching
 - H2: Measured Practice
