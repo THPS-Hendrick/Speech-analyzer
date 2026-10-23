@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /members/
-Disallow: /crm/
+Disallow: /partials/
+Disallow: /api/
 
 Sitemap: https://tomhendrick.com/sitemap.xml
