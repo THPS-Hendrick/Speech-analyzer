@@ -287,6 +287,31 @@
 
 ---
 
+## File: /website/members/terms.html
+
+### Body Text:
+- Effective Date: October 23, 2026
+- The THPS Performance Plan and Mic-Check Pro subscriptions require full payment upfront before services commence. Standard invoices are due within seven days of receipt. Overdue accounts incur a 5% monthly late fee. We require these terms to secure dedicated coaching time and maintain seamless software access.
+- Clients must provide a minimum of 24 hours of notice to reschedule a THPS Speech Assessment or coaching session. Failure to provide 24 hours of notice results in the forfeiture of that session. We do not provide refunds for change of mind or partially completed programs.
+- Tom Hendrick Public Speaking retains complete ownership of all proprietary frameworks, methodologies, and the Mic-Check App software. However, once your invoice is fully paid, you retain absolute ownership of the final customized presentation drafts, personal stories, and individual assessment reports generated during your coaching.
+- This Services Agreement ("Agreement") governs your use of the tomhendrick.com website, the Mic-Check App, and any coaching services provided by Tom Hendrick Public Speaking ("Provider", "I", "me", "my"). By accessing our Member Portal or purchasing our services, you ("Client", "you", "your") agree to these terms.
+- The Provider agrees to deliver coaching, drafting, assessment, and/or software access services as outlined in your selected package. Services may include the THPS Speech Assessment, the THPS Performance Plan, or subscription access to the Mic-Check App. The standard of quality for drafting and assessment services is based on the Provider's proprietary objective speech measuring tool. Deliverables are deemed complete when they meet the approved measurable metrics (achieving a high Green Score).
+- Coaching Sessions: The Client must provide a minimum of twenty-four (24) hours' notice to reschedule a coaching session. Failure to provide 24 hours' notice, or failing to attend a scheduled session, will result in the forfeiture of that session.
+- Refunds: No refunds will be provided for "change of mind" or partially completed coaching packages. Refunds will only be issued if the Provider is unable to deliver the agreed-upon services. Mic-Check Pro subscriptions are non-refundable for the current billing period once charged.
+- Provider’s IP: The Provider retains 100% ownership of all proprietary methodologies, speech measuring tools, rubrics, metrics, course materials, frameworks, and login portal infrastructure (including the Mic-Check App). The Client is granted a limited, non-exclusive license to use these tools during the term of this Agreement.
+- Client’s IP: Upon receipt of full payment, the Client will retain full ownership of the final customized presentation drafts and their individual assessment reports created under this Agreement.
+- Both parties agree to a mutual standard of confidentiality. The Provider will not disclose any of the Client's sensitive business information, personal stories, corporate strategies, or trade secrets shared during coaching sessions or captured via the Mic-Check App. In return, the Client agrees not to share, distribute, or resell their Member Portal login credentials, or the Provider’s proprietary coaching frameworks, to any third parties.
+- Deliverable Guarantee: The Provider guarantees that the coaching services and deliverables will be measured against objective speaking metrics established by the Mic-Check App.
+- Outcome Disclaimer: The Client acknowledges that the Provider does not and cannot guarantee specific real-world outcomes resulting from the use of these services (e.g., winning a pitch, securing funding, obtaining a promotion). Audience reactions remain outside the control of the Provider.
+- Liability Cap: The Provider’s total liability for any claim arising out of this Agreement shall not exceed the total fees paid by the Client to the Provider under this Agreement.
+- This Agreement shall be governed by and construed in accordance with the laws of South Australia. Any disputes arising from this Agreement shall be resolved in the courts of South Australia.
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
 ## File: /website/partials/footer.html
 
 ### Body Text:

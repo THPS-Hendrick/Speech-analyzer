@@ -517,6 +517,87 @@
 
 ---
 
+## File: /website/members/terms.html
+
+**Title:** Terms of Service | THPS Member Portal
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick Public Speaking",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are the payment terms for THPS coaching?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The THPS Performance Plan and Mic-Check Pro subscriptions require full payment upfront before services commence. Standard invoices are due within seven days of receipt. Overdue accounts incur a 5% monthly late fee. We require these terms to secure dedicated coaching time and maintain seamless software access."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the cancellation policy for a THPS Speech Assessment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Clients must provide a minimum of 24 hours of notice to reschedule a THPS Speech Assessment or coaching session. Failure to provide 24 hours of notice results in the forfeiture of that session. We do not provide refunds for change of mind or partially completed programs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who owns the intellectual property of my coaching sessions?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tom Hendrick Public Speaking retains complete ownership of all proprietary frameworks, methodologies, and the Mic-Check App software. However, once your invoice is fully paid, you retain absolute ownership of the final customized presentation drafts, personal stories, and individual assessment reports generated during your coaching."
+          }
+        }
+      ]
+    }
+```
+
+**Headings:**
+- H1: Terms of Service
+- H2: Quick Answers (FAQ)
+- H3: What are the payment terms for THPS coaching?
+- H3: What is the cancellation policy for a THPS Speech Assessment?
+- H3: Who owns the intellectual property of my coaching sessions?
+- H2: Formal Services Agreement
+- H3: 1. Scope of Services
+- H3: 2. Fees and Subscriptions
+- H3: 3. Cancellations, Rescheduling, and Refunds
+- H3: 4. Intellectual Property
+- H3: 5. Confidentiality
+- H3: 6. Guarantees and Limitation of Liability
+- H3: 7. Governing Law
+
+---
+
 ## File: /website/partials/footer.html
 
 **Headings:**
