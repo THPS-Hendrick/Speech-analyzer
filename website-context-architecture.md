@@ -93,8 +93,8 @@
 
 **Headings:**
 - H1: Meet Tom Hendrick: Top-Rated Online Public Speaking Coach
-- H3: Recognized as a Top 10 Speech Coach
-- H2: High-Stakes Track Record
+- H2: Recognized as a Top 10 Speech Coach
+- H3: Why data-driven coaching is the best approach to high-stakes presentations
 - H3: $100M+ Engineering & Satellite Projects
 - H3: Venture Capital & Startup Pitches
 - H3: C-Suite & Boardroom Transformation
