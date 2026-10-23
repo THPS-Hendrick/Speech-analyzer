@@ -337,7 +337,7 @@
 ## File: /website/partials/footer.html
 
 ### Body Text:
-- &copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Public Speaking Coaching.
+- &copy; 2026 Tom Hendrick. All rights reserved. Data-Driven Online Public Speaking Coach.
 
 ### Interactables (Links/Buttons):
 - [A] Home
@@ -356,6 +356,8 @@
                     
                          
                         0419 499 331
+- [A] Terms of Service
+- [A] Privacy Policy
 
 ### Image Alt Text:
 - THPS Logo
