@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data-Driven Public Speaking Coach Adelaide | Tom Hendrick</title>
     <meta name="description" content="Get data-driven executive speaking skills in just 4 hours. Book an Adelaide coaching session, THPS Speech Assessment, or practice with the Mic-Check App.">
-<link rel="canonical" href="https://tomhendrick.com/" />
+    <link rel="canonical" href="https://tomhendrick.com/" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
@@ -59,15 +59,18 @@
       "@type": "VideoObject",
       "name": "Live Executive Coaching: Overcoming Skill Inhibition",
       "description": "Top-rated online public speaking coach Tom Hendrick uses live audio data from the Mic-Check App to help a corporate executive reduce their pacing to the optimal WPM zone.",
-      "thumbnailUrl": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/thps-executive-coaching-online-mic-check-app-progress.webp",
+      "thumbnailUrl": "https://tomhendrick.com/image/thps-executive-coaching-online-mic-check-app-progress.webp",
       "uploadDate": "2026-10-19T08:00:00+08:00",
       "embedUrl": "https://www.youtube.com/embed/VHKt58SrD1Q"
     }
     </script>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Preconnect External Domains for Faster Handshake -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- FontAwesome for Icons -->
@@ -100,25 +103,27 @@
         .faq-icon.open { transform: rotate(180deg); }
     </style>
 
-    <!-- Optimized Lazy-Load Google Analytics --><script>
-  let gaLoaded = false;
-  function loadGoogleAnalytics() {
-    if (gaLoaded) return;
-    gaLoaded = true;
-    const script = document.createElement('script');
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-Y7SSEBXQ5X';
-    script.async = true;
-    document.head.appendChild(script);
-    
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-Y7SSEBXQ5X');
-  }
-  // Load on user interaction to protect PageSpeed scores
-  ['scroll', 'mousemove', 'touchstart', 'click'].forEach(event => {
-    window.addEventListener(event, loadGoogleAnalytics, { once: true, passive: true });
-  });</script>
+    <!-- Optimized Lazy-Load Google Analytics -->
+    <script>
+      let gaLoaded = false;
+      function loadGoogleAnalytics() {
+        if (gaLoaded) return;
+        gaLoaded = true;
+        const script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-Y7SSEBXQ5X';
+        script.async = true;
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Y7SSEBXQ5X');
+      }
+      // Load on user interaction to protect PageSpeed scores
+      ['scroll', 'mousemove', 'touchstart', 'click'].forEach(event => {
+        window.addEventListener(event, loadGoogleAnalytics, { once: true, passive: true });
+      });
+    </script>
 </head>
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative pb-24">
 
@@ -148,7 +153,7 @@
         </button>
     </nav>
     <main>
-            <!-- SEO-Optimized Hero Section -->
+        <!-- SEO-Optimized Hero Section -->
         <section class="relative bg-white pt-20 pb-16 md:pt-28 md:pb-24 border-b border-gray-100 overflow-hidden">
             <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-green/5 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
             
@@ -178,7 +183,13 @@
                     <!-- Hero Visual Proof -->
                     <div class="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
                         <div class="relative w-full rounded-[2rem] overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border-4 border-white transform lg:-rotate-2 transition-transform hover:rotate-0 duration-500 bg-gray-100 aspect-[25/13] flex items-center justify-center">
-                            <img src="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/thps-executive-coaching-online-mic-check-app-progress.webp" alt="Mic-Check App Dashboard analyzing executive speech biometrics" class="w-full h-full object-cover">
+                            <img src="/image/thps-executive-coaching-online-mic-check-app-progress.webp" 
+                                 alt="Mic-Check App Dashboard analyzing executive speech biometrics" 
+                                 width="750" 
+                                 height="390"
+                                 fetchpriority="high"
+                                 decoding="async"
+                                 class="w-full h-full object-cover">
                         </div>
                     </div>
                     
@@ -365,7 +376,6 @@
                     <!-- Left: Concentrated Video Evidence -->
                     <div class="lg:col-span-7">
                         <div class="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
-                            <!-- Lazy-loaded YouTube iframe protects page speed -->
                             <iframe 
                                 width="100%" 
                                 height="100%" 
@@ -387,13 +397,13 @@
                     <div class="lg:col-span-5 flex flex-col h-full">
                         <div class="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 h-full flex flex-col">
                             <div class="flex items-center justify-center lg:justify-start gap-3 mb-6">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="w-8 h-8">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" width="32" height="32" class="w-8 h-8">
                                 <h3 class="text-2xl font-bold text-white">Verified Reviews</h3>
                             </div>
                             
                             <!-- INJECT YOUR GOOGLE REVIEWS API SCRIPT/WIDGET HERE -->
                             <div id="google-reviews-widget-container" class="flex-grow min-h-[300px] w-full bg-black/20 rounded-xl border border-white/5 flex items-center justify-center p-4">
-                                <!-- STATIC FALLBACK: Perfectly matches the API UI and guarantees Schema alignment -->
+                                <!-- STATIC FALLBACK: Matches API UI and guarantees Schema alignment -->
                                 <div class="flex flex-col gap-4 w-full">
                                     <div class="bg-black/30 p-5 rounded-xl border border-white/5 flex flex-col gap-3">
                                         <div class="flex items-center gap-3">
@@ -502,7 +512,7 @@
                 </div>
             </div>
         </section>
-</main>
+    </main>
 
     <!-- INJECT_FOOTER -->
 
@@ -534,10 +544,13 @@
                         let reviewsHTML = `<div class="flex flex-col gap-4 w-full">`;
                         
                         topReviews.forEach(review => {
+                            // Downscale 128px avatar to 80px thumbnail from Google's image server
+                            const optimizedAvatar = (review.profile_photo_url || '').replace(/=s\d+/, '=s80');
+                            
                             reviewsHTML += `
                                 <div class="bg-black/30 p-5 rounded-xl border border-white/5 flex flex-col gap-3">
                                     <div class="flex items-center gap-3">
-                                        <img src="${review.profile_photo_url}" alt="${review.author_name}" class="w-10 h-10 rounded-full">
+                                        <img src="${optimizedAvatar}" alt="${review.author_name}" width="40" height="40" loading="lazy" class="w-10 h-10 rounded-full object-cover">
                                         <div>
                                             <p class="text-white font-bold text-sm">${review.author_name}</p>
                                             <div class="flex text-brand-gold text-xs">
@@ -555,8 +568,6 @@
                         reviewsContainer.innerHTML = reviewsHTML;
                     })
                     .catch(error => {
-                        // Silently fail in the console. Do NOT overwrite the reviewsContainer, 
-                        // leaving the perfectly formatted static fallback and outbound link intact.
                         console.error('API Feed unavailable. Falling back to static E-E-A-T layout:', error);
                     });
             }
@@ -578,18 +589,17 @@
             const pauseEl = document.getElementById('pause-live');
 
             if (wpmEl && spsEl && pauseEl) {
-                // Creates a realistic subtle fluctuation every 1.5 seconds to simulate a live diagnostic
                 setInterval(() => {
                     const baseWPM = 127;
-                    const wpmFluctuation = Math.floor(Math.random() * 5) - 2; // -2 to +2 variation
+                    const wpmFluctuation = Math.floor(Math.random() * 5) - 2;
                     wpmEl.innerText = baseWPM + wpmFluctuation;
                     
                     const baseSPS = 3.9;
-                    const spsFluctuation = (Math.random() * 0.2 - 0.1).toFixed(1); // -0.1 to +0.1 variation
+                    const spsFluctuation = (Math.random() * 0.2 - 0.1).toFixed(1);
                     spsEl.innerText = (baseSPS + parseFloat(spsFluctuation)).toFixed(1);
 
                     const basePause = 22;
-                    const pauseFluctuation = Math.floor(Math.random() * 3) - 1; // -1 to +1 variation
+                    const pauseFluctuation = Math.floor(Math.random() * 3) - 1;
                     pauseEl.innerText = (basePause + pauseFluctuation) + '%';
                 }, 1500);
             }
