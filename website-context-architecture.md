@@ -455,7 +455,7 @@
       "@type": "VideoObject",
       "name": "Live Executive Coaching: Overcoming Skill Inhibition",
       "description": "Top-rated online public speaking coach Tom Hendrick uses live audio data from the Mic-Check App to help a corporate executive reduce their pacing to the optimal WPM zone.",
-      "thumbnailUrl": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/website/image/thps-executive-coaching-online-mic-check-app-progress.webp",
+      "thumbnailUrl": "https://tomhendrick.com/image/thps-executive-coaching-online-mic-check-app-progress.webp",
       "uploadDate": "2026-10-19T08:00:00+08:00",
       "embedUrl": "https://www.youtube.com/embed/VHKt58SrD1Q"
     }
