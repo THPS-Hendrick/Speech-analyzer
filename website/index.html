@@ -532,24 +532,24 @@
                 });
             }
 
-            // --- Live Google Reviews Fetch ---
-            const reviewsContainer = document.getElementById('google-reviews-widget-container');
-            
-            if (reviewsContainer) {
+// --- Live Google Reviews Fetch (Lazy-loaded via IntersectionObserver) ---
+const reviewsContainer = document.getElementById('google-reviews-widget-container');
+
+if (reviewsContainer && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                obs.disconnect(); // Fire once
+                
                 fetch('/api/reviews')
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) throw new Error(data.error);
-                        
-                        // Limit to top 3 recent reviews for the UI
                         const topReviews = data.reviews.slice(0, 3);
-                        
                         let reviewsHTML = `<div class="flex flex-col gap-4 w-full">`;
                         
                         topReviews.forEach(review => {
-                            // Downscale 128px avatar to 80px thumbnail from Google's image server
                             const optimizedAvatar = (review.profile_photo_url || '').replace(/=s\d+/, '=s80');
-                            
                             reviewsHTML += `
                                 <div class="bg-black/30 p-5 rounded-xl border border-white/5 flex flex-col gap-3">
                                     <div class="flex items-center gap-3">
@@ -565,15 +565,18 @@
                                 </div>
                             `;
                         });
-                        
                         reviewsHTML += `</div>`;
-                        
                         reviewsContainer.innerHTML = reviewsHTML;
                     })
                     .catch(error => {
                         console.error('API Feed unavailable. Falling back to static E-E-A-T layout:', error);
                     });
             }
+        });
+    }, { rootMargin: '200px' }); // Start fetching 200px before user scrolls into view
+    
+    observer.observe(reviewsContainer);
+}
 
             // --- FAQ Accordion Logic ---
             const faqButtons = document.querySelectorAll('.faq-btn');
