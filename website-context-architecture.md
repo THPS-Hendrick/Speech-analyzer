@@ -345,7 +345,7 @@
       "@context": "https://schema.org/",
       "@type": "LocalBusiness",
       "name": "Tom Hendrick Public Speaking",
-      "image": "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-tom-hendrick-public-speaking.svg",
+      "image": "/image/thps-logo-tom-hendrick-public-speaking.svg",
       "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
       "aggregateRating": {
         "@type": "AggregateRating",
