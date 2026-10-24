@@ -119,6 +119,28 @@
         .faq-icon { transition: transform 0.2s ease-in-out; }
         .faq-icon.open { transform: rotate(180deg); }
     </style>
+
+        <!-- Optimized Lazy-Load Google Analytics -->
+    <script>
+      let gaLoaded = false;
+      function loadGoogleAnalytics() {
+        if (gaLoaded) return;
+        gaLoaded = true;
+        const script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-Y7SSEBXQ5X';
+        script.async = true;
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Y7SSEBXQ5X');
+      }
+      // Load on user interaction to protect PageSpeed scores
+      ['scroll', 'mousemove', 'touchstart', 'click'].forEach(event => {
+        window.addEventListener(event, loadGoogleAnalytics, { once: true, passive: true });
+      });
+    </script>
 </head>
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative pb-24">
 
