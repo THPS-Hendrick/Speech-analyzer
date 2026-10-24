@@ -404,7 +404,7 @@
 
 ## File: /website/index.html
 
-**Title:** Tom Hendrick | Data-Driven Online Public Speaking Coach
+**Title:** Data-Driven Public Speaking Coach Adelaide | Tom Hendrick
 
 **Schema 1:**
 ```json
