@@ -80,28 +80,28 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Tailwind Configuration -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Optimized Lazy-Load Google Analytics -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            green: '#106030',
-                            dark: '#0c4a25',
-                            gold: '#FFCC00',
-                            offwhite: '#FAF9F5'
-                        }
-                    }
-                }
-            }
-        }
+      let gaLoaded = false;
+      function loadGoogleAnalytics() {
+        if (gaLoaded) return;
+        gaLoaded = true;
+        const script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-Y7SSEBXQ5X';
+        script.async = true;
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Y7SSEBXQ5X');
+      }
+      // Load on user interaction to protect PageSpeed scores
+      ['scroll', 'mousemove', 'touchstart', 'click'].forEach(event => {
+        window.addEventListener(event, loadGoogleAnalytics, { once: true, passive: true });
+      });
     </script>
 </head>
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
