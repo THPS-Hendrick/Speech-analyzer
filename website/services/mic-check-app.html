@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mic-Check App | AI Public Speaking Metrics</title>
+    <title>Mic-Check App | Measure Speech Metrics and Progress-Tracking</title>
     <meta name="description" content="Stop guessing how you sound. The Mic-Check App measures your pace, pause ratio, and vocabulary mix in real-time. Try the free demo or subscribe for full access.">
 <link rel="canonical" href="https://tomhendrick.com/services/mic-check-app.html" />
     
@@ -84,11 +84,22 @@
     }
     </script>
 
-    <!-- Google Fonts & Icons -->
+    <!-- Google Fonts, Icons & External Domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Google Fonts: Inter (Non-Render Blocking) --><link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
-    <!-- FontAwesome (Deferred / Non-Render Blocking) --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preconnect" href="https://mic-check-backend.vercel.app">
+    
+    <!-- Google Fonts: Inter (Non-Render Blocking) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
+    
+    <!-- FontAwesome (Deferred / Non-Render Blocking) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <!-- Preload Main CSS to resolve chaining critical requests -->
+    <link rel="preload" href="/style.css" as="style">
     <link rel="stylesheet" href="/style.css">
 
     <!-- Optimized Lazy-Load Google Analytics -->
@@ -284,7 +295,7 @@
                     
                     <div class="md:w-1/2 relative z-10">
                         <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-3"><i class="fa-solid fa-unlock"></i> Upgrade to Full Access</div>
-                        <h2 class="text-3xl font-bold text-white mb-4">Track Your History & Save Your Progress</h2>
+                        <h3 class="text-3xl font-bold text-white mb-4">Track Your History & Save Your Progress</h3>
                         <p class="text-slate-300 mb-6 leading-relaxed">The free demo resets after every use. Subscribe to unlock cloud history, detailed PDF reports, and advanced speaking courses.</p>
                         
                         <ul class="space-y-3 mb-8">
