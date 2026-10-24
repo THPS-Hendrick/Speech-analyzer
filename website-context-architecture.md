@@ -694,7 +694,7 @@
 
 ## File: /website/services/mic-check-app.html
 
-**Title:** Mic-Check App | AI Public Speaking Metrics
+**Title:** Mic-Check App | Measure Speech Metrics and Progress-Tracking
 
 **Schema 1:**
 ```json
@@ -787,7 +787,7 @@
 - H3: What is a good Comp-Grade for speeches?
 - H3: What is the Simple % metric?
 - H2: Frequently Asked Questions
-- H2: Track Your History & Save Your Progress
+- H3: Track Your History & Save Your Progress
 
 ---
 
