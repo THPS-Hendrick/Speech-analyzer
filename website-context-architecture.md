@@ -330,7 +330,7 @@
         "addressRegion": "SA",
         "postalCode": "5000",
         "addressCountry": "AU"
-      },
+    },
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": "-34.9252",
