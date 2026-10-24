@@ -404,7 +404,7 @@
 
 ## File: /website/index.html
 
-**Title:** The Premier Online Public Speaking Coach | THPS
+**Title:** Tom Hendrick | Data-Driven Online Public Speaking Coach
 
 **Schema 1:**
 ```json
