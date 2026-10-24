@@ -972,7 +972,7 @@
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": "-34.9252",
-        "longitude": "138.6063"
+        "lonude": "138.6063"
       },
       "aggregateRating": {
         "@type": "AggregateRating",
