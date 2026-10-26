@@ -11,28 +11,79 @@ export default async function handler(req, res) {
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
     try {
-        // 2. Define our search window (Today to 7 days from now)
         const timeZone = 'Australia/Adelaide';
         const now = new Date();
         const timeMin = new Date(now);
         const timeMax = new Date(now);
         timeMax.setDate(timeMax.getDate() + 7);
 
-        // 3. Ask Google for times you are already booked
+        // Define the specific calendar IDs you want to pool
+        const primaryId = 'primary'; // tom@tomhendrick.com
+        const taTomId = 'tom@talentacademy.com.au';
+        const taInfoId = 'info@talentacademy.com.au';
+
+        let allBusySlots = [];
+
+        // ====================================================================
+        // STEP 1: Fast FreeBusy Query for personal and direct TA emails
+        // ====================================================================
         const freeBusyResponse = await calendar.freebusy.query({
             requestBody: {
                 timeMin: timeMin.toISOString(),
                 timeMax: timeMax.toISOString(),
                 timeZone: timeZone,
-                items: [{ id: 'primary' }] // 'primary' is your main Google Calendar
+                items: [{ id: primaryId }, { id: taTomId }] 
             }
         });
-        const busySlots = freeBusyResponse.data.calendars.primary.busy;
 
-        // 4. Generate open 1-hour slots between 9 AM and 5 PM
+        // Merge the busy blocks from both direct calendars
+        const calendarsData = freeBusyResponse.data.calendars;
+        if (calendarsData[primaryId]?.busy) {
+            allBusySlots = allBusySlots.concat(calendarsData[primaryId].busy);
+        }
+        if (calendarsData[taTomId]?.busy) {
+            allBusySlots = allBusySlots.concat(calendarsData[taTomId].busy);
+        }
+
+        // ====================================================================
+        // STEP 2: Intelligent Events List Query for shared info@ email
+        // ====================================================================
+        const eventsResponse = await calendar.events.list({
+            calendarId: taInfoId,
+            timeMin: timeMin.toISOString(),
+            timeMax: timeMax.toISOString(),
+            singleEvents: true,
+            orderBy: 'startTime',
+            timeZone: timeZone
+        });
+
+        const infoEvents = eventsResponse.data.items || [];
+        
+        infoEvents.forEach(event => {
+            const title = event.summary || '';
+            const description = event.description || '';
+            const attendees = event.attendees || [];
+
+            // Intelligent filter: Check if "Tom" is mentioned, or if his email is an attendee
+            const mentionsTom = /tom/i.test(title) || /tom/i.test(description);
+            const isAttendee = attendees.some(a => a.email.toLowerCase().includes('tom'));
+
+            if (mentionsTom || isAttendee) {
+                // Handle both standard events and all-day events
+                const start = event.start.dateTime || event.start.date;
+                const end = event.end.dateTime || event.end.date;
+                
+                if (start && end) {
+                    allBusySlots.push({ start: start, end: end });
+                }
+            }
+        });
+
+        // ====================================================================
+        // STEP 3: Generate open 1-hour slots against the unified busy array
+        // ====================================================================
         let availableSlots = [];
         
-        // Loop through the next 7 days
         for (let i = 1; i <= 7; i++) {
             let currentDay = new Date(now);
             currentDay.setDate(currentDay.getDate() + i);
@@ -40,36 +91,33 @@ export default async function handler(req, res) {
             // Skip weekends (0 is Sunday, 6 is Saturday)
             if (currentDay.getDay() === 0 || currentDay.getDay() === 6) continue;
 
-            // Check 9 AM through 4 PM (for 1-hour sessions ending at 5 PM)
             for (let hour = 9; hour <= 16; hour++) {
                 let slotStart = new Date(currentDay);
                 slotStart.setHours(hour, 0, 0, 0);
                 let slotEnd = new Date(slotStart);
                 slotEnd.setHours(hour + 1, 0, 0, 0);
 
-                // Check if this slot overlaps with any busy periods
-                let isBusy = busySlots.some(busy => {
+                // Check if this slot overlaps with ANY busy period from ANY calendar
+                let isBusy = allBusySlots.some(busy => {
                     let busyStart = new Date(busy.start);
                     let busyEnd = new Date(busy.end);
                     return (slotStart < busyEnd && slotEnd > busyStart);
                 });
 
-                // If it is not busy, add it to our available list
                 if (!isBusy) {
                     availableSlots.push({
                         date: slotStart.toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' }),
                         time: slotStart.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }),
-                        iso: slotStart.toISOString() // We will send this back to the server when booking
+                        iso: slotStart.toISOString() 
                     });
                 }
             }
         }
 
-        // 5. Send the available slots to the browser
         res.status(200).json({ success: true, slots: availableSlots });
 
     } catch (error) {
-        console.error("Calendar Error:", error);
+        console.error("Calendar Pooling Error:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 }
