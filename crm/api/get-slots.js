@@ -64,12 +64,19 @@ export default async function handler(req, res) {
             const description = event.description || '';
             const attendees = event.attendees || [];
 
-            // Intelligent filter: Check if "Tom" is mentioned, or if his email is an attendee
-            const mentionsTom = /tom/i.test(title) || /tom/i.test(description);
-            const isAttendee = attendees.some(a => a.email.toLowerCase().includes('tom'));
+            // 1. Use \b for word boundaries to stop "tomorrow" and "customer"
+            // The 'i' keeps it case-insensitive for "Tom" and "TOM"
+            const tomRegex = /\btom\b/i;
+            const mentionsTom = tomRegex.test(title) || tomRegex.test(description);
+
+            // 2. Use an exact match array for his emails to stop "customer@..."
+            const tomsEmails = [
+                'tom@tomhendrick.com',
+                'tom@talentacademy.com.au'
+            ];
+            const isAttendee = attendees.some(a => tomsEmails.includes(a.email.toLowerCase()));
 
             if (mentionsTom || isAttendee) {
-                // Handle both standard events and all-day events
                 const start = event.start.dateTime || event.start.date;
                 const end = event.end.dateTime || event.end.date;
                 
