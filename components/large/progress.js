@@ -12,19 +12,15 @@ class ThpsProgress extends HTMLElement {
         // Define the target zones for every possible metric
         this.METRIC_CONFIG = {
             'grade': {
-                key: 'totalPoints',
-                title: 'Overall Grade (/100)',
-                min: 0, max: 100,
+                key: 'totalPoints', title: 'Overall Grade (/100)', min: 0, max: 100,
                 zones: [
-                    { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, // Green
-                    { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' },  // Yellow
-                    { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' }   // Red
+                    { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' },
+                    { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, 
+                    { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' }   
                 ]
             },
             'greenScore': {
-                key: 'greenScore',
-                title: 'Green Metrics Hit (/10)',
-                min: 0, max: 10,
+                key: 'greenScore', title: 'Green Metrics Hit (/10)', min: 0, max: 10,
                 zones: [
                     { min: 8, max: 10, color: 'rgba(34, 197, 94, 0.12)' },
                     { min: 5, max: 8, color: 'rgba(234, 179, 8, 0.12)' },
@@ -32,9 +28,7 @@ class ThpsProgress extends HTMLElement {
                 ]
             },
             'wpm': {
-                key: 'wpm',
-                title: 'Words Per Minute',
-                min: 50, max: 200,
+                key: 'wpm', title: 'Words Per Minute', min: 50, max: 200,
                 zones: [
                     { min: 0, max: 85, color: 'rgba(239, 68, 68, 0.12)' },
                     { min: 85, max: 100, color: 'rgba(234, 179, 8, 0.12)' },
@@ -44,9 +38,7 @@ class ThpsProgress extends HTMLElement {
                 ]
             },
             'sps': {
-                key: 'sps',
-                title: 'Syllables / Sec',
-                min: 2.0, max: 6.0,
+                key: 'sps', title: 'Syllables / Sec', min: 2.0, max: 6.0,
                 zones: [
                     { min: 0, max: 3.0, color: 'rgba(239, 68, 68, 0.12)' },
                     { min: 3.0, max: 3.5, color: 'rgba(234, 179, 8, 0.12)' },
@@ -116,31 +108,6 @@ class ThpsProgress extends HTMLElement {
                 ]
             }
         };
-
-        // Custom Chart.js Plugin to draw the colored background threshold zones
-        this.zoneBackgroundPlugin = {
-            id: 'zoneBackground',
-            beforeDraw: (chart) => {
-                const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
-                const zones = chart.config.options.plugins.zoneBackground.zones;
-                
-                if (!zones) return;
-
-                ctx.save();
-                zones.forEach(zone => {
-                    // Chart.js Y-axis is inverted (0 is at the bottom visually)
-                    const yTopPixel = Math.max(top, y.getPixelForValue(zone.max));
-                    const yBottomPixel = Math.min(bottom, y.getPixelForValue(zone.min));
-                    const height = yBottomPixel - yTopPixel;
-
-                    if (height > 0) {
-                        ctx.fillStyle = zone.color;
-                        ctx.fillRect(left, yTopPixel, right - left, height);
-                    }
-                });
-                ctx.restore();
-            }
-        };
     }
 
     connectedCallback() {
@@ -177,6 +144,29 @@ class ThpsProgress extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons();
 
+        // Safely register the custom Chart.js Plugin globally
+        if (window.Chart && !window.Chart.registry.plugins.get('zoneBackground')) {
+            window.Chart.register({
+                id: 'zoneBackground',
+                beforeDraw: (chart) => {
+                    const zones = chart.config.options.plugins.zoneBackground?.zones;
+                    if (!zones) return;
+                    const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                    ctx.save();
+                    zones.forEach(zone => {
+                        const yTopPixel = Math.max(top, y.getPixelForValue(zone.max));
+                        const yBottomPixel = Math.min(bottom, y.getPixelForValue(zone.min));
+                        const height = yBottomPixel - yTopPixel;
+                        if (height > 0) {
+                            ctx.fillStyle = zone.color;
+                            ctx.fillRect(left, yTopPixel, right - left, height);
+                        }
+                    });
+                    ctx.restore();
+                }
+            });
+        }
+
         this.querySelector('.thps-close-btn').addEventListener('click', () => {
             const wrapper = this.closest('.cursor-move');
             if (wrapper) wrapper.remove(); 
@@ -212,7 +202,6 @@ class ThpsProgress extends HTMLElement {
         const history = window.thps_sessionHistory || [];
         const emptyState = this.querySelector('#progress-empty');
         
-        // Show empty state if there is no history to plot
         if (history.length === 0) {
             emptyState.classList.remove('hidden');
             if (this.chart) { this.chart.destroy(); this.chart = null; }
@@ -239,6 +228,11 @@ class ThpsProgress extends HTMLElement {
             this.chart.data.datasets[0].data = dataPoints;
             this.chart.options.scales.y.min = config.min;
             this.chart.options.scales.y.max = config.max;
+            
+            // Ensure plugin config object exists before overwriting zones
+            if (!this.chart.options.plugins.zoneBackground) {
+                this.chart.options.plugins.zoneBackground = {};
+            }
             this.chart.options.plugins.zoneBackground.zones = config.zones;
             
             // Trigger smooth animation to the new metric
@@ -247,16 +241,15 @@ class ThpsProgress extends HTMLElement {
             // Initial Creation
             this.chart = new Chart(canvas, {
                 type: 'line',
-                plugins: [this.zoneBackgroundPlugin],
                 data: {
                     labels: labels,
                     datasets: [{
                         label: config.title,
                         data: dataPoints,
-                        borderColor: 'rgba(15, 23, 42, 0.4)', // Slate-900 transparent line
+                        borderColor: 'rgba(15, 23, 42, 0.4)', 
                         borderWidth: 1.5,
-                        borderDash: [5, 5], // Dotted connecting line
-                        pointBackgroundColor: '#0f172a', // Solid Black dots
+                        borderDash: [5, 5], 
+                        pointBackgroundColor: '#0f172a', 
                         pointBorderColor: '#0f172a',
                         pointRadius: 5,
                         pointHoverRadius: 7,
