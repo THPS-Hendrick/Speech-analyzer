@@ -20,6 +20,7 @@
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/main-dash.js]"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/thps-ai-coach.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/thps-progress-report.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
@@ -369,6 +370,9 @@
                  <div>
                     <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-3 flex items-center gap-3"><div class="w-full h-px bg-slate-200"></div> SIMPLICITY <div class="w-full h-px bg-slate-200"></div></h4>
                     <div class="grid grid-cols-1 gap-3">
+                        <div onclick="window.THPS.Dashboard.spawnWidget('thps-main-dash', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
+                            <i data-lucide="plus" class="w-4 h-4 mb-1"></i>Main Dash
+                        </div>
                         <div onclick="window.THPS.Dashboard.spawnWidget('thps-whats-this', 'w-full mt-2', this)" class="border-2 border-slate-200 rounded-xl h-16 flex flex-col items-center justify-center text-xs font-bold text-blue-600 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 cursor-pointer transition-all">
                             <i data-lucide="plus" class="w-4 h-4 mb-1"></i> What's This?
                         </div>
@@ -452,16 +456,12 @@
                         </div>
                         
                         <div class="w-full mt-2 cursor-move relative group">
-                            <thps-score-summary></thps-score-summary>
+                            <thps-main-dash></thps-main-dash>
                         </div>
 
                         <!-- NEW DEFAULT LOADOUT: PROGRESS GRAPH -->
                         <div class="w-full mt-2 cursor-move relative group">
                             <thps-progress></thps-progress>
-                        </div>
-
-                        <div class="w-full mt-2 cursor-move relative group">
-                            <thps-voice-graph title="Voice Graph"></thps-voice-graph>
                         </div>
      
                         <div class="w-full mt-2 cursor-move relative group">
