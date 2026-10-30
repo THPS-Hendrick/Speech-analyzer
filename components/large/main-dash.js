@@ -30,20 +30,17 @@ class ThpsMainDash extends HTMLElement {
         this.innerHTML = `
             <div class="score-card glass-panel p-0 rounded-2xl border-t-4 border-slate-800 shadow-lg transition-colors duration-300 relative w-full h-full group cursor-move flex flex-col min-h-[420px] overflow-hidden bg-white">
                 
-                <!-- SELF DESTRUCT BUTTON -->
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
-                <!-- TAB NAVIGATION -->
                 <div class="flex border-b border-slate-200 bg-slate-50 pt-2 px-2 gap-1 overflow-x-auto styled-scrollbar">
-                    <button class="dash-tab-btn px-4 py-2 text-sm font-black tracking-wide rounded-t-xl transition-colors text-blue-600 bg-white border-t border-l border-r border-slate-200" data-tab="summary">Summary</button>
-                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100" data-tab="progress">Progress</button>
-                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100" data-tab="moe">MoE</button>
-                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100" data-tab="history">History <span class="history-count-badge ml-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full">0</span></button>
+                    <button class="dash-tab-btn px-4 py-2 text-sm font-black tracking-wide rounded-t-xl transition-colors text-blue-600 bg-white border-t border-l border-r border-slate-200 shadow-sm relative z-10" data-tab="summary">Summary</button>
+                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100 border-b border-transparent" data-tab="progress">Progress</button>
+                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100 border-b border-transparent" data-tab="moe">MoE</button>
+                    <button class="dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100 border-b border-transparent" data-tab="history">History <span class="history-count-badge ml-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full">0</span></button>
                 </div>
 
-                <!-- VIEW CONTAINERS -->
                 <div class="p-5 sm:p-6 flex-1 flex flex-col relative w-full h-full overflow-hidden">
                     
                     <!-- TAB 1: SUMMARY -->
@@ -103,8 +100,7 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                         </div>
                         
-                        <!-- NEW: Progress Metric Selector Pills -->
-                        <div class="flex w-full gap-2 overflow-x-auto styled-scrollbar pb-3 mb-2 border-b border-slate-100">
+                        <div class="flex w-full gap-2 overflow-x-auto styled-scrollbar pb-3 mb-2 border-b border-slate-100 dash-progress-selectors">
                             <!-- Injected by JS -->
                         </div>
 
@@ -120,7 +116,7 @@ class ThpsMainDash extends HTMLElement {
 
                     <!-- TAB 3: MoE DISPERSION -->
                     <div id="dash-view-moe" class="dash-view hidden w-full h-full flex-col">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm pointer-events-none">
                                     <i data-lucide="target" class="w-4 h-4"></i>
@@ -129,9 +125,10 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                             <p class="text-[10px] uppercase font-bold text-slate-400">Green zone centered.</p>
                         </div>
-                        <div class="flex-1 w-full relative">
-                            <!-- MoE Tracks go here -->
-                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-2 justify-between"></div>
+                        <div class="flex-1 w-full relative flex flex-col">
+                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-4 md:gap-2 justify-between flex-1">
+                                <!-- Tracks will be injected here via JS -->
+                            </div>
                         </div>
                     </div>
 
@@ -159,7 +156,6 @@ class ThpsMainDash extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons();
 
-        // Chart.js Plugin Registration (Hooking globally to avoid context issues)
         if (window.Chart && !window.Chart.registry.plugins.get('zoneBackground')) {
             window.Chart.register({
                 id: 'zoneBackground',
@@ -182,7 +178,6 @@ class ThpsMainDash extends HTMLElement {
             });
         }
 
-        // Build Progress Tab Selectors
         this.buildProgressSelectors();
 
         this.querySelector('.thps-close-btn').addEventListener('click', () => {
@@ -236,10 +231,8 @@ class ThpsMainDash extends HTMLElement {
         if (tabName === 'history') this.renderHistoryList();
     }
 
-    // --- SUMMARY ---
     triggerMetricSelect(term, key) {
         this.showLocalExplanation(term);
-        // Switch to progress tab and show the clicked metric
         if (this.METRIC_CONFIG[key]) {
             this.currentMetric = key;
             this.switchTab('progress');
@@ -324,9 +317,8 @@ class ThpsMainDash extends HTMLElement {
         }
     }
 
-    // --- PROGRESS ---
     buildProgressSelectors() {
-        const container = this.querySelector('#dash-view-progress .flex.w-full.gap-2');
+        const container = this.querySelector('.dash-progress-selectors');
         Object.keys(this.METRIC_CONFIG).forEach(key => {
             const btn = document.createElement('button');
             btn.className = `prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border ${this.currentMetric === key ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`;
@@ -343,7 +335,6 @@ class ThpsMainDash extends HTMLElement {
 
     renderChart() {
         if (!window.Chart || this.activeTab !== 'progress') return;
-        
         const history = window.thps_sessionHistory || [];
         const emptyState = this.querySelector('.dash-progress-empty');
         
@@ -357,8 +348,6 @@ class ThpsMainDash extends HTMLElement {
 
         const config = this.METRIC_CONFIG[this.currentMetric];
         this.querySelector('.dash-progress-label').innerText = config.title;
-
-        // Ensure the correct pill is highlighted if navigated to from Summary
         this.querySelectorAll('.prog-pill').forEach(p => {
             if (p.innerText === config.title) p.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-blue-600 text-white border-blue-600";
             else p.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-white text-slate-500 border-slate-200 hover:bg-slate-50";
@@ -369,7 +358,6 @@ class ThpsMainDash extends HTMLElement {
         const dataPoints = chronologicalHistory.map(h => h[config.key] !== undefined ? h[config.key] : null);
 
         const canvas = this.querySelector('.dash-progress-canvas');
-        
         if (this.chart) {
             this.chart.data.labels = labels;
             this.chart.data.datasets[0].label = config.title;
@@ -384,22 +372,13 @@ class ThpsMainDash extends HTMLElement {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: config.title,
-                        data: dataPoints,
-                        borderColor: 'rgba(15, 23, 42, 0.4)',
-                        borderWidth: 1.5,
-                        borderDash: [5, 5], 
-                        pointBackgroundColor: '#0f172a', 
-                        pointBorderColor: '#0f172a',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        fill: false,
-                        tension: 0.1
+                        label: config.title, data: dataPoints, borderColor: 'rgba(15, 23, 42, 0.4)', borderWidth: 1.5,
+                        borderDash: [5, 5], pointBackgroundColor: '#0f172a', pointBorderColor: '#0f172a',
+                        pointRadius: 5, pointHoverRadius: 7, fill: false, tension: 0.1
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { size: 10 }, bodyFont: { size: 13, weight: 'bold' }, padding: 10, displayColors: false },
@@ -415,78 +394,80 @@ class ThpsMainDash extends HTMLElement {
         }
     }
 
-    // --- MoE DISPERSION ---
     getSymmetricBounds(config) {
-        // Find the absolute center of the perfect green zone
         const greenZone = config.zones.find(z => z.color.includes('197, 94'));
         const center = greenZone ? (greenZone.min + greenZone.max) / 2 : (config.min + config.max) / 2;
-        
-        // Find maximum absolute distance from center to either edge
         const maxDist = Math.max(center - config.min, config.max - center);
-        
-        // Return synthetic bounds where 'center' is mathematically exactly 50%
-        return {
-            visMin: center - maxDist,
-            visMax: center + maxDist,
-            center: center,
-            visRange: maxDist * 2
-        };
+        return { visMin: center - maxDist, visMax: center + maxDist, center: center, visRange: maxDist * 2 };
     }
 
     renderMoE() {
         if (!this.latestData || this.activeTab !== 'moe') return;
-        
         const grid = this.querySelector('.dash-moe-grid');
         grid.innerHTML = '';
 
         const metricsToMap = ['personal', 'visual', 'intangible', 'wpm', 'sps', 'pause', 'runtime', 'grade', 'simple'];
+        const history = window.thps_sessionHistory || [];
 
         metricsToMap.forEach(key => {
             const config = this.METRIC_CONFIG[key];
-            const rawVal = this.latestData[config.key];
-            const hideDot = (rawVal === null || rawVal === undefined || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !this.latestData.recordedAudio));
-
             const bounds = this.getSymmetricBounds(config);
             
-            // Map actual score to % inside symmetric bounds
-            let dotPct = 50;
-            if (!hideDot) {
-                dotPct = ((rawVal - bounds.visMin) / bounds.visRange) * 100;
-                dotPct = Math.max(0, Math.min(100, dotPct)); // Clamp for visual dot
-            }
-
-            // Build symmetric gradients
             let gradientStops = [];
             config.zones.forEach(zone => {
-                let startPct = ((zone.min - bounds.visMin) / bounds.visRange) * 100;
-                let endPct = ((zone.max - bounds.visMin) / bounds.visRange) * 100;
-                startPct = Math.max(0, Math.min(100, startPct));
-                endPct = Math.max(0, Math.min(100, endPct));
-                
+                let startPct = Math.max(0, Math.min(100, ((zone.min - bounds.visMin) / bounds.visRange) * 100));
+                let endPct = Math.max(0, Math.min(100, ((zone.max - bounds.visMin) / bounds.visRange) * 100));
                 const solidColor = zone.color.includes('197') ? '#dcfce7' : (zone.color.includes('179') ? '#fef08a' : '#fee2e2');
-                gradientStops.push(`${solidColor} ${startPct}%`);
-                gradientStops.push(`${solidColor} ${endPct}%`);
+                gradientStops.push(`${solidColor} ${startPct}%`, `${solidColor} ${endPct}%`);
             });
 
-            // Track Element
-            const track = document.createElement('div');
-            track.className = "flex-1 flex flex-col md:flex-row items-center relative group";
+            // Calculate positions for all historical dots and apply cross-axis dodging for overlaps
+            let dotsHtml = '';
+            let usedPercentages = [];
             
-            // Note: Flex direction flips based on mobile/desktop so the layout matches image 8 (columns on desktop)
-            track.innerHTML = `
-                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-center w-full md:w-auto md:min-w-[70px] shrink-0 mb-1 md:mb-0 md:mr-2 border-b-2 md:border-b-0 md:border-r-2 border-slate-100 pb-1 md:pb-0 md:pr-2">${config.title.split(' ')[0]}</div>
-                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-6 md:h-full md:w-8">
-                     <!-- Desktop Gradient (Vertical: bottom to top) -->
-                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
-                     <!-- Mobile Gradient (Horizontal: left to right) -->
-                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
-                     
-                     <!-- Center Line -->
-                     <div class="absolute bg-white/70 shadow-sm md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+            // Iterate history in reverse so newest is plotted last (on top)
+            [...history].reverse().forEach((attempt) => {
+                const rawVal = attempt[config.key];
+                const hideDot = (rawVal === null || rawVal === undefined || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !attempt.recordedAudio));
+                
+                if (!hideDot) {
+                    let dotPct = Math.max(0, Math.min(100, ((rawVal - bounds.visMin) / bounds.visRange) * 100));
+                    let dotPctRounded = Math.round(dotPct);
+                    
+                    // Basic Collision Dodging: Shift cross-axis by a few pixels if another dot is within 2%
+                    let dodgeOffset = 0;
+                    const collisions = usedPercentages.filter(p => Math.abs(p - dotPctRounded) < 2).length;
+                    if (collisions > 0) {
+                        // Alternate offset direction based on collision count
+                        dodgeOffset = collisions % 2 === 0 ? (collisions * 4) : -(collisions * 4);
+                    }
+                    usedPercentages.push(dotPctRounded);
 
-                     <!-- Data Dot -->
-                     ${!hideDot ? `<div class="absolute w-4 h-4 rounded-full bg-slate-800 shadow-lg border-2 border-white z-10 transition-all duration-500 ease-out dot-mobile block md:hidden" style="top: 50%; left: ${dotPct}%; transform: translate(-50%, -50%);" title="${rawVal}"></div>
-                                   <div class="absolute w-4 h-4 rounded-full bg-slate-800 shadow-lg border-2 border-white z-10 transition-all duration-500 ease-out dot-desktop hidden md:block" style="left: 50%; bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="${rawVal}"></div>` : ''}
+                    const isActive = attempt.id === this.latestData.id;
+                    const dotClass = isActive ? 'bg-slate-800 border-white z-20 w-4 h-4' : 'bg-slate-400 border-slate-200 z-10 w-3 h-3 opacity-80';
+
+                    // Desktop uses bottom (Y-axis), Mobile uses left (X-axis) with standard centering
+                    dotsHtml += `
+                        <!-- Mobile Dot -->
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-mobile block md:hidden ${dotClass}" 
+                             style="top: calc(50% + ${dodgeOffset}px); left: ${dotPct}%; transform: translate(-50%, -50%);" title="Att ${attempt.id}: ${rawVal}"></div>
+                        <!-- Desktop Dot -->
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-desktop hidden md:block ${dotClass}" 
+                             style="left: calc(50% + ${dodgeOffset}px); bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="Att ${attempt.id}: ${rawVal}"></div>
+                    `;
+                }
+            });
+
+            const track = document.createElement('div');
+            // Full height stretch on desktop, horizontal row on mobile
+            track.className = "flex-1 flex flex-row md:flex-col items-center relative group w-full h-full";
+            track.innerHTML = `
+                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-left md:text-center w-20 md:w-full shrink-0 mb-0 md:mb-2 md:mr-0 pr-2 md:pr-0 truncate">${config.title.split(' ')[0]}</div>
+                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 md:h-full md:w-10 shadow-inner">
+                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute bg-white/70 md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                     ${dotsHtml}
                 </div>
             `;
             grid.appendChild(track);
@@ -503,21 +484,17 @@ class ThpsMainDash extends HTMLElement {
         if (this.activeTab !== 'history') return;
         const listEl = this.querySelector('.dash-history-list');
         listEl.innerHTML = '';
-        
         const history = window.thps_sessionHistory || [];
         if (history.length === 0) {
             listEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
             return;
         }
-
         history.forEach((attempt) => {
             const isActive = (this.latestData && this.latestData.id === attempt.id);
             const gradeText = attempt.overrideGrade ? '-' : attempt.totalPoints.toFixed(1);
-            
             const item = document.createElement('div');
             item.className = `p-4 rounded-xl border-2 cursor-pointer transition-all ${isActive ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'}`;
             item.onclick = () => window.loadHistoryAttempt(attempt.id);
-            
             item.innerHTML = `
                 <div class="flex justify-between items-center mb-1">
                     <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
@@ -530,7 +507,6 @@ class ThpsMainDash extends HTMLElement {
             `;
             listEl.appendChild(item);
         });
-        
         if (window.lucide) window.lucide.createIcons();
     }
 }
