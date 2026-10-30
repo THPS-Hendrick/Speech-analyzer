@@ -11,45 +11,24 @@ class ThpsMainDash extends HTMLElement {
         this.currentMetric = 'grade';
         this.latestData = null;
 
-        // Unified Metric Configuration (From Progress Graph)
+        // Unified Metric Configuration
         this.METRIC_CONFIG = {
-            'grade': { key: 'totalPoints', title: 'Overall Grade', min: 0, max: 100, zones: [ { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'grade': { key: 'totalPoints', title: 'Overall', min: 0, max: 100, zones: [ { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'greenScore': { key: 'greenScore', title: 'Greens', min: 0, max: 10, zones: [ { min: 8, max: 10, color: 'rgba(34, 197, 94, 0.12)' }, { min: 5, max: 8, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'personal': { key: 'personal', title: 'Personal', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 30, color: 'rgba(234, 179, 8, 0.12)' }, { min: 30, max: 60, color: 'rgba(34, 197, 94, 0.12)' }, { min: 60, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'visual': { key: 'visual', title: 'Visual', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 20, color: 'rgba(234, 179, 8, 0.12)' }, { min: 20, max: 50, color: 'rgba(34, 197, 94, 0.12)' }, { min: 50, max: 60, color: 'rgba(234, 179, 8, 0.12)' }, { min: 60, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'intangible': { key: 'intangible', title: 'Intangible', min: 0, max: 100, zones: [ { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' }, { min: 5, max: 10, color: 'rgba(234, 179, 8, 0.12)' }, { min: 10, max: 30, color: 'rgba(34, 197, 94, 0.12)' }, { min: 30, max: 50, color: 'rgba(234, 179, 8, 0.12)' }, { min: 50, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'wpm': { key: 'wpm', title: 'Words/Min', min: 50, max: 200, zones: [ { min: 0, max: 85, color: 'rgba(239, 68, 68, 0.12)' }, { min: 85, max: 100, color: 'rgba(234, 179, 8, 0.12)' }, { min: 100, max: 150, color: 'rgba(34, 197, 94, 0.12)' }, { min: 150, max: 170, color: 'rgba(234, 179, 8, 0.12)' }, { min: 170, max: 300, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'sps': { key: 'sps', title: 'Syll/Sec', min: 2.0, max: 6.0, zones: [ { min: 0, max: 3.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 3.0, max: 3.5, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.5, max: 4.5, color: 'rgba(34, 197, 94, 0.12)' }, { min: 4.5, max: 5.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 5.0, max: 10, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'personal': { key: 'personal', title: 'Personal %', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 30, color: 'rgba(234, 179, 8, 0.12)' }, { min: 30, max: 60, color: 'rgba(34, 197, 94, 0.12)' }, { min: 60, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'visual': { key: 'visual', title: 'Visual %', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 20, color: 'rgba(234, 179, 8, 0.12)' }, { min: 20, max: 50, color: 'rgba(34, 197, 94, 0.12)' }, { min: 50, max: 60, color: 'rgba(234, 179, 8, 0.12)' }, { min: 60, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'intangible': { key: 'intangible', title: 'Intangible %', min: 0, max: 100, zones: [ { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' }, { min: 5, max: 10, color: 'rgba(234, 179, 8, 0.12)' }, { min: 10, max: 30, color: 'rgba(34, 197, 94, 0.12)' }, { min: 30, max: 50, color: 'rgba(234, 179, 8, 0.12)' }, { min: 50, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'pause': { key: 'pause', title: 'Pause %', min: 0, max: 60, zones: [ { min: 0, max: 9, color: 'rgba(239, 68, 68, 0.12)' }, { min: 9, max: 15, color: 'rgba(234, 179, 8, 0.12)' }, { min: 15, max: 35, color: 'rgba(34, 197, 94, 0.12)' }, { min: 35, max: 41, color: 'rgba(234, 179, 8, 0.12)' }, { min: 41, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'runtime': { key: 'runtime', title: 'Runtime (s)', min: 0, max: 12, zones: [ { min: 0, max: 2.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 2.0, max: 3.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.0, max: 6.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 6.0, max: 9.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 9.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'simple': { key: 'simple', title: 'Simple %', min: 50, max: 100, zones: [ { min: 0, max: 70, color: 'rgba(239, 68, 68, 0.12)' }, { min: 70, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 90, color: 'rgba(34, 197, 94, 0.12)' }, { min: 90, max: 96, color: 'rgba(234, 179, 8, 0.12)' }, { min: 96, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] }
-        };
-
-        // Chart.js Plugin for Progress
-        this.zoneBackgroundPlugin = {
-            id: 'zoneBackground',
-            beforeDraw: (chart) => {
-                const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
-                const zones = chart.config.options.plugins.zoneBackground.zones;
-                if (!zones) return;
-                ctx.save();
-                zones.forEach(zone => {
-                    const yTopPixel = Math.max(top, y.getPixelForValue(zone.max));
-                    const yBottomPixel = Math.min(bottom, y.getPixelForValue(zone.min));
-                    const height = yBottomPixel - yTopPixel;
-                    if (height > 0) {
-                        ctx.fillStyle = zone.color;
-                        ctx.fillRect(left, yTopPixel, right - left, height);
-                    }
-                });
-                ctx.restore();
-            }
+            'pause': { key: 'pause', title: 'Pause', min: 0, max: 60, zones: [ { min: 0, max: 9, color: 'rgba(239, 68, 68, 0.12)' }, { min: 9, max: 15, color: 'rgba(234, 179, 8, 0.12)' }, { min: 15, max: 35, color: 'rgba(34, 197, 94, 0.12)' }, { min: 35, max: 41, color: 'rgba(234, 179, 8, 0.12)' }, { min: 41, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'runtime': { key: 'runtime', title: 'Runtime', min: 0, max: 12, zones: [ { min: 0, max: 2.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 2.0, max: 3.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.0, max: 6.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 6.0, max: 9.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 9.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'simple': { key: 'simple', title: 'Simple', min: 50, max: 100, zones: [ { min: 0, max: 70, color: 'rgba(239, 68, 68, 0.12)' }, { min: 70, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 90, color: 'rgba(34, 197, 94, 0.12)' }, { min: 90, max: 96, color: 'rgba(234, 179, 8, 0.12)' }, { min: 96, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] }
         };
     }
 
     connectedCallback() {
         this.innerHTML = `
-            <div class="score-card glass-panel p-0 rounded-2xl border-t-4 border-slate-800 shadow-lg transition-colors duration-300 relative w-full h-full group cursor-move flex flex-col min-h-[400px] overflow-hidden bg-white">
+            <div class="score-card glass-panel p-0 rounded-2xl border-t-4 border-slate-800 shadow-lg transition-colors duration-300 relative w-full h-full group cursor-move flex flex-col min-h-[420px] overflow-hidden bg-white">
                 
                 <!-- SELF DESTRUCT BUTTON -->
                 <button class="thps-close-btn absolute top-3 right-3 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
@@ -65,19 +44,19 @@ class ThpsMainDash extends HTMLElement {
                 </div>
 
                 <!-- VIEW CONTAINERS -->
-                <div class="p-5 sm:p-6 flex-1 flex flex-col relative">
+                <div class="p-5 sm:p-6 flex-1 flex flex-col relative w-full h-full overflow-hidden">
                     
                     <!-- TAB 1: SUMMARY -->
                     <div id="dash-view-summary" class="dash-view block w-full h-full flex-col">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4 pr-6">
-                            <h2 class="text-lg font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Score Summary', 'grade')">Score Summary</h2>
+                            <h2 class="text-lg font-bold text-slate-800">Score Summary</h2>
                             <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Green Score', 'greenScore')">
-                                    <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Greens:</span>
-                                    <span class="dash-greens font-bold text-slate-800 text-sm pointer-events-none">- / 10</span>
+                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                                    <span class="text-xs font-bold text-slate-500 uppercase">Greens:</span>
+                                    <span class="dash-greens font-bold text-slate-800 text-sm">- / 10</span>
                                 </div>
-                                <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Grade', 'grade')">
-                                    Grade: <span class="dash-overallGrade text-blue-600 pointer-events-none">- / 100</span>
+                                <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner">
+                                    Grade: <span class="dash-overallGrade text-blue-600">- / 100</span>
                                 </div>
                             </div>
                         </div>
@@ -103,8 +82,8 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                         </div>
                         <div class="mt-auto pt-4 border-t border-slate-100 flex flex-col w-full">
-                            <div class="w-full min-h-[60px] max-h-[100px] overflow-y-auto styled-scrollbar pr-2">
-                                <span class="dash-explainer-title text-xs font-black text-slate-700 uppercase tracking-widest mr-1">Score Summary:</span>
+                            <div class="w-full min-h-[60px] max-h-[100px] overflow-y-auto styled-scrollbar pr-2 flex items-start gap-1">
+                                <span class="dash-explainer-title text-xs font-black text-slate-700 uppercase tracking-widest shrink-0">Score Summary:</span>
                                 <span class="dash-explainer-content text-xs font-medium text-slate-500 leading-relaxed">Loading explanation...</span>
                             </div>
                         </div>
@@ -112,20 +91,26 @@ class ThpsMainDash extends HTMLElement {
 
                     <!-- TAB 2: PROGRESS -->
                     <div id="dash-view-progress" class="dash-view hidden w-full h-full flex-col">
-                        <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100">
+                        <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm pointer-events-none">
                                     <i data-lucide="line-chart" class="w-4 h-4"></i>
                                 </div>
                                 <h2 class="text-lg font-bold text-slate-800">Historical Progress</h2>
                             </div>
-                            <div class="dash-progress-label text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 uppercase tracking-widest shadow-inner">
+                            <div class="dash-progress-label text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 uppercase tracking-widest shadow-inner whitespace-nowrap">
                                 Overall Grade
                             </div>
                         </div>
+                        
+                        <!-- NEW: Progress Metric Selector Pills -->
+                        <div class="flex w-full gap-2 overflow-x-auto styled-scrollbar pb-3 mb-2 border-b border-slate-100">
+                            <!-- Injected by JS -->
+                        </div>
+
                         <div class="flex-1 w-full relative min-h-[220px]">
                             <canvas class="dash-progress-canvas"></canvas>
-                            <div class="dash-progress-empty absolute inset-0 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm z-10 rounded-xl transition-all duration-300">
+                            <div class="dash-progress-empty absolute inset-0 flex items-center justify-center bg-white z-10 transition-all duration-300">
                                 <p class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <i data-lucide="activity" class="w-4 h-4"></i> Complete an attempt to plot data
                                 </p>
@@ -135,19 +120,18 @@ class ThpsMainDash extends HTMLElement {
 
                     <!-- TAB 3: MoE DISPERSION -->
                     <div id="dash-view-moe" class="dash-view hidden w-full h-full flex-col">
-                        <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100">
+                        <div class="flex justify-between items-center mb-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm pointer-events-none">
                                     <i data-lucide="target" class="w-4 h-4"></i>
                                 </div>
                                 <h2 class="text-lg font-bold text-slate-800">Margin of Error</h2>
                             </div>
-                            <p class="text-xs text-slate-400 font-medium">Green zone centered.</p>
+                            <p class="text-[10px] uppercase font-bold text-slate-400">Green zone centered.</p>
                         </div>
-                        <div class="flex-1 w-full relative bg-slate-50 rounded-xl border border-slate-200 p-2 overflow-hidden">
-                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-2 justify-between">
-                                <!-- Tracks will be injected here via JS -->
-                            </div>
+                        <div class="flex-1 w-full relative">
+                            <!-- MoE Tracks go here -->
+                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-2 justify-between"></div>
                         </div>
                     </div>
 
@@ -175,40 +159,53 @@ class ThpsMainDash extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons();
 
-        // Bind Close Button
+        // Chart.js Plugin Registration (Hooking globally to avoid context issues)
+        if (window.Chart && !window.Chart.registry.plugins.get('zoneBackground')) {
+            window.Chart.register({
+                id: 'zoneBackground',
+                beforeDraw: (chart) => {
+                    const zones = chart.config.options.plugins.zoneBackground?.zones;
+                    if (!zones) return;
+                    const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+                    ctx.save();
+                    zones.forEach(zone => {
+                        const yTopPixel = Math.max(top, y.getPixelForValue(zone.max));
+                        const yBottomPixel = Math.min(bottom, y.getPixelForValue(zone.min));
+                        const height = yBottomPixel - yTopPixel;
+                        if (height > 0) {
+                            ctx.fillStyle = zone.color;
+                            ctx.fillRect(left, yTopPixel, right - left, height);
+                        }
+                    });
+                    ctx.restore();
+                }
+            });
+        }
+
+        // Build Progress Tab Selectors
+        this.buildProgressSelectors();
+
         this.querySelector('.thps-close-btn').addEventListener('click', () => {
             const wrapper = this.closest('.cursor-move');
             if (wrapper) wrapper.remove(); 
             else this.remove(); 
         });
 
-        // Bind Tab Buttons
         this.querySelectorAll('.dash-tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
         });
 
-        // Event Listeners
         this.updateHandler = (e) => {
             this.latestData = e.detail;
             this.updateSummary(this.latestData);
             this.updateHistoryCount();
-            // Only re-render heavy views if they are currently active
             if (this.activeTab === 'progress') this.renderChart();
             if (this.activeTab === 'moe') this.renderMoE();
             if (this.activeTab === 'history') this.renderHistoryList();
         };
 
-        this.metricSelectHandler = (e) => {
-            if (this.METRIC_CONFIG[e.detail]) {
-                this.currentMetric = e.detail;
-                if (this.activeTab === 'progress') this.renderChart();
-            }
-        };
-
         window.addEventListener('thps-dashboard-update', this.updateHandler);
-        window.addEventListener('thps-metric-select', this.metricSelectHandler);
         
-        // Initial Render
         if (window.thps_lastPayload) {
             this.latestData = window.thps_lastPayload;
             setTimeout(() => this.updateHandler({ detail: this.latestData }), 50);
@@ -218,68 +215,55 @@ class ThpsMainDash extends HTMLElement {
 
     disconnectedCallback() {
         window.removeEventListener('thps-dashboard-update', this.updateHandler);
-        window.removeEventListener('thps-metric-select', this.metricSelectHandler);
         if (this.chart) this.chart.destroy();
     }
 
-    // --- TAB ROUTING ---
     switchTab(tabName) {
         this.activeTab = tabName;
-        
-        // Style Buttons
         this.querySelectorAll('.dash-tab-btn').forEach(btn => {
             if (btn.dataset.tab === tabName) {
-                btn.className = "dash-tab-btn px-4 py-2 text-sm font-black tracking-wide rounded-t-xl transition-colors text-blue-600 bg-white border-t border-l border-r border-slate-200";
+                btn.className = "dash-tab-btn px-4 py-2 text-sm font-black tracking-wide rounded-t-xl transition-colors text-blue-600 bg-white border-t border-l border-r border-slate-200 shadow-sm relative z-10";
             } else {
                 btn.className = "dash-tab-btn px-4 py-2 text-sm font-bold tracking-wide rounded-t-xl transition-colors text-slate-400 hover:text-slate-600 hover:bg-slate-100 border-b border-transparent";
             }
         });
 
-        // Toggle Views
         this.querySelectorAll('.dash-view').forEach(view => view.classList.add('hidden'));
         this.querySelector(`#dash-view-${tabName}`).classList.remove('hidden');
 
-        // Lazy Render
         if (tabName === 'progress') this.renderChart();
         if (tabName === 'moe') this.renderMoE();
         if (tabName === 'history') this.renderHistoryList();
     }
 
-    // --- TAB 1: SUMMARY LOGIC ---
+    // --- SUMMARY ---
     triggerMetricSelect(term, key) {
         this.showLocalExplanation(term);
-        window.dispatchEvent(new CustomEvent('thps-metric-select', { detail: key }));
+        // Switch to progress tab and show the clicked metric
+        if (this.METRIC_CONFIG[key]) {
+            this.currentMetric = key;
+            this.switchTab('progress');
+        }
     }
 
     showLocalExplanation(term) {
         const titleEl = this.querySelector('.dash-explainer-title');
         const contentEl = this.querySelector('.dash-explainer-content');
         if (!titleEl || !contentEl) return;
-
         titleEl.innerText = term + ':';
         contentEl.innerHTML = `<span class="animate-pulse">Loading...</span>`;
-
         setTimeout(() => {
-            let text = (window.explanationsData && window.explanationsData[term]) 
-                       ? window.explanationsData[term] 
-                       : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] 
-                            ? window.FALLBACK_EXPLANATIONS[term] 
-                            : `Explanation for "${term}" will appear here soon.`);
+            let text = (window.explanationsData && window.explanationsData[term]) ? window.explanationsData[term] : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] ? window.FALLBACK_EXPLANATIONS[term] : `Explanation for "${term}" will appear here soon.`);
             contentEl.innerHTML = text;
         }, 100);
     }
 
     updateSummary(data) {
         if (!data || data.totalPoints === undefined) return;
-
         const setEval = (cls, text, colorClass) => {
             const el = this.querySelector(`.${cls}`);
-            if(el) { 
-                el.textContent = text; 
-                el.className = `${cls} text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide ${colorClass} ml-1 pointer-events-none`; 
-            }
+            if(el) { el.textContent = text; el.className = `${cls} text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide ${colorClass} ml-1 pointer-events-none`; }
         };
-
         const formatBadge = (pts) => pts === 10 ? "+10" : "+" + pts.toFixed(1);
         const getBadgeStyle = (pts) => pts === 10 ? 'bg-green-100 text-green-700' : (pts >= 5.0 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700');
 
@@ -340,7 +324,23 @@ class ThpsMainDash extends HTMLElement {
         }
     }
 
-    // --- TAB 2: PROGRESS LOGIC ---
+    // --- PROGRESS ---
+    buildProgressSelectors() {
+        const container = this.querySelector('#dash-view-progress .flex.w-full.gap-2');
+        Object.keys(this.METRIC_CONFIG).forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = `prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border ${this.currentMetric === key ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`;
+            btn.innerText = this.METRIC_CONFIG[key].title;
+            btn.onclick = () => {
+                this.currentMetric = key;
+                this.querySelectorAll('.prog-pill').forEach(p => p.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-white text-slate-500 border-slate-200 hover:bg-slate-50");
+                btn.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-blue-600 text-white border-blue-600";
+                this.renderChart();
+            };
+            container.appendChild(btn);
+        });
+    }
+
     renderChart() {
         if (!window.Chart || this.activeTab !== 'progress') return;
         
@@ -358,6 +358,12 @@ class ThpsMainDash extends HTMLElement {
         const config = this.METRIC_CONFIG[this.currentMetric];
         this.querySelector('.dash-progress-label').innerText = config.title;
 
+        // Ensure the correct pill is highlighted if navigated to from Summary
+        this.querySelectorAll('.prog-pill').forEach(p => {
+            if (p.innerText === config.title) p.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-blue-600 text-white border-blue-600";
+            else p.className = "prog-pill px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase transition-colors whitespace-nowrap border bg-white text-slate-500 border-slate-200 hover:bg-slate-50";
+        });
+
         const chronologicalHistory = [...history].reverse();
         const labels = chronologicalHistory.map(h => `Att ${h.id}`);
         const dataPoints = chronologicalHistory.map(h => h[config.key] !== undefined ? h[config.key] : null);
@@ -370,12 +376,11 @@ class ThpsMainDash extends HTMLElement {
             this.chart.data.datasets[0].data = dataPoints;
             this.chart.options.scales.y.min = config.min;
             this.chart.options.scales.y.max = config.max;
-            this.chart.options.plugins.zoneBackground.zones = config.zones;
+            this.chart.options.plugins.zoneBackground = { zones: config.zones };
             this.chart.update();
         } else {
             this.chart = new Chart(canvas, {
                 type: 'line',
-                plugins: [this.zoneBackgroundPlugin],
                 data: {
                     labels: labels,
                     datasets: [{
@@ -397,7 +402,8 @@ class ThpsMainDash extends HTMLElement {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { size: 10 }, bodyFont: { size: 13, weight: 'bold' }, padding: 10, displayColors: false }
+                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { size: 10 }, bodyFont: { size: 13, weight: 'bold' }, padding: 10, displayColors: false },
+                        zoneBackground: { zones: config.zones }
                     },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' } },
@@ -409,99 +415,85 @@ class ThpsMainDash extends HTMLElement {
         }
     }
 
-    // --- TAB 3: MoE DISPERSION LOGIC ---
-    calculateMoEPosition(val, config) {
-        if (val === null || val === undefined) return null;
-        
-        // Find the designated green zone (assumes rgba(34, 197, 94...))
+    // --- MoE DISPERSION ---
+    getSymmetricBounds(config) {
+        // Find the absolute center of the perfect green zone
         const greenZone = config.zones.find(z => z.color.includes('197, 94'));
-        if (!greenZone) return 50; // Fallback
-
-        const greenCenter = (greenZone.min + greenZone.max) / 2;
+        const center = greenZone ? (greenZone.min + greenZone.max) / 2 : (config.min + config.max) / 2;
         
-        // Force the value into a 0-100% position where greenCenter is exactly 50%
-        if (val === greenCenter) return 50;
+        // Find maximum absolute distance from center to either edge
+        const maxDist = Math.max(center - config.min, config.max - center);
         
-        if (val < greenCenter) {
-            // Map [config.min to greenCenter] -> [0% to 50%]
-            const range = greenCenter - config.min;
-            if (range <= 0 || val <= config.min) return 0;
-            return ((val - config.min) / range) * 50;
-        } else {
-            // Map [greenCenter to config.max] -> [50% to 100%]
-            const range = config.max - greenCenter;
-            if (range <= 0 || val >= config.max) return 100;
-            return 50 + (((val - greenCenter) / range) * 50);
-        }
+        // Return synthetic bounds where 'center' is mathematically exactly 50%
+        return {
+            visMin: center - maxDist,
+            visMax: center + maxDist,
+            center: center,
+            visRange: maxDist * 2
+        };
     }
 
     renderMoE() {
         if (!this.latestData || this.activeTab !== 'moe') return;
         
         const grid = this.querySelector('.dash-moe-grid');
-        grid.innerHTML = ''; // Clear existing
+        grid.innerHTML = '';
 
         const metricsToMap = ['personal', 'visual', 'intangible', 'wpm', 'sps', 'pause', 'runtime', 'grade', 'simple'];
 
         metricsToMap.forEach(key => {
             const config = this.METRIC_CONFIG[key];
             const rawVal = this.latestData[config.key];
-            const posPct = this.calculateMoEPosition(rawVal, config);
+            const hideDot = (rawVal === null || rawVal === undefined || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !this.latestData.recordedAudio));
 
-            // Determine if dot is visible (hide if text-only logic applied to audio metric)
-            const hideDot = (posPct === null || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !this.latestData.recordedAudio));
+            const bounds = this.getSymmetricBounds(config);
+            
+            // Map actual score to % inside symmetric bounds
+            let dotPct = 50;
+            if (!hideDot) {
+                dotPct = ((rawVal - bounds.visMin) / bounds.visRange) * 100;
+                dotPct = Math.max(0, Math.min(100, dotPct)); // Clamp for visual dot
+            }
 
-            // Background Gradient built dynamically from zones mapped to 0-100
+            // Build symmetric gradients
             let gradientStops = [];
             config.zones.forEach(zone => {
-                const startPct = this.calculateMoEPosition(zone.min, config);
-                const endPct = this.calculateMoEPosition(zone.max, config);
-                // Convert rgba opacity to solid for clear background tracking
+                let startPct = ((zone.min - bounds.visMin) / bounds.visRange) * 100;
+                let endPct = ((zone.max - bounds.visMin) / bounds.visRange) * 100;
+                startPct = Math.max(0, Math.min(100, startPct));
+                endPct = Math.max(0, Math.min(100, endPct));
+                
                 const solidColor = zone.color.includes('197') ? '#dcfce7' : (zone.color.includes('179') ? '#fef08a' : '#fee2e2');
                 gradientStops.push(`${solidColor} ${startPct}%`);
                 gradientStops.push(`${solidColor} ${endPct}%`);
             });
 
-            // Create Responsive Track (Flex-1 allows columns on md, rows on mobile)
+            // Track Element
             const track = document.createElement('div');
-            track.className = "flex-1 flex flex-row md:flex-col items-center gap-2 relative group cursor-pointer";
-            track.onclick = () => this.triggerMetricSelect(config.title, key);
+            track.className = "flex-1 flex flex-col md:flex-row items-center relative group";
             
+            // Note: Flex direction flips based on mobile/desktop so the layout matches image 8 (columns on desktop)
             track.innerHTML = `
-                <div class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase text-right md:text-center w-12 md:w-auto shrink-0 group-hover:text-blue-600 transition-colors">${config.title.split(' ')[0]}</div>
-                <div class="flex-1 w-full relative rounded-full overflow-hidden shadow-inner border border-slate-200" 
-                     style="background: linear-gradient(to right, ${gradientStops.join(', ')}); md:background: linear-gradient(to bottom, ${gradientStops.join(', ')});">
-                     <!-- CSS overrides inline background for desktop orientation using a style block below -->
-                     <div class="moe-bg-desktop absolute inset-0 hidden md:block" style="background: linear-gradient(to bottom, ${gradientStops.join(', ')});"></div>
-                     <div class="moe-bg-mobile absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
+                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-center w-full md:w-auto md:min-w-[70px] shrink-0 mb-1 md:mb-0 md:mr-2 border-b-2 md:border-b-0 md:border-r-2 border-slate-100 pb-1 md:pb-0 md:pr-2">${config.title.split(' ')[0]}</div>
+                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-6 md:h-full md:w-8">
+                     <!-- Desktop Gradient (Vertical: bottom to top) -->
+                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
+                     <!-- Mobile Gradient (Horizontal: left to right) -->
+                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
                      
-                     <!-- The Central Target Line -->
-                     <div class="absolute bg-slate-300 md:w-full md:h-[1px] w-[1px] h-full" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                     <!-- Center Line -->
+                     <div class="absolute bg-white/70 shadow-sm md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
 
-                     <!-- The Data Dot -->
-                     ${!hideDot ? `<div class="absolute w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 shadow-md border-2 border-white transition-all duration-500 ease-out" 
-                          style="top: 50%; left: ${posPct}%; transform: translate(-50%, -50%);" 
-                          data-desktop-style="top: ${posPct}%; left: 50%;"
-                          title="${rawVal}"></div>` : ''}
+                     <!-- Data Dot -->
+                     ${!hideDot ? `<div class="absolute w-4 h-4 rounded-full bg-slate-800 shadow-lg border-2 border-white z-10 transition-all duration-500 ease-out dot-mobile block md:hidden" style="top: 50%; left: ${dotPct}%; transform: translate(-50%, -50%);" title="${rawVal}"></div>
+                                   <div class="absolute w-4 h-4 rounded-full bg-slate-800 shadow-lg border-2 border-white z-10 transition-all duration-500 ease-out dot-desktop hidden md:block" style="left: 50%; bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="${rawVal}"></div>` : ''}
                 </div>
             `;
             grid.appendChild(track);
         });
-
-        // Apply orientation logic for dots
-        setTimeout(() => {
-            const isDesktop = window.innerWidth >= 768;
-            grid.querySelectorAll('.w-3').forEach(dot => {
-                const pos = dot.style.left; // captured from mobile style
-                if (isDesktop) {
-                    dot.style.left = '50%';
-                    dot.style.top = dot.getAttribute('data-desktop-style').split('top: ')[1].split(';')[0];
-                }
-            });
-        }, 10);
     }
 
-    // --- TAB 4: HISTORY LOGIC ---
+    // --- HISTORY ---
     updateHistoryCount() {
         const count = window.thps_sessionHistory ? window.thps_sessionHistory.length : 0;
         this.querySelectorAll('.history-count-badge').forEach(el => el.innerText = count);
