@@ -14,7 +14,7 @@ class ThpsMainDash extends HTMLElement {
         // Unified Metric Configuration (Ordered for Progress Tab Selectors)
         this.METRIC_CONFIG = {
             'grade': { key: 'totalPoints', title: 'Overall', min: 0, max: 100, zones: [ { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' } ] },
-            'greenScore': { key: 'greenScore', title: 'Greens', min: 0, max: 10, zones: [ { min: 8, max: 10, color: 'rgba(34, 197, 94, 0.12)' }, { min: 5, max: 8, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'clarity': { key: 'clarity', title: 'Clarity %', min: 0, max: 100, zones: [ { min: 90, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 80, max: 90, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 80, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'personal': { key: 'personal', title: 'Personal', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 30, color: 'rgba(234, 179, 8, 0.12)' }, { min: 30, max: 60, color: 'rgba(34, 197, 94, 0.12)' }, { min: 60, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'visual': { key: 'visual', title: 'Visual', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 20, color: 'rgba(234, 179, 8, 0.12)' }, { min: 20, max: 50, color: 'rgba(34, 197, 94, 0.12)' }, { min: 50, max: 60, color: 'rgba(234, 179, 8, 0.12)' }, { min: 60, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'intangible': { key: 'intangible', title: 'Intangible', min: 0, max: 100, zones: [ { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' }, { min: 5, max: 10, color: 'rgba(234, 179, 8, 0.12)' }, { min: 10, max: 30, color: 'rgba(34, 197, 94, 0.12)' }, { min: 30, max: 50, color: 'rgba(234, 179, 8, 0.12)' }, { min: 50, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
@@ -49,9 +49,9 @@ class ThpsMainDash extends HTMLElement {
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4 pr-6">
                             <h2 class="text-lg font-bold text-slate-800">Score Summary</h2>
                             <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Green Score', 'greenScore')">
-                                    <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Greens:</span>
-                                    <span class="dash-greens font-bold text-slate-800 text-sm pointer-events-none">- / 10</span>
+                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Clarity %', 'clarity')">
+                                    <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Clarity:</span>
+                                    <span class="dash-clarity font-bold text-slate-800 text-sm pointer-events-none">- %</span>
                                 </div>
                                 <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Overall Grade', 'grade')">
                                     Grade: <span class="dash-overallGrade text-blue-600 pointer-events-none">- / 100</span>
@@ -318,12 +318,25 @@ class ThpsMainDash extends HTMLElement {
         let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
         setEval('dash-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
         
+        // Apply fallback logic for readlevel mapping
+        let rLvlVal = data.readlevel !== undefined ? data.readlevel : data.grade;
+        this.querySelector('.dash-readlevel').textContent = rLvlVal.toFixed(1);
+        let gPts = window.getMetricPoints ? window.getMetricPoints('readlevel', rLvlVal) : 0;
+        setEval('dash-readlevel-eval', formatBadge(gPts), getBadgeStyle(gPts));
+
+        this.querySelector('.dash-simple').textContent = `${data.simple}%`;
+        let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
+        setEval('dash-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
+        
+        // NEW: Handle Fallback for old history data
+        let clarityVal = data.clarity !== undefined ? data.clarity : 0; 
+
         if (data.overrideGrade) {
             this.querySelector('.dash-overallGrade').textContent = "- / 100";
-            this.querySelector('.dash-greens').textContent = "- / 10";
+            this.querySelector('.dash-clarity').textContent = "-";
         } else {
             this.querySelector('.dash-overallGrade').textContent = `${data.totalPoints.toFixed(1)} / 100`;
-            this.querySelector('.dash-greens').textContent = `${data.greenScore || 0} / 10`;
+            this.querySelector('.dash-clarity').textContent = `${clarityVal}%`;
         }
     }
 
@@ -508,7 +521,7 @@ class ThpsMainDash extends HTMLElement {
                     <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/100</span>
                 </div>
                 <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
-                    <span>Greens: ${attempt.greenScore || 0}/10</span>
+                    <span>Clarity: ${attempt.clarity !== undefined ? attempt.clarity + '%' : 'N/A'}</span>
                     <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id}); document.querySelector('thps-main-dash').renderHistoryList();" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
             `;
