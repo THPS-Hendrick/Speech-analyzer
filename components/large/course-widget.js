@@ -16,6 +16,8 @@ class THPSCourseWidget extends HTMLElement {
         this.eslCategory = null;
         this.eslSentences = [];
         this.eslIndex = 0;
+        this.eslActiveBucket = 'unclear'; // 'unclear' -> 'ok' -> 'good'
+        this.eslLatestTelemetry = null;
 
         // Voice Choice Specific State
         this.vcActiveSpeechIndex = 0;
@@ -30,8 +32,8 @@ class THPSCourseWidget extends HTMLElement {
         this.rcMenuIndex = 0;
         this.rcActiveLevel = 0; 
         this.rcSetIndex = 0; 
-        this.rcState = 'prompt'; // 'prompt' or 'grade'
-        this.rcLatestTelemetry = null; // Caches the 9 metrics
+        this.rcState = 'prompt'; 
+        this.rcLatestTelemetry = null; 
     }
 
     connectedCallback() {
@@ -108,7 +110,7 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     // ==========================================
-    // REPEAT + COUNT LOGIC (10-LEVEL PROGRESSION)
+    // REPEAT + COUNT LOGIC
     // ==========================================
     async fetchRepeatCountData(url) {
         this.innerHTML = `
@@ -220,8 +222,6 @@ class THPSCourseWidget extends HTMLElement {
             </style>
             
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
-                
-                <!-- TOP HEADER -->
                 <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
                     <button class="thps-rc-back text-slate-300 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
                         <i data-lucide="arrow-left" class="w-4 h-4 pointer-events-none"></i> Levels
@@ -235,11 +235,7 @@ class THPSCourseWidget extends HTMLElement {
                     </button>
                 </div>
 
-                <!-- 3D FLIPPABLE CARDS -->
-                <!-- FIX: Reduced margins (mb-3/mt-3) and gap (gap-2) to prevent flexbox overflow -->
                 <div class="flex-1 flex flex-col gap-2 max-w-lg mx-auto w-full mb-3 mt-3 px-4 md:px-0 justify-center min-h-0">
-                    
-                    <!-- CARD 1: QUESTION / MANUAL GRADING -->
                     <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-1">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-indigo-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
@@ -264,7 +260,6 @@ class THPSCourseWidget extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- CARD 2: REPEAT / CONTENT & DELIVERY -->
                     <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-2">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-emerald-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
@@ -302,7 +297,6 @@ class THPSCourseWidget extends HTMLElement {
                         </div>
                     </div>
 
-                    <!-- CARD 3: COUNT / SIMPLICITY & ACTIONS -->
                     <div class="rc-flip-card flex-1 min-h-[110px] ${isFlipped ? 'rc-flipped' : ''}" id="rc-card-3">
                         <div class="rc-flip-inner">
                             <div class="rc-flip-front bg-white border-2 border-amber-100 rounded-2xl shadow-sm flex flex-col items-center justify-center p-4">
@@ -335,18 +329,13 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- SLEEK ARCADE TIMER BAR PANEL -->
-                <!-- FIX: Shrunk height slightly to guarantee vertical fit -->
                 <div class="w-full max-w-lg mx-auto relative h-[60px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-3 px-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
-                    
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
                 </div>
 
-                <!-- BOTTOM MASTER NAVIGATION -->
-                <!-- FIX: Now guaranteed to display within the 650px container -->
                 <div class="bg-white border-t border-slate-200 p-3 flex justify-between items-center shrink-0 z-20">
                     <button id="rc-drill-prev" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2 active:scale-95 shadow-sm">
                         <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i> Prev Set
@@ -361,7 +350,6 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
 
-        // Listeners
         this.querySelector('.thps-rc-back').addEventListener('click', () => {
             if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
             this.currentStep = 'rc-menu';
@@ -394,12 +382,10 @@ class THPSCourseWidget extends HTMLElement {
         });
 
         this.querySelector('#arcade-record-btn').addEventListener('click', () => {
-            // Prevent recording if currently in grading view
             if (this.rcState === 'grade') return;
             if (typeof window.toggleRecording === 'function') window.toggleRecording();
         });
 
-        // Retry & Save Action Listeners (Only active when flipped)
         const btnRetry = this.querySelector('#btn-rc-retry');
         if (btnRetry) {
             btnRetry.addEventListener('click', () => {
@@ -414,7 +400,6 @@ class THPSCourseWidget extends HTMLElement {
             btnSave.addEventListener('click', () => this.saveRcAttemptToCRM(btnSave));
         }
         
-        // Auto-hydrate the telemetry numbers if rendering in flipped state
         if (this.rcState === 'grade' && this.rcLatestTelemetry) {
             this.updateRcTelemetryUI();
         }
@@ -464,7 +449,6 @@ class THPSCourseWidget extends HTMLElement {
             telemetry: this.rcLatestTelemetry
         };
 
-        // UI Loading State
         const originalHtml = btnEl.innerHTML;
         btnEl.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Saving...`;
         if (window.lucide) window.lucide.createIcons({ root: btnEl });
@@ -479,7 +463,6 @@ class THPSCourseWidget extends HTMLElement {
 
             if (!response.ok) throw new Error('CRM Sync Failed');
 
-            // Success State - Automatically progress to the next set
             btnEl.classList.replace('bg-emerald-600', 'bg-blue-600');
             btnEl.innerHTML = `<i data-lucide="check-circle" class="w-3 h-3"></i> Saved!`;
             if (window.lucide) window.lucide.createIcons({ root: btnEl });
@@ -502,7 +485,7 @@ class THPSCourseWidget extends HTMLElement {
     }
 
     // ==========================================
-    // MIC-CHECK DAILY COURSE LOGIC
+    // MIC-CHECK DAILY
     // ==========================================
     async fetchMicCheckDaily() {
         this.innerHTML = `
@@ -530,10 +513,7 @@ class THPSCourseWidget extends HTMLElement {
             const todayStr = `${year}-${month}-${day}`;
             
             let index = this.micCheckDates.indexOf(todayStr);
-
-            if (index === -1) {
-                index = this.micCheckDates.length - 1; 
-            }
+            if (index === -1) index = this.micCheckDates.length - 1;
             
             this.micCheckCurrentDateIndex = index;
             this.currentStep = 'mic-check';
@@ -559,12 +539,10 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
-                <!-- MINI EXIT BUTTON -->
                 <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
 
-                <!-- INTERACTIVE DATE NAVIGATION HEADER -->
                 <div class="flex items-center justify-center gap-3 mb-5 mt-3">
                     <button id="mic-check-prev" class="p-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full transition-colors active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed" ${this.micCheckCurrentDateIndex === 0 ? 'disabled' : ''}>
                         <i data-lucide="chevron-left" class="w-5 h-5 pointer-events-none"></i>
@@ -586,9 +564,7 @@ class THPSCourseWidget extends HTMLElement {
                     </button>
                 </div>
 
-                <!-- FOUR RESPONSIVE PROMPT FIELDS -->
                 <div class="flex-1 flex flex-col gap-2.5 max-w-lg mx-auto w-full mb-4 justify-center">
-                    
                     <div class="flex-1 max-h-[85px] min-h-[70px] bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-center justify-center p-3 relative">
                         <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest absolute top-2 left-4">Challenge</span>
                         <span class="text-sm md:text-base font-bold text-slate-700 text-center mt-3 leading-snug w-[90%] mx-auto line-clamp-2">${activePrompts.challenge}</span>
@@ -610,10 +586,8 @@ class THPSCourseWidget extends HTMLElement {
                     </div>
                 </div>
 
-                <!-- SLEEK ARCADE TIMER BAR PANEL -->
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
                     <div id="arcade-progress" class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-indigo-500 to-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
-                    
                     <button id="arcade-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="mic" id="arcade-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
                     </button>
@@ -623,51 +597,36 @@ class THPSCourseWidget extends HTMLElement {
 
         if (window.lucide) window.lucide.createIcons({ root: this });
         
-        const exitBtn = this.querySelector('.thps-exit-course');
-        if (exitBtn) {
-            exitBtn.addEventListener('click', () => {
-                if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
-                this.micCheckFullData = null;
-                this.micCheckDates = [];
-                this.currentStep = 0;
-                this.renderCourseSelector();
-            });
-        }
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+            this.micCheckFullData = null;
+            this.micCheckDates = [];
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
 
-        const prevBtn = this.querySelector('#mic-check-prev');
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (this.micCheckCurrentDateIndex > 0) {
-                    this.micCheckCurrentDateIndex--;
-                    this.renderMicCheckUI();
-                }
-            });
-        }
-
-        const nextBtn = this.querySelector('#mic-check-next');
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                if (this.micCheckCurrentDateIndex < this.micCheckDates.length - 1) {
-                    this.micCheckCurrentDateIndex++;
-                    this.renderMicCheckUI();
-                }
-            });
-        }
-
-        const dateSelect = this.querySelector('#mic-check-date-select');
-        if (dateSelect) {
-            dateSelect.addEventListener('change', (e) => {
-                this.micCheckCurrentDateIndex = parseInt(e.target.value);
+        this.querySelector('#mic-check-prev').addEventListener('click', () => {
+            if (this.micCheckCurrentDateIndex > 0) {
+                this.micCheckCurrentDateIndex--;
                 this.renderMicCheckUI();
-            });
-        }
+            }
+        });
 
-        const recordBtn = this.querySelector('#arcade-record-btn');
-        if (recordBtn) {
-            recordBtn.addEventListener('click', () => {
-                if (typeof window.toggleRecording === 'function') window.toggleRecording();
-            });
-        }
+        this.querySelector('#mic-check-next').addEventListener('click', () => {
+            if (this.micCheckCurrentDateIndex < this.micCheckDates.length - 1) {
+                this.micCheckCurrentDateIndex++;
+                this.renderMicCheckUI();
+            }
+        });
+
+        this.querySelector('#mic-check-date-select').addEventListener('change', (e) => {
+            this.micCheckCurrentDateIndex = parseInt(e.target.value);
+            this.renderMicCheckUI();
+        });
+
+        this.querySelector('#arcade-record-btn').addEventListener('click', () => {
+            if (typeof window.toggleRecording === 'function') window.toggleRecording();
+        });
     }
 
     // ==========================================
@@ -749,7 +708,6 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
-                <!-- TOP HEADER -->
                 <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
                     <button class="thps-vc-back text-slate-300 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
                         <i data-lucide="arrow-left" class="w-4 h-4 pointer-events-none"></i> Scripts
@@ -758,22 +716,19 @@ class THPSCourseWidget extends HTMLElement {
                         <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest">VOICE CHOICE</span>
                         <span class="block text-sm font-bold truncate">${speech.title}</span>
                     </div>
-                    <div class="w-16"></div> <!-- Spacer -->
+                    <div class="w-16"></div>
                 </div>
 
-                <!-- GLIDING PROMPTER AREA -->
                 <div class="flex-1 relative flex flex-col min-h-0">
                     <div id="vc-scroll-viewport" class="flex-1 overflow-hidden scroll-smooth relative px-4 md:px-12 py-10">
                         <div class="max-w-2xl mx-auto flex flex-col pb-48"> 
                             ${linesHTML}
                         </div>
                     </div>
-                    
                     <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none z-10"></div>
                     <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none z-10"></div>
                 </div>
 
-                <!-- CONTROLS & RECORDING PANEL -->
                 <div class="bg-white border-t border-slate-200 p-4 shrink-0 z-20 flex flex-col">
                     <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-3">
                         <button class="thps-vc-up p-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors active:scale-90" ${this.vcLineIndex === 0 ? 'disabled' : ''}>
@@ -924,6 +879,8 @@ class THPSCourseWidget extends HTMLElement {
             this.eslSentences = await res.json();
             this.eslCategory = category.toUpperCase();
             this.eslIndex = 0;
+            this.eslActiveBucket = 'unclear';
+            this.eslLatestTelemetry = null;
             this.currentStep = 'esl-drill';
             this.renderEslDrill();
         } catch (e) {
@@ -933,50 +890,187 @@ class THPSCourseWidget extends HTMLElement {
         }
     }
 
+    calculateEslScore(clarityVal, wpmVal) {
+        // Clarity Zones: >90 green, 81-90 yellow, <=80 red
+        let clarityZone = 'red';
+        if (clarityVal > 90) clarityZone = 'green';
+        else if (clarityVal >= 81) clarityZone = 'yellow';
+
+        // WPM Zones: >=186 green, 151-185 yellow, <=150 red
+        let wpmZone = 'red';
+        if (wpmVal >= 186) wpmZone = 'green';
+        else if (wpmVal >= 151) wpmZone = 'yellow';
+
+        const greenCount = (clarityZone === 'green' ? 1 : 0) + (wpmZone === 'green' ? 1 : 0);
+        const yellowCount = (clarityZone === 'yellow' ? 1 : 0) + (wpmZone === 'yellow' ? 1 : 0);
+        const redCount = (clarityZone === 'red' ? 1 : 0) + (wpmZone === 'red' ? 1 : 0);
+
+        let label = 'Unclear';
+        let bgClass = 'bg-rose-600';
+        let textClass = 'text-rose-600';
+
+        if (greenCount === 2) {
+            label = 'Excellent';
+            bgClass = 'bg-emerald-700'; // Dark green
+            textClass = 'text-emerald-700';
+        } else if (greenCount === 1 && yellowCount === 1) {
+            label = 'Good';
+            bgClass = 'bg-green-600'; // Light green
+            textClass = 'text-green-600';
+        } else if (yellowCount === 2 || (greenCount === 1 && redCount === 1)) {
+            label = 'Ok';
+            bgClass = 'bg-amber-500'; // Orangey-yellow
+            textClass = 'text-amber-500';
+        } else {
+            label = 'Unclear';
+            bgClass = 'bg-rose-500'; // Red
+            textClass = 'text-rose-500';
+        }
+
+        return { label, bgClass, textClass, clarityZone, wpmZone };
+    }
+
     renderEslDrill() {
         const sentence = this.eslSentences[this.eslIndex];
+        const d = this.eslLatestTelemetry;
+
+        // Meta scores fallback values
+        let clarityStr = d ? `${d.clarity}%` : '- %';
+        let wpmStr = d ? `${Math.round(d.wpm)}` : '-';
+        let scoreLabel = d ? d.score.label : '-';
+        let scoreBg = d ? d.score.bgClass : 'bg-slate-700';
+
+        let clarityTextClass = 'text-slate-800';
+        if (d) {
+            if (d.score.clarityZone === 'green') clarityTextClass = 'text-emerald-600';
+            else if (d.score.clarityZone === 'yellow') clarityTextClass = 'text-amber-500';
+            else clarityTextClass = 'text-rose-600';
+        }
+
+        let wpmTextClass = 'text-slate-800';
+        if (d) {
+            if (d.score.wpmZone === 'green') wpmTextClass = 'text-emerald-600';
+            else if (d.score.wpmZone === 'yellow') wpmTextClass = 'text-amber-500';
+            else wpmTextClass = 'text-rose-600';
+        }
+
+        // Active Bucket Data
+        const bucket = this.eslActiveBucket; // 'unclear' | 'ok' | 'good'
+        let wordsInActiveBucket = [];
+        let bucketBadgeBg = 'bg-rose-100 text-rose-700 border-rose-300';
+        let bucketLabel = 'Unclear (≤ 80%)';
+
+        if (bucket === 'good') {
+            wordsInActiveBucket = d ? d.goodWords : [];
+            bucketBadgeBg = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+            bucketLabel = 'Good (91% - 100%)';
+        } else if (bucket === 'ok') {
+            wordsInActiveBucket = d ? d.okWords : [];
+            bucketBadgeBg = 'bg-amber-100 text-amber-800 border-amber-300';
+            bucketLabel = 'Ok (81% - 90%)';
+        } else {
+            wordsInActiveBucket = d ? d.unclearWords : [];
+            bucketBadgeBg = 'bg-rose-100 text-rose-800 border-rose-300';
+            bucketLabel = 'Unclear (≤ 80%)';
+        }
+
+        const wordsHtml = wordsInActiveBucket.length > 0
+            ? wordsInActiveBucket.map(w => `<span class="inline-block bg-white border border-slate-200 shadow-sm rounded-lg px-2.5 py-1 text-xs font-bold text-slate-700">${w}</span>`).join(' ')
+            : `<span class="text-xs text-slate-400 italic">${d ? 'No words in this tier' : 'Complete speech to see clarity breakdown'}</span>`;
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
                 <!-- TOP HEADER -->
-                <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
-                    <button class="thps-esl-back text-slate-300 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
+                <div class="bg-slate-900 text-white p-3.5 flex justify-between items-center shrink-0 shadow-md z-20">
+                    <button class="thps-esl-back text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
                         <i data-lucide="arrow-left" class="w-4 h-4 pointer-events-none"></i> Back
                     </button>
                     <div class="text-center">
-                        <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-widest">${this.eslCategory} PRACTICE</span>
-                        <span class="block text-sm font-bold">Drill ${this.eslIndex + 1} of ${this.eslSentences.length}</span>
+                        <span class="block text-[9px] font-black text-indigo-400 uppercase tracking-widest">${this.eslCategory}</span>
+                        <span class="block text-xs font-bold">Drill ${this.eslIndex + 1} of ${this.eslSentences.length}</span>
                     </div>
-                    <div class="w-16"></div> <!-- Spacer -->
+                    <button class="thps-exit-course text-slate-300 hover:text-rose-400 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors active:scale-95">
+                        Exit <i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>
+                    </button>
                 </div>
 
-                <!-- MAIN DRILL AREA -->
-                <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
-                    <div class="w-full max-w-2xl bg-white border-2 border-indigo-100 rounded-2xl p-6 md:p-8 shadow-sm text-center mb-8">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Target Sentence</span>
-                        <p class="text-2xl md:text-3xl font-bold text-slate-800 leading-tight w-[95%] mx-auto line-clamp-3">${sentence}</p>
+                <!-- MAIN DRILL BODY (LOCKED TO VIEWPORT HEIGHT) -->
+                <div class="flex-1 flex flex-col justify-between p-4 sm:p-5 max-w-2xl mx-auto w-full min-h-0">
+                    
+                    <!-- TIER 1: TARGET SENTENCE -->
+                    <div class="w-full bg-white border-2 border-indigo-100 rounded-2xl p-4 shadow-sm text-center shrink-0">
+                        <span class="text-[10px] font-black text-indigo-500 uppercase tracking-widest block mb-1">Repeat 3 times fast</span>
+                        <p class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug line-clamp-2">${sentence}</p>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center mb-8">
-                        <div class="thps-esl-timer text-5xl md:text-6xl font-mono font-black text-slate-800 tracking-wider mb-4 drop-shadow-sm transition-colors">0.00<span class="text-2xl text-slate-400">s</span></div>
-                        <button id="esl-record-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-16 h-16 rounded-full font-black flex items-center justify-center transition-all shadow-[0_0_15px_rgba(79,70,229,0.4)] hover:shadow-[0_0_25px_rgba(79,70,229,0.6)] active:scale-90">
-                            <i data-lucide="mic" id="esl-record-icon" class="w-6 h-6 pointer-events-none transition-transform"></i>
-                        </button>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3" id="esl-record-text">Tap to Start</span>
+                    <!-- TIER 2: CONTROLS & 3 META SCORES -->
+                    <div class="w-full flex items-center gap-3 shrink-0 my-1">
+                        <!-- Compact Mic Button -->
+                        <div class="flex flex-col items-center shrink-0">
+                            <button id="esl-record-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-12 h-12 rounded-full font-black flex items-center justify-center transition-all shadow-[0_0_12px_rgba(79,70,229,0.35)] active:scale-90">
+                                <i data-lucide="mic" id="esl-record-icon" class="w-5 h-5 pointer-events-none transition-transform"></i>
+                            </button>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1" id="esl-record-text">Tap</span>
+                        </div>
+
+                        <!-- 3 Meta Displays -->
+                        <div class="flex-1 grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 text-center shadow-sm">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Clarity %</span>
+                                <span class="text-base sm:text-lg font-black ${clarityTextClass}">${clarityStr}</span>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 text-center shadow-sm">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Words/Min</span>
+                                <span class="text-base sm:text-lg font-black ${wpmTextClass}">${wpmStr}</span>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-xl p-2 text-center shadow-sm flex flex-col justify-center items-center">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Score</span>
+                                <span class="inline-block text-[10px] sm:text-xs font-black uppercase text-white px-2.5 py-0.5 rounded-full ${scoreBg} tracking-wide shadow-sm">${scoreLabel}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="w-full max-w-md bg-slate-100 border border-slate-200 rounded-xl p-4 relative">
-                        <span class="absolute -top-2.5 left-4 bg-slate-100 px-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">What we heard:</span>
-                        <p id="esl-transcript" class="text-sm font-medium text-slate-600 text-center min-h-[1.25rem] italic">...</p>
+                    <!-- TIER 3: CYCLING CLARITY DISPLAY -->
+                    <div id="esl-tier3-card" class="w-full flex-1 min-h-[170px] bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-2xl p-3.5 shadow-sm flex flex-col justify-between transition-colors cursor-pointer group">
+                        <!-- Top Bar of Tier 3 -->
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black px-2.5 py-0.5 rounded-full border ${bucketBadgeBg} uppercase tracking-wider">
+                                    ${bucketLabel}
+                                </span>
+                                <span class="text-[11px] font-bold text-slate-400">(${wordsInActiveBucket.length} words)</span>
+                            </div>
+                            
+                            <!-- Mini Selector Tabs -->
+                            <div class="flex items-center gap-1 pointer-events-none">
+                                <span class="w-2.5 h-2.5 rounded-full ${bucket === 'unclear' ? 'bg-rose-500 ring-2 ring-rose-200' : 'bg-slate-200'}"></span>
+                                <span class="w-2.5 h-2.5 rounded-full ${bucket === 'ok' ? 'bg-amber-400 ring-2 ring-amber-200' : 'bg-slate-200'}"></span>
+                                <span class="w-2.5 h-2.5 rounded-full ${bucket === 'good' ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-slate-200'}"></span>
+                                <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400 ml-1 group-hover:text-indigo-600 transition-colors">Tap to cycle</span>
+                            </div>
+                        </div>
+
+                        <!-- Words Flow Area -->
+                        <div class="flex-1 overflow-y-auto custom-scrollbar my-2 pr-1 flex flex-wrap gap-1.5 content-start">
+                            ${wordsHtml}
+                        </div>
+
+                        <!-- Helper Footer -->
+                        <div class="pt-1.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 flex justify-between items-center">
+                            <span>Showing: ${bucket.toUpperCase()} words</span>
+                            <span class="text-indigo-500 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">Next Tier <i data-lucide="chevron-right" class="w-3 h-3"></i></span>
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- BOTTOM NAVIGATION -->
-                <div class="bg-white border-t border-slate-200 p-4 flex justify-between items-center shrink-0 z-20">
-                    <button class="thps-esl-prev px-6 py-3 rounded-xl font-bold text-sm text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-2 active:scale-95 ${this.eslIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${this.eslIndex === 0 ? 'disabled' : ''}>
+                <div class="bg-white border-t border-slate-200 p-3 flex justify-between items-center shrink-0 z-20">
+                    <button class="thps-esl-prev px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 active:scale-95 ${this.eslIndex === 0 ? 'opacity-40 cursor-not-allowed' : ''}" ${this.eslIndex === 0 ? 'disabled' : ''}>
                         <i data-lucide="chevron-left" class="w-4 h-4 pointer-events-none"></i> Prev
                     </button>
-                    <button class="thps-esl-next px-6 py-3 rounded-xl font-bold text-sm text-white bg-slate-800 hover:bg-slate-900 transition-colors shadow-md flex items-center gap-2 active:scale-95 ${this.eslIndex === this.eslSentences.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${this.eslIndex === this.eslSentences.length - 1 ? 'disabled' : ''}>
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">${this.eslIndex + 1} / ${this.eslSentences.length}</span>
+                    <button class="thps-esl-next px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-slate-800 hover:bg-slate-900 transition-colors shadow-md flex items-center gap-1.5 active:scale-95 ${this.eslIndex === this.eslSentences.length - 1 ? 'opacity-40 cursor-not-allowed' : ''}" ${this.eslIndex === this.eslSentences.length - 1 ? 'disabled' : ''}>
                         Next <i data-lucide="chevron-right" class="w-4 h-4 pointer-events-none"></i>
                     </button>
                 </div>
@@ -984,17 +1078,26 @@ class THPSCourseWidget extends HTMLElement {
         `;
 
         if (window.lucide) window.lucide.createIcons({ root: this });
-        
+
         this.querySelector('.thps-esl-back').addEventListener('click', () => {
             if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording(); 
             this.currentStep = 'esl-menu';
             this.renderEslMenu();
         });
 
+        this.querySelector('.thps-exit-course').addEventListener('click', () => {
+            if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
+            this.courseData = null;
+            this.currentStep = 0;
+            this.renderCourseSelector();
+        });
+
         this.querySelector('.thps-esl-prev').addEventListener('click', () => {
             if (this.eslIndex > 0) {
                 if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
                 this.eslIndex--;
+                this.eslActiveBucket = 'unclear';
+                this.eslLatestTelemetry = null;
                 this.renderEslDrill();
             }
         });
@@ -1003,6 +1106,8 @@ class THPSCourseWidget extends HTMLElement {
             if (this.eslIndex < this.eslSentences.length - 1) {
                 if (window.isActive && typeof window.toggleRecording === 'function') window.toggleRecording();
                 this.eslIndex++;
+                this.eslActiveBucket = 'unclear';
+                this.eslLatestTelemetry = null;
                 this.renderEslDrill();
             }
         });
@@ -1010,11 +1115,15 @@ class THPSCourseWidget extends HTMLElement {
         this.querySelector('#esl-record-btn').addEventListener('click', () => {
             if (typeof window.toggleRecording === 'function') {
                 window.toggleRecording();
-                if (!window.isActive) {
-                    const tBox = this.querySelector('#esl-transcript');
-                    if (tBox) tBox.innerText = 'Listening...';
-                }
             }
+        });
+
+        // Tier 3 Cycling on Click
+        this.querySelector('#esl-tier3-card').addEventListener('click', () => {
+            if (this.eslActiveBucket === 'unclear') this.eslActiveBucket = 'ok';
+            else if (this.eslActiveBucket === 'ok') this.eslActiveBucket = 'good';
+            else this.eslActiveBucket = 'unclear';
+            this.renderEslDrill();
         });
     }
 
@@ -1033,7 +1142,6 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-slate-50 border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans p-5 sm:p-6">
-                <!-- EXIT BUTTON -->
                 <button class="thps-exit-course absolute top-0 right-0 bg-white border-l border-b border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-400 px-4 py-2.5 rounded-bl-xl font-bold text-xs uppercase tracking-widest z-30 transition-colors flex items-center gap-2 shadow-sm active:scale-95">
                     Exit <i data-lucide="x" class="w-3 h-3 pointer-events-none"></i>
                 </button>
@@ -1041,9 +1149,7 @@ class THPSCourseWidget extends HTMLElement {
                 <div class="flex-1 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-center mb-6 mt-12 w-full max-w-5xl mx-auto">
                     <div class="relative w-full md:flex-1 aspect-video bg-slate-200 rounded-none md:rounded-r-2xl overflow-hidden shadow-md group shrink-0 -mx-5 sm:-mx-6 md:mx-0 md:-ml-6">
                         <img src="${currentImage}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" id="swys-img-el">
-                        
                         <div id="swys-mask-el" class="absolute top-0 bottom-0 right-0 bg-black/70 backdrop-blur-[2px] transition-all duration-300 pointer-events-none z-10 ${getMaskClass(this.swysLevel)}"></div>
-                        
                         <button id="swys-prev-img" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 hover:bg-slate-900/90 text-white p-2 rounded-full backdrop-blur-md transition-all z-20 active:scale-90 shadow-md">
                             <i data-lucide="chevron-left" class="w-5 h-5 md:w-6 md:h-6 pointer-events-none"></i>
                         </button>
@@ -1070,14 +1176,12 @@ class THPSCourseWidget extends HTMLElement {
 
                 <div class="w-full max-w-lg mx-auto relative h-[68px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center shrink-0 border border-slate-800 mb-2">
                     <div id="swys-progress" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-[50ms] ease-linear"></div>
-                    
                     <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 25%;">
                         <i data-lucide="star-half" id="swys-star-25" class="w-5 h-5 text-slate-400/50 transition-colors"></i>
                     </div>
                     <div class="absolute text-slate-500 w-5 h-5 -ml-2.5 z-10 flex items-center justify-center pointer-events-none" style="left: 75%;">
                         <i data-lucide="star" id="swys-star-75" class="w-5 h-5 text-slate-400/50 transition-colors"></i>
                     </div>
-                    
                     <button id="swys-record-btn" class="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center text-white z-20 transition-all active:scale-90 shadow-md">
                         <i data-lucide="play" id="swys-record-icon" class="w-5 h-5 pointer-events-none transition-transform ml-1"></i>
                     </button>
@@ -1237,7 +1341,6 @@ class THPSCourseWidget extends HTMLElement {
 
         this.innerHTML = `
             <div class="relative w-full h-[650px] bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col font-sans">
-                
                 <button class="thps-course-menu-toggle absolute top-0 left-0 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-br-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest z-30 transition-colors shadow-md flex items-center gap-2 active:scale-95 origin-top-left">
                     <i data-lucide="menu" class="w-3 h-3 sm:w-4 sm:h-4 pointer-events-none"></i> 
                     <span class="pointer-events-none">Step ${this.currentStep} / ${this.courseData.totalSteps}</span>
@@ -1366,6 +1469,45 @@ class THPSCourseWidget extends HTMLElement {
         
         const payload = e.detail;
 
+        // Catch ESL Drill Telemetry
+        if (this.currentStep === 'esl-drill' && payload.text && payload.text.trim() !== '') {
+            let goodWords = [];
+            let okWords = [];
+            let unclearWords = [];
+
+            if (payload.wordTimestamps && payload.wordTimestamps.length > 0) {
+                payload.wordTimestamps.forEach(w => {
+                    const cleanWord = w.word ? w.word.toLowerCase().replace(/[^a-z']/g, '') : '';
+                    if (!cleanWord) return;
+
+                    const conf = w.confidence !== undefined ? Math.round(w.confidence * 100) : 0;
+                    if (conf > 90) goodWords.push(cleanWord);
+                    else if (conf >= 81) okWords.push(cleanWord);
+                    else unclearWords.push(cleanWord);
+                });
+            }
+
+            goodWords.sort();
+            okWords.sort();
+            unclearWords.sort();
+
+            const clarityVal = payload.clarity !== undefined ? payload.clarity : 0;
+            const wpmVal = payload.wpm !== undefined ? payload.wpm : 0;
+            const scoreObj = this.calculateEslScore(clarityVal, wpmVal);
+
+            this.eslLatestTelemetry = {
+                clarity: clarityVal,
+                wpm: wpmVal,
+                score: scoreObj,
+                goodWords: goodWords,
+                okWords: okWords,
+                unclearWords: unclearWords
+            };
+
+            this.renderEslDrill();
+            return;
+        }
+
         // Catch and process the Repeat+Count Telemetry
         if (this.currentStep === 'rc-drill' && payload.text && payload.text.trim() !== '') {
             this.rcLatestTelemetry = {
@@ -1380,7 +1522,7 @@ class THPSCourseWidget extends HTMLElement {
                 simple: payload.simple || 0
             };
             this.rcState = 'grade';
-            this.renderRepeatCountDrill(); // Re-render triggers the flip animation
+            this.renderRepeatCountDrill();
             return;
         }
 
@@ -1490,7 +1632,6 @@ class THPSCourseWidget extends HTMLElement {
         if (arcadeProgress && arcadeBtn && arcadeIcon) {
             if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
                 const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
-                
                 const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
                 arcadeProgress.style.width = `${fillPct}%`;
                 
@@ -1515,26 +1656,18 @@ class THPSCourseWidget extends HTMLElement {
             }
         }
 
-        const eslTimer = this.querySelector('.thps-esl-timer');
+        // ESL Drill Compact Mic Controls
         const eslRecordBtn = this.querySelector('#esl-record-btn');
         const eslRecordIcon = this.querySelector('#esl-record-icon');
         const eslRecordText = this.querySelector('#esl-record-text');
-        const eslTranscript = this.querySelector('#esl-transcript');
 
-        if (eslTimer && eslRecordBtn) {
+        if (eslRecordBtn) {
             if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
-                const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
-                eslTimer.innerHTML = `${elapsedSecs.toFixed(2)}<span class="text-2xl text-slate-400">s</span>`;
-                eslTimer.classList.add('text-indigo-600');
-
-                const liveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
-                if (eslTranscript && liveText) eslTranscript.innerText = liveText;
-
                 if (!eslRecordBtn.classList.contains('bg-rose-500')) {
                     eslRecordBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
                     eslRecordBtn.classList.replace('hover:bg-indigo-500', 'hover:bg-rose-400');
                     eslRecordBtn.style.boxShadow = "0 0 15px rgba(243, 24, 73, 0.4)";
-                    if (eslRecordText) eslRecordText.innerText = "Stop Drill";
+                    if (eslRecordText) eslRecordText.innerText = "Stop";
                     
                     if (eslRecordIcon) {
                         eslRecordIcon.setAttribute('data-lucide', 'square');
@@ -1542,16 +1675,11 @@ class THPSCourseWidget extends HTMLElement {
                     }
                 }
             } else {
-                eslTimer.classList.remove('text-indigo-600');
-                
-                const finalLiveText = document.getElementById('cba-inputText') ? document.getElementById('cba-inputText').value : '';
-                if (eslTranscript && finalLiveText) eslTranscript.innerText = finalLiveText;
-
                 if (eslRecordBtn.classList.contains('bg-rose-500')) {
                     eslRecordBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
                     eslRecordBtn.classList.replace('hover:bg-rose-400', 'hover:bg-indigo-500');
-                    eslRecordBtn.style.boxShadow = "0 0 15px rgba(79,70,229,0.4)";
-                    if (eslRecordText) eslRecordText.innerText = "Tap to Start";
+                    eslRecordBtn.style.boxShadow = "0 0 12px rgba(79,70,229,0.35)";
+                    if (eslRecordText) eslRecordText.innerText = "Tap";
                     
                     if (eslRecordIcon) {
                         eslRecordIcon.setAttribute('data-lucide', 'mic');
@@ -1612,7 +1740,6 @@ class THPSCourseWidget extends HTMLElement {
         if (swysProgress && swysBtn && swysIcon) {
             if (window.isActive && window.THPS && window.THPS.Audio && window.THPS.Audio.recordStartTime) {
                 const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
-                
                 const fillPct = Math.min((elapsedSecs / 80) * 100, 100);
                 swysProgress.style.width = `${fillPct}%`;
                 
