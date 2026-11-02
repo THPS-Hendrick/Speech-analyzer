@@ -11,7 +11,7 @@ class ThpsMainDash extends HTMLElement {
         this.currentMetric = 'grade';
         this.latestData = null;
 
-        // Unified Metric Configuration
+        // Unified Metric Configuration (Ordered for Progress Tab Selectors)
         this.METRIC_CONFIG = {
             'grade': { key: 'totalPoints', title: 'Overall', min: 0, max: 100, zones: [ { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'greenScore': { key: 'greenScore', title: 'Greens', min: 0, max: 10, zones: [ { min: 8, max: 10, color: 'rgba(34, 197, 94, 0.12)' }, { min: 5, max: 8, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' } ] },
@@ -22,6 +22,7 @@ class ThpsMainDash extends HTMLElement {
             'sps': { key: 'sps', title: 'Syll/Sec', min: 2.0, max: 6.0, zones: [ { min: 0, max: 3.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 3.0, max: 3.5, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.5, max: 4.5, color: 'rgba(34, 197, 94, 0.12)' }, { min: 4.5, max: 5.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 5.0, max: 10, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'pause': { key: 'pause', title: 'Pause', min: 0, max: 60, zones: [ { min: 0, max: 9, color: 'rgba(239, 68, 68, 0.12)' }, { min: 9, max: 15, color: 'rgba(234, 179, 8, 0.12)' }, { min: 15, max: 35, color: 'rgba(34, 197, 94, 0.12)' }, { min: 35, max: 41, color: 'rgba(234, 179, 8, 0.12)' }, { min: 41, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'runtime': { key: 'runtime', title: 'Runtime', min: 0, max: 12, zones: [ { min: 0, max: 2.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 2.0, max: 3.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.0, max: 6.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 6.0, max: 9.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 9.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'readlevel': { key: 'readlevel', title: 'Read-Level', min: 0, max: 16, zones: [ { min: 0, max: 4.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 4.0, max: 5.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 5.0, max: 10.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 10.0, max: 12.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 12.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
             'simple': { key: 'simple', title: 'Simple', min: 50, max: 100, zones: [ { min: 0, max: 70, color: 'rgba(239, 68, 68, 0.12)' }, { min: 70, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 90, color: 'rgba(34, 197, 94, 0.12)' }, { min: 90, max: 96, color: 'rgba(234, 179, 8, 0.12)' }, { min: 96, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] }
         };
     }
@@ -48,12 +49,12 @@ class ThpsMainDash extends HTMLElement {
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4 pr-6">
                             <h2 class="text-lg font-bold text-slate-800">Score Summary</h2>
                             <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-                                    <span class="text-xs font-bold text-slate-500 uppercase">Greens:</span>
-                                    <span class="dash-greens font-bold text-slate-800 text-sm">- / 10</span>
+                                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Green Score', 'greenScore')">
+                                    <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Greens:</span>
+                                    <span class="dash-greens font-bold text-slate-800 text-sm pointer-events-none">- / 10</span>
                                 </div>
-                                <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner">
-                                    Grade: <span class="dash-overallGrade text-blue-600">- / 100</span>
+                                <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-main-dash').triggerMetricSelect('Overall Grade', 'grade')">
+                                    Grade: <span class="dash-overallGrade text-blue-600 pointer-events-none">- / 100</span>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +75,7 @@ class ThpsMainDash extends HTMLElement {
                             <div class="space-y-3">
                                 <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="this.closest('thps-main-dash').triggerMetricSelect('Simplicity', 'grade')">Simplicity</h3>
                                 <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-main-dash').triggerMetricSelect('Runtime', 'runtime')"><span class="score-label group-hover:text-blue-600 transition-colors">Runtime:</span> <div class="flex items-center gap-1"><span class="dash-runtime score-value pointer-events-none">0.0s</span> <span class="dash-runtime-eval text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-main-dash').triggerMetricSelect('Comp. Grade', 'grade')"><span class="score-label group-hover:text-blue-600 transition-colors">Comp. Grade:</span> <div class="flex items-center gap-1"><span class="dash-grade score-value pointer-events-none">0.0</span> <span class="dash-grade-eval text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
+                                <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-main-dash').triggerMetricSelect('Read-Level', 'readlevel')"><span class="score-label group-hover:text-blue-600 transition-colors">Read-Level:</span> <div class="flex items-center gap-1"><span class="dash-readlevel score-value pointer-events-none">0.0</span> <span class="dash-readlevel-eval text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                                 <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-main-dash').triggerMetricSelect('Simple %', 'simple')"><span class="score-label group-hover:text-blue-600 transition-colors">Simple %:</span> <div class="flex items-center gap-1"><span class="dash-simple score-value pointer-events-none">0%</span> <span class="dash-simple-eval text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                             </div>
                         </div>
@@ -125,10 +126,8 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                             <p class="text-[10px] uppercase font-bold text-slate-400">Green zone centered.</p>
                         </div>
-                        
-                        <div class="flex-1 w-full relative flex flex-col overflow-y-auto styled-scrollbar pr-2">
-                            <!-- Switched to flex-col exclusively to match the mobile stack -->
-                            <div class="dash-moe-grid w-full h-full flex flex-col gap-4 justify-between flex-1">
+                        <div class="flex-1 w-full relative flex flex-col md:min-h-[250px] overflow-y-auto styled-scrollbar pr-2">
+                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-4 md:gap-2 justify-between flex-1">
                                 <!-- Tracks will be injected here via JS -->
                             </div>
                         </div>
@@ -236,8 +235,12 @@ class ThpsMainDash extends HTMLElement {
     triggerMetricSelect(term, key) {
         this.showLocalExplanation(term);
         if (this.METRIC_CONFIG[key]) {
+            // Quietly prime the internal Progress chart
             this.currentMetric = key;
-            this.switchTab('progress');
+            if (this.activeTab === 'progress') this.renderChart();
+            
+            // Broadcast so the standalone Progress widget updates
+            window.dispatchEvent(new CustomEvent('thps-metric-select', { detail: key }));
         }
     }
 
@@ -245,10 +248,13 @@ class ThpsMainDash extends HTMLElement {
         const titleEl = this.querySelector('.dash-explainer-title');
         const contentEl = this.querySelector('.dash-explainer-content');
         if (!titleEl || !contentEl) return;
+        
+        // Handle mapped explanation title for backwards compatibility with the JSON dictionary
+        const displayTerm = term === 'Read-Level' ? 'Comp. Grade' : term;
         titleEl.innerText = term + ':';
         contentEl.innerHTML = `<span class="animate-pulse">Loading...</span>`;
         setTimeout(() => {
-            let text = (window.explanationsData && window.explanationsData[term]) ? window.explanationsData[term] : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] ? window.FALLBACK_EXPLANATIONS[term] : `Explanation for "${term}" will appear here soon.`);
+            let text = (window.explanationsData && window.explanationsData[displayTerm]) ? window.explanationsData[displayTerm] : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[displayTerm] ? window.FALLBACK_EXPLANATIONS[displayTerm] : `Explanation for "${term}" will appear here soon.`);
             contentEl.innerHTML = text;
         }, 100);
     }
@@ -302,9 +308,11 @@ class ThpsMainDash extends HTMLElement {
             setEval('dash-runtime-eval', 'Text Only', 'bg-slate-100 text-slate-500');
         }
 
-        this.querySelector('.dash-grade').textContent = data.grade.toFixed(1);
-        let gPts = window.getMetricPoints ? window.getMetricPoints('grade', data.grade) : 0;
-        setEval('dash-grade-eval', formatBadge(gPts), getBadgeStyle(gPts));
+        // Apply fallback logic for readlevel mapping
+        let rLvlVal = data.readlevel !== undefined ? data.readlevel : data.grade;
+        this.querySelector('.dash-readlevel').textContent = rLvlVal.toFixed(1);
+        let gPts = window.getMetricPoints ? window.getMetricPoints('readlevel', rLvlVal) : 0;
+        setEval('dash-readlevel-eval', formatBadge(gPts), getBadgeStyle(gPts));
 
         this.querySelector('.dash-simple').textContent = `${data.simple}%`;
         let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
@@ -357,7 +365,11 @@ class ThpsMainDash extends HTMLElement {
 
         const chronologicalHistory = [...history].reverse();
         const labels = chronologicalHistory.map(h => `Att ${h.id}`);
-        const dataPoints = chronologicalHistory.map(h => h[config.key] !== undefined ? h[config.key] : null);
+        // Read level fallback applied here
+        const dataPoints = chronologicalHistory.map(h => {
+            let val = h[config.key] !== undefined ? h[config.key] : (config.key === 'readlevel' ? h['grade'] : null);
+            return val;
+        });
 
         const canvas = this.querySelector('.dash-progress-canvas');
         if (this.chart) {
@@ -408,7 +420,8 @@ class ThpsMainDash extends HTMLElement {
         const grid = this.querySelector('.dash-moe-grid');
         grid.innerHTML = '';
 
-        const metricsToMap = ['personal', 'visual', 'intangible', 'wpm', 'sps', 'pause', 'runtime', 'grade', 'simple'];
+        // Strictly the 9 core metrics (Overall Grade removed, readlevel added)
+        const metricsToMap = ['personal', 'visual', 'intangible', 'wpm', 'sps', 'pause', 'runtime', 'readlevel', 'simple'];
         const history = window.thps_sessionHistory || [];
 
         metricsToMap.forEach(key => {
@@ -427,7 +440,8 @@ class ThpsMainDash extends HTMLElement {
             let usedPercentages = [];
             
             [...history].reverse().forEach((attempt) => {
-                const rawVal = attempt[config.key];
+                // Apply fallback mapping for readlevel
+                let rawVal = attempt[config.key] !== undefined ? attempt[config.key] : (config.key === 'readlevel' ? attempt.grade : null);
                 const hideDot = (rawVal === null || rawVal === undefined || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !attempt.recordedAudio));
                 
                 if (!hideDot) {
@@ -444,23 +458,23 @@ class ThpsMainDash extends HTMLElement {
                     const isActive = attempt.id === this.latestData.id;
                     const dotClass = isActive ? 'bg-slate-800 border-white z-20 w-4 h-4' : 'bg-slate-400 border-slate-200 z-10 w-3 h-3 opacity-80';
 
-                    // Removed the dot-desktop vs dot-mobile duality. Using ONLY the horizontal style now.
                     dotsHtml += `
-                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out ${dotClass}" 
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-mobile block md:hidden ${dotClass}" 
                              style="top: calc(50% + ${dodgeOffset}px); left: ${dotPct}%; transform: translate(-50%, -50%);" title="Att ${attempt.id}: ${rawVal}"></div>
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-desktop hidden md:block ${dotClass}" 
+                             style="left: calc(50% + ${dodgeOffset}px); bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="Att ${attempt.id}: ${rawVal}"></div>
                     `;
                 }
             });
 
             const track = document.createElement('div');
-            // Using only the horizontal flex-row layout
-            track.className = "flex-1 flex flex-row items-center relative group w-full h-full";
+            track.className = "flex-1 flex flex-row md:flex-col items-center relative group w-full h-full";
             track.innerHTML = `
-                <div class="text-[10px] sm:text-xs font-black text-slate-400 uppercase text-left w-24 shrink-0 pr-2 truncate">${config.title}</div>
-                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 shadow-inner" style="max-width: 800px;">
-                     <!-- Horizontal gradient only -->
-                     <div class="absolute inset-0" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
-                     <div class="absolute bg-white/70 w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-left md:text-center w-20 md:w-full shrink-0 mb-0 md:mb-2 md:mr-0 pr-2 md:pr-0 truncate">${config.title.split(' ')[0]}</div>
+                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 md:h-full md:w-10 shadow-inner">
+                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute bg-white/70 md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
                      ${dotsHtml}
                 </div>
             `;
