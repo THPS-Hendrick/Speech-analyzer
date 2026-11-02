@@ -150,7 +150,8 @@ window.THPS.Audio.stopRecordingProcess = async function() {
                     finalStitchedWords.push({
                         word: w.word,
                         start: w.start + (chunk.index * 30),
-                        end: w.end + (chunk.index * 30)
+                        end: w.end + (chunk.index * 30),
+                        confidence: w.confidence // <-- FIX: Confidence score preserved through the 30-sec stitch
                     });
                 });
             }
