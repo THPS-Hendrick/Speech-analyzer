@@ -318,16 +318,6 @@ class ThpsMainDash extends HTMLElement {
         let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
         setEval('dash-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
         
-        // Apply fallback logic for readlevel mapping
-        let rLvlVal = data.readlevel !== undefined ? data.readlevel : data.grade;
-        this.querySelector('.dash-readlevel').textContent = rLvlVal.toFixed(1);
-        let gPts = window.getMetricPoints ? window.getMetricPoints('readlevel', rLvlVal) : 0;
-        setEval('dash-readlevel-eval', formatBadge(gPts), getBadgeStyle(gPts));
-
-        this.querySelector('.dash-simple').textContent = `${data.simple}%`;
-        let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
-        setEval('dash-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
-        
         // NEW: Handle Fallback for old history data
         let clarityVal = data.clarity !== undefined ? data.clarity : 0; 
 
