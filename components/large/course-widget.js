@@ -896,10 +896,10 @@ class THPSCourseWidget extends HTMLElement {
         if (clarityVal > 90) clarityZone = 'green';
         else if (clarityVal >= 81) clarityZone = 'yellow';
 
-        // WPM Zones: >=186 green, 151-185 yellow, <=150 red
+        // WPM Zones: >=150 green, 126-150 yellow, <=125 red
         let wpmZone = 'red';
-        if (wpmVal >= 186) wpmZone = 'green';
-        else if (wpmVal >= 151) wpmZone = 'yellow';
+        if (wpmVal >= 150) wpmZone = 'green';
+        else if (wpmVal >= 126) wpmZone = 'yellow';
 
         const greenCount = (clarityZone === 'green' ? 1 : 0) + (wpmZone === 'green' ? 1 : 0);
         const yellowCount = (clarityZone === 'yellow' ? 1 : 0) + (wpmZone === 'yellow' ? 1 : 0);
