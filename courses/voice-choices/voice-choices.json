@@ -1,3 +1,6 @@
+Here is the updated JSON for `courses/voice-choices/voice-choices.json` with the new **Liam Neeson - Taken** speech inserted directly under Milla Jovovich:
+
+```json
 {
   "mode": "voice-choice",
   "title": "Voice Choice: Intensity",
@@ -30,6 +33,21 @@
         { "intensity": 5, "text": "I have seen enough blood. But if you want more, I can't stop you." },
         { "intensity": 5, "text": "I can only warn you, that it will be your blood, not ours." },
         { "intensity": 5, "text": "I am waiting for your answer." }
+      ]
+    },
+    {
+      "title": "Liam Neeson - Taken",
+      "description": "Endure delivering deadly 1’s for a long time",
+      "lines": [
+        { "intensity": 1, "text": "I don't know who you are. I don't know what you want." },
+        { "intensity": 1, "text": "If you are looking for ransom, I can tell you I don't have money." },
+        { "intensity": 1, "text": "But what I do have are a very particular set of skills;" },
+        { "intensity": 1, "text": "Skills I have acquired over a very long career." },
+        { "intensity": 1, "text": "Skills that make me a nightmare for people like you." },
+        { "intensity": 1, "text": "If you let my daughter go now, that'll be the end of it." },
+        { "intensity": 1, "text": "I will not look for you, I will not pursue you." },
+        { "intensity": 1, "text": "But if you don't …" },
+        { "intensity": 1, "text": "I will look for you. I will find you. And I will kill you." }
       ]
     },
     {
@@ -109,3 +127,5 @@
     }
   ]
 }
+
+```
