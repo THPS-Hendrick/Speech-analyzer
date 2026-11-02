@@ -830,7 +830,7 @@
                 sps: [3.0, 3.5, 4.5, 5.0],
                 pause: [9, 15, 35, 41],
                 runtime: [2.0, 3.0, 6.0, 9.0],
-                grade: [4.0, 5.0, 10.0, 12.0],
+                readlevel: [4.0, 5.0, 10.0, 12.0],
                 simple: [70, 80, 90, 96]
             };
             
@@ -948,7 +948,7 @@
                     {k: 'sps', v: mumbleScore}, 
                     {k: 'pause', v: pausePercent}, 
                     {k: 'runtime', v: finalRuntime}, 
-                    {k: 'grade', v: avgGrade}, 
+                    {k: 'readlevel', v: avgGrade}, 
                     {k: 'simple', v: coreSimpleScore}
                 ];
 
@@ -966,7 +966,7 @@
                 const payload = { 
                     sps: mumbleScore,
                     wpm: avgWpm,
-                    grade: avgGrade,
+                    readlevel: avgGrade,
                     time: elapsedSecs,
                     personal: personalPercent,
                     visual: visualPercent,
@@ -1025,7 +1025,7 @@
         window.formatMetric = function(key, val) {
             if (val === null || val === undefined) return '-';
             if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
-            if (['totalPoints', 'sps', 'grade'].includes(key)) return val.toFixed(1);
+            if (['totalPoints', 'sps', 'grade', 'readlevel'].includes(key)) return val.toFixed(1);
             if (key === 'runtime') return val.toFixed(1) + 's';
             if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
             return Math.round(val);
@@ -1098,7 +1098,7 @@
                 { label: 'SPS', key: 'sps' },
                 { label: 'Pause', key: 'pause' },
                 { label: 'Runtime', key: 'runtime' },
-                { label: 'Comp', key: 'grade' },
+                { label: 'Read-Lvl', key: 'readlevel' },
                 { label: 'Sim%', key: 'simple' }
             ];
 
@@ -1110,7 +1110,7 @@
                 let bestVal = null, bestPts = -1;
 
                 window.thps_sessionHistory.forEach(h => {
-                    let val = h[m.key];
+                    let val = h[m.key] !== undefined ? h[m.key] : (m.key === 'readlevel' ? h.grade : undefined);
 
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
