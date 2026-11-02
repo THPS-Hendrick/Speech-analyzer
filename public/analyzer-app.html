@@ -535,7 +535,7 @@
         window.explanationsData = null;
         window.FALLBACK_EXPLANATIONS = {
             "Score Summary": "Measures your Content, Delivery, and Simplicity. Metrics in the \"green\" zone get +10 points. Total Grade out of 100.",
-            "Green Score": "Counts how many of the 9 metrics hit the perfect Green Zone (+10). Each green metric adds +1 to this score. Getting all 9 greens awards a +1 bonus, for a perfect 10/10.",
+            "Clarity %": "How confident Google Speech-to-text was at transcribing each word you pronounced. Aim for 90%+.",
             "Grade": "Your final score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).",
             "Content": "Measures the substance of your speech. Aim for 30-60% Personal and 20-50% Visual.",
             "Delivery": "Measures how you sound. Aim for 100-150 Words/min, 3.5-4.5 Syllables/sec, and 15-35% Pause time.",
@@ -831,7 +831,8 @@
                 pause: [9, 15, 35, 41],
                 runtime: [2.0, 3.0, 6.0, 9.0],
                 readlevel: [4.0, 5.0, 10.0, 12.0],
-                simple: [70, 80, 90, 96]
+                simple: [70, 80, 90, 96],
+                clarity: [70, 90, 100, 101] // <-- NEW: minOuter 70, minGreen 90
             };
             
             if (!limits[key] || val === undefined || val === null) return 0;
@@ -927,19 +928,26 @@
             let personalPercent = numWords > 0 ? Math.round((personalCount / numWords) * 100) : 0;
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+            let clarityPercent = 0;
+            if (timestamps && timestamps.length > 0) {
+                const validWords = timestamps.filter(w => w.confidence !== undefined);
+                if (validWords.length > 0) {
+                    const sumConf = validWords.reduce((sum, w) => sum + w.confidence, 0);
+                    clarityPercent = Math.round((sumConf / validWords.length) * 100);
+                }
+            }
 
             try {
                 let totalPoints = 0;
-                let greenCount = 0;
                 let overrideGrade = false;
 
                 if (!window.THPS.Audio || !window.THPS.Audio.recordedAudio || elapsedSecs === 0) {
                     overrideGrade = true;
                 }
 
-                let finalRuntime = masterData.runtime || 0; // Capture safely
+                let finalRuntime = masterData.runtime || 0; 
 
-                // New Sliding Scale Scoring Engine
+                // UPDATED: Clarity is now the 10th core metric
                 const scoreKeys = [
                     {k: 'personal', v: personalPercent}, 
                     {k: 'visual', v: visualPercent}, 
@@ -949,18 +957,14 @@
                     {k: 'pause', v: pausePercent}, 
                     {k: 'runtime', v: finalRuntime}, 
                     {k: 'readlevel', v: avgGrade}, 
-                    {k: 'simple', v: coreSimpleScore}
+                    {k: 'simple', v: coreSimpleScore},
+                    {k: 'clarity', v: clarityPercent} // <-- Replaces Greens
                 ];
 
                 scoreKeys.forEach(metric => {
                     let pts = window.getMetricPoints(metric.k, metric.v);
-                    totalPoints += pts;
-                    if (pts === 10) greenCount++;
+                    totalPoints += pts; // 10 metrics * 10 max points = 100 total points
                 });
-
-                // Calculate the final 10-point bonus (Green Score)
-                let greenScore = (greenCount === 9) ? 10 : greenCount;
-                totalPoints += greenScore;
 
                 // --- THE TRACKMAN CACHE ---
                 const payload = { 
@@ -980,7 +984,7 @@
                     runtime: finalRuntime,
                     simple: coreSimpleScore,
                     totalPoints: totalPoints,
-                    greenScore: greenScore,
+                    clarity: clarityPercent,
                     overrideGrade: overrideGrade,
                     recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
                     highlightedHTML: highlightedHTML,
