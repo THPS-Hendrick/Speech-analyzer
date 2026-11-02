@@ -9,7 +9,7 @@ class ThpsPillGrade extends HTMLElement {
                 <button class="thps-close-btn absolute top-2 right-2 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Comp. Grade</h3>
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Read-Level</h3>
                 <div class="flex items-baseline gap-1">
                     <span class="thps-val text-3xl sm:text-4xl font-black text-teal-500">-</span>
                     <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">LVL</span>
@@ -31,7 +31,7 @@ class ThpsPillGrade extends HTMLElement {
 
     update(data) {
         if (data.grade === undefined) return;
-        this.querySelector('.thps-val').innerText = Number(data.grade).toFixed(1);
+        this.querySelector('.thps-val').innerText = Number(data.readlevel).toFixed(1);
     }
 }
 customElements.define('thps-pill-grade', ThpsPillGrade);
