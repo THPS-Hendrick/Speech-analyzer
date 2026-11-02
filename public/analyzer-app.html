@@ -928,6 +928,8 @@
             let personalPercent = numWords > 0 ? Math.round((personalCount / numWords) * 100) : 0;
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+            
+            // NEW: Calculate Clarity %
             let clarityPercent = 0;
             if (timestamps && timestamps.length > 0) {
                 const validWords = timestamps.filter(w => w.confidence !== undefined);
@@ -1084,7 +1086,7 @@
                         <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/100</span>
                     </div>
                     <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
-                        <span>Greens: ${attempt.greenScore || 0}/10</span>
+                        <span>Clarity: ${attempt.clarity !== undefined ? attempt.clarity + '%' : 'N/A'}</span>
                         <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>
                 `;
@@ -1094,7 +1096,7 @@
             // Map UI text labels to their payload keys
             const metricsMap = [
                 { label: 'Score', key: 'totalPoints' },
-                { label: 'Greens', key: 'greenScore' },
+                { label: 'Clarity', key: 'clarity' },
                 { label: 'Pers', key: 'personal' },
                 { label: 'Vis', key: 'visual' },
                 { label: 'Intg', key: 'intangible' },
@@ -1114,13 +1116,19 @@
                 let bestVal = null, bestPts = -1;
 
                 window.thps_sessionHistory.forEach(h => {
-                    let val = h[m.key] !== undefined ? h[m.key] : (m.key === 'readlevel' ? h.grade : undefined);
+                    // Safely handle both the 'readlevel' re-map and the missing 'clarity' in old history
+                    let val = h[m.key];
+                    if (val === undefined) {
+                        if (m.key === 'readlevel') val = h.grade;
+                        else if (m.key === 'clarity') val = 0; // Old history gets 0 clarity
+                    }
 
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
                         count++;
                         
-                        let pts = (m.key === 'totalPoints' || m.key === 'greenScore') ? val : window.getMetricPoints(m.key, val);
+                        // Update check to ignore window.getMetricPoints for clarity (it calculates its own)
+                        let pts = (m.key === 'totalPoints' || m.key === 'clarity') ? val : window.getMetricPoints(m.key, val);
                         if (pts > bestPts) {
                             bestPts = pts;
                             bestVal = val;
