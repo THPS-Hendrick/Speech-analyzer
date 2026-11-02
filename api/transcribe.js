@@ -59,7 +59,8 @@ module.exports = async function handler(req, res) {
                 languageCode: 'en-AU',
                 alternativeLanguageCodes: ['en-US', 'en-GB'],
                 enableAutomaticPunctuation: true,
-                enableWordTimeOffsets: true, // <-- NEW: Turns on exact timestamps!
+                enableWordTimeOffsets: true, 
+                enableWordConfidence: true, // <-- NEW: Tells Google to score each word
             },
             audio: {
                 content: audioContent,
@@ -86,7 +87,8 @@ module.exports = async function handler(req, res) {
                     words.push({
                         word: w.word,
                         start: startSecs + (startNanos / 1e9),
-                        end: endSecs + (endNanos / 1e9)
+                        end: endSecs + (endNanos / 1e9),
+                        confidence: w.confidence || 0.0 // <-- NEW: Passes to frontend
                     });
                 });
             }
