@@ -536,20 +536,21 @@
         window.FALLBACK_EXPLANATIONS = {
             "Score Summary": "Measures your Content, Delivery, and Simplicity. Metrics in the \"green\" zone get +10 points. Total Grade out of 100.",
             "Clarity %": "How confident Google Speech-to-text was at transcribing each word you pronounced. Aim for 90%+.",
-            "Grade": "Your final score out of 100. It is the sum of your 9 core metrics (max 90 points) plus your Green Score (max 10 points).",
+            "Grade": "Your final score out of 100 across 10 core delivery metrics.",
             "Content": "Measures the substance of your speech. Aim for 30-60% Personal and 20-50% Visual.",
-            "Delivery": "Measures how you sound. Aim for 100-150 Words/min, 3.5-4.5 Syllables/sec, and 15-35% Pause time.",
-            "Simplicity": "Measures how easy your speech is to understand. Keep Runtime between 3.0-6.0s.",
+            "Delivery": "Measures how you sound. Aim for 100-155 Words/min, 3.5-4.5 Syllables/sec, and 15-35% Pause time.",
+            "Simplicity": "Measures how easy your speech is to understand. Keep Runtime between 3.0-7.0s.",
             "Personal": "Measures storytelling. Aim for 30-60% content about specific people doing specific things.",
             "Visual": "Measures sensory words that paint a picture. Aim for 20-50%.",
             "Intangible": "Measures abstract concepts and filler. Keep it between 10-30%.",
-            "Words/min": "Your speaking pace. The sweet spot is 100-150 words per minute.",
+            "Words/min": "Your speaking pace. The sweet spot is 100-155 words per minute.",
             "Syllable/sec": "Our 'Mumble Meter'. The green zone is 3.5 to 4.5 syllables per second.",
             "Pause %": "The percentage of time you spend silent. Aim for 15-35%.",
-            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 6.0s.",
-            "Comp. Grade": "The reading grade level of your speech. A grade of 5.0 to 10.0 is perfect.",
+            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 7.0s.",
+            "Comp. Grade": "The reading grade level of your speech. A grade of 6.0 to 11.0 is plain english.",
+            "Read-Level": "The reading grade level of your speech. A grade of 6.0 to 11.0 is plain english.",
             "Simple %": "The percentage of your words within the 10,000 most common English words. Aim for 80-90%.",
-            "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varrying pause lengths affects meaning.",
+            "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varying pause lengths affects meaning.",
             "Voice Var.": "In 3sec chunks, counts how varied is your speaking volume. Varying volume is engaging.",
             "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
         };
@@ -820,37 +821,69 @@
             if (window.lucide) window.lucide.createIcons();
         };
 
-        // NEW: Interpolation Math Engine
+        // NEW: Multi-tiered Linear Score Interpolation Engine
+        // [minRedFloor, minYellowFloor, minGreen, maxGreen, maxYellowCeil, maxRedCeil]
+        // Inside Green: 10.0 pts
+        // Lower Yellow: 6.0 to 10.0 pts
+        // Upper Yellow: 10.0 down to 6.0 pts
+        // Lower Red: 0.0 to 6.0 pts (never below 0.0)
+        // Upper Red: 6.0 down to 0.0 pts (never below 0.0)
         window.getMetricPoints = function(key, val) {
             const limits = {
-                personal: [10, 30, 60, 80],
-                visual: [10, 20, 50, 60],
-                intangible: [5, 10, 30, 50],
-                wpm: [85, 100, 150, 170],
-                sps: [3.0, 3.5, 4.5, 5.0],
-                pause: [9, 15, 35, 41],
-                runtime: [2.0, 3.0, 6.0, 9.0],
-                readlevel: [4.0, 5.0, 10.0, 12.0],
-                simple: [70, 80, 90, 96],
-                clarity: [70, 90, 100, 101] // <-- NEW: minOuter 70, minGreen 90
+                // Key: [minRed, minYellow, minGreen, maxGreen, maxYellow, maxRed]
+                personal:   [0,    10,   30,   60,   80,   100],
+                visual:     [0,    10,   20,   50,   60,   100],
+                intangible: [0,    5,    10,   30,   50,   100],
+                wpm:        [50,   85,   100,  155,  170,  200], // Green 100-155
+                sps:        [2.0,  3.0,  3.5,  4.5,  5.0,  6.0],
+                pause:      [0,    9,    15,   35,   41,   60],
+                runtime:    [0.0,  2.0,  3.0,  7.0,  9.0,  12.0], // Green 3.0-7.0s
+                readlevel:  [2.0,  4.5,  6.0,  11.0, 13.0, 16.0], // Green 6.0-11.0
+                simple:     [50,   70,   80,   90,   96,   100],
+                clarity:    [60,   80,   90,   100,  100.1, 100.2] // Single-sided metric
             };
             
-            if (!limits[key] || val === undefined || val === null) return 0;
-            let [minOuter, minGreen, maxGreen, maxOuter] = limits[key];
-            
-            // Inside Green
-            if (val >= minGreen && val <= maxGreen) return 10;
-            // Outside limits
-            if (val <= minOuter || val >= maxOuter) return 0;
-            
-            // Pro-rated zones
-            if (val > minOuter && val < minGreen) {
-                return ((val - minOuter) / (minGreen - minOuter)) * 10;
+            if (!limits[key] || val === undefined || val === null || isNaN(val)) return 0.0;
+            const [minRed, minYellow, minGreen, maxGreen, maxYellow, maxRed] = limits[key];
+
+            // 1. Inside Green Zone: Full 10 Points
+            if (val >= minGreen && val <= maxGreen) {
+                return 10.0;
             }
-            if (val > maxGreen && val < maxOuter) {
-                return (1 - ((val - maxGreen) / (maxOuter - maxGreen))) * 10;
+
+            // 2. Below Green Range
+            if (val < minGreen) {
+                if (val <= minRed) return 0.0; // Hard zero floor
+                if (val >= minYellow) {
+                    // Lower Yellow Zone: 6.0 to 10.0
+                    if (minGreen === minYellow) return 10.0;
+                    const ratio = (val - minYellow) / (minGreen - minYellow);
+                    return Math.max(6.0, Math.min(10.0, 6.0 + (ratio * 4.0)));
+                } else {
+                    // Lower Red Zone: 0.0 to 6.0
+                    if (minYellow === minRed) return 0.0;
+                    const ratio = (val - minRed) / (minYellow - minRed);
+                    return Math.max(0.0, Math.min(6.0, ratio * 6.0));
+                }
             }
-            return 0;
+
+            // 3. Above Green Range
+            if (val > maxGreen) {
+                if (val >= maxRed) return 0.0; // Hard zero floor
+                if (val <= maxYellow) {
+                    // Upper Yellow Zone: 10.0 down to 6.0
+                    if (maxYellow === maxGreen) return 6.0;
+                    const ratio = (maxYellow - val) / (maxYellow - maxGreen);
+                    return Math.max(6.0, Math.min(10.0, 6.0 + (ratio * 4.0)));
+                } else {
+                    // Upper Red Zone: 6.0 down to 0.0
+                    if (maxRed === maxYellow) return 0.0;
+                    const ratio = (maxRed - val) / (maxRed - maxYellow);
+                    return Math.max(0.0, Math.min(6.0, ratio * 6.0));
+                }
+            }
+
+            return 0.0;
         };
 
         window.analyze = function() {
@@ -929,7 +962,7 @@
             let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
             let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
             
-            // NEW: Calculate Clarity %
+            // Calculate Clarity %
             let clarityPercent = 0;
             if (timestamps && timestamps.length > 0) {
                 const validWords = timestamps.filter(w => w.confidence !== undefined);
@@ -949,7 +982,7 @@
 
                 let finalRuntime = masterData.runtime || 0; 
 
-                // UPDATED: Clarity is now the 10th core metric
+                // Clarity as the 10th core metric
                 const scoreKeys = [
                     {k: 'personal', v: personalPercent}, 
                     {k: 'visual', v: visualPercent}, 
@@ -960,7 +993,7 @@
                     {k: 'runtime', v: finalRuntime}, 
                     {k: 'readlevel', v: avgGrade}, 
                     {k: 'simple', v: coreSimpleScore},
-                    {k: 'clarity', v: clarityPercent} // <-- Replaces Greens
+                    {k: 'clarity', v: clarityPercent}
                 ];
 
                 scoreKeys.forEach(metric => {
@@ -998,7 +1031,6 @@
                     unifiedSimpleCount: unifiedSimpleCount,
                     readability: readability,
                     
-// NEW: EXPLICITLY PASSING TELEMETRY ARRAYS
                     pauseEvents: masterData.pauseEvents || [],
                     runPaces: masterData.runPaces || [],
                     runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, 
@@ -1120,15 +1152,14 @@
                     let val = h[m.key];
                     if (val === undefined) {
                         if (m.key === 'readlevel') val = h.grade;
-                        else if (m.key === 'clarity') val = 0; // Old history gets 0 clarity
+                        else if (m.key === 'clarity') val = 0;
                     }
 
                     if (val !== undefined && val !== null && !isNaN(val)) {
                         sum += val;
                         count++;
                         
-                        // Update check to ignore window.getMetricPoints for clarity (it calculates its own)
-                        let pts = (m.key === 'totalPoints' || m.key === 'clarity') ? val : window.getMetricPoints(m.key, val);
+                        let pts = (m.key === 'totalPoints') ? val : window.getMetricPoints(m.key, val);
                         if (pts > bestPts) {
                             bestPts = pts;
                             bestVal = val;
@@ -1165,7 +1196,7 @@
             window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: attempt }));
             window.updateHistoryUI();
             
-            if (window.innerWidth < 640) window.closeAllMenus(); // Close drawer on mobile after selection
+            if (window.innerWidth < 640) window.closeAllMenus();
         };
 
         window.copyReportToClipboard = function() {
@@ -1276,7 +1307,6 @@
             if (!authBtn) return;
 
             if (clientId) {
-                // Truncate long UUIDs for the UI (e.g., "cli_9f82...")
                 const displayId = clientId.length > 10 ? clientId.substring(0, 10) + '...' : clientId;
                 authBtn.innerHTML = `<i data-lucide="user-check" class="w-6 h-6 text-indigo-600"></i> <span class="text-indigo-600">${displayId}</span>`;
             } else {
