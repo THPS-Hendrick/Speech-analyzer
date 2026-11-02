@@ -117,7 +117,7 @@ class ThpsMainDash extends HTMLElement {
 
                     <!-- TAB 3: MoE DISPERSION -->
                     <div id="dash-view-moe" class="dash-view hidden w-full h-full flex-col">
-                        <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100">
+                        <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100 shrink-0">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm pointer-events-none">
                                     <i data-lucide="target" class="w-4 h-4"></i>
@@ -126,8 +126,8 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                             <p class="text-[10px] uppercase font-bold text-slate-400">Green zone centered.</p>
                         </div>
-                        <div class="flex-1 w-full relative flex flex-col md:min-h-[250px] overflow-y-auto styled-scrollbar pr-2">
-                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-4 md:gap-2 justify-between flex-1">
+                        <div class="flex-1 w-full relative flex flex-col overflow-y-auto styled-scrollbar pr-2 pb-2">
+                            <div class="dash-moe-grid w-full flex flex-col gap-4 justify-start">
                                 <!-- Tracks will be injected here via JS -->
                             </div>
                         </div>
@@ -318,7 +318,7 @@ class ThpsMainDash extends HTMLElement {
         let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
         setEval('dash-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
         
-        // NEW: Handle Fallback for old history data
+        // Handle Fallback for old history data
         let clarityVal = data.clarity !== undefined ? data.clarity : 0; 
 
         if (data.overrideGrade) {
@@ -368,9 +368,14 @@ class ThpsMainDash extends HTMLElement {
 
         const chronologicalHistory = [...history].reverse();
         const labels = chronologicalHistory.map(h => `Att ${h.id}`);
-        // Read level fallback applied here
+        // Read level & clarity fallbacks applied here
         const dataPoints = chronologicalHistory.map(h => {
-            let val = h[config.key] !== undefined ? h[config.key] : (config.key === 'readlevel' ? h['grade'] : null);
+            let val = h[config.key];
+            if (val === undefined) {
+                if (config.key === 'readlevel') val = h['grade'];
+                else if (config.key === 'clarity') val = 0;
+                else val = null;
+            }
             return val;
         });
 
@@ -461,23 +466,22 @@ class ThpsMainDash extends HTMLElement {
                     const isActive = attempt.id === this.latestData.id;
                     const dotClass = isActive ? 'bg-slate-800 border-white z-20 w-4 h-4' : 'bg-slate-400 border-slate-200 z-10 w-3 h-3 opacity-80';
 
+                    // Singular dot mapping restricted to horizontal plotting
                     dotsHtml += `
-                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-mobile block md:hidden ${dotClass}" 
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out ${dotClass}" 
                              style="top: calc(50% + ${dodgeOffset}px); left: ${dotPct}%; transform: translate(-50%, -50%);" title="Att ${attempt.id}: ${rawVal}"></div>
-                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-desktop hidden md:block ${dotClass}" 
-                             style="left: calc(50% + ${dodgeOffset}px); bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="Att ${attempt.id}: ${rawVal}"></div>
                     `;
                 }
             });
 
             const track = document.createElement('div');
-            track.className = "flex-1 flex flex-row md:flex-col items-center relative group w-full h-full";
+            // Locked horizontal layout for all screen sizes
+            track.className = "flex flex-row items-center relative group w-full h-8 sm:h-10 shrink-0";
             track.innerHTML = `
-                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-left md:text-center w-20 md:w-full shrink-0 mb-0 md:mb-2 md:mr-0 pr-2 md:pr-0 truncate">${config.title.split(' ')[0]}</div>
-                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 md:h-full md:w-10 shadow-inner">
-                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
-                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
-                     <div class="absolute bg-white/70 md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-left w-20 shrink-0 pr-2 truncate">${config.title.split(' ')[0]}</div>
+                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-full shadow-inner">
+                     <div class="absolute inset-0" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute bg-white/70 w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
                      ${dotsHtml}
                 </div>
             `;
