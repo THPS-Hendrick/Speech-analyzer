@@ -7,7 +7,8 @@ class ThpsEditMode extends HTMLElement {
         this.virtualSentences = [];
         this.virtualWords = [];
         this.syllableGroups = [];
-        this.repeatGroups = []; // NEW: Stores repeat word data
+        this.repeatGroups = []; 
+        this.clarityGroups = []; // NEW: Stores clarity confidence data
         this.currentMode = "edit-speech"; // Default mode
         this.isEditing = false; // Toggle state for the editor
         this.lastDataPayload = null;
@@ -16,7 +17,7 @@ class ThpsEditMode extends HTMLElement {
             <style>
                 .github-line { display: flex; font-size: 0.875rem; line-height: 1.5; border-bottom: 1px solid transparent; transition: background-color 0.15s; }
                 .github-line:hover { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-                .github-gutter { width: 4rem; flex-shrink: 0; padding: 0.25rem 0.5rem; text-align: right; color: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; user-select: none; border-right: 1px solid #e2e8f0; margin-right: 1rem; align-items: flex-start; display: flex; justify-content: flex-end; }
+                .github-gutter { width: 4.5rem; flex-shrink: 0; padding: 0.25rem 0.5rem; text-align: right; color: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; user-select: none; border-right: 1px solid #e2e8f0; margin-right: 1rem; align-items: flex-start; display: flex; justify-content: flex-end; }
                 .github-content { flex-grow: 1; padding: 0.25rem 0; color: #334155; }
                 .metric-highlight { color: #ef4444; font-weight: bold; } 
                 
@@ -72,6 +73,7 @@ class ThpsEditMode extends HTMLElement {
                             <option value="long-short">Words / Sentence</option>
                             <option value="syllables">Syllables / Word</option>
                             <option value="repeat">Repeated Words</option>
+                            <option value="clarity">Clarity %</option> <!-- NEW -->
                         </select>
 
                         <!-- Filters Dropdown -->
@@ -205,6 +207,7 @@ class ThpsEditMode extends HTMLElement {
             this.virtualSentences = [];
             this.syllableGroups = [];
             this.repeatGroups = [];
+            this.clarityGroups = [];
             this.renderDOM();
             return;
         }
@@ -245,7 +248,7 @@ class ThpsEditMode extends HTMLElement {
                 };
             });
 
-        // NEW: Process Repeat Mode
+        // Process Repeat Mode
         let wordCounts = {};
         allWords.forEach(word => {
             const cleanWord = word.toLowerCase().replace(/[^a-z']/g, ''); // Keep letters and apostrophes
@@ -270,6 +273,46 @@ class ThpsEditMode extends HTMLElement {
                 return {
                     repeats: repeatCount,
                     words: repeatMap[repeatCount].sort() // Sort right column alphabetically
+                };
+            });
+
+        // NEW: Process Clarity Mode
+        let clarityMap = {};
+        if (data.wordTimestamps && data.wordTimestamps.length > 0) {
+            data.wordTimestamps.forEach(w => {
+                if (w.confidence !== undefined && w.confidence !== null) {
+                    let pct = Math.round(w.confidence * 100);
+                    let bucketStr = "";
+                    let sortKey = 0;
+                    
+                    if (pct > 90) { bucketStr = "91-100"; sortKey = 90; }
+                    else if (pct > 80) { bucketStr = "81-90"; sortKey = 80; }
+                    else if (pct > 70) { bucketStr = "71-80"; sortKey = 70; }
+                    else if (pct > 60) { bucketStr = "61-70"; sortKey = 60; }
+                    else if (pct > 50) { bucketStr = "51-60"; sortKey = 50; }
+                    else if (pct > 40) { bucketStr = "41-50"; sortKey = 40; }
+                    else if (pct > 30) { bucketStr = "31-40"; sortKey = 30; }
+                    else if (pct > 20) { bucketStr = "21-30"; sortKey = 20; }
+                    else if (pct > 10) { bucketStr = "11-20"; sortKey = 10; }
+                    else { bucketStr = "0-10"; sortKey = 0; }
+                    
+                    const cleanWord = w.word.toLowerCase().replace(/[^a-z']/g, '');
+                    if (cleanWord) {
+                        if (!clarityMap[sortKey]) clarityMap[sortKey] = { label: bucketStr, words: [] };
+                        clarityMap[sortKey].words.push(cleanWord);
+                    }
+                }
+            });
+        }
+
+        this.clarityGroups = Object.keys(clarityMap)
+            .map(Number)
+            .sort((a, b) => b - a) // Highest clarity ranges float to the top
+            .map(key => {
+                return {
+                    label: clarityMap[key].label,
+                    sortKey: key,
+                    words: clarityMap[key].words.sort() // Sort words alphabetically, retaining duplicates
                 };
             });
 
@@ -374,6 +417,30 @@ class ThpsEditMode extends HTMLElement {
                 });
             }
         }
+        else if (this.currentMode === "clarity") {
+            if (this.clarityGroups.length === 0) {
+                htmlOutput += `
+                    <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">No clarity data available</span>
+                    </div>
+                `;
+            } else {
+                this.clarityGroups.forEach(group => {
+                    // Highlights any clarity bucket below the perfect 91-100 range
+                    let gutterClass = group.sortKey < 90 ? "metric-highlight" : "text-slate-400";
+                    htmlOutput += `
+                        <div class="github-line">
+                            <div class="github-gutter ${gutterClass}" title="${group.words.length} words in this range">
+                                ${group.label}
+                            </div>
+                            <div class="github-content leading-relaxed">
+                                ${group.words.join(', ')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
         else {
             // Sentence Mode (Long-Short)
             let displayArray = [...this.virtualSentences];
@@ -383,7 +450,7 @@ class ThpsEditMode extends HTMLElement {
                 let gutterValue = this.currentMode === "long-short" ? item.wordCount : item.originalIndex;
                 let gutterClass = (this.currentMode === "long-short" && item.wordCount >= 15) ? "metric-highlight" : "text-slate-400";
                 
-                // NEW FOR STEP 4: We inject the original HTML string into the re-ordered sentences to retain highlights in Long-Short mode!
+                // We inject the original HTML string into the re-ordered sentences to retain highlights in Long-Short mode!
                 // We use a quick regex match to pull the highlighted sentence from the payload based on the plain text.
                 let sentenceHTML = item.text;
                 if (this.lastDataPayload.highlightedHTML) {
