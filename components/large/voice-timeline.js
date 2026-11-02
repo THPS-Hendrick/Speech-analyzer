@@ -97,22 +97,24 @@ class ThpsVoiceTimeline extends HTMLElement {
         return `00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
     }
 
-    showWordTelemetry(word, start, t) {
+    showWordTelemetry(word, start, t, confidence) {
         if (!t) return;
         const container = this.querySelector('#timeline-telemetry-content');
         
         let delta = t.actualDurationMs - t.expectedDurationMs;
         let sign = delta >= 0 ? '+' : '';
         let vol = t.volumeDb !== undefined ? t.volumeDb.toFixed(1) : '--';
+        let clarityStr = (confidence !== undefined && confidence !== null) ? confidence.toFixed(2) : 'N/A';
 
         container.innerHTML = `
             <div class="flex items-center text-white text-[13px] font-bold tracking-wide mb-1.5">
                 ${word} [${t.sylCount}] (${t.paceLabel || 'normal'})
             </div>
-            <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+            <div class="flex flex-wrap gap-x-6 gap-y-1 text-slate-400 text-[11px] font-mono">
                 <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(start)}</span>
                 <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
                 <span><strong class="text-slate-300">Duration:</strong> ${t.actualDurationMs}ms [${sign}${delta}]</span>
+                <span><strong class="text-slate-300">Clarity:</strong> ${clarityStr}</span>
             </div>
         `;
     }
@@ -179,7 +181,6 @@ class ThpsVoiceTimeline extends HTMLElement {
         const runPaces = data.runPaces || [];
         const pauseCounts = data.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
         const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-        // Switch from paceBuckets to the new absolute Run buckets
         const runCounts = data.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 };
         const validChunks = data.volumeChunks || [];
 
@@ -257,7 +258,6 @@ class ThpsVoiceTimeline extends HTMLElement {
             const xPos = w.start * PIXELS_PER_SEC; 
             const row = index % 5;
             
-            // Text color matches the pace heat map exactly
             const paceColor = w.telemetry && w.telemetry.paceColor ? w.telemetry.paceColor : '#334155';
             
             span.className = `staff-item absolute text-[9px] px-1 py-0.5 bg-white font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-slate-50 hover:z-20 hover:scale-110 transition-all cursor-pointer`;
@@ -265,7 +265,7 @@ class ThpsVoiceTimeline extends HTMLElement {
             span.style.left = `${xPos}px`; 
             span.style.top = `calc(${row * 20}% + 4px)`; 
             
-            span.onclick = () => this.showWordTelemetry(w.word, w.start, w.telemetry);
+            span.onclick = () => this.showWordTelemetry(w.word, w.start, w.telemetry, w.confidence);
             staff.appendChild(span);
         });
 
