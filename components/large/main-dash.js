@@ -125,9 +125,10 @@ class ThpsMainDash extends HTMLElement {
                             </div>
                             <p class="text-[10px] uppercase font-bold text-slate-400">Green zone centered.</p>
                         </div>
-                        <!-- OPTION 2: EXPLICIT DESKTOP MIN-HEIGHT -->
-                        <div class="flex-1 w-full relative flex flex-col md:min-h-[250px] overflow-y-auto styled-scrollbar pr-2">
-                            <div class="dash-moe-grid w-full h-full flex flex-col md:flex-row gap-4 md:gap-2 justify-between flex-1">
+                        
+                        <div class="flex-1 w-full relative flex flex-col overflow-y-auto styled-scrollbar pr-2">
+                            <!-- Switched to flex-col exclusively to match the mobile stack -->
+                            <div class="dash-moe-grid w-full h-full flex flex-col gap-4 justify-between flex-1">
                                 <!-- Tracks will be injected here via JS -->
                             </div>
                         </div>
@@ -422,11 +423,9 @@ class ThpsMainDash extends HTMLElement {
                 gradientStops.push(`${solidColor} ${startPct}%`, `${solidColor} ${endPct}%`);
             });
 
-            // Calculate positions for all historical dots and apply cross-axis dodging for overlaps
             let dotsHtml = '';
             let usedPercentages = [];
             
-            // Iterate history in reverse so newest is plotted last (on top)
             [...history].reverse().forEach((attempt) => {
                 const rawVal = attempt[config.key];
                 const hideDot = (rawVal === null || rawVal === undefined || (['wpm', 'sps', 'pause', 'runtime'].includes(key) && !attempt.recordedAudio));
@@ -435,11 +434,9 @@ class ThpsMainDash extends HTMLElement {
                     let dotPct = Math.max(0, Math.min(100, ((rawVal - bounds.visMin) / bounds.visRange) * 100));
                     let dotPctRounded = Math.round(dotPct);
                     
-                    // Basic Collision Dodging: Shift cross-axis by a few pixels if another dot is within 2%
                     let dodgeOffset = 0;
                     const collisions = usedPercentages.filter(p => Math.abs(p - dotPctRounded) < 2).length;
                     if (collisions > 0) {
-                        // Alternate offset direction based on collision count
                         dodgeOffset = collisions % 2 === 0 ? (collisions * 4) : -(collisions * 4);
                     }
                     usedPercentages.push(dotPctRounded);
@@ -447,27 +444,23 @@ class ThpsMainDash extends HTMLElement {
                     const isActive = attempt.id === this.latestData.id;
                     const dotClass = isActive ? 'bg-slate-800 border-white z-20 w-4 h-4' : 'bg-slate-400 border-slate-200 z-10 w-3 h-3 opacity-80';
 
-                    // Desktop uses bottom (Y-axis), Mobile uses left (X-axis) with standard centering
+                    // Removed the dot-desktop vs dot-mobile duality. Using ONLY the horizontal style now.
                     dotsHtml += `
-                        <!-- Mobile Dot -->
-                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-mobile block md:hidden ${dotClass}" 
+                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out ${dotClass}" 
                              style="top: calc(50% + ${dodgeOffset}px); left: ${dotPct}%; transform: translate(-50%, -50%);" title="Att ${attempt.id}: ${rawVal}"></div>
-                        <!-- Desktop Dot -->
-                        <div class="absolute rounded-full shadow-md border-2 transition-all duration-300 ease-out dot-desktop hidden md:block ${dotClass}" 
-                             style="left: calc(50% + ${dodgeOffset}px); bottom: ${dotPct}%; transform: translate(-50%, 50%);" title="Att ${attempt.id}: ${rawVal}"></div>
                     `;
                 }
             });
 
             const track = document.createElement('div');
-            // Full height stretch on desktop, horizontal row on mobile
-            track.className = "flex-1 flex flex-row md:flex-col items-center relative group w-full h-full";
+            // Using only the horizontal flex-row layout
+            track.className = "flex-1 flex flex-row items-center relative group w-full h-full";
             track.innerHTML = `
-                <div class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase text-left md:text-center w-20 md:w-full shrink-0 mb-0 md:mb-2 md:mr-0 pr-2 md:pr-0 truncate">${config.title.split(' ')[0]}</div>
-                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 md:h-full md:w-10 shadow-inner">
-                     <div class="absolute inset-0 hidden md:block" style="background: linear-gradient(to top, ${gradientStops.join(', ')});"></div>
-                     <div class="absolute inset-0 block md:hidden" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
-                     <div class="absolute bg-white/70 md:w-full md:h-[2px] w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                <div class="text-[10px] sm:text-xs font-black text-slate-400 uppercase text-left w-24 shrink-0 pr-2 truncate">${config.title}</div>
+                <div class="flex-1 w-full relative rounded-md overflow-hidden bg-slate-100 h-8 shadow-inner" style="max-width: 800px;">
+                     <!-- Horizontal gradient only -->
+                     <div class="absolute inset-0" style="background: linear-gradient(to right, ${gradientStops.join(', ')});"></div>
+                     <div class="absolute bg-white/70 w-[2px] h-full z-0" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
                      ${dotsHtml}
                 </div>
             `;
@@ -475,7 +468,6 @@ class ThpsMainDash extends HTMLElement {
         });
     }
 
-    // --- HISTORY ---
     updateHistoryCount() {
         const count = window.thps_sessionHistory ? window.thps_sessionHistory.length : 0;
         this.querySelectorAll('.history-count-badge').forEach(el => el.innerText = count);
