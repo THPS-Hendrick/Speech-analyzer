@@ -275,9 +275,9 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         pausePercent: 0, 
         runtime: 0, 
         activeSpeakingSecs: 0,
-        pauseBuckets: { micro: 0, blue: 0, green: 0, orange: 0, red: 0 },
+        pauseBuckets: { micro: 0, short: 0, medium: 0, long: 0, vLong: 0, extreme: 0 },
         paceBuckets: { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 },
-        runBuckets: { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, // NEW: Absolute SPS Run Tracking
+        runBuckets: { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 },
         volumeData: volumeData || [],
         
         pauseEvents: [], 
@@ -356,10 +356,11 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                         }
 
                         let pColor = '', pY = 0;
-                        if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.red++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Very Long)
-                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.orange++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Long)
-                        else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.green++; pColor = '#10b981'; pY = 0.50; } // Green (Medium)
-                        else { acousticData.pauseBuckets.blue++; pColor = '#f97316'; pY = 0.35; } // Orange (Short)
+                        if (pauseUnitValue >= 2.00) { acousticData.pauseBuckets.extreme++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Extreme)
+                        else if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.vLong++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Very Long)
+                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.long++; pColor = '#10b981'; pY = 0.50; } // Green (Long)
+                        else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.medium++; pColor = '#f97316'; pY = 0.35; } // Orange (Medium)
+                        else { acousticData.pauseBuckets.short++; pColor = '#ef4444'; pY = 0.20; } // Red (Short)
                         
                         let expectedNextStart = currWord.start + (sylCount * 0.35); 
                         acousticData.pauseEvents.push({ start: expectedNextStart, duration: pauseUnitValue, color: pColor, yPct: pY });
@@ -391,7 +392,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 paceLabel: wordPaceLabel
             };
 
-            // TRUE RUNTIME BLOCK: Only breaks on pauses >= 0.70s or at the end
+            // TRUE RUNTIME BLOCK: Breaks on pauses >= 0.70s or at the end
             if (pauseUnitValue >= 0.70 || i === timestamps.length - 2) {
                 
                 // Ensure the final word of the transcript is captured in the final run
@@ -415,7 +416,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 let runSpsFloat = parseFloat(runSps);
                 let runColor = '', runRow = 2, runLabel = '4.0sps';
                 
-                // NEW: Absolute SPS Run Tiers
+                // Absolute SPS Run Tiers
                 if (runSpsFloat > 4.7) { runColor = '#ef4444'; runRow = 4; runLabel = '>5.0sps'; acousticData.runBuckets.vFast++; } 
                 else if (runSpsFloat > 4.2) { runColor = '#f97316'; runRow = 3; runLabel = '4.5sps'; acousticData.runBuckets.fast++; } 
                 else if (runSpsFloat >= 3.8) { runColor = '#10b981'; runRow = 2; runLabel = '4.0sps'; acousticData.runBuckets.norm++; } 
@@ -507,7 +508,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             }
         });
 
-        // NEW: Fixed 6dB Psychoacoustic thresholds (+/- 3dB and +/- 9dB from average spoken word)
+        // Fixed 6dB Psychoacoustic thresholds (+/- 3dB and +/- 9dB from average spoken word)
         let wordChunksForStats = validChunks.filter(vc => vc.type === 'word');
         let avgSpokenDb = -40;
 
@@ -547,7 +548,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             } 
             else if (vc.db < bounds[3]) { 
                 if (vc.type === 'word') volumeBuckets.high++; 
-                vc.color = '#f59e0b'; vc.hPct = 0.75; 
+                vc.color = '#f97316'; vc.hPct = 0.75; 
             } 
             else { 
                 if (vc.type === 'word') volumeBuckets.vHigh++; 
