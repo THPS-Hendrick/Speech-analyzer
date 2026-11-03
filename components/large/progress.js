@@ -9,108 +9,28 @@ class ThpsProgress extends HTMLElement {
         this.chart = null;
         this.currentMetric = 'grade'; // Default view
         
-        // Define the target zones for every possible metric
+        // Unified Metric Configuration (Matches main-dash exactly)
         this.METRIC_CONFIG = {
-            'grade': {
-                key: 'totalPoints', title: 'Overall Grade (/100)', min: 0, max: 100,
-                zones: [
-                    { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, 
-                    { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' }   
-                ]
-            },
-            'greenScore': {
-                key: 'greenScore', title: 'Green Metrics Hit (/10)', min: 0, max: 10,
-                zones: [
-                    { min: 8, max: 10, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 5, max: 8, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'wpm': {
-                key: 'wpm', title: 'Words Per Minute', min: 50, max: 200,
-                zones: [
-                    { min: 0, max: 85, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 85, max: 100, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 100, max: 150, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 150, max: 170, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 170, max: 300, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'sps': {
-                key: 'sps', title: 'Syllables / Sec', min: 2.0, max: 6.0,
-                zones: [
-                    { min: 0, max: 3.0, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 3.0, max: 3.5, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 3.5, max: 4.5, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 4.5, max: 5.0, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 5.0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'personal': {
-                key: 'personal', title: 'Personal Content %', min: 0, max: 100,
-                zones: [
-                    { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 10, max: 30, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 30, max: 60, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 60, max: 80, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 80, max: 100, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'visual': {
-                key: 'visual', title: 'Visual Content %', min: 0, max: 100,
-                zones: [
-                    { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 10, max: 20, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 20, max: 50, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 50, max: 60, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 60, max: 100, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'intangible': {
-                key: 'intangible', title: 'Intangible Content %', min: 0, max: 100,
-                zones: [
-                    { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 5, max: 10, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 10, max: 30, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 30, max: 50, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 50, max: 100, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'pause': {
-                key: 'pause', title: 'Pause Time %', min: 0, max: 60,
-                zones: [
-                    { min: 0, max: 9, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 9, max: 15, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 15, max: 35, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 35, max: 41, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 41, max: 100, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'runtime': {
-                key: 'runtime', title: 'Runtime (Seconds)', min: 0, max: 12,
-                zones: [
-                    { min: 0, max: 2.0, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 2.0, max: 3.0, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 3.0, max: 6.0, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 6.0, max: 9.0, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 9.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            },
-            'simple': {
-                key: 'simple', title: 'Simple Language %', min: 50, max: 100,
-                zones: [
-                    { min: 0, max: 70, color: 'rgba(239, 68, 68, 0.12)' },
-                    { min: 70, max: 80, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 80, max: 90, color: 'rgba(34, 197, 94, 0.12)' },
-                    { min: 90, max: 96, color: 'rgba(234, 179, 8, 0.12)' },
-                    { min: 96, max: 100, color: 'rgba(239, 68, 68, 0.12)' }
-                ]
-            }
+            'grade': { key: 'totalPoints', title: 'Overall Grade', min: 0, max: 100, zones: [ { min: 80, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 65, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 65, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'clarity': { key: 'clarity', title: 'Clarity %', min: 0, max: 100, zones: [ { min: 90, max: 100, color: 'rgba(34, 197, 94, 0.12)' }, { min: 80, max: 90, color: 'rgba(234, 179, 8, 0.12)' }, { min: 0, max: 80, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'personal': { key: 'personal', title: 'Personal %', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 30, color: 'rgba(234, 179, 8, 0.12)' }, { min: 30, max: 60, color: 'rgba(34, 197, 94, 0.12)' }, { min: 60, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'visual': { key: 'visual', title: 'Visual %', min: 0, max: 100, zones: [ { min: 0, max: 10, color: 'rgba(239, 68, 68, 0.12)' }, { min: 10, max: 20, color: 'rgba(234, 179, 8, 0.12)' }, { min: 20, max: 50, color: 'rgba(34, 197, 94, 0.12)' }, { min: 50, max: 60, color: 'rgba(234, 179, 8, 0.12)' }, { min: 60, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'intangible': { key: 'intangible', title: 'Intangible %', min: 0, max: 100, zones: [ { min: 0, max: 5, color: 'rgba(239, 68, 68, 0.12)' }, { min: 5, max: 10, color: 'rgba(234, 179, 8, 0.12)' }, { min: 10, max: 30, color: 'rgba(34, 197, 94, 0.12)' }, { min: 30, max: 50, color: 'rgba(234, 179, 8, 0.12)' }, { min: 50, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'wpm': { key: 'wpm', title: 'Words/Min', min: 50, max: 200, zones: [ { min: 0, max: 85, color: 'rgba(239, 68, 68, 0.12)' }, { min: 85, max: 100, color: 'rgba(234, 179, 8, 0.12)' }, { min: 100, max: 155, color: 'rgba(34, 197, 94, 0.12)' }, { min: 155, max: 170, color: 'rgba(234, 179, 8, 0.12)' }, { min: 170, max: 300, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'sps': { key: 'sps', title: 'Syllables/Sec', min: 2.0, max: 6.0, zones: [ { min: 0, max: 3.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 3.0, max: 3.5, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.5, max: 4.5, color: 'rgba(34, 197, 94, 0.12)' }, { min: 4.5, max: 5.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 5.0, max: 10, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'pause': { key: 'pause', title: 'Pause %', min: 0, max: 60, zones: [ { min: 0, max: 9, color: 'rgba(239, 68, 68, 0.12)' }, { min: 9, max: 15, color: 'rgba(234, 179, 8, 0.12)' }, { min: 15, max: 35, color: 'rgba(34, 197, 94, 0.12)' }, { min: 35, max: 41, color: 'rgba(234, 179, 8, 0.12)' }, { min: 41, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'runtime': { key: 'runtime', title: 'Runtime (Seconds)', min: 0, max: 12, zones: [ { min: 0, max: 2.0, color: 'rgba(239, 68, 68, 0.12)' }, { min: 2.0, max: 3.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 3.0, max: 7.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 7.0, max: 9.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 9.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'readlevel': { key: 'readlevel', title: 'Read-Level', min: 0, max: 16, zones: [ { min: 0, max: 4.5, color: 'rgba(239, 68, 68, 0.12)' }, { min: 4.5, max: 6.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 6.0, max: 11.0, color: 'rgba(34, 197, 94, 0.12)' }, { min: 11.0, max: 13.0, color: 'rgba(234, 179, 8, 0.12)' }, { min: 13.0, max: 30, color: 'rgba(239, 68, 68, 0.12)' } ] },
+            'simple': { key: 'simple', title: 'Simple Language %', min: 50, max: 100, zones: [ { min: 0, max: 70, color: 'rgba(239, 68, 68, 0.12)' }, { min: 70, max: 80, color: 'rgba(234, 179, 8, 0.12)' }, { min: 80, max: 90, color: 'rgba(34, 197, 94, 0.12)' }, { min: 90, max: 96, color: 'rgba(234, 179, 8, 0.12)' }, { min: 96, max: 100, color: 'rgba(239, 68, 68, 0.12)' } ] }
         };
     }
 
     connectedCallback() {
+        // Build the dropdown options dynamically
+        const optionsHtml = Object.keys(this.METRIC_CONFIG).map(key => {
+            return `<option value="${key}" ${key === this.currentMetric ? 'selected' : ''}>${this.METRIC_CONFIG[key].title}</option>`;
+        }).join('');
+
         this.innerHTML = `
             <div class="score-card glass-panel p-5 sm:p-6 rounded-2xl border-t-4 border-amber-500 shadow-sm transition-colors duration-300 relative w-full h-full group cursor-move flex flex-col min-h-[350px]">
                 
@@ -118,15 +38,19 @@ class ThpsProgress extends HTMLElement {
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
-                <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100">
+                <div class="flex justify-between items-center mb-4 border-b pb-4 border-slate-100 pr-6 md:pr-0">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm pointer-events-none">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm pointer-events-none shrink-0">
                             <i data-lucide="line-chart" class="w-4 h-4"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-slate-800">Historical Progress</h2>
+                        <h2 class="text-lg font-bold text-slate-800 whitespace-nowrap">Historical Progress</h2>
                     </div>
-                    <div id="progress-metric-label" class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 uppercase tracking-widest shadow-inner">
-                        Overall Grade
+                    
+                    <div class="relative group/select shrink-0 ml-2">
+                        <select id="progress-metric-select" class="appearance-none text-xs font-bold text-slate-500 bg-slate-100 pl-3 pr-8 py-1.5 rounded-lg border border-slate-200 uppercase tracking-widest shadow-inner outline-none cursor-pointer hover:bg-slate-200 hover:text-slate-700 transition-colors">
+                            ${optionsHtml}
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none group-hover/select:text-slate-600 transition-colors"></i>
                     </div>
                 </div>
                 
@@ -142,7 +66,7 @@ class ThpsProgress extends HTMLElement {
             </div>
         `;
 
-        if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons({ root: this });
 
         // Safely register the custom Chart.js Plugin globally
         if (window.Chart && !window.Chart.registry.plugins.get('zoneBackground')) {
@@ -173,12 +97,23 @@ class ThpsProgress extends HTMLElement {
             else this.remove(); 
         });
 
-        // Event Listeners
+        // Dropdown Event Listener
+        this.querySelector('#progress-metric-select').addEventListener('change', (e) => {
+            this.currentMetric = e.target.value;
+            // Broadcast so other widgets (like main-dash) can optionally update their explanation fields
+            window.dispatchEvent(new CustomEvent('thps-metric-select', { detail: this.currentMetric }));
+            this.renderChart();
+        });
+
+        // Event Listeners for External Sync
         this.updateHandler = (e) => this.renderChart();
+        
         this.metricSelectHandler = (e) => {
             const key = e.detail;
-            if (this.METRIC_CONFIG[key]) {
+            if (this.METRIC_CONFIG[key] && this.currentMetric !== key) {
                 this.currentMetric = key;
+                const dropdown = this.querySelector('#progress-metric-select');
+                if (dropdown) dropdown.value = key;
                 this.renderChart();
             }
         };
@@ -211,13 +146,20 @@ class ThpsProgress extends HTMLElement {
         }
 
         const config = this.METRIC_CONFIG[this.currentMetric];
-        this.querySelector('#progress-metric-label').innerText = config.title;
 
         // History array places newest at index 0. Reverse it to plot chronologically.
         const chronologicalHistory = [...history].reverse();
         
         const labels = chronologicalHistory.map(h => `Att ${h.id}`);
-        const dataPoints = chronologicalHistory.map(h => h[config.key] !== undefined ? h[config.key] : null);
+        const dataPoints = chronologicalHistory.map(h => {
+            let val = h[config.key];
+            if (val === undefined) {
+                if (config.key === 'readlevel') val = h['grade'];
+                else if (config.key === 'clarity') val = 0; // Old history gets 0 clarity
+                else val = null;
+            }
+            return val;
+        });
 
         const canvas = this.querySelector('#progress-canvas');
         
