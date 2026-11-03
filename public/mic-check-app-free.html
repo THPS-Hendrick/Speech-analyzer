@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Analyzer App - Free Practice Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <!-- NEW DOWNLOAD & PDF DEPENDENCIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <link rel="stylesheet" href="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/css/thps-core.css">
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/report-scoring-matrix.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/main-dash.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/thps-ai-coach.js"></script>
+    
+    <!-- NEW PRACTICE HUB WIDGET -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/core/thps-practice-hub.js"></script>
+    
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/thps-progress-report.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/live-mic-timer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/score-summary.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/speech-prompter.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/progress.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/whats-this.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/text-input.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/tangible-text.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-timeline.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/upload-speech.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/record-reel.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/compare-speech.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/course-widget.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/diagnostic.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/report-card.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/edit-mode.js"></script>
+
+    <!-- NEW: RESULTS WIDGET (Spawnable & used headlessly for PDFs) -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/results.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/wpm-graph.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/mumble-card.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/personal-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/visual-balance.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/signal-noise.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/sentence-complexity.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/simple-language.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/google-benchmark.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/gauge-mumble.js"></script>
+
+    <!-- NEW MEDIUM WIDGETS -->
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/timer-med.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/upload-med.js"></script>
+
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-mumble.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-grade.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-simple.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-runtime.js"></script>
+
+   <style>
+        /* DASHBOARD LOCK PROTECTION */
+        #thps-dashboard-grid:not(.edit-mode-active) .thps-close-btn { display: none !important; }
+        #thps-dashboard-grid:not(.edit-mode-active) .cursor-move { cursor: default !important; }
+
+        /* FULLSCREEN SCROLL FIX */
+        :fullscreen { overflow-y: auto !important; background-color: #f8fafc; }
+        :-webkit-full-screen { overflow-y: auto !important; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="w-full mx-auto min-h-screen md:p-8 flex flex-col items-center justify-start overflow-x-hidden relative bg-slate-50">
+
+    <textarea id="cba-inputText" class="hidden"></textarea>
+
+    <!-- UI OVERLAYS -->
+    <div id="widget-menu-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300" onclick="window.closeAllMenus()"></div>
+
+    <!-- UPDATED: CRM CLIENT LINK MODAL -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-[10002] bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-start pt-24 md:pt-32 px-4 transition-all duration-300">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm w-full flex flex-col items-center relative">
+            <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                <i data-lucide="link" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 uppercase tracking-widest mb-2 text-center">Link CRM Session</h3>
+            <p class="text-sm text-slate-500 text-center mb-5 font-medium leading-relaxed">Enter the Client ID to route this session's telemetry and performance data to their CRM profile.</p>
+
+            <input type="text" id="crm-client-input" placeholder="e.g., cli_9f82a1b..." class="w-full p-3 border-2 border-slate-200 rounded-xl mb-4 text-center font-mono text-sm text-slate-700 outline-none focus:border-indigo-500 transition-colors">
+
+            <div class="flex gap-2 w-full">
+                <button onclick="window.clearCrmClient()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors">Unlink</button>
+                <button onclick="window.saveCrmClient()" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-md">Connect ID</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: ANALYZING AUDIO OVERLAY -->
+    <div id="cba-processing-panel" class="hidden fixed inset-0 z-[10000] bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-center px-4 transition-all duration-300">
+        <div class="score-card glass-panel p-8 rounded-2xl border-t-4 border-blue-500 shadow-2xl bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center max-w-lg w-full">
+            <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner">
+                <i data-lucide="refresh-cw" class="w-8 h-8 text-blue-600 animate-spin"></i>
+                <i data-lucide="mic" class="w-4 h-4 text-blue-800 absolute"></i>
+            </div>
+            <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-slate-800 drop-shadow-sm text-center">Analyzing Audio...</h2>
+            <p class="text-sm text-slate-500 font-medium mt-2 text-center animate-pulse">Running advanced parallel transcription and analysis. Please hold tight!</p>
+        </div>
+    </div>
+
+    <!-- NEW: MASS DOWNLOAD CONFIRMATION MODAL -->
+    <div id="download-confirm-modal" class="hidden fixed inset-0 z-[10001] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-4 transition-all duration-300">
+        <div class="bg-white p-5 rounded-2xl shadow-xl max-w-[280px] w-full text-center">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Mass Download</h3>
+            <p id="download-confirm-text" class="text-xs text-slate-500 mb-5 font-medium leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button onclick="window.closeDownloadModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors">No</button>
+                <button id="btn-confirm-download" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-sm">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAWERS (Hidden logic maintained for dependencies) -->
+    <div id="history-menu-drawer" class="fixed top-[0] bottom-0 left-0 w-full sm:w-[400px] bg-white shadow-2xl transform -translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-r border-t border-slate-200">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-800 tracking-wide uppercase">Session History</h2>
+            </div>
+            <button onclick="window.closeAllMenus()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex w-full border-b border-slate-200 bg-white">
+            <button onclick="window.switchHistoryTab('list')" id="hist-tab-btn-list" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors">List</button>
+            <button onclick="window.switchHistoryTab('avg')" id="hist-tab-btn-avg" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Avg</button>
+            <button onclick="window.switchHistoryTab('best')" id="hist-tab-btn-best" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">Best</button>
+
+            <button onclick="window.spawnCompareWidget()" class="flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-1">
+                <i data-lucide="scale" class="w-3 h-3 hidden sm:block"></i> VS
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+            <div id="hist-tab-content-list" class="block">
+
+                <div class="w-full flex items-center justify-end gap-2 pb-3 mb-3 border-b border-slate-200">
+                    <button onclick="window.handleHistoryDownload('json')" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer" title="Download Data">
+                        <i data-lucide="file-json" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="window.handleHistoryDownload('pdf')" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Download PDF">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </button>
+                    <div class="w-px h-5 bg-slate-300 mx-1"></div>
+                    <button id="btn-history-all" onclick="window.toggleAllPrimer()" class="px-3 py-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        <span>All</span>
+                    </button>
+                </div>
+                <div id="hist-tab-items-list" class="space-y-3"></div>
+            </div>
+
+            <div id="hist-tab-content-avg" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
+            </div>
+            <div id="hist-tab-content-best" class="hidden">
+                <p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="widget-menu-drawer" class="fixed top-[0] bottom-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex flex-col border-l border-t border-slate-200">
+        <!-- Kept to prevent script crashes on missing IDs -->
+    </div>
+
+    <div class="max-w-4xl mx-auto w-full px-2 flex flex-col items-center">
+        <div id="cba-errorMsg" class="hidden w-full text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm text-center mt-4"></div>
+    </div>
+
+    <div id="cba-wrapper" class="w-full max-w-6xl mx-auto mb-16">
+        <div class="flex flex-col">
+            <div id="cba-resultsContainer" class="flex flex-col mt-4">
+
+                <div class="w-full">
+                    <!-- HIDDEN HEADER LAYOUT FOR CLEAN MOBILE-FIRST FREE APP -->
+                    <div class="flex justify-between items-start border-slate-200 pb-2 px-2">
+                        <!-- LEFT ALIGNED: Auth & History (Hidden) -->
+                        <div class="flex flex-col gap-3">
+                            <button onclick="document.getElementById('auth-modal').classList.remove('hidden')" class="hidden items-center gap-2 text-xl sm:text-2xl font-black text-slate-800 tracking-tight hover:text-blue-600 transition-colors w-max">
+                                <i data-lucide="user-circle" class="w-6 h-6"></i> Guest
+                            </button>
+                            <button id="toggle-history-btn" onclick="window.toggleHistoryMenu()" class="hidden items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-indigo-200 w-max">
+                                <i data-lucide="history" class="w-4 h-4"></i>
+                                <span>History: <span id="history-count">0</span></span>
+                            </button>
+                        </div>
+
+                        <!-- RIGHT ALIGNED: Only Full Screen Visible -->
+                        <div class="flex flex-col items-end gap-2 ml-auto">
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.toggleFullScreen()" class="flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-xl transition-all shadow-sm active:scale-95 border border-slate-200" title="Toggle Fullscreen">
+                                    <i id="fullscreen-icon" data-lucide="maximize" class="w-4 h-4"></i>
+                                </button>
+
+                                <button id="toggle-edit-mode-btn" onclick="window.toggleEditMode()" class="hidden items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-500 px-3 py-2 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 border border-slate-200 w-max">
+                                    <i id="edit-mode-icon" data-lucide="lock" class="w-4 h-4"></i>
+                                    <span id="edit-mode-text" class="hidden sm:inline">Locked</span>
+                                </button>
+                            </div>
+                            <button onclick="window.toggleWidgetMenu()" class="hidden items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 group w-max">
+                                <i data-lucide="layout-grid" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+                                <span class="hidden sm:inline">Add Widget</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NEW MOBILE-FIRST DASHBOARD LOADOUT -->
+                    <div id="thps-dashboard-grid" class="flex flex-wrap w-full items-start min-h-[150px]">
+                        <div class="w-full relative">
+                            <thps-practice-hub></thps-practice-hub>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        window.gameTimerInterval = null;
+        window.isActive = false;
+        let reportMarkdownText = "";
+
+        // ==========================================
+        // HISTORY STATE
+        // ==========================================
+        window.thps_sessionHistory = [];
+        window.thps_currentAttemptId = 1;
+        window.isHistoryAllPrimed = false; // MASS DOWNLOAD STATE
+
+        // ==========================================
+        // EDIT MODE (LOCK/UNLOCK) LOGIC
+        // ==========================================
+        window.thps_editMode = false; // Locked by default
+
+        window.toggleEditMode = function() {
+            window.thps_editMode = !window.thps_editMode;
+            const grid = document.getElementById('thps-dashboard-grid');
+            const btnIcon = document.getElementById('edit-mode-icon');
+            const btnText = document.getElementById('edit-mode-text');
+            const btnEl = document.getElementById('toggle-edit-mode-btn');
+
+            if (window.thps_editMode) {
+                grid.classList.add('edit-mode-active');
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'unlock');
+                if(btnText) btnText.innerText = 'Edit Mode';
+                if(btnEl) {
+                    btnEl.classList.replace('bg-slate-100', 'bg-rose-100');
+                    btnEl.classList.replace('text-slate-500', 'text-rose-600');
+                    btnEl.classList.replace('border-slate-200', 'border-rose-200');
+                }
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", false);
+            } else {
+                grid.classList.remove('edit-mode-active');
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'lock');
+                if(btnText) btnText.innerText = 'Locked';
+                if(btnEl) {
+                    btnEl.classList.replace('bg-rose-100', 'bg-slate-100');
+                    btnEl.classList.replace('text-rose-600', 'text-slate-500');
+                    btnEl.classList.replace('border-rose-200', 'border-slate-200');
+                }
+                if (window.THPS?.Dashboard?.sortableInstance) window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        setTimeout(() => {
+            if (!window.thps_editMode && window.THPS?.Dashboard?.sortableInstance) {
+                window.THPS.Dashboard.sortableInstance.option("disabled", true);
+            }
+        }, 1000);
+
+        const EXPLANATIONS_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/explanations.json"; 
+
+        window.explanationsData = null;
+        window.FALLBACK_EXPLANATIONS = {
+            "Score Summary": "Measures your Content, Delivery, and Simplicity. Metrics in the \"green\" zone get +10 points. Total Grade out of 100.",
+            "Clarity %": "How confident Google Speech-to-text was at transcribing each word you pronounced. Aim for 90%+.",
+            "Grade": "Your final score out of 100 across 10 core delivery metrics.",
+            "Content": "Measures the substance of your speech. Aim for 30-60% Personal and 20-50% Visual.",
+            "Delivery": "Measures how you sound. Aim for 100-155 Words/min, 3.5-4.5 Syllables/sec, and 15-35% Pause time.",
+            "Simplicity": "Measures how easy your speech is to understand. Keep Runtime between 3.0-7.0s.",
+            "Personal": "Measures storytelling. Aim for 30-60% content about specific people doing specific things.",
+            "Visual": "Measures sensory words that paint a picture. Aim for 20-50%.",
+            "Intangible": "Measures abstract concepts and filler. Keep it between 10-30%.",
+            "Words/min": "Your speaking pace. The sweet spot is 100-155 words per minute.",
+            "Syllable/sec": "Our 'Mumble Meter'. The green zone is 3.5 to 4.5 syllables per second.",
+            "Pause %": "The percentage of time you spend silent. Aim for 15-35%.",
+            "Runtime": "The average seconds you speak continuously before taking a meaningful pause. Aim for 3.0s to 7.0s.",
+            "Comp. Grade": "The reading grade level of your speech. A grade of 6.0 to 11.0 is plain english.",
+            "Read-Level": "The reading grade level of your speech. A grade of 6.0 to 11.0 is plain english.",
+            "Simple %": "The percentage of your words within the 10,000 most common English words. Aim for 80-90%.",
+            "Pause Var.": "In 3sec chunks, counts how varied is your pause lengths. Varying pause lengths affects meaning.",
+            "Voice Var.": "In 3sec chunks, counts how varied is your speaking volume. Varying volume is engaging.",
+            "Pace Var.": "In 3sec chunks, counts your slow and fast sentences. Varying rhythm & cadence is engaging."
+        };
+
+        let menuOverlayTimeout = null;
+
+        window.closeAllMenus = function() {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+
+            const widgetDrawer = document.getElementById('widget-menu-drawer');
+            const historyDrawer = document.getElementById('history-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if(overlay) overlay.classList.add('opacity-0');
+            if(widgetDrawer) widgetDrawer.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
+            if(historyDrawer) historyDrawer.classList.add('-translate-x-full', 'opacity-0', 'pointer-events-none');
+
+            if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+            menuOverlayTimeout = setTimeout(() => {
+                if(overlay) overlay.classList.add('hidden');
+            }, 300); 
+        };
+
+        window.toggleWidgetMenu = function() {
+            const drawer = document.getElementById('widget-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if (drawer && drawer.classList.contains('translate-x-full')) {
+                window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+
+                if(overlay) overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    if(overlay) overlay.classList.remove('opacity-0');
+                    if(drawer) drawer.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
+                }, 10);
+            } else {
+                window.closeAllMenus();
+            }
+        };
+
+        window.toggleHistoryMenu = function() {
+            const drawer = document.getElementById('history-menu-drawer');
+            const overlay = document.getElementById('widget-menu-overlay');
+
+            if (drawer && drawer.classList.contains('-translate-x-full')) {
+                window.closeAllMenus();
+                if (menuOverlayTimeout) clearTimeout(menuOverlayTimeout);
+
+                if(overlay) overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    if(overlay) overlay.classList.remove('opacity-0');
+                    if(drawer) drawer.classList.remove('-translate-x-full', 'opacity-0', 'pointer-events-none');
+                }, 10);
+            } else {
+                window.closeAllMenus();
+            }
+        };
+
+        window.switchHistoryTab = function(tabName) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+
+            ['list', 'avg', 'best'].forEach(s => {
+                const btn = document.getElementById(`hist-tab-btn-${s}`);
+                const content = document.getElementById(`hist-tab-content-${s}`);
+                if(btn) btn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
+                if(content) {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                }
+            });
+            const activeBtn = document.getElementById(`hist-tab-btn-${tabName}`);
+            const activeContent = document.getElementById(`hist-tab-content-${tabName}`);
+            if(activeBtn) activeBtn.className = "flex-1 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider border-b-2 border-indigo-600 text-indigo-600 transition-colors";
+            if(activeContent) {
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('block');
+            }
+        };
+
+        window.switchWidgetTab = function(size) {
+            ['small', 'medium', 'large'].forEach(s => {
+                const btn = document.getElementById(`tab-btn-${s}`);
+                const content = document.getElementById(`tab-content-${s}`);
+                if(btn) btn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors";
+                if(content) {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                }
+            });
+            const activeBtn = document.getElementById(`tab-btn-${size}`);
+            const activeContent = document.getElementById(`tab-content-${size}`);
+            if(activeBtn) activeBtn.className = "flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 border-blue-600 text-blue-600 transition-colors";
+            if(activeContent) {
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('block');
+            }
+        };
+
+        // ==========================================
+        // MASS DOWNLOAD & PDF EXPORT LOGIC
+        // ==========================================
+
+        window.toggleAllPrimer = function() {
+            window.isHistoryAllPrimed = !window.isHistoryAllPrimed;
+            const btn = document.getElementById('btn-history-all');
+
+            if (window.isHistoryAllPrimed) {
+                if(btn) {
+                    btn.classList.replace('text-slate-500', 'text-blue-600');
+                    btn.classList.replace('bg-white', 'bg-blue-50');
+                    btn.classList.replace('border-slate-200', 'border-blue-200');
+                }
+            } else {
+                window.unprimeHistoryAll();
+            }
+        };
+
+        window.unprimeHistoryAll = function() {
+            window.isHistoryAllPrimed = false;
+            const btn = document.getElementById('btn-history-all');
+            if (btn) {
+                btn.classList.replace('text-blue-600', 'text-slate-500');
+                btn.classList.replace('bg-blue-50', 'bg-white');
+                btn.classList.replace('border-blue-200', 'border-slate-200');
+            }
+        };
+
+        window.handleHistoryDownload = function(type) {
+            const savedAttempts = window.thps_sessionHistory || [];
+            const totalEntries = savedAttempts.length;
+
+            if (window.isHistoryAllPrimed && totalEntries > 1) {
+                // Mass Download Route
+                const estSeconds = totalEntries * (type === 'pdf' ? 1.5 : 0.1); 
+                document.getElementById('download-confirm-text').innerHTML = `Download <strong>${totalEntries} files</strong>?<br>(Estimated ${Math.ceil(estSeconds)} seconds)`;
+
+                document.getElementById('btn-confirm-download').onclick = () => {
+                    window.closeDownloadModal();
+                    window.executeMassDownload(type, savedAttempts);
+                };
+
+                document.getElementById('download-confirm-modal').classList.remove('hidden');
+            } else {
+                // Single Download Route
+                const activePayload = window.thps_lastPayload;
+                if (!activePayload) return alert("Please select an entry first.");
+
+                if (type === 'json') {
+                    const blob = new Blob([JSON.stringify(activePayload, null, 2)], {type: "application/json"});
+                    saveAs(blob, `THPS_${activePayload.title ? activePayload.title.replace(/\s+/g, '_') : 'Attempt'}.json`);
+                } else if (type === 'pdf') {
+                    window.generatePhantomPDF(activePayload, true);
+                }
+            }
+        };
+
+        window.closeDownloadModal = function() {
+            document.getElementById('download-confirm-modal').classList.add('hidden');
+        };
+
+        window.generatePhantomPDF = async function(payload, saveImmediately = false) {
+            const ghostDiv = document.createElement('div');
+            ghostDiv.style.position = 'absolute';
+            ghostDiv.style.left = '-9999px';
+            ghostDiv.style.width = '210mm'; 
+            document.body.appendChild(ghostDiv);
+
+            const ghostWidget = document.createElement('thps-results');
+            ghostWidget.setAttribute('phantom', 'true');
+            ghostDiv.appendChild(ghostWidget);
+
+            // Allow the custom element to be upgraded and connected
+            await new Promise(resolve => setTimeout(resolve, 50)); 
+
+            if (typeof ghostWidget.injectDataAndRender === 'function') {
+                ghostWidget.injectDataAndRender(payload);
+            }
+
+            // Give the canvases time to paint their graphs before snapping
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            let result;
+            if (saveImmediately) {
+                if (typeof ghostWidget.triggerSingleDownload === 'function') {
+                    ghostWidget.triggerSingleDownload();
+                }
+            } else {
+                if (typeof ghostWidget.generatePDFBlob === 'function') {
+                    result = await ghostWidget.generatePDFBlob();
+                }
+            }
+
+            document.body.removeChild(ghostDiv);
+            return result;
+        };
+
+        window.executeMassDownload = async function(type, attemptsArray) {
+            const zip = new JSZip();
+
+            for (let i = 0; i < attemptsArray.length; i++) {
+                const payload = attemptsArray[i];
+                const attemptName = payload.title ? payload.title.replace(/\s+/g, '_') : `Attempt_${i+1}`;
+
+                if (type === 'json') {
+                    zip.file(`THPS_${attemptName}.json`, JSON.stringify(payload, null, 2));
+                } else if (type === 'pdf') {
+                    const pdfBlob = await window.generatePhantomPDF(payload, false); 
+                    if (pdfBlob) zip.file(`THPS_${attemptName}.pdf`, pdfBlob);
+                }
+            }
+
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, `THPS_Session_Data.zip`);
+                window.unprimeHistoryAll(); 
+            });
+        };
+
+        // ==========================================
+        // ACTIVE RECORDING & ANALYSIS LOGIC
+        // ==========================================
+
+        window.toggleRecording = function() {
+            const btnText = document.getElementById('toggle-text');
+            const btnIcon = document.getElementById('toggle-icon');
+            const actionBar = document.getElementById('action-bar');
+            const timerProgress = document.getElementById('timer-progress');
+
+            if (window.isActive) {
+                clearInterval(window.gameTimerInterval);
+                window.isActive = false;
+                if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                    actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                }
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                    window.THPS.Audio.stopRecordingProcess();
+                }
+            } else {
+                window.isActive = true;
+                if(btnText) btnText.innerText = 'TAP TO STOP';
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'square');
+                if(actionBar) {
+                    actionBar.classList.replace('bg-slate-800', 'bg-rose-600');
+                    actionBar.classList.replace('hover:bg-slate-700', 'hover:bg-rose-500');
+                }
+                if(timerProgress) timerProgress.style.width = '0%';
+
+                if (window.clearAnalyzer) window.clearAnalyzer();
+
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
+                    window.THPS.Audio.startRecordingProcess();
+                }
+
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
+                window.gameTimerInterval = setInterval(() => {
+                    const elapsedSecs = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                    if (elapsedSecs >= 240) {
+                        clearInterval(window.gameTimerInterval);
+                        window.isActive = false;
+                        if(btnText) btnText.innerText = 'TAP TO START RECORDING';
+                        if(btnIcon) btnIcon.setAttribute('data-lucide', 'play');
+                        if(actionBar) {
+                            actionBar.classList.replace('bg-rose-600', 'bg-slate-800');
+                            actionBar.classList.replace('hover:bg-rose-500', 'hover:bg-slate-700');
+                        }
+                        if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                            window.THPS.Audio.stopRecordingProcess();
+                        }
+                        if (window.lucide) window.lucide.createIcons();
+                    } else {
+                        if(timerProgress) timerProgress.style.width = `${(elapsedSecs / 240) * 100}%`;
+                    }
+                }, 50);
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // NEW: Multi-tiered Linear Score Interpolation Engine
+        // [minRedFloor, minYellowFloor, minGreen, maxGreen, maxYellowCeil, maxRedCeil]
+        // Inside Green: 10.0 pts
+        // Lower Yellow: 6.0 to 10.0 pts
+        // Upper Yellow: 10.0 down to 6.0 pts
+        // Lower Red: 0.0 to 6.0 pts (never below 0.0)
+        // Upper Red: 6.0 down to 0.0 pts (never below 0.0)
+        window.getMetricPoints = function(key, val) {
+            const limits = {
+                // Key: [minRed, minYellow, minGreen, maxGreen, maxYellow, maxRed]
+                personal:   [0,    10,   30,   60,   80,   100],
+                visual:     [0,    10,   20,   50,   60,   100],
+                intangible: [0,    5,    10,   30,   50,   100],
+                wpm:        [50,   85,   100,  155,  170,  200], // Green 100-155
+                sps:        [2.0,  3.0,  3.5,  4.5,  5.0,  6.0],
+                pause:      [0,    9,    15,   35,   41,   60],
+                runtime:    [0.0,  2.0,  3.0,  7.0,  9.0,  12.0], // Green 3.0-7.0s
+                readlevel:  [2.0,  4.5,  6.0,  11.0, 13.0, 16.0], // Green 6.0-11.0
+                simple:     [50,   70,   80,   90,   96,   100],
+                clarity:    [60,   80,   90,   100,  100.1, 100.2] // Single-sided metric
+            };
+
+            if (!limits[key] || val === undefined || val === null || isNaN(val)) return 0.0;
+            const [minRed, minYellow, minGreen, maxGreen, maxYellow, maxRed] = limits[key];
+
+            // 1. Inside Green Zone: Full 10 Points
+            if (val >= minGreen && val <= maxGreen) {
+                return 10.0;
+            }
+
+            // 2. Below Green Range
+            if (val < minGreen) {
+                if (val <= minRed) return 0.0; // Hard zero floor
+                if (val >= minYellow) {
+                    // Lower Yellow Zone: 6.0 to 10.0
+                    if (minGreen === minYellow) return 10.0;
+                    const ratio = (val - minYellow) / (minGreen - minYellow);
+                    return Math.max(6.0, Math.min(10.0, 6.0 + (ratio * 4.0)));
+                } else {
+                    // Lower Red Zone: 0.0 to 6.0
+                    if (minYellow === minRed) return 0.0;
+                    const ratio = (val - minRed) / (minYellow - minRed);
+                    return Math.max(0.0, Math.min(6.0, ratio * 6.0));
+                }
+            }
+
+            // 3. Above Green Range
+            if (val > maxGreen) {
+                if (val >= maxRed) return 0.0; // Hard zero floor
+                if (val <= maxYellow) {
+                    // Upper Yellow Zone: 10.0 down to 6.0
+                    if (maxYellow === maxGreen) return 6.0;
+                    const ratio = (maxYellow - val) / (maxYellow - maxGreen);
+                    return Math.max(6.0, Math.min(10.0, 6.0 + (ratio * 4.0)));
+                } else {
+                    // Upper Red Zone: 6.0 down to 0.0
+                    if (maxRed === maxYellow) return 0.0;
+                    const ratio = (maxRed - val) / (maxRed - maxYellow);
+                    return Math.max(0.0, Math.min(6.0, ratio * 6.0));
+                }
+            }
+
+            return 0.0;
+        };
+
+        window.analyze = function() {
+            try {
+                if (!window.THPS || !window.THPS.NLP || typeof window.THPS.NLP.loadDictionaries !== 'function') return;
+            } catch(e) { return; }
+
+            if (!window.THPS.NLP.dictsLoaded) return;
+
+            let text = "";
+            const widgetEl = document.getElementById('cba-inputText-widget');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (widgetEl && widgetEl.value.trim() !== '') text = widgetEl.value.trim();
+            else if (hiddenEl) text = hiddenEl.value.trim();
+
+            if (!text) {
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: { text: "" } }));
+                return;
+            }
+
+            let timestamps = [];
+            let volumeData = [];
+            let elapsedSecs = 0;
+
+            if (window.THPS.Audio) {
+                if (window.THPS.Audio.recordedAudio && window.THPS.Audio.wordTimestamps) {
+                    timestamps = window.THPS.Audio.wordTimestamps;
+                }
+                if (window.THPS.Audio.volumeData) {
+                    volumeData = window.THPS.Audio.volumeData;
+                }
+                elapsedSecs = window.THPS.Audio.recordedAudio ? (window.THPS.Audio.lastRecordedDuration || 0) : 0;
+            }
+
+            let masterData = {};
+            if (typeof window.THPS.NLP.analyzeSpeech === 'function') {
+                masterData = window.THPS.NLP.analyzeSpeech(text, timestamps, volumeData, elapsedSecs);
+            } else {
+                console.warn("analyzeSpeech not found, falling back to analyzeTranscript");
+                masterData = window.THPS.NLP.analyzeTranscript(text, timestamps);
+            }
+
+            const { 
+                numWords = 0, numSentences = 0, totalSyllables = 0, letterCount = 0, complexWordCount = 0, 
+                personalCount = 0, visualCount = 0, unifiedSimpleCount = 0, google10kCount = 0, 
+                highlightedHTML = "", reportMarkdownText: newReportMarkdown = "",
+                wordTimestamps = [] 
+            } = masterData;
+
+            reportMarkdownText = newReportMarkdown; 
+
+            // Extract Master Acoustic Math
+            const mumbleScore = masterData.mumbleScore || 0;
+            const avgWpm = masterData.wpm || 0;
+            const pausePercent = masterData.pausePercent || 0;
+            const pauseBuckets = masterData.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
+            const paceBuckets = masterData.paceBuckets || { fastest: 0, fast: 0, normal: 0, slow: 0, slowest: 0 };
+
+            let coreSimpleScore = numWords > 0 ? Math.round((unifiedSimpleCount / numWords) * 100) : 0;
+
+            let avgGrade = 0;
+            let readability = null;
+            if (typeof window.THPS.NLP.calculateReadabilityMetrics === 'function') {
+                 readability = window.THPS.NLP.calculateReadabilityMetrics(numWords, numSentences, totalSyllables, letterCount, complexWordCount);
+                 avgGrade = readability.avgGrade;
+            } else {
+                let flesch = (0.39 * (numWords / Math.max(1, numSentences))) + (11.8 * (totalSyllables / Math.max(1, numWords))) - 15.59;
+                let fog = 0.4 * ((numWords / Math.max(1, numSentences)) + 100 * (complexWordCount / Math.max(1, numWords)));
+                let smog = 1.0430 * Math.sqrt(complexWordCount * (30 / Math.max(1, numSentences))) + 3.1291;
+                let coleman = 0.0588 * ((letterCount / Math.max(1, numWords)) * 100) - 0.296 * ((numSentences / Math.max(1, numWords)) * 100) - 15.8;
+                avgGrade = ((Math.max(0, flesch)) + (Math.max(0, fog)) + (Math.max(0, smog)) + (Math.max(0, coleman))) / 4;
+                readability = { flesch: Math.max(0, flesch), fog: Math.max(0, fog), smog: Math.max(0, smog), coleman: Math.max(0, coleman), avgGrade: avgGrade };
+            }
+
+            let personalPercent = numWords > 0 ? Math.round((personalCount / numWords) * 100) : 0;
+            let visualPercent = numWords > 0 ? Math.round((visualCount / numWords) * 100) : 0;
+            let intangiblePercent = Math.max(0, 100 - personalPercent - visualPercent);
+
+            // Calculate Clarity %
+            let clarityPercent = 0;
+            if (timestamps && timestamps.length > 0) {
+                const validWords = timestamps.filter(w => w.confidence !== undefined);
+                if (validWords.length > 0) {
+                    const sumConf = validWords.reduce((sum, w) => sum + w.confidence, 0);
+                    clarityPercent = Math.round((sumConf / validWords.length) * 100);
+                }
+            }
+
+            try {
+                let totalPoints = 0;
+                let overrideGrade = false;
+
+                if (!window.THPS.Audio || !window.THPS.Audio.recordedAudio || elapsedSecs === 0) {
+                    overrideGrade = true;
+                }
+
+                let finalRuntime = masterData.runtime || 0; 
+
+                // Clarity as the 10th core metric
+                const scoreKeys = [
+                    {k: 'personal', v: personalPercent}, 
+                    {k: 'visual', v: visualPercent}, 
+                    {k: 'intangible', v: intangiblePercent}, 
+                    {k: 'wpm', v: avgWpm}, 
+                    {k: 'sps', v: mumbleScore}, 
+                    {k: 'pause', v: pausePercent}, 
+                    {k: 'runtime', v: finalRuntime}, 
+                    {k: 'readlevel', v: avgGrade}, 
+                    {k: 'simple', v: coreSimpleScore},
+                    {k: 'clarity', v: clarityPercent}
+                ];
+
+                scoreKeys.forEach(metric => {
+                    let pts = window.getMetricPoints(metric.k, metric.v);
+                    totalPoints += pts; // 10 metrics * 10 max points = 100 total points
+                });
+
+                // --- THE TRACKMAN CACHE ---
+                const payload = { 
+                    sps: mumbleScore,
+                    wpm: avgWpm,
+                    readlevel: avgGrade,
+                    time: elapsedSecs,
+                    personal: personalPercent,
+                    visual: visualPercent,
+                    text: text,
+                    wordTimestamps: wordTimestamps,
+                    volumeData: volumeData,
+                    pauseBuckets: pauseBuckets, 
+                    paceBuckets: paceBuckets,   
+                    pause: pausePercent,
+                    intangible: intangiblePercent,
+                    runtime: finalRuntime,
+                    simple: coreSimpleScore,
+                    totalPoints: totalPoints,
+                    clarity: clarityPercent,
+                    overrideGrade: overrideGrade,
+                    recordedAudio: window.THPS.Audio ? window.THPS.Audio.recordedAudio : false,
+                    highlightedHTML: highlightedHTML,
+                    reportMarkdownText: reportMarkdownText,
+                    numWords: numWords,
+                    numSentences: numSentences,
+                    totalSyllables: totalSyllables,
+                    google10kCount: google10kCount,
+                    unifiedSimpleCount: unifiedSimpleCount,
+                    readability: readability,
+
+                    pauseEvents: masterData.pauseEvents || [],
+                    runPaces: masterData.runPaces || [],
+                    runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 }, 
+                    volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
+                    volumeLabels: masterData.volumeLabels || [],
+                    volumeChunks: masterData.volumeChunks || []
+                };
+
+                window.thps_lastPayload = payload; // THE NEW MEMORY CACHE
+
+                // --- SAVE TO HISTORY FIRST (Prevents Race Conditions) ---
+                if (text.trim() !== '' || elapsedSecs > 0) {
+                    let existingIndex = window.thps_sessionHistory.findIndex(h => h.id === window.thps_currentAttemptId);
+                    let historyPayload = { ...payload, id: window.thps_currentAttemptId, title: 'Attempt ' + window.thps_currentAttemptId, date: new Date() };
+
+                    if (existingIndex >= 0) {
+                        window.thps_sessionHistory[existingIndex] = historyPayload;
+                    } else {
+                        window.thps_sessionHistory.unshift(historyPayload); // Add to beginning (most recent top)
+                    }
+                    window.updateHistoryUI();
+                }
+
+                // --- NOW BROADCAST TO WIDGETS ---
+                window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
+
+            } catch(e) { console.error("Summary Dashboard Error:", e); }
+        };
+
+        window.formatMetric = function(key, val) {
+            if (val === null || val === undefined) return '-';
+            if (key === 'time') return `${Math.floor(val / 60)}:${Math.floor(val % 60).toString().padStart(2, '0')}`;
+            if (['totalPoints', 'sps', 'grade', 'readlevel'].includes(key)) return val.toFixed(1);
+            if (key === 'runtime') return val.toFixed(1) + 's';
+            if (['pause', 'personal', 'visual', 'intangible', 'simple'].includes(key)) return val.toFixed(0) + '%';
+            return Math.round(val);
+        };
+
+        window.deleteHistoryAttempt = function(id) {
+            window.thps_sessionHistory = window.thps_sessionHistory.filter(h => h.id !== id);
+            window.updateHistoryUI();
+
+            // If deleting currently viewed attempt, try viewing latest or clear screen
+            if (window.thps_lastPayload && window.thps_lastPayload.id === id) {
+                if (window.thps_sessionHistory.length > 0) {
+                    window.loadHistoryAttempt(window.thps_sessionHistory[0].id);
+                } else {
+                    window.clearAnalyzer();
+                }
+            }
+        };
+
+        window.updateHistoryUI = function() {
+            const countEl = document.getElementById('history-count');
+            const listEl = document.getElementById('hist-tab-items-list');
+            const avgEl = document.getElementById('hist-tab-content-avg');
+            const bestEl = document.getElementById('hist-tab-content-best');
+
+            // Always show the count
+            if (countEl) {
+                countEl.innerText = window.thps_sessionHistory.length;
+            }
+
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+
+            if (window.thps_sessionHistory.length === 0) {
+                if (avgEl) avgEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                if (bestEl) bestEl.innerHTML = `<p class="text-slate-500 font-medium text-sm text-center py-10">No history yet.</p>`;
+                return;
+            }
+
+            window.thps_sessionHistory.forEach((attempt) => {
+                const isActive = (window.thps_lastPayload && window.thps_lastPayload.id === attempt.id);
+                const gradeText = attempt.overrideGrade ? '-' : attempt.totalPoints.toFixed(1);
+
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border-2 cursor-pointer transition-all ${isActive ? 'border-indigo-500 bg-indigo-50 shadow-md scale-[1.02]' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'}`;
+                item.onclick = () => window.loadHistoryAttempt(attempt.id);
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-black text-slate-800 ${isActive ? 'text-indigo-700' : ''}">${attempt.title} ${isActive ? '<span class="ml-2 text-[10px] bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full uppercase">Viewing</span>' : ''}</span>
+                        <span class="font-bold text-sm text-slate-500">Score: ${gradeText}/100</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-slate-400 font-medium mt-2">
+                        <span>Clarity: ${attempt.clarity !== undefined ? attempt.clarity + '%' : 'N/A'}</span>
+                        <button onclick="event.stopPropagation(); window.deleteHistoryAttempt(${attempt.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1 -mr-1 rounded-md hover:bg-red-50" title="Delete Attempt"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+
+            // Map UI text labels to their payload keys
+            const metricsMap = [
+                { label: 'Score', key: 'totalPoints' },
+                { label: 'Clarity', key: 'clarity' },
+                { label: 'Pers', key: 'personal' },
+                { label: 'Vis', key: 'visual' },
+                { label: 'Intg', key: 'intangible' },
+                { label: 'WPM', key: 'wpm' },
+                { label: 'SPS', key: 'sps' },
+                { label: 'Pause', key: 'pause' },
+                { label: 'Runtime', key: 'runtime' },
+                { label: 'Read-Lvl', key: 'readlevel' },
+                { label: 'Sim%', key: 'simple' }
+            ];
+
+            let avgHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Average</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            let bestHtml = `<div class="border border-slate-200 rounded-lg overflow-hidden bg-white"><table class="w-full text-left text-sm text-slate-600"><thead class="bg-slate-50 border-b border-slate-200"><tr class="text-xs uppercase text-slate-400 font-bold"><th class="px-4 py-3">Metric</th><th class="px-4 py-3">Best</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+
+            metricsMap.forEach(m => {
+                let sum = 0, count = 0;
+                let bestVal = null, bestPts = -1;
+
+                window.thps_sessionHistory.forEach(h => {
+                    // Safely handle both the 'readlevel' re-map and the missing 'clarity' in old history
+                    let val = h[m.key];
+                    if (val === undefined) {
+                        if (m.key === 'readlevel') val = h.grade;
+                        else if (m.key === 'clarity') val = 0;
+                    }
+
+                    if (val !== undefined && val !== null && !isNaN(val)) {
+                        sum += val;
+                        count++;
+
+                        let pts = (m.key === 'totalPoints') ? val : window.getMetricPoints(m.key, val);
+                        if (pts > bestPts) {
+                            bestPts = pts;
+                            bestVal = val;
+                        }
+                    }
+                });
+
+                let avgVal = count > 0 ? sum / count : null;
+                avgHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, avgVal)}</td></tr>`;
+                bestHtml += `<tr><td class="px-4 py-2 font-bold text-slate-700">${m.label}</td><td class="px-4 py-2 font-medium">${window.formatMetric(m.key, bestVal)}</td></tr>`;
+            });
+
+            avgHtml += `</tbody></table></div>`;
+            bestHtml += `</tbody></table></div>`;
+
+            if (avgEl) avgEl.innerHTML = avgHtml;
+            if (bestEl) bestEl.innerHTML = bestHtml;
+
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        window.loadHistoryAttempt = function(id) {
+            if (window.unprimeHistoryAll) window.unprimeHistoryAll();
+
+            const attempt = window.thps_sessionHistory.find(h => h.id === id);
+            if (!attempt) return;
+
+            const widgetEl = document.getElementById('cba-inputText-widget');
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (widgetEl) widgetEl.value = attempt.text;
+            if (hiddenEl) hiddenEl.value = attempt.text;
+
+            window.thps_lastPayload = attempt;
+            window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: attempt }));
+            window.updateHistoryUI();
+
+            if (window.innerWidth < 640) window.closeAllMenus();
+        };
+
+        window.copyReportToClipboard = function() {
+            let cleanMarkdown = reportMarkdownText.trim().replace(/\n/g, '\n\n').replace(/ +/g, ' ');
+            const report = `MIC-CHECK CHALLENGE - REPORT\n=========================================\n\n--- TRANSCRIPT (Marked Up) ---\n* Personal text is **bolded**\n* Visual text is _underlined_\n* Overlapping text is _**both**_\n\n${cleanMarkdown}\n`;
+
+            const el = document.createElement('textarea');
+            el.value = report;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        };
+
+        window.clearAnalyzer = function() {
+            const hiddenEl = document.getElementById('cba-inputText');
+            if (hiddenEl) hiddenEl.value = '';
+
+            const procPanel = document.getElementById('cba-processing-panel');
+            if (procPanel) procPanel.classList.add('hidden');
+
+            if (window.THPS && window.THPS.Audio) {
+                window.THPS.Audio.recordedAudio = false; 
+                window.THPS.Audio.lastRecordedDuration = 0;
+                window.THPS.Audio.wordTimestamps = []; 
+                window.THPS.Audio.volumeData = [];
+            }
+
+            // Advance attempt ID if we have a valid previous attempt
+            if (window.thps_lastPayload && (window.thps_lastPayload.text.trim() !== '' || window.thps_lastPayload.time > 0)) {
+                window.thps_currentAttemptId++;
+            }
+
+            window.thps_lastPayload = null; // WIPE THE CACHE
+
+            window.analyze();
+        };
+
+        window.explain = function(term) {
+            const titleEl = document.getElementById('cba-explanationTitle');
+            const contentEl = document.getElementById('cba-explanationContent');
+            if (!titleEl || !contentEl) return;
+
+            const panel = titleEl.closest('.glass-panel');
+            if (panel) {
+                panel.classList.add('ring-2', 'ring-blue-400', 'scale-[1.01]');
+                setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-400', 'scale-[1.01]'), 300);
+            }
+
+            titleEl.innerText = term;
+            contentEl.classList.remove('italic', 'justify-center');
+            contentEl.innerHTML = `<span class="animate-pulse">Loading explanation...</span>`;
+
+            setTimeout(() => {
+                let text = (window.explanationsData && window.explanationsData[term]) 
+                            ? window.explanationsData[term] 
+                            : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] 
+                                ? window.FALLBACK_EXPLANATIONS[term] 
+                                : `Detailed explanation for "${term}" will appear here soon.`);
+                contentEl.innerHTML = text;
+            }, 150);
+        };
+
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'cba-inputText-widget') {
+                const hiddenEl = document.getElementById('cba-inputText');
+                if (hiddenEl) hiddenEl.value = e.target.value;
+            }
+        });
+
+        async function fetchExplanations() {
+            try {
+                const res = await fetch(EXPLANATIONS_URL + '?nocache=' + new Date().getTime());
+                if (res.ok) window.explanationsData = await res.json();
+            } catch (e) {
+                console.warn("Using fallback explanations for 'What does this mean' panel.");
+            }
+        }
+
+        window.onload = () => {
+            if (window.THPS && window.THPS.NLP && typeof window.THPS.NLP.loadDictionaries === 'function') {
+                window.THPS.NLP.loadDictionaries();
+            }
+            fetchExplanations();
+        };
+
+        // ==========================================
+        // CRM CLIENT AUTHENTICATION LOGIC
+        // ==========================================
+        window.saveCrmClient = function() {
+            const input = document.getElementById('crm-client-input').value.trim();
+            if (!input) return alert("Please enter a valid Client ID.");
+
+            localStorage.setItem('thps_crm_client_id', input);
+            window.updateAuthUI(input);
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.clearCrmClient = function() {
+            localStorage.removeItem('thps_crm_client_id');
+            document.getElementById('crm-client-input').value = '';
+            window.updateAuthUI(null);
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.updateAuthUI = function(clientId) {
+            const authBtn = document.querySelector('button[onclick="document.getElementById(\'auth-modal\').classList.remove(\'hidden\')"]');
+            if (!authBtn) return;
+
+            if (clientId) {
+                const displayId = clientId.length > 10 ? clientId.substring(0, 10) + '...' : clientId;
+                authBtn.innerHTML = `<i data-lucide="user-check" class="w-6 h-6 text-indigo-600"></i> <span class="text-indigo-600">${displayId}</span>`;
+            } else {
+                authBtn.innerHTML = `<i data-lucide="user-circle" class="w-6 h-6"></i> Guest`;
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Check for active client on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            const activeClient = localStorage.getItem('thps_crm_client_id');
+            if (activeClient) {
+                document.getElementById('crm-client-input').value = activeClient;
+                window.updateAuthUI(activeClient);
+            }
+        });
+
+        // ==========================================
+        // FULL SCREEN LOGIC
+        // ==========================================
+        window.toggleFullScreen = function() {
+            const icon = document.getElementById('fullscreen-icon');
+
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if (icon) icon.setAttribute('data-lucide', 'minimize');
+                    if (window.lucide) window.lucide.createIcons();
+                }).catch(err => {
+                    console.warn(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if (icon) icon.setAttribute('data-lucide', 'maximize');
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                }
+            }
+        };
+
+        // Listen for Esc key exits to keep the icon in sync
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (!document.fullscreenElement && icon) {
+                icon.setAttribute('data-lucide', 'maximize');
+                if (window.lucide) window.lucide.createIcons();
+            }
+        });
+
+        window.spawnCompareWidget = function() {
+            window.closeAllMenus();
+            if (window.THPS && window.THPS.Dashboard) {
+                const dummyBtn = document.createElement('div');
+                dummyBtn.innerHTML = 'VS';
+
+                window.THPS.Dashboard.spawnWidget('thps-compare-speech', 'w-full mt-2', dummyBtn);
+
+                setTimeout(() => {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+        };
+    </script>
+</body>
+</html>
