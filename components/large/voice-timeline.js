@@ -19,8 +19,11 @@ class ThpsVoiceTimeline extends HTMLElement {
 
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Timeline</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Trackman Acoustic Telemetry</p>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Timeline</h3>
+                            <span id="overall-variety-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-100 text-slate-500 border-slate-200">Wait</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Measures pause, volume & pace variety</p>
                     </div>
                 </div>
                 
@@ -52,15 +55,24 @@ class ThpsVoiceTimeline extends HTMLElement {
                 <!-- GRAPHS -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                     <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pause Var.')">Pause Var.</h4>
+                        <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                            <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pause Var.')">Pause Var.</h4>
+                            <span id="badge-pause-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                        </div>
                         <div class="thps-bar-container-pause flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                     <div class="flex flex-col h-full">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Voice Var.')">Voice Var.</h4>
+                        <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                            <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Vol Var.')">Vol Var.</h4>
+                            <span id="badge-voice-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                        </div>
                         <div class="thps-bar-container-voice flex-1 flex items-end"></div>
                     </div>
                     <div class="flex flex-col">
-                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2 cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Run Var.')">Run Var.</h4>
+                        <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                            <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors" onclick="window.explain('Pace Var.')">Pace Var.</h4>
+                            <span id="badge-run-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                        </div>
                         <div class="thps-bar-container-run flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
                     </div>
                 </div>
@@ -97,6 +109,27 @@ class ThpsVoiceTimeline extends HTMLElement {
         return `00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
     }
 
+    calculateVariety(countsObj, ignoreKeys = []) {
+        let total = 0;
+        let max = 0;
+        
+        for (const [k, v] of Object.entries(countsObj)) {
+            if (ignoreKeys.includes(k)) continue;
+            let val = v || 0;
+            total += val;
+            if (val > max) max = val;
+        }
+        
+        if (total < 3) return { label: 'N/A', pctStr: '', color: 'bg-slate-200 text-slate-500 border-slate-300', score: 0 };
+        
+        let spreadPct = ((total - max) / total) * 100;
+        let pctStr = Math.round(spreadPct) + '%';
+        
+        if (spreadPct < 20) return { label: 'Low', pctStr, color: 'bg-red-100 text-red-700 border-red-200', score: -1 };
+        if (spreadPct > 45) return { label: 'High', pctStr, color: 'bg-orange-100 text-orange-700 border-orange-200', score: 1 };
+        return { label: 'Med', pctStr, color: 'bg-green-100 text-green-700 border-green-200', score: 0 };
+    }
+
     showWordTelemetry(word, start, t, confidence) {
         if (!t) return;
         const container = this.querySelector('#timeline-telemetry-content');
@@ -124,10 +157,12 @@ class ThpsVoiceTimeline extends HTMLElement {
         let category = "unknown";
         let range = "";
         
-        if (pause.duration <= 0.700) { category = "short pause"; range = "0.35s to 0.70s"; }
-        else if (pause.duration <= 1.050) { category = "medium pause"; range = "0.70s to 1.05s"; }
-        else if (pause.duration <= 1.400) { category = "long pause"; range = "1.05s to 1.40s"; }
-        else { category = "very long pause"; range = "> 1.40s"; }
+        if (pause.duration < 0.350) { category = "micro pause"; range = "< 0.35s"; }
+        else if (pause.duration < 0.700) { category = "short pause"; range = "0.35s to 0.70s"; }
+        else if (pause.duration < 1.050) { category = "medium pause"; range = "0.70s to 1.05s"; }
+        else if (pause.duration < 1.400) { category = "long pause"; range = "1.05s to 1.40s"; }
+        else if (pause.duration < 2.000) { category = "1.4s pause"; range = "1.40s to 2.00s"; }
+        else { category = "long pause"; range = "> 2.00s"; }
 
         let vol = pause.volumeDb !== undefined ? pause.volumeDb.toFixed(1) : '--';
 
@@ -179,10 +214,57 @@ class ThpsVoiceTimeline extends HTMLElement {
         
         const pauseEvents = data.pauseEvents || [];
         const runPaces = data.runPaces || [];
-        const pauseCounts = data.pauseBuckets || { micro: 0, blue: 0, green: 0, orange: 0, red: 0 };
+        
+        // Handle backwards compatibility mapping for pause buckets
+        const rawPauseBuckets = data.pauseBuckets || {};
+        const pauseCounts = {
+            short: rawPauseBuckets.short || rawPauseBuckets.orange || 0,
+            medium: rawPauseBuckets.medium || rawPauseBuckets.green || 0,
+            long: rawPauseBuckets.long || rawPauseBuckets.blue || 0,
+            vLong: rawPauseBuckets.vLong || rawPauseBuckets.red || 0, // Legacy fallback
+            extreme: rawPauseBuckets.extreme || 0
+        };
+
         const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
         const runCounts = data.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 };
         const validChunks = data.volumeChunks || [];
+
+        // Update Variety Badges
+        const pauseVar = this.calculateVariety(pauseCounts);
+        const voiceVar = this.calculateVariety(voiceCounts);
+        const paceVar = this.calculateVariety(runCounts);
+
+        const setBadge = (id, result) => {
+            const el = this.querySelector(id);
+            if (el) {
+                el.className = `text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border ${result.color}`;
+                el.innerText = result.pctStr ? `${result.label} ${result.pctStr}` : result.label;
+            }
+        };
+
+        setBadge('#badge-pause-var', pauseVar);
+        setBadge('#badge-voice-var', voiceVar);
+        setBadge('#badge-run-var', paceVar);
+
+        // Overall Variety Score
+        let totalScore = pauseVar.score + voiceVar.score + paceVar.score;
+        let overallEl = this.querySelector('#overall-variety-badge');
+        
+        if (pauseVar.score === 0 && voiceVar.score === 0 && paceVar.score === 0 && pauseVar.label === 'N/A') {
+            overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-200 text-slate-500 border-slate-300';
+            overallEl.innerText = 'N/A';
+        } else {
+            if (totalScore <= -2) {
+                overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-red-100 text-red-700 border-red-200';
+                overallEl.innerText = 'Low Variety';
+            } else if (totalScore >= 2) {
+                overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-orange-100 text-orange-700 border-orange-200';
+                overallEl.innerText = 'High Variety';
+            } else {
+                overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-green-100 text-green-700 border-green-200';
+                overallEl.innerText = 'Med Variety';
+            }
+        }
 
         // --- VISUAL PAINTING 1: TIME AXIS ---
         axis.innerHTML = '';
@@ -325,11 +407,15 @@ class ThpsVoiceTimeline extends HTMLElement {
             });
         };
 
-        // Pause Var (micro=red, short=orange, med=green, long=blue, vLong=purple)
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['micro', '0.35s', '0.70s', '1.05s', 'long'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
-        // Voice Var
-        drawVerticalBars('.thps-bar-container-voice', voiceCounts, data.volumeLabels || [], ['bg-purple-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500']);
-        // Run Var (vFast=red, fast=orange, norm=green, slow=blue, vSlow=purple)
+        // Pause Var (short=red, med=orange, long=green, vLong=blue, extreme=purple) - Excludes Micro
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['0.35s', '0.70s', '1.05s', '1.4s', 'Long'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        
+        // Vol Var (Mirrored rendering: Red on Left to Purple on Right)
+        const mirroredVolCounts = { vHigh: voiceCounts.vHigh, high: voiceCounts.high, norm: voiceCounts.norm, low: voiceCounts.low, vLow: voiceCounts.vLow };
+        const mirroredVolLabels = data.volumeLabels ? [...data.volumeLabels].reverse() : ['> -15dB', '-15dB', '-25dB', '-35dB', '< -35dB'];
+        drawVerticalBars('.thps-bar-container-voice', mirroredVolCounts, mirroredVolLabels, ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        
+        // Pace Var (vFast=red, fast=orange, norm=green, slow=blue, vSlow=purple)
         drawHorizontalBars('.thps-bar-container-run', runCounts, ['>5.0sps', '4.5sps', '4.0sps', '3.5sps', '<3.0sps'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
     }
 }
