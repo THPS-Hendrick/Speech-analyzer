@@ -504,6 +504,7 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             if (dbCount > 0) {
                 let avgDb = 10 * Math.log10(linearSum / dbCount);
                 validChunks.push({ start: ev.start, end: ev.end, db: avgDb, type: ev.type });
+                // Assign raw dB to the object reference (captures pause dB for the inspector)
                 if (ev.ref) ev.ref.volumeDb = avgDb; 
             }
         });
@@ -534,24 +535,30 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         ];
         
         validChunks.forEach(vc => {
+            // EXPLICIT FILTER: Do not map math, color, or height to background noise during pauses
+            if (vc.type === 'pause') {
+                vc.hPct = 0; // Safe-guard zeroes visual height just in case
+                return; 
+            }
+            
             if (vc.db < bounds[0]) { 
-                if (vc.type === 'word') volumeBuckets.vLow++; 
+                volumeBuckets.vLow++; 
                 vc.color = '#8b5cf6'; vc.hPct = 0.15; 
             } 
             else if (vc.db < bounds[1]) { 
-                if (vc.type === 'word') volumeBuckets.low++; 
+                volumeBuckets.low++; 
                 vc.color = '#3b82f6'; vc.hPct = 0.30; 
             } 
             else if (vc.db < bounds[2]) { 
-                if (vc.type === 'word') volumeBuckets.norm++; 
+                volumeBuckets.norm++; 
                 vc.color = '#10b981'; vc.hPct = 0.50; 
             } 
             else if (vc.db < bounds[3]) { 
-                if (vc.type === 'word') volumeBuckets.high++; 
+                volumeBuckets.high++; 
                 vc.color = '#f97316'; vc.hPct = 0.75; 
             } 
             else { 
-                if (vc.type === 'word') volumeBuckets.vHigh++; 
+                volumeBuckets.vHigh++; 
                 vc.color = '#ef4444'; vc.hPct = 0.97; 
             } 
         });
