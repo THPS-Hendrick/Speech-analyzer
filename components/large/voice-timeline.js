@@ -303,6 +303,9 @@ class ThpsVoiceTimeline extends HTMLElement {
         }
 
         validChunks.forEach(vc => {
+            // EXPLICIT FILTER: Skip painting if chunk is a pause or has no color assigned
+            if (vc.type === 'pause' || !vc.color) return; 
+            
             let x = vc.start * PIXELS_PER_SEC;
             let w = Math.max(2, (vc.end - vc.start) * PIXELS_PER_SEC); 
             let h = vc.hPct * canvasHeight;
