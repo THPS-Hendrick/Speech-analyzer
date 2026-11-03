@@ -43,7 +43,7 @@ class ThpsProgress extends HTMLElement {
                         <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm pointer-events-none shrink-0">
                             <i data-lucide="line-chart" class="w-4 h-4"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-slate-800 whitespace-nowrap">Historical Progress</h2>
+                        <h2 class="text-lg font-bold text-slate-800 whitespace-nowrap">Progress</h2>
                     </div>
                     
                     <div class="relative group/select shrink-0 ml-2">
