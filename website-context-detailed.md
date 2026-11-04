@@ -37,7 +37,7 @@
 ### Body Text:
 - A data-driven breakdown of optimizing delivery mechanics from 166 WPM to 123 WPM by leveraging personal storytelling.
 - Specialist in Speech Biomechanics. Helping leaders measure and optimize spoken delivery.
-- Click to load the live Mic-Check App. Speak into your microphone to generate your own real-time Voice Graph and WPM telemetry.
+- Click to load the free verision of the Mic-Check App. See your own speech metrics and practice improving how you speak.
 - The browser app requires microphone permissions to analyze your delivery.
 - Narmada is a senior auditor evaluating food safety and dysphagia standards across hospitality and aged-care facilities. When she was tapped to deliver her first major presentation at the Hospitality in Healthcare (HIH) Conference, the pressure triggered immediate Skill Inhibition.
 - During her initial THPS Speech Assessment, the baseline data revealed exactly how the pressure was manifesting:
