@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mic-Check App | Measure Speech Metrics and Progress-Tracking</title>
     <meta name="description" content="Stop guessing how you sound. The Mic-Check App measures your pace, pause ratio, and vocabulary mix in real-time. Try the free demo or subscribe for full access.">
-<link rel="canonical" href="https://tomhendrick.com/services/mic-check-app.html" />
+    <link rel="canonical" href="https://tomhendrick.com/services/mic-check-app.html" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/image/thps-logo-golden-wreath.svg">
@@ -147,17 +147,22 @@
                 </p>
             </header>
 
-            <!-- FULL WORKING APP IFRAME -->
-            <div class="w-full mx-auto rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200 bg-white mb-24 relative">
-                <iframe 
-                  src="https://mic-check-backend.vercel.app/analyzer-app.html" 
-                  style="width: 100%; height: 4500px; border: none; background: transparent; overflow: hidden;" 
-                  allow="camera; microphone; autoplay; playsinline"
-                  scrolling="no"
-                  loading="lazy"
-                  title="Mic-Check App Interface">
-                </iframe>
+            <!-- PERFORMANCE FAÇADE (CLICK-TO-LOAD APP) -->
+            <div id="app-facade" class="w-full mx-auto rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 mb-4 relative cursor-pointer group transition-all h-[600px] md:h-[700px] flex flex-col items-center justify-center">
+                <!-- Decorative Background -->
+                <div class="absolute inset-0 bg-brand-dark/90 group-hover:bg-brand-dark/80 transition-colors z-0"></div>
+                
+                <!-- Overlay Content -->
+                <div class="relative z-10 text-center p-8 flex flex-col items-center">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-microphone-lines text-3xl text-brand-green"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-white mb-4">Start the Mic-Check App</h3>
+                    <p class="text-green-100 text-lg max-w-md mx-auto mb-8">Click to load the live speech analyzer. Speak into your microphone to measure your pacing, pauses, and vocabulary.</p>
+                    <span class="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-full text-sm uppercase tracking-wider">Launch Free Demo</span>
+                </div>
             </div>
+            <p id="app-facade-caption" class="text-xs text-center text-gray-500 mb-24">The browser app requires microphone permissions to analyze your delivery.</p>
 
             <!-- UNDER THE HOOD: AIO / SEO HIERARCHY -->
             <section class="max-w-4xl mx-auto mb-24">
@@ -323,5 +328,33 @@
 
     <!-- INJECT_FOOTER -->
 
+    <!-- Façade Injection Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const facadeBtn = document.getElementById('app-facade');
+            const facadeCaption = document.getElementById('app-facade-caption');
+            
+            if (facadeBtn) {
+                facadeBtn.addEventListener('click', () => {
+                    // Inject the heavy iframe only upon user intent
+                    facadeBtn.innerHTML = `
+                        <iframe 
+                          src="https://mic-check-backend.vercel.app/analyzer-app.html" 
+                          style="width: 100%; height: 4000px; border: none; background: transparent; overflow: hidden;" 
+                          allow="camera; microphone; autoplay; playsinline"
+                          scrolling="no"
+                          title="Mic-Check App Interface">
+                        </iframe>
+                    `;
+                    // Remove height and styling constraints to let the app expand fully
+                    facadeBtn.classList.remove('cursor-pointer', 'group', 'h-[600px]', 'md:h-[700px]', 'bg-slate-900');
+                    facadeBtn.classList.add('bg-white');
+                    
+                    // Hide the microphone warning caption since the app handles its own permissions UI
+                    if (facadeCaption) facadeCaption.style.display = 'none';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
