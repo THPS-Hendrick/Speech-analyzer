@@ -215,7 +215,7 @@
 - Need to change your email? Contact Support to securely migrate your history.
 - Billed $9.90 AUD monthly
 - Next billing date: 14 Nov 2026
-- Linking your account allows your Mic-Check App telemetry to automatically route to your coach's dashboard for professional review during your Performance Plan sessions.
+- Linking your account allows your Mic-Check App progress to sync with your coach's dashboard for professional review during your Performance Plan sessions.
 - Active Connection
 - Unlinking your account will immediately stop sending diagnostic data to your coach. Only do this if your 4-week program has concluded.
 
