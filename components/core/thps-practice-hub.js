@@ -206,8 +206,9 @@ class ThpsPracticeHub extends HTMLElement {
         let spreadPct = ((total - max) / total) * 100;
         let pctStr = Math.round(spreadPct) + '%';
         
-        if (spreadPct < 20) return { label: 'Low', pctStr, colorClass: 'bg-red-100 text-red-700', score: -1 };
-        if (spreadPct > 45) return { label: 'High', pctStr, colorClass: 'bg-orange-100 text-orange-700', score: 1 };
+        // NEW STRICT THRESHOLDS (Mirrors voice-timeline.js updates)
+        if (spreadPct < 50) return { label: 'Low', pctStr, colorClass: 'bg-red-100 text-red-700', score: -1 };
+        if (spreadPct > 60) return { label: 'High', pctStr, colorClass: 'bg-orange-100 text-orange-700', score: 1 };
         return { label: 'Med', pctStr, colorClass: 'bg-green-100 text-green-700', score: 0 };
     }
 
