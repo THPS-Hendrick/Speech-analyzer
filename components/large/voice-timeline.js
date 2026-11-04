@@ -125,8 +125,9 @@ class ThpsVoiceTimeline extends HTMLElement {
         let spreadPct = ((total - max) / total) * 100;
         let pctStr = Math.round(spreadPct) + '%';
         
-        if (spreadPct < 20) return { label: 'Low', pctStr, color: 'bg-red-100 text-red-700 border-red-200', score: -1 };
-        if (spreadPct > 45) return { label: 'High', pctStr, color: 'bg-orange-100 text-orange-700 border-orange-200', score: 1 };
+        // NEW PUNISHING THRESHOLDS
+        if (spreadPct < 50) return { label: 'Low', pctStr, color: 'bg-red-100 text-red-700 border-red-200', score: -1 };
+        if (spreadPct > 60) return { label: 'High', pctStr, color: 'bg-orange-100 text-orange-700 border-orange-200', score: 1 };
         return { label: 'Med', pctStr, color: 'bg-green-100 text-green-700 border-green-200', score: 0 };
     }
 
@@ -157,12 +158,13 @@ class ThpsVoiceTimeline extends HTMLElement {
         let category = "unknown";
         let range = "";
         
+        // NEW PAUSE TIERS
         if (pause.duration < 0.350) { category = "micro pause"; range = "< 0.35s"; }
         else if (pause.duration < 0.700) { category = "short pause"; range = "0.35s to 0.70s"; }
-        else if (pause.duration < 1.050) { category = "medium pause"; range = "0.70s to 1.05s"; }
-        else if (pause.duration < 1.400) { category = "long pause"; range = "1.05s to 1.40s"; }
-        else if (pause.duration < 2.000) { category = "1.4s pause"; range = "1.40s to 2.00s"; }
-        else { category = "long pause"; range = "> 2.00s"; }
+        else if (pause.duration < 1.200) { category = "medium pause"; range = "0.70s to 1.20s"; }
+        else if (pause.duration < 1.700) { category = "long pause"; range = "1.20s to 1.70s"; }
+        else if (pause.duration < 2.200) { category = "very long pause"; range = "1.70s to 2.20s"; }
+        else { category = "extreme pause"; range = "> 2.20s"; }
 
         let vol = pause.volumeDb !== undefined ? pause.volumeDb.toFixed(1) : '--';
 
@@ -410,16 +412,16 @@ class ThpsVoiceTimeline extends HTMLElement {
             });
         };
 
-        // Pause Var (short=red, med=orange, long=green, vLong=blue, extreme=purple) - Excludes Micro
-        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['0.35s', '0.70s', '1.05s', '1.4s', 'Long'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        // NEW HARDCODED LABELS for Pause Var
+        drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['0.35s', '0.70s', '1.2s', '1.7s', '2.2s+'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
         
-        // Vol Var (Mirrored rendering: Red on Left to Purple on Right)
+        // Vol Var (Mirrored rendering: Red on Left to Purple on Right) - Dynamic labels fetched from payload
         const mirroredVolCounts = { vHigh: voiceCounts.vHigh, high: voiceCounts.high, norm: voiceCounts.norm, low: voiceCounts.low, vLow: voiceCounts.vLow };
-        const mirroredVolLabels = data.volumeLabels ? [...data.volumeLabels].reverse() : ['> -15dB', '-15dB', '-25dB', '-35dB', '< -35dB'];
+        const mirroredVolLabels = data.volumeLabels ? [...data.volumeLabels].reverse() : ['> -20dB', '-20dB', '-30dB', '-40dB', '< -40dB'];
         drawVerticalBars('.thps-bar-container-voice', mirroredVolCounts, mirroredVolLabels, ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
         
-        // Pace Var (vFast=red, fast=orange, norm=green, slow=blue, vSlow=purple)
-        drawHorizontalBars('.thps-bar-container-run', runCounts, ['>5.0sps', '4.5sps', '4.0sps', '3.5sps', '<3.0sps'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+        // NEW HARDCODED LABELS for Pace Var
+        drawHorizontalBars('.thps-bar-container-run', runCounts, ['>4.9sps', '4.6sps', '4.0sps', '3.5sps', '<3.1sps'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
     }
 }
 
