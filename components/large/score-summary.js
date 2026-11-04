@@ -16,11 +16,11 @@ class ThpsScoreSummary extends HTMLElement {
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 border-slate-100 gap-4 pr-6">
                     <h2 class="text-lg font-bold text-slate-800 cursor-pointer hover:text-blue-600 transition-colors" onclick="this.closest('thps-score-summary').triggerMetricSelect('Score Summary', 'grade')">Score Summary</h2>
                     <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="this.closest('thps-score-summary').triggerMetricSelect('Green Score', 'greenScore')">
-                            <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Greens:</span>
-                            <span id="sum-greens" class="font-bold text-slate-800 text-sm pointer-events-none">- / 10</span>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-colors" onclick="this.closest('thps-score-summary').triggerMetricSelect('Clarity %', 'clarity')">
+                            <span class="text-xs font-bold text-slate-500 uppercase pointer-events-none">Clarity:</span>
+                            <span id="sum-clarity" class="font-bold text-slate-800 text-sm pointer-events-none">- %</span>
                         </div>
-                        <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-score-summary').triggerMetricSelect('Grade', 'grade')">
+                        <div class="text-base font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg shadow-inner cursor-pointer hover:bg-blue-100 transition-colors" onclick="this.closest('thps-score-summary').triggerMetricSelect('Overall Grade', 'grade')">
                             Grade: <span id="sum-overallGrade" class="text-blue-600 pointer-events-none">- / 100</span>
                         </div>
                     </div>
@@ -45,7 +45,7 @@ class ThpsScoreSummary extends HTMLElement {
                     <div class="space-y-3">
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 pb-1 cursor-pointer hover:text-blue-600 transition-colors inline-block" onclick="this.closest('thps-score-summary').triggerMetricSelect('Simplicity', 'grade')">Simplicity</h3>
                         <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-score-summary').triggerMetricSelect('Runtime', 'runtime')"><span class="score-label group-hover:text-blue-600 transition-colors">Runtime:</span> <div class="flex items-center gap-1"><span id="sum-runtime" class="score-value pointer-events-none">0.0s</span> <span id="sum-runtime-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
-                        <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-score-summary').triggerMetricSelect('Comp. Grade', 'grade')"><span class="score-label group-hover:text-blue-600 transition-colors">Comp. Grade:</span> <div class="flex items-center gap-1"><span id="sum-grade" class="score-value pointer-events-none">0.0</span> <span id="sum-grade-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
+                        <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-score-summary').triggerMetricSelect('Read-Level', 'readlevel')"><span class="score-label group-hover:text-blue-600 transition-colors">Read-Level:</span> <div class="flex items-center gap-1"><span id="sum-grade" class="score-value pointer-events-none">0.0</span> <span id="sum-grade-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                         <div class="score-row cursor-pointer hover:bg-slate-100 p-1 -mx-1 rounded transition-colors group" onclick="this.closest('thps-score-summary').triggerMetricSelect('Simple %', 'simple')"><span class="score-label group-hover:text-blue-600 transition-colors">Simple %:</span> <div class="flex items-center gap-1"><span id="sum-simple" class="score-value pointer-events-none">0%</span> <span id="sum-simple-eval" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-slate-100 text-slate-500 ml-1 pointer-events-none">WAITING</span></div></div>
                     </div>
                 </div>
@@ -86,15 +86,17 @@ class ThpsScoreSummary extends HTMLElement {
         const titleEl = this.querySelector('#local-explanation-title');
         const contentEl = this.querySelector('#local-explanation-content');
         if (!titleEl || !contentEl) return;
-
+        
+        // Handle mapped explanation title for backwards compatibility with the JSON dictionary
+        const displayTerm = term === 'Read-Level' ? 'Comp. Grade' : term;
         titleEl.innerText = term + ':';
         contentEl.innerHTML = `<span class="animate-pulse">Loading...</span>`;
 
         setTimeout(() => {
-            let text = (window.explanationsData && window.explanationsData[term]) 
-                       ? window.explanationsData[term] 
-                       : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[term] 
-                            ? window.FALLBACK_EXPLANATIONS[term] 
+            let text = (window.explanationsData && window.explanationsData[displayTerm]) 
+                       ? window.explanationsData[displayTerm] 
+                       : (window.FALLBACK_EXPLANATIONS && window.FALLBACK_EXPLANATIONS[displayTerm] 
+                            ? window.FALLBACK_EXPLANATIONS[displayTerm] 
                             : `Explanation for "${term}" will appear here soon.`);
             contentEl.innerHTML = text;
         }, 100);
@@ -115,7 +117,7 @@ class ThpsScoreSummary extends HTMLElement {
 
         const getBadgeStyle = (pts) => {
             if (pts === 10) return 'bg-green-100 text-green-700';
-            if (pts >= 5.0) return 'bg-amber-100 text-amber-700';
+            if (pts >= 4.0) return 'bg-amber-100 text-amber-700';
             return 'bg-red-100 text-red-700';
         };
 
@@ -165,21 +167,28 @@ class ThpsScoreSummary extends HTMLElement {
             setEval('sum-runtime-eval', 'Text Only', 'bg-slate-100 text-slate-500');
         }
 
-        this.querySelector('#sum-grade').textContent = data.grade.toFixed(1);
-        let gPts = window.getMetricPoints ? window.getMetricPoints('grade', data.grade) : 0;
+        // Apply fallback logic for readlevel mapping
+        let rLvlVal = data.readlevel !== undefined ? data.readlevel : data.grade;
+        this.querySelector('#sum-grade').textContent = rLvlVal.toFixed(1);
+        let gPts = window.getMetricPoints ? window.getMetricPoints('readlevel', rLvlVal) : 0;
         setEval('sum-grade-eval', formatBadge(gPts), getBadgeStyle(gPts));
 
         this.querySelector('#sum-simple').textContent = `${data.simple}%`;
         let sPts = window.getMetricPoints ? window.getMetricPoints('simple', data.simple) : 0;
         setEval('sum-simple-eval', formatBadge(sPts), getBadgeStyle(sPts));
         
+        // Handle Fallback for old history data
+        let clarityVal = data.clarity !== undefined ? data.clarity : 0; 
+        
         // Final Output
         if (data.overrideGrade) {
             this.querySelector('#sum-overallGrade').textContent = "- / 100";
-            this.querySelector('#sum-greens').textContent = "- / 10";
+            const clrEl = this.querySelector('#sum-clarity');
+            if (clrEl) clrEl.textContent = "- %";
         } else {
             this.querySelector('#sum-overallGrade').textContent = `${data.totalPoints.toFixed(1)} / 100`;
-            this.querySelector('#sum-greens').textContent = `${data.greenScore || 0} / 10`;
+            const clrEl = this.querySelector('#sum-clarity');
+            if (clrEl) clrEl.textContent = `${clarityVal}%`;
         }
     }
 }
