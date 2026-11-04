@@ -355,10 +355,11 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                             meaningfulPauseCount++;
                         }
 
+                        // NEW PAUSE TIERS: Pushed out to 0.5s gaps
                         let pColor = '', pY = 0;
-                        if (pauseUnitValue >= 2.00) { acousticData.pauseBuckets.extreme++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Extreme)
-                        else if (pauseUnitValue >= 1.40) { acousticData.pauseBuckets.vLong++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Very Long)
-                        else if (pauseUnitValue >= 1.05) { acousticData.pauseBuckets.long++; pColor = '#10b981'; pY = 0.50; } // Green (Long)
+                        if (pauseUnitValue >= 2.20) { acousticData.pauseBuckets.extreme++; pColor = '#8b5cf6'; pY = 0.85; } // Purple (Extreme)
+                        else if (pauseUnitValue >= 1.70) { acousticData.pauseBuckets.vLong++; pColor = '#3b82f6'; pY = 0.65; } // Blue (Very Long)
+                        else if (pauseUnitValue >= 1.20) { acousticData.pauseBuckets.long++; pColor = '#10b981'; pY = 0.50; } // Green (Long)
                         else if (pauseUnitValue >= 0.70) { acousticData.pauseBuckets.medium++; pColor = '#f97316'; pY = 0.35; } // Orange (Medium)
                         else { acousticData.pauseBuckets.short++; pColor = '#ef4444'; pY = 0.20; } // Red (Short)
                         
@@ -416,12 +417,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
                 let runSpsFloat = parseFloat(runSps);
                 let runColor = '', runRow = 2, runLabel = '4.0sps';
                 
-                // Absolute SPS Run Tiers
-                if (runSpsFloat > 4.7) { runColor = '#ef4444'; runRow = 4; runLabel = '>5.0sps'; acousticData.runBuckets.vFast++; } 
-                else if (runSpsFloat > 4.2) { runColor = '#f97316'; runRow = 3; runLabel = '4.5sps'; acousticData.runBuckets.fast++; } 
+                // NEW PACE TIERS: Pushed out to 0.7sps increments
+                if (runSpsFloat > 4.9) { runColor = '#ef4444'; runRow = 4; runLabel = '>4.9sps'; acousticData.runBuckets.vFast++; } 
+                else if (runSpsFloat > 4.2) { runColor = '#f97316'; runRow = 3; runLabel = '4.6sps'; acousticData.runBuckets.fast++; } 
                 else if (runSpsFloat >= 3.8) { runColor = '#10b981'; runRow = 2; runLabel = '4.0sps'; acousticData.runBuckets.norm++; } 
-                else if (runSpsFloat >= 3.3) { runColor = '#3b82f6'; runRow = 1; runLabel = '3.5sps'; acousticData.runBuckets.slow++; } 
-                else { runColor = '#8b5cf6'; runRow = 0; runLabel = '<3.0sps'; acousticData.runBuckets.vSlow++; } 
+                else if (runSpsFloat >= 3.1) { runColor = '#3b82f6'; runRow = 1; runLabel = '3.5sps'; acousticData.runBuckets.slow++; } 
+                else { runColor = '#8b5cf6'; runRow = 0; runLabel = '<3.1sps'; acousticData.runBuckets.vSlow++; } 
 
                 acousticData.runPaces.push({ 
                     id: currentRunIndex++,
@@ -473,11 +474,11 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
     }
 
     // ==========================================
-    // 4. PSYCHOACOUSTIC VOLUME ENGINE (BIOLOGICAL 6dB TIERS)
+    // 4. PSYCHOACOUSTIC VOLUME ENGINE (BIOLOGICAL TIERS)
     // ==========================================
     let validChunks = [];
     let volumeBuckets = { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
-    let volumeLabels = ['< -35dB', '-35dB', '-25dB', '-15dB', '> -15dB']; 
+    let volumeLabels = ['< -40dB', '-40dB', '-30dB', '-20dB', '> -20dB']; 
 
     if (volumeData && volumeData.length > 0) {
         let dynamicEvents = [];
@@ -509,7 +510,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             }
         });
 
-        // Fixed 6dB Psychoacoustic thresholds (+/- 3dB and +/- 9dB from average spoken word)
         let wordChunksForStats = validChunks.filter(vc => vc.type === 'word');
         let avgSpokenDb = -40;
 
@@ -519,11 +519,12 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             avgSpokenDb = totalWordDb / wordChunksForStats.length;
         }
 
+        // NEW VOLUME TIERS: Pushed out to 8dB jumps from baseline
         let bounds = [
-            avgSpokenDb - 9, // Very Quiet
-            avgSpokenDb - 3, // Quiet
-            avgSpokenDb + 3, // Loud
-            avgSpokenDb + 9  // Very Loud
+            avgSpokenDb - 11, // Very Quiet
+            avgSpokenDb - 3,  // Quiet
+            avgSpokenDb + 3,  // Loud
+            avgSpokenDb + 11  // Very Loud
         ];
 
         volumeLabels = [
