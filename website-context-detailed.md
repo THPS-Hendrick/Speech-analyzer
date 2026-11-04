@@ -35,45 +35,41 @@
 ## File: /website/articles/case-studies.html
 
 ### Body Text:
-- A data-driven breakdown of mastering tempo and reducing cognitive load during high-stakes presentations.
-- Specialist in Speech Biomechanics & Acoustic Telemetry. Helping leaders measure and optimize spoken delivery.
-- The Challenge: An executive speaker was struggling with high cognitive load, rushing through material at 180 Words Per Minute (WPM), resulting in poor audience retention. 
-                    The Solution: Following a baseline THPS Speech Assessment, we implemented Repeat-Count training over a 4-week THPS Performance Plan, tracked in real-time via the Mic-Check App.
-                    The Result: The client optimized their pace to a sustainable 145-150 WPM, achieving a 90/100 engagement score and complete composure during Q&A.
-- Speak into your browser microphone to generate live cadence, pause variation, and tempo telemetry.
-- In corporate environments, pressure often manifests physically through a speaker's tempo. For Sumeena, an executive leader presenting highly technical information to stakeholders, this pressure caused her average speaking rate to spike to 180 Words Per Minute (WPM).
-- At 180 WPM, a speaker sacrifices the ability to pause, breathe, or process the room's reaction. "When I started, I was just blank and juggling words," she noted. This speed severely limited her Information Gain retention with the audience and increased her own cognitive load during hostile Q&A sessions.
-- You cannot manage what you do not measure. The turning point began by booking a THPS Speech Assessment. Instead of subjective feedback like "slow down," we analyzed her baseline audio data.
-- The assessment confirmed that her rapid pacing was destroying her Intangible Engagement Score. We needed a precise, mechanical fix.
-- Moving into a 4-week THPS Performance Plan, we utilized the Vocal Mechanics Method—specifically "Repeat-Count" training—to rebuild her muscle memory.
-- Between our 1-on-1 Zoom sessions, she utilized the Mic-Check App (which you can try via a free demo here) to practice her material. The app provided real-time, on-screen visual feedback if her tempo drifted above the 150 WPM threshold, ensuring her solo practice was scientifically grounded.
-- By the final session, her historical progress chart had stabilized perfectly within the 145-150 WPM range. Because her brain was no longer rushing to output words, her cognitive load dropped, giving her the mental bandwidth to handle complex Q&A seamlessly. Her overall performance grade jumped to a 90/100, completely transforming her professional delivery.
-- Unlike basic word-counting scripts, our proprietary THPS.NLP.analyzeSpeech engine evaluates spoken audio across multiple biomechanical dimensions in real time:
-- We calculate syllable counts per word token and map acoustic gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds 700ms to 750ms.
+- A data-driven breakdown of optimizing delivery mechanics from 166 WPM to 123 WPM by leveraging personal storytelling.
+- Specialist in Speech Biomechanics. Helping leaders measure and optimize spoken delivery.
+- Click to load the live Mic-Check App. Speak into your microphone to generate your own real-time Voice Graph and WPM telemetry.
+- The browser app requires microphone permissions to analyze your delivery.
+- Narmada is a senior auditor evaluating food safety and dysphagia standards across hospitality and aged-care facilities. When she was tapped to deliver her first major presentation at the Hospitality in Healthcare (HIH) Conference, the pressure triggered immediate Skill Inhibition.
+- During her initial THPS Speech Assessment, the baseline data revealed exactly how the pressure was manifesting:
+- To prepare for the HIH Conference, we transitioned into the 1-on-1 THPS Performance Plan. To reduce her 12.6-second Runtime, Narmada needed to build muscle memory around deliberate, structural pauses.
+- We completely restructured her presentation content. Instead of quoting regulatory guidelines, we drafted a deeply Visual and Personal narrative. We anchored her speech to a vivid, high-stakes scenario: "Imagine it is 12:05 pm in an aged-care home... One resident requires a texture-modified meal. Another has a documented milk allergy."
+- By Session 4, the transformation in her Mic-Check dashboard was profound. By leaning into personal storytelling, her content metrics shifted to 59% Personal and 18% Visual. Because she felt emotionally connected to the material, her pace naturally dropped to an authoritative 123 WPM, and her Runtime normalized to 5.5 seconds.
+- She walked into the HIH Conference not just surviving the presentation, but commanding the room with a final grading of 96.0 / 100.
+- Unlike basic word-counting scripts, our proprietary THPS.analyzeSpeech engine evaluates spoken audio across multiple biomechanical dimensions in real time:
+- We calculate syllable counts per word token and map gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds 700ms to 750ms.
 - Continuous speech runs between structural pauses are classified into absolute cadence tiers:
                                 &gt;5.0 SPS (Too Fast), 
                                 3.8–4.2 SPS (Optimal Command Zone), and 
                                 &lt;3.0 SPS (Drag Zone).
-- Spoken energy is continuously grouped using biological 6dB decibel thresholds (±3dB and ±9dB relative to the speaker’s average spoken word intensity) to track dynamic contrast vs. monotone strain.
-- Transcripts are evaluated against normalized dictionaries (including Google 10k Common Words and Visual Imagery corpora) to calculate grade level, narrative pronoun density, and visual clarity.
-- "Tom's data-driven approach completely changed how I present to board members. Measuring my WPM in real time gave me confidence I never had before."
+- Spoken energy is continuously grouped using biological decibel thresholds (±3dB and ±9dB relative to the speaker’s average spoken word intensity) to track dynamic contrast vs. monotone strain on a real-time Voice Graph.
+- Transcripts are evaluated against normalized dictionaries (including 10k Common Words and Visual Imagery corpora) to calculate grade level, narrative pronoun density, and visual clarity without relying on subjective opinions.
 - Get your own baseline analytics and discover the exact metrics holding back your communication.
 
 ### Interactables (Links/Buttons):
 - [A] Back to Transformations Hub
-- [A] LinkedIn
-- [A] About Coaching Methodology
+- [A] About Methodology
+- [A] Skill Inhibition
 - [A] THPS Speech Assessment
+- [A] Runtime
 - [A] THPS Performance Plan
-- [A] Mic-Check App
-- [A] try via a free demo here
-- [A] Read All 24 Reviews
+- [A] Visual
+- [A] Verified Google Business Review
 - [A] Book a Speech Assessment
 - [A] Try the App Demo
 
 ### Image Alt Text:
 - Tom Hendrick
-- Mic-Check App Dashboard showing pacing progress from 180 to 150 WPM
+- Tom Hendrick coaching Narmada via Zoom with an audience simulation background
 
 ---
 

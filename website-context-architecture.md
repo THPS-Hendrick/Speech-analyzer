@@ -108,14 +108,14 @@
 
 ## File: /website/articles/case-studies.html
 
-**Title:** Case Study: Optimizing Executive Pace to 150 WPM | Tom Hendrick
+**Title:** Case Study: Narmada's HIH Conference Presentation | Tom Hendrick
 
 **Schema 1:**
 ```json
 {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
-      "name": "Tom Hendrick",
+      "name": "Tom Hendrick Public Speaking",
       "legalName": "Thomas Geoffrey Hendrick",
       "url": "https://tomhendrick.com",
       "telephone": "+61419499331",
@@ -143,14 +143,14 @@
       "@graph": [
         {
           "@type": "Article",
-          "@id": "https://tomhendrick.com/articles/case-study-pacing.html#article",
-          "headline": "How an Executive Optimized Speaking Pace Under Pressure to 150 WPM",
-          "description": "A data-driven case study detailing how an executive optimized speaking tempo from 180 WPM to 150 WPM using acoustic telemetry and the Vocal Mechanics Method.",
+          "@id": "https://tomhendrick.com/articles/case-studies.html#article",
+          "headline": "How a Food Safety Auditor Mastered the HIH Conference Under Pressure",
+          "description": "A data-driven case study detailing how an executive optimized her speaking tempo from 166 WPM to 123 WPM using speech biometrics and the Vocal Mechanics Method.",
           "author": {
             "@type": "Person",
             "@id": "https://tomhendrick.com/about.html#author",
             "name": "Tom Hendrick",
-            "jobTitle": "Speech Biomechanics Specialist & Public Speaking Coach",
+            "jobTitle": "Speech Biometrics Specialist & Public Speaking Coach",
             "url": "https://tomhendrick.com/about.html",
             "sameAs": [
               "https://www.linkedin.com/in/tomhendrick-publicspeaking"
@@ -166,7 +166,7 @@
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "https://tomhendrick.com/articles/case-study-pacing.html"
+            "@id": "https://tomhendrick.com/articles/case-studies.html"
           }
         },
         {
@@ -178,32 +178,22 @@
           "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD"
+            "priceCurrency": "AUD"
           }
-        },
-        {
-          "@type": "AggregateRating",
-          "@id": "https://tomhendrick.com/#rating",
-          "itemReviewed": {
-            "@type": "LocalBusiness",
-            "name": "Tom Hendrick Public Speaking"
-          },
-          "ratingValue": "5.0",
-          "reviewCount": "24",
-          "bestRating": "5"
         }
       ]
     }
 ```
 
 **Headings:**
-- H1: How an Executive Optimized Speaking Pace Under Pressure to 150 WPM
+- H1: How a Food Safety Auditor Mastered the HIH Conference Under Pressure
 - H2: Executive Summary / TL;DR
 - H3: Interactive Tool: Test Your Speech Mechanics
-- H2: The Baseline Challenge: Racing the Clock
-- H2: The Diagnostic: Establishing the Data
-- H2: The Intervention: The THPS Performance Plan
-- H2: The Final Result: Composure and Command
+- H3: Try Narmada's Simulated Exercise
+- H2: The Baseline Challenge: High Runtimes and Intangible Data
+- H2: The Intervention: Simulating Pressure
+- H2: The Final Result: Authority Through Pacing
+- H3: Narmada Oogathoo
 - H3: How the Mic-Check Scorer Engine Measures Your Spoken Voice
 - H3: Stop Guessing. Start Measuring.
 
