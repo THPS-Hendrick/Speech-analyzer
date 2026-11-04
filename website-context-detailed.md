@@ -421,6 +421,8 @@
 
 ### Body Text:
 - Stop guessing how you sound. Use the dashboard below to record a brief baseline, then view your full data-driven speaking metrics and vocal performance report.
+- Click to load the live speech analyzer. Speak into your microphone to measure your pacing, pauses, and vocabulary.
+- The browser app requires microphone permissions to analyze your delivery.
 - Our proprietary engine breaks your communication down into three measurable categories: Content, Delivery, and Simplicity. Here is how your data translates to a better performance.
 - The Personal metric measures storytelling by tracking how much of your content describes a specific person’s thoughts and actions. A lack of personal content risks being unengaging or vague. Our database of measured professional speakers suggests the best speakers range between 30 to 60% Personal content.
 - The Visual metric measures how much of your content relies on sensory words people can visualize, like colors, sizes, or objects. Low visual scores limit audience retention. Our database of measured professional speakers suggests the best speakers range between 20 to 50% Visual content.

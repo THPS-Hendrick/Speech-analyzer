@@ -762,6 +762,7 @@
 
 **Headings:**
 - H1: Measure your speech metrics and track progress with the Mic-Check App
+- H3: Start the Mic-Check App
 - H2: How the Mic-Check App Scores Your Speech
 - H2: Content (What You Say)
 - H3: What is the Personal metric in public speaking?
