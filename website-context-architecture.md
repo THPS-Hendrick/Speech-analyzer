@@ -817,7 +817,7 @@
       "@context": "https://schema.org",
       "@type": "EducationEvent",
       "name": "THPS Fun Fridays: Online Public Speaking Class",
-      "description": "A free, weekly interactive group practice session combining improv mechanics with live acoustic telemetry feedback using the Mic-Check App.",
+      "description": "A free, weekly interactive group practice session combining improv mechanics with speech metric measurement and progress-tracking using the Mic-Check App.",
       "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
       "eventSchedule": {
         "@type": "Schedule",
