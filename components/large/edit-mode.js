@@ -562,5 +562,3 @@ class ThpsEditMode extends HTMLElement {
     }
 }
 customElements.define('thps-edit-mode', ThpsEditMode);
-
-```
