@@ -8,7 +8,10 @@ class ThpsEditMode extends HTMLElement {
         this.virtualWords = [];
         this.syllableGroups = [];
         this.repeatGroups = []; 
-        this.clarityGroups = []; // NEW: Stores clarity confidence data
+        this.clarityGroups = []; 
+        this.familiarGroups = []; // NEW: Stores asynchronous familiarity data
+        this.familiarityAvg = null; // NEW: Stores overall zipf score
+        
         this.currentMode = "edit-speech"; // Default mode
         this.isEditing = false; // Toggle state for the editor
         this.lastDataPayload = null;
@@ -73,7 +76,8 @@ class ThpsEditMode extends HTMLElement {
                             <option value="long-short">Words / Sentence</option>
                             <option value="syllables">Syllables / Word</option>
                             <option value="repeat">Repeated Words</option>
-                            <option value="clarity">Clarity %</option> <!-- NEW -->
+                            <option value="clarity">Clarity %</option>
+                            <option value="familiarity">Familiar %</option> <!-- NEW -->
                         </select>
 
                         <!-- Filters Dropdown -->
@@ -171,9 +175,15 @@ class ThpsEditMode extends HTMLElement {
         
         if (window.lucide) window.lucide.createIcons({ root: this });
         window.addEventListener('thps-dashboard-update', (e) => this.processData(e.detail));
+        
+        // NEW: Listen for the asynchronous familiarity payload
+        window.addEventListener('thps-familiarity-update', (e) => this.processFamiliarity(e.detail));
 
         if (window.thps_lastPayload) {
             setTimeout(() => this.processData(window.thps_lastPayload), 50);
+            if (window.thps_lastPayload.familiarity) {
+                setTimeout(() => this.processFamiliarity(window.thps_lastPayload.familiarity), 60);
+            }
         }
     }
 
@@ -208,8 +218,17 @@ class ThpsEditMode extends HTMLElement {
             this.syllableGroups = [];
             this.repeatGroups = [];
             this.clarityGroups = [];
+            this.familiarGroups = []; // Clear familiarity on new empty text
+            this.familiarityAvg = null;
             this.renderDOM();
             return;
+        }
+
+        // Reset familiar groups while waiting for new async payload to arrive
+        this.familiarGroups = [];
+        this.familiarityAvg = null;
+        if (data.familiarity) {
+            this.processFamiliarity(data.familiarity);
         }
 
         // Parse Sentences using plain text so sort matches word count
@@ -276,7 +295,7 @@ class ThpsEditMode extends HTMLElement {
                 };
             });
 
-        // NEW: Process Clarity Mode
+        // Process Clarity Mode
         let clarityMap = {};
         if (data.wordTimestamps && data.wordTimestamps.length > 0) {
             data.wordTimestamps.forEach(w => {
@@ -318,6 +337,39 @@ class ThpsEditMode extends HTMLElement {
 
         this.updateStatsPanel(data);
         this.renderDOM();
+    }
+
+    // NEW: Processes the delayed Familiarity % payload
+    processFamiliarity(famData) {
+        if (!famData || !famData.wordScores) return;
+        
+        this.familiarityAvg = famData.averageFamiliarity;
+        let bucketMap = {};
+
+        // Group words by their rounded familiarity score (e.g. 8.2 becomes 8)
+        for (const [word, score] of Object.entries(famData.wordScores)) {
+            let roundedScore = Math.round(score);
+            // Zipf rarely exceeds 8, so we cap it there for visual consistency
+            if (roundedScore > 8) roundedScore = 8; 
+            
+            if (!bucketMap[roundedScore]) bucketMap[roundedScore] = [];
+            bucketMap[roundedScore].push(word);
+        }
+
+        this.familiarGroups = Object.keys(bucketMap)
+            .map(Number)
+            .sort((a, b) => b - a) // Highest familiarity drops to the top
+            .map(key => {
+                return {
+                    level: key,
+                    words: bucketMap[key].sort()
+                };
+            });
+
+        // Only re-render if the user is currently looking at this specific mode
+        if (this.currentMode === "familiarity") {
+            this.renderDOM();
+        }
     }
 
     updateStatsPanel(data) {
@@ -441,6 +493,41 @@ class ThpsEditMode extends HTMLElement {
                 });
             }
         }
+        else if (this.currentMode === "familiarity") {
+            if (this.familiarGroups.length === 0) {
+                htmlOutput += `
+                    <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center animate-pulse">Calculating Familiarity...</span>
+                    </div>
+                `;
+            } else {
+                htmlOutput += `
+                    <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider text-center">Avg Score: ${this.familiarityAvg} / 8.0</span>
+                    </div>
+                `;
+                this.familiarGroups.forEach(group => {
+                    // Highlight technical/rare words (score of 3 or lower)
+                    let gutterClass = group.level <= 3 ? "metric-highlight" : "text-slate-400";
+                    
+                    // Format labels for context (e.g., Level 8 is ultra-common, Level 2 is rare)
+                    let label = `Level ${group.level}`;
+                    if (group.level >= 7) label += " (Everyday)";
+                    if (group.level <= 3) label += " (Niche)";
+
+                    htmlOutput += `
+                        <div class="github-line">
+                            <div class="github-gutter ${gutterClass}" title="${group.words.length} words in this threshold">
+                                ${label}
+                            </div>
+                            <div class="github-content leading-relaxed">
+                                ${group.words.join(', ')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
         else {
             // Sentence Mode (Long-Short)
             let displayArray = [...this.virtualSentences];
@@ -475,3 +562,5 @@ class ThpsEditMode extends HTMLElement {
     }
 }
 customElements.define('thps-edit-mode', ThpsEditMode);
+
+```
