@@ -1058,6 +1058,30 @@
                 window.dispatchEvent(new CustomEvent('thps-dashboard-update', { detail: payload }));
 
             } catch(e) { console.error("Summary Dashboard Error:", e); }
+
+            // --- NEW: LAZY LOAD FAMILIARITY SCORES ---
+            if (text.trim() !== '') {
+                fetch('/api/analyze_words', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(res => res.json())
+                .then(famData => {
+                    // 1. Update the active payload cache
+                    if (window.thps_lastPayload) {
+                        window.thps_lastPayload.familiarity = famData;
+                    }
+                    // 2. Update the exact attempt in history
+                    let attempt = window.thps_sessionHistory.find(h => h.id === window.thps_currentAttemptId);
+                    if (attempt) attempt.familiarity = famData;
+            
+                    // 3. Broadcast the isolated data so the Edit Mode widget can catch it
+                    window.dispatchEvent(new CustomEvent('thps-familiarity-update', { detail: famData }));
+                })
+                .catch(err => console.error("Familiarity background fetch failed", err));
+            }
+            
         };
 
         window.formatMetric = function(key, val) {
