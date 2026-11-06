@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THPS Skill Acquisition & Cognitive Capacity Simulator</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #070a12;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* 16:9 Graph Ratio Container */
+    .graph-aspect-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      position: relative;
+    }
+    @media (max-width: 640px) {
+      .graph-aspect-box {
+        aspect-ratio: 16 / 10;
+      }
+    }
+
+    /* Glassmorphic Panels */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Tube Overload Pulse Animation */
+    @keyframes pulse-red {
+      0%, 100% { 
+        box-shadow: 0 0 18px rgba(239, 68, 68, 0.6), inset 0 0 16px rgba(239, 68, 68, 0.5); 
+        border-color: rgba(239, 68, 68, 0.9);
+      }
+      50% { 
+        box-shadow: 0 0 35px rgba(239, 68, 68, 1), inset 0 0 28px rgba(239, 68, 68, 0.8); 
+        border-color: #fca5a5;
+      }
+    }
+    .tube-overload {
+      animation: pulse-red 1s infinite ease-in-out;
+    }
+
+    /* Red Zone Total Meltdown Fill */
+    .red-zone-fill {
+      background: linear-gradient(180deg, #ef4444 0%, #b91c1c 60%, #7f1d1d 100%);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.8) inset;
+    }
+
+    /* SVG Draggable Node Styling */
+    .draggable-pill {
+      cursor: grab;
+      touch-action: none;
+      transition: filter 0.15s ease;
+    }
+    .draggable-pill:active, .draggable-pill.dragging {
+      cursor: grabbing;
+      filter: brightness(1.3) drop-shadow(0 0 14px currentColor);
+    }
+
+    /* Smooth Height & Color Transitions */
+    .tube-segment {
+      transition: height 0.1s linear, background-color 0.2s ease;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1120;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-3 sm:p-5 lg:p-7">
+
+  <!-- Full-Width Header Section -->
+  <header class="max-w-6xl w-full mx-auto mb-3 sm:mb-5 border-b border-slate-800/90 pb-3 sm:pb-4">
+    <div class="flex items-center space-x-2.5">
+      <span class="px-2.5 py-0.5 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/40 rounded-md">
+        THPS Mechanics
+      </span>
+      <h1 class="text-lg sm:text-2xl font-black text-white tracking-tight">
+        Cognitive Load vs. Skill Acquisition
+      </h1>
+    </div>
+    <p class="text-xs sm:text-sm text-slate-400 mt-1.5 leading-relaxed max-w-4xl">
+      Demonstrating the <strong class="text-slate-200">Juggler Model</strong>: Skills start in the <span class="text-amber-400 font-semibold">Cognitive (Knowledge)</span> phase with high load (&gt;80%). Drilling them into the <span class="text-emerald-400 font-semibold">Autonomous (Effortless)</span> phase drops their burden to ~4–8%, freeing up bandwidth to deploy 10+ skills simultaneously.
+    </p>
+  </header>
+
+  <!-- Main Interactive Coordinate Stage & Tube -->
+  <main class="max-w-6xl w-full mx-auto flex-1 flex flex-col items-center justify-center">
+
+    <!-- Graph + Capacity Tube Wrapper -->
+    <div class="w-full glass-card rounded-2xl p-3 sm:p-5 shadow-2xl relative">
+      
+      <div class="flex items-stretch gap-3 sm:gap-6">
+        
+        <!-- LEFT: Cognitive Capacity Tube -->
+        <div class="w-20 sm:w-28 shrink-0 flex flex-col items-center">
+          <div class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider text-center leading-tight mb-2">
+            Cognitive<br>Capacity
+          </div>
+
+          <!-- Glass Tube Housing -->
+          <div class="relative w-full flex-1 bg-slate-950/90 rounded-2xl border-2 border-slate-700/80 p-0 overflow-hidden transition-all duration-300" id="tube-container">
+            
+            <!-- 100% MAX Threshold Line -->
+            <div class="absolute w-full left-0 border-b-2 border-dashed border-red-500 z-20 pointer-events-none" style="bottom: 90.9%;">
+              <span class="absolute right-1 -top-3.5 text-[8.5px] sm:text-[9.5px] font-extrabold text-red-400 mono tracking-wider bg-slate-900/90 px-1 rounded">100% MAX</span>
+            </div>
+
+            <!-- 50% Threshold Line -->
+            <div class="absolute w-full left-0 border-b border-dashed border-sky-400/70 z-20 pointer-events-none" style="bottom: 45.45%;">
+              <span class="absolute right-1 -top-3 text-[8px] sm:text-[9px] font-bold text-sky-400/90 mono bg-slate-900/80 px-1 rounded">50%</span>
+            </div>
+
+            <!-- Stacked Tube Fill Area -->
+            <div class="absolute bottom-0 left-0 right-0 w-full flex flex-col-reverse justify-start items-center transition-all duration-75 z-10 overflow-hidden" id="tube-segments-wrapper" style="height: 100%;"></div>
+
+            <!-- Red Zone 110% Overload Failsafe Overlay -->
+            <div id="red-zone-failsafe-overlay" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center text-center p-2 red-zone-fill transition-all duration-200">
+              <i data-lucide="alert-octagon" class="w-7 h-7 sm:w-9 sm:h-9 text-white mb-1.5 animate-bounce"></i>
+              <span class="font-black text-white text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">RED ZONED</span>
+              <span class="text-[9px] sm:text-[10px] text-red-100 font-extrabold tracking-wide mt-0.5">&gt; 110% CAPACITY</span>
+            </div>
+
+            <!-- Empty Tube Placeholder Notice -->
+            <div id="empty-tube-hint" class="absolute inset-0 flex items-center justify-center text-center p-2 text-[10px] text-slate-500 font-medium">
+              Tube Empty.<br>Combine a skill.
+            </div>
+          </div>
+
+          <!-- Total Tube Readout Meter -->
+          <div class="mt-2 text-center">
+            <span class="text-[9px] sm:text-[10px] text-slate-400 font-medium block uppercase tracking-wide">Total Load</span>
+            <span id="load-readout" class="mono text-xs sm:text-sm font-extrabold text-emerald-400">0% / 100%</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Interactive 16:9 X-Y Coordinate Plane -->
+        <div class="flex-1 flex flex-col min-w-0">
+          
+          <!-- Stage Phase Legend Headers -->
+          <div class="grid grid-cols-3 text-center mb-1.5 text-[10px] sm:text-xs font-semibold gap-1">
+            <div class="text-amber-400 bg-amber-500/10 border border-amber-500/30 py-1 px-1 rounded">
+              Phase 1: Cognitive <span class="hidden md:inline font-normal text-slate-300">(Knowledge)</span>
+            </div>
+            <div class="text-sky-400 bg-sky-500/10 border border-sky-500/30 py-1 px-1 rounded">
+              Phase 2: Associative <span class="hidden md:inline font-normal text-slate-300">(Self-correct)</span>
+            </div>
+            <div class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 py-1 px-1 rounded">
+              Phase 3: Autonomous <span class="hidden md:inline font-normal text-slate-300">(Effortless)</span>
+            </div>
+          </div>
+
+          <!-- 16:9 Aspect Ratio SVG Coordinate Plane -->
+          <div class="graph-aspect-box bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden shadow-inner">
+            
+            <svg id="graph-svg" class="w-full h-full" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
+              <defs>
+                <!-- Curve Glow Filter -->
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+
+                <!-- Background Subtle Grid -->
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.035)" stroke-width="1"/>
+                </pattern>
+
+                <!-- Zone Gradient Fills -->
+                <linearGradient id="grad-cognitive" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.12"/>
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02"/>
+                </linearGradient>
+                <linearGradient id="grad-autonomous" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.02"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.14"/>
+                </linearGradient>
+
+                <!-- Curve Gradient (Red -> Amber -> Cyan -> Emerald) -->
+                <linearGradient id="curve-gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#ef4444" />
+                  <stop offset="30%" stop-color="#f59e0b" />
+                  <stop offset="65%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#10b981" />
+                </linearGradient>
+              </defs>
+
+              <!-- Subtle Background Grid -->
+              <rect width="1000" height="562.5" fill="url(#grid)" />
+
+              <!-- Phase Shading Areas -->
+              <rect x="110" y="25" width="280" height="475" fill="url(#grad-cognitive)" />
+              <rect x="670" y="25" width="290" height="475" fill="url(#grad-autonomous)" />
+
+              <!-- Phase Vertical Dividing Markers -->
+              <line x1="390" y1="25" x2="390" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
+              <line x1="670" y1="25" x2="670" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
+
+              <!-- Y-AXIS -->
+              <line x1="110" y1="25" x2="110" y2="500" stroke="#64748b" stroke-width="2.5"/>
+              <polygon points="110,14 105,27 115,27" fill="#64748b" />
+              
+              <!-- Y-Axis Title & Tick Markers -->
+              <g id="y-axis-labels">
+                <text x="-260" y="45" fill="#cbd5e1" font-size="14" font-weight="800" letter-spacing="1.5" transform="rotate(-90)" text-anchor="middle">
+                  COGNITIVE LOAD
+                </text>
+                
+                <line x1="102" y1="45" x2="110" y2="45" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="50" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">100%</text>
+
+                <line x1="102" y1="272" x2="110" y2="272" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="276" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">50%</text>
+
+                <line x1="102" y1="500" x2="110" y2="500" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="504" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">0%</text>
+              </g>
+
+              <!-- X-AXIS -->
+              <line x1="110" y1="500" x2="960" y2="500" stroke="#64748b" stroke-width="2.5"/>
+              <polygon points="972,500 958,494 958,506" fill="#64748b" />
+              <text x="540" y="535" fill="#cbd5e1" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="1">
+                STAGES OF SKILL ACQUISITION &rarr;
+              </text>
+
+              <!-- Master Mathematical Decay Curve Path -->
+              <path id="curve-path" d="" fill="none" stroke="url(#curve-gradient)" stroke-width="5" filter="url(#glow)"/>
+
+              <!-- Asymptote extension heading up towards infinity along Y-axis -->
+              <path id="asymptote-top-path" d="M 112 55 C 111.5 35, 111 20, 111 10" fill="none" stroke="#ef4444" stroke-width="4.5" stroke-dasharray="4 4" stroke-opacity="0.8" />
+              <polygon points="111,3 105,15 117,15" fill="#ef4444" opacity="0.9" />
+              <text x="122" y="24" fill="#f87171" font-size="10" font-weight="800" font-family="'JetBrains Mono', monospace">&infin; (Load &rarr; &infin; as X &rarr; 0)</text>
+
+              <!-- Active Draggable Pill Nodes Layer on SVG -->
+              <g id="curve-nodes-layer"></g>
+            </svg>
+
+            <!-- Floating Drag Info Tooltip -->
+            <div id="node-drag-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity bg-slate-900/95 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs mono shadow-2xl -translate-x-1/2 -translate-y-10 z-40">
+              Personal: 42% Load
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Live Caliber Banner -->
+    <div id="caliber-banner" class="w-full mt-3 transition-all duration-300">
+      <div id="caliber-banner-inner" class="bg-blue-950/40 border border-blue-500/30 text-blue-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md">
+        <div class="flex items-center space-x-3">
+          <div id="caliber-banner-icon" class="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 shrink-0">
+            <i data-lucide="award" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span id="caliber-banner-title" class="font-bold text-white uppercase tracking-wide block sm:inline">
+              Speaker Caliber:
+            </span>
+            <span id="caliber-banner-text" class="text-blue-100 ml-0 sm:ml-1 font-medium">
+              Select speaking skills from the bank below and click Combine to deploy.
+            </span>
+          </div>
+        </div>
+        
+        <span id="caliber-banner-badge" class="shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30 mono">
+          READY
+        </span>
+      </div>
+    </div>
+
+    <!-- COGNITIVE PRESETS BAR -->
+    <div class="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mt-4 mb-2 px-1">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-slate-400"></i>
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Cognitive Presets:</span>
+      </div>
+
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+        <button onclick="applyPreset('novice')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+          <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="font-semibold">Novice (Overload at 2 Skills)</span>
+        </button>
+
+        <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
+          <span class="font-semibold">Intermediate (4 Skills in Associative)</span>
+        </button>
+
+        <button onclick="applyPreset('master')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
+          <i data-lucide="crown" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span class="font-bold">Master (10+ Autonomous Skills)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Speaking Skills Bank & Controls -->
+    <div class="w-full glass-card rounded-2xl p-4 sm:p-5 shadow-xl border border-slate-800">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
+            <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
+            <span>Speaking Skills Bank</span>
+            <span id="selected-counter" class="text-xs font-normal text-slate-400 ml-2">(1 selected)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Knowledge). You must move deployed skills rightward to free up capacity before adding more!
+          </p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="toggleAllSkills(false)" class="px-2.5 py-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition font-medium">
+            Clear
+          </button>
+          
+          <button id="btn-combine" onclick="combinePills()" class="px-5 py-2 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center space-x-2">
+            <i data-lucide="merge" class="w-4 h-4"></i>
+            <span>Combine</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 12 Skill Pills Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="skills-bank"></div>
+
+    </div>
+
+  </main>
+
+  <!-- Simulation Logic & Event Handling -->
+  <script>
+    // 12 Speaking Skills with distinct high-contrast colors
+    const SKILLS_DATA = [
+      { id: 'theory', name: '1. Theory', color: '#ef4444', textLight: true },
+      { id: 'personal', name: '2. Personal', color: '#f97316', textLight: true },
+      { id: 'visual', name: '3. Visual', color: '#f59e0b', textLight: false },
+      { id: 'pause_var', name: '4. Pause Var', color: '#10b981', textLight: true },
+      { id: 'vol_var', name: '5. Vol Var', color: '#06b6d4', textLight: true },
+      { id: 'pace_var', name: '6. Pace Var', color: '#3b82f6', textLight: true },
+      { id: 'aware', name: '7. Aware', color: '#6366f1', textLight: true },
+      { id: 'runtime', name: '8. Runtime', color: '#8b5cf6', textLight: true },
+      { id: 'question', name: '9. Question', color: '#d946ef', textLight: true },
+      { id: 'repeat', name: '10. Repeat', color: '#ec4899', textLight: true },
+      { id: 'count', name: '11. Count', color: '#14b8a6', textLight: true },
+      { id: 'w_assoc', name: '12. W.Assoc', color: '#84cc16', textLight: false }
+    ];
+
+    // Global State
+    const state = {
+      selectedSkillIds: new Set(['theory']),
+      activeMountedSkills: new Map(),
+      isDraggingId: null,
+      spawnNormX: 0.05
+    };
+
+    // SVG Coordinate Setup (1000 x 562.5 viewBox)
+    const SVG_CONFIG = {
+      viewWidth: 1000,
+      viewHeight: 562.5,
+      xMin: 112,   // Near x=0 (hugs vertical axis)
+      xMax: 940,   // Late Effortless phase (Phase 3: Autonomous)
+      yMin: 35,    // High ceiling where curve shoots to infinity
+      yMax: 500    // Base line (0% load)
+    };
+
+    // Upgraded Power-law Decay Formula:
+    // y -> infinity as x -> 0, y -> 0 as x -> infinity
+    // Maintains wider rightward trajectory through associative and autonomous phases
+    function calculateCurve(normX) {
+      const clampedX = Math.max(0.0001, Math.min(1.0, normX));
+
+      // alpha < 1 flattens the premature plunge and stretches curve rightward
+      const alpha = 0.78;
+      const k = 0.022;
+      
+      const rawLoad = 100 * Math.pow(k / clampedX, alpha);
+      const loadPct = Math.round(Math.max(0.1, rawLoad) * 10) / 10;
+
+      // Map load directly to coordinate on SVG
+      const clampedDisplayLoad = Math.max(0, Math.min(105, loadPct));
+      const normHeightRatio = clampedDisplayLoad / 100;
+      const svgY = Math.max(SVG_CONFIG.yMin, SVG_CONFIG.yMax - normHeightRatio * (SVG_CONFIG.yMax - SVG_CONFIG.yMin));
+      const svgX = SVG_CONFIG.xMin + clampedX * (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
+
+      return { svgX, svgY, loadPct };
+    }
+
+    // Convert SVG X to Normalized [0, 1]
+    function svgXToNorm(svgX) {
+      const clamped = Math.max(SVG_CONFIG.xMin, Math.min(SVG_CONFIG.xMax, svgX));
+      return (clamped - SVG_CONFIG.xMin) / (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
+    }
+
+    // Render Master Curve in SVG
+    function drawCurvePath() {
+      const points = [];
+      const steps = 250;
+      for (let i = 0; i <= steps; i++) {
+        const t = Math.pow(i / steps, 1.3);
+        const pt = calculateCurve(t);
+        points.push(`${pt.svgX.toFixed(1)},${pt.svgY.toFixed(1)}`);
+      }
+      document.getElementById('curve-path').setAttribute('d', `M ${points.join(' L ')}`);
+    }
+
+    // Calculate Current Total Cognitive Load (%)
+    function getTotalCognitiveLoad() {
+      let sum = 0;
+      state.activeMountedSkills.forEach(skill => {
+        sum += skill.loadPct;
+      });
+      return sum;
+    }
+
+    // Render Skills Bank
+    function renderSkillsBank() {
+      const container = document.getElementById('skills-bank');
+      container.innerHTML = '';
+
+      SKILLS_DATA.forEach(skill => {
+        const isSelected = state.selectedSkillIds.has(skill.id);
+        const isMounted = state.activeMountedSkills.has(skill.id);
+
+        const pillBtn = document.createElement('button');
+        pillBtn.type = 'button';
+        pillBtn.className = `p-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all duration-200 ${
+          isSelected 
+            ? 'ring-2 ring-offset-2 ring-offset-slate-900 border-transparent shadow-md' 
+            : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:border-slate-600'
+        }`;
+        
+        if (isSelected) {
+          pillBtn.style.backgroundColor = `${skill.color}25`;
+          pillBtn.style.borderColor = skill.color;
+          pillBtn.style.color = skill.color;
+          pillBtn.style.setProperty('--tw-ring-color', skill.color);
+        }
+
+        pillBtn.onclick = () => toggleSkillSelect(skill.id);
+
+        pillBtn.innerHTML = `
+          <div class="flex items-center space-x-2 truncate">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${skill.color}"></span>
+            <span class="truncate">${skill.name}</span>
+          </div>
+          <span class="text-[10px] ml-1 shrink-0 ${isMounted ? 'text-emerald-400 font-mono font-bold' : 'text-slate-600'}">
+            ${isMounted ? '● LIVE' : '○'}
+          </span>
+        `;
+
+        container.appendChild(pillBtn);
+      });
+
+      document.getElementById('selected-counter').textContent = `(${state.selectedSkillIds.size} selected)`;
+    }
+
+    // Toggle Skill in Selection Bank
+    function toggleSkillSelect(id) {
+      if (state.selectedSkillIds.has(id)) {
+        state.selectedSkillIds.delete(id);
+      } else {
+        state.selectedSkillIds.add(id);
+      }
+      renderSkillsBank();
+    }
+
+    // Toggle All Skills in Bank
+    function toggleAllSkills(selectAll) {
+      if (selectAll) {
+        SKILLS_DATA.forEach(s => state.selectedSkillIds.add(s.id));
+      } else {
+        state.selectedSkillIds.clear();
+      }
+      renderSkillsBank();
+    }
+
+    // COMBINE PILLS: Free, Unrestricted Placement Anywhere on Curve
+    function combinePills() {
+      // Despawn unselected skills
+      for (const [id] of state.activeMountedSkills.entries()) {
+        if (!state.selectedSkillIds.has(id)) {
+          state.activeMountedSkills.delete(id);
+        }
+      }
+
+      // Spawn newly selected skills along curve
+      let stagger = 0;
+      state.selectedSkillIds.forEach(id => {
+        if (!state.activeMountedSkills.has(id)) {
+          const meta = SKILLS_DATA.find(s => s.id === id);
+          const normX = Math.min(0.92, state.spawnNormX + (stagger * 0.06));
+          const curveData = calculateCurve(normX);
+          state.activeMountedSkills.set(id, {
+            data: meta,
+            normX: normX,
+            loadPct: curveData.loadPct
+          });
+          stagger++;
+        }
+      });
+
+      updateAllVisuals();
+      renderSkillsBank();
+
+      const btn = document.getElementById('btn-combine');
+      btn.classList.add('scale-95');
+      setTimeout(() => btn.classList.remove('scale-95'), 120);
+    }
+
+    // Master Render: Visuals, Tube, and Explainer Banner
+    function updateAllVisuals() {
+      updateGraphNodes();
+      updateCapacityTube();
+      updateCaliberBanner();
+    }
+
+    // Render Draggable SVG Nodes on Graph Curve
+    function updateGraphNodes() {
+      const layer = document.getElementById('curve-nodes-layer');
+      layer.innerHTML = '';
+
+      state.activeMountedSkills.forEach((skillState, id) => {
+        const { svgX, svgY } = calculateCurve(skillState.normX);
+        const meta = skillState.data;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'draggable-pill');
+        g.setAttribute('data-skill-id', id);
+        g.setAttribute('transform', `translate(${svgX}, ${svgY})`);
+
+        g.innerHTML = `
+          <line x1="0" y1="0" x2="0" y2="${SVG_CONFIG.yMax - svgY}" stroke="${meta.color}" stroke-opacity="0.4" stroke-dasharray="3 3" stroke-width="1.8" />
+          <circle cx="0" cy="0" r="17" fill="${meta.color}" fill-opacity="0.25" />
+          <rect x="-44" y="-15" width="88" height="30" rx="15" fill="#090d16" stroke="${meta.color}" stroke-width="2.5" />
+          <circle cx="-27" cy="0" r="5" fill="${meta.color}" />
+          <text x="-16" y="4.5" fill="#ffffff" font-size="11" font-weight="700" font-family="'Inter', sans-serif">
+            ${meta.name.replace(/^[0-9]+\.\s*/, '')}
+          </text>
+        `;
+
+        g.addEventListener('mousedown', (e) => startDrag(e, id));
+        g.addEventListener('touchstart', (e) => startDrag(e, id), { passive: false });
+
+        layer.appendChild(g);
+      });
+    }
+
+    // UPDATE CAPACITY TUBE
+    function updateCapacityTube() {
+      const container = document.getElementById('tube-segments-wrapper');
+      const emptyHint = document.getElementById('empty-tube-hint');
+      const tubeHousing = document.getElementById('tube-container');
+      const loadReadout = document.getElementById('load-readout');
+      const redZoneOverlay = document.getElementById('red-zone-failsafe-overlay');
+
+      container.innerHTML = '';
+
+      if (state.activeMountedSkills.size === 0) {
+        emptyHint.classList.remove('hidden');
+        redZoneOverlay.classList.add('hidden');
+        tubeHousing.classList.remove('tube-overload');
+        loadReadout.textContent = '0% / 100%';
+        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-slate-400';
+        return;
+      }
+
+      emptyHint.classList.add('hidden');
+
+      const totalLoadPct = getTotalCognitiveLoad();
+      const roundedTotal = Math.round(totalLoadPct);
+      loadReadout.textContent = `${roundedTotal}% / 100%`;
+
+      // FAILSAFE: Total Load >= 110%
+      if (roundedTotal >= 110) {
+        redZoneOverlay.classList.remove('hidden');
+        tubeHousing.classList.add('tube-overload');
+        loadReadout.className = 'mono text-xs sm:text-sm font-black text-red-400 animate-pulse';
+        return;
+      }
+
+      redZoneOverlay.classList.add('hidden');
+
+      state.activeMountedSkills.forEach((skillState) => {
+        const meta = skillState.data;
+        const load = skillState.loadPct;
+        const visualHeightPct = (load / 110) * 100;
+
+        const segment = document.createElement('div');
+        segment.className = 'w-full tube-segment flex items-center justify-between px-1.5 font-bold shadow-sm shrink-0 overflow-hidden rounded-sm';
+        segment.style.backgroundColor = meta.color;
+        segment.style.height = `${Math.max(1.8, visualHeightPct)}%`;
+        segment.style.color = meta.textLight ? '#ffffff' : '#070a12';
+
+        segment.innerHTML = `
+          <span class="truncate text-[8.5px] leading-tight">${meta.name.replace(/^[0-9]+\.\s*/, '')}</span>
+          <span class="mono text-[8px] opacity-90 ml-1 shrink-0">${Math.round(load)}%</span>
+        `;
+
+        container.appendChild(segment);
+      });
+
+      if (roundedTotal > 100) {
+        tubeHousing.classList.add('tube-overload');
+        loadReadout.className = 'mono text-xs sm:text-sm font-black text-amber-400 animate-pulse';
+      } else if (roundedTotal > 75) {
+        tubeHousing.classList.remove('tube-overload');
+        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-amber-400';
+      } else {
+        tubeHousing.classList.remove('tube-overload');
+        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-emerald-400';
+      }
+    }
+
+    // UPDATE DYNAMIC SPEAKER CALIBER BANNER
+    function updateCaliberBanner() {
+      const bannerInner = document.getElementById('caliber-banner-inner');
+      const bannerIcon = document.getElementById('caliber-banner-icon');
+      const bannerTitle = document.getElementById('caliber-banner-title');
+      const bannerText = document.getElementById('caliber-banner-text');
+      const bannerBadge = document.getElementById('caliber-banner-badge');
+
+      const count = state.activeMountedSkills.size;
+      const totalLoad = getTotalCognitiveLoad();
+
+      if (totalLoad >= 110) {
+        bannerInner.className = 'bg-red-950/80 border-2 border-red-500 text-red-100 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-xl backdrop-blur-md animate-pulse';
+        bannerIcon.className = 'p-1.5 rounded-lg bg-red-500/30 text-red-300 shrink-0';
+        bannerIcon.innerHTML = `<i data-lucide="flame" class="w-5 h-5 text-red-400"></i>`;
+        bannerTitle.textContent = 'Cognitive Overload:';
+        bannerTitle.className = 'font-black text-white uppercase tracking-wide block sm:inline';
+        bannerText.textContent = 'You need to practice to use this many speaking skills under pressure.';
+        bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-black rounded-md bg-red-600 text-white mono shadow-lg border border-red-400';
+        bannerBadge.textContent = 'RED ZONE';
+      } else {
+        bannerInner.className = 'bg-slate-900/90 border border-slate-700/80 text-slate-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md';
+        bannerIcon.className = 'p-1.5 rounded-lg bg-blue-500/20 text-blue-400 shrink-0';
+        bannerIcon.innerHTML = `<i data-lucide="award" class="w-5 h-5"></i>`;
+        bannerTitle.textContent = 'Speaker Caliber:';
+        bannerTitle.className = 'font-bold text-white uppercase tracking-wide block sm:inline';
+
+        if (count === 0) {
+          bannerText.textContent = 'Select speaking skills from the bank below and click Combine to deploy.';
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-bold rounded-md bg-slate-800 text-slate-400 border border-slate-700 mono';
+          bannerBadge.textContent = '0 SKILLS';
+        } else if (count <= 2) {
+          bannerText.textContent = `${count} skill${count > 1 ? 's' : ''} means in a room of 100 people you're the 98th best speaker (Top 98%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-stone-500/20 text-stone-300 border border-stone-500/40 mono';
+          bannerBadge.textContent = 'TOP 98%';
+        } else if (count <= 4) {
+          bannerText.textContent = `${count} skills means in a room of 100 people you're the 80th best speaker (Top 80%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 mono';
+          bannerBadge.textContent = 'TOP 80%';
+        } else if (count <= 6) {
+          bannerText.textContent = `${count} skills means in a room of 100 people you're the 30th best speaker (Top 30%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40 mono';
+          bannerBadge.textContent = 'TOP 30%';
+        } else if (count <= 8) {
+          bannerText.textContent = `${count} skills means in a room of 100 people you're the 7th best speaker (Top 7%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 mono';
+          bannerBadge.textContent = 'TOP 7%';
+        } else if (count <= 10) {
+          bannerText.textContent = `${count} skills means in a room of 1,000 people you're the 5th best speaker (Top 0.5%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mono';
+          bannerBadge.textContent = 'TOP 0.5%';
+        } else {
+          bannerText.textContent = `${count} skills means in a room of 1,000 people you're the #1 best speaker (Top 0.02%).`;
+          bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-black rounded-md bg-emerald-500 text-slate-950 border border-emerald-400 mono shadow-lg';
+          bannerBadge.textContent = 'TOP 0.02%';
+        }
+      }
+
+      lucide.createIcons();
+    }
+
+    // FREE DRAG AND DROP
+    const svgEl = document.getElementById('graph-svg');
+    const tooltip = document.getElementById('node-drag-tooltip');
+
+    function getSvgCoordinates(e) {
+      const rect = svgEl.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      
+      const x = ((clientX - rect.left) / rect.width) * SVG_CONFIG.viewWidth;
+      const y = ((clientY - rect.top) / rect.height) * SVG_CONFIG.viewHeight;
+      return { x, y, clientX, clientY };
+    }
+
+    function startDrag(e, skillId) {
+      e.preventDefault();
+      state.isDraggingId = skillId;
+
+      const skillNode = state.activeMountedSkills.get(skillId);
+      if (!skillNode) return;
+
+      const coords = getSvgCoordinates(e);
+      showTooltip(coords.clientX, coords.clientY, skillNode);
+
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('touchmove', handleDragMove, { passive: false });
+      window.addEventListener('mouseup', stopDrag);
+      window.addEventListener('touchend', stopDrag);
+    }
+
+    function handleDragMove(e) {
+      if (!state.isDraggingId) return;
+      e.preventDefault();
+
+      const skillNode = state.activeMountedSkills.get(state.isDraggingId);
+      if (!skillNode) return;
+
+      const coords = getSvgCoordinates(e);
+      const targetNormX = svgXToNorm(coords.x);
+
+      const curveData = calculateCurve(targetNormX);
+      skillNode.normX = targetNormX;
+      skillNode.loadPct = curveData.loadPct;
+
+      updateAllVisuals();
+      showTooltip(coords.clientX, coords.clientY, skillNode);
+    }
+
+    function stopDrag() {
+      state.isDraggingId = null;
+      hideTooltip();
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('touchend', stopDrag);
+    }
+
+    function showTooltip(clientX, clientY, skillNode) {
+      const stageName = skillNode.normX < 0.33 
+        ? 'Cognitive' 
+        : (skillNode.normX < 0.67 ? 'Associative' : 'Autonomous');
+
+      tooltip.innerHTML = `<strong>${skillNode.data.name}</strong> • ${stageName} • <span class="text-amber-300 font-bold">${Math.round(skillNode.loadPct)}% Load</span>`;
+      tooltip.style.left = `${clientX}px`;
+      tooltip.style.top = `${clientY}px`;
+      tooltip.style.opacity = '1';
+    }
+
+    function hideTooltip() {
+      tooltip.style.opacity = '0';
+    }
+
+    // PRESETS FOR DEMONSTRATION
+    function applyPreset(presetType) {
+      state.selectedSkillIds.clear();
+      state.activeMountedSkills.clear();
+
+      if (presetType === 'novice') {
+        // 2 skills placed early (normX ~ 0.015 & 0.045 => ~74% + ~33% = >107-110% Overload)
+        const skills = ['theory', 'personal'];
+        skills.forEach((id, idx) => {
+          state.selectedSkillIds.add(id);
+          const normX = 0.015 + (idx * 0.03);
+          const meta = SKILLS_DATA.find(s => s.id === id);
+          const curveData = calculateCurve(normX);
+          state.activeMountedSkills.set(id, {
+            data: meta,
+            normX,
+            loadPct: curveData.loadPct
+          });
+        });
+      } else if (presetType === 'intermediate') {
+        // 4 skills in Associative Phase (Self-Correct, loads ~20% each => ~80% total under 100%)
+        const skills = ['theory', 'personal', 'visual', 'pause_var'];
+        skills.forEach((id, idx) => {
+          state.selectedSkillIds.add(id);
+          const normX = 0.38 + (idx * 0.07);
+          const meta = SKILLS_DATA.find(s => s.id === id);
+          const curveData = calculateCurve(normX);
+          state.activeMountedSkills.set(id, {
+            data: meta,
+            normX,
+            loadPct: curveData.loadPct
+          });
+        });
+      } else if (presetType === 'master') {
+        // All 12 skills drilled into Autonomous Phase (loads ~4-8% each)
+        SKILLS_DATA.forEach((meta, idx) => {
+          state.selectedSkillIds.add(meta.id);
+          const normX = 0.70 + (idx * 0.024);
+          const curveData = calculateCurve(normX);
+          state.activeMountedSkills.set(meta.id, {
+            data: meta,
+            normX,
+            loadPct: curveData.loadPct
+          });
+        });
+      }
+
+      renderSkillsBank();
+      updateAllVisuals();
+    }
+
+    // App Initialization
+    window.onload = function() {
+      lucide.createIcons();
+      drawCurvePath();
+      renderSkillsBank();
+      combinePills();
+    };
+  </script>
+</body>
+</html>
