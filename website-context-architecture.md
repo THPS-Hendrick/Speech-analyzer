@@ -193,6 +193,7 @@
 - H2: The Baseline Challenge: High Runtimes and Intangible Data
 - H2: The Intervention: Simulating Pressure
 - H2: The Final Result: Authority Through Pacing
+- H3: Visualizing the Cognitive Transformation
 - H3: Narmada Oogathoo
 - H3: How the Mic-Check Scorer Engine Measures Your Spoken Voice
 - H3: Stop Guessing. Start Measuring.

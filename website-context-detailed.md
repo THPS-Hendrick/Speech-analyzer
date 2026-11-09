@@ -45,6 +45,12 @@
 - We completely restructured her presentation content. Instead of quoting regulatory guidelines, we drafted a deeply Visual and Personal narrative. We anchored her speech to a vivid, high-stakes scenario: "Imagine it is 12:05 pm in an aged-care home... One resident requires a texture-modified meal. Another has a documented milk allergy."
 - By Session 4, the transformation in her Mic-Check dashboard was profound. By leaning into personal storytelling, her content metrics shifted to 59% Personal and 18% Visual. Because she felt emotionally connected to the material, her pace naturally dropped to an authoritative 123 WPM, and her Runtime normalized to 5.5 seconds.
 - She walked into the HIH Conference not just surviving the presentation, but commanding the room with a final grading of 96.0 / 100.
+- While the Mic-Check App measured Narmada's pacing and pauses, the underlying driver of her success was a massive reduction in cognitive load. Here is how her working memory shifted from Red-Zone overload to effortless execution.
+- Client Video Validation
+- Narmada discusses her experience shifting from cognitive overload to autonomous delivery.
+- The Bottleneck: Attempting to manually memorize regulatory scripts pushed Narmada's working memory past 110% capacity, triggering the SAM Axis and shutting down her pacing control.
+- The Breakthrough: By relying on familiar visual stories and Repeat/Count structures, her speech execution dropped to an 8% cognitive load, freeing her brain to command the room dynamically.
+- Visualized progression based on client self-reporting mapped to the Fitts & Posner motor-learning model. Not a physical biometric measurement.
 - Unlike basic word-counting scripts, our proprietary THPS.analyzeSpeech engine evaluates spoken audio across multiple biomechanical dimensions in real time:
 - We calculate syllable counts per word token and map gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds 700ms to 750ms.
 - Continuous speech runs between structural pauses are classified into absolute cadence tiers:
@@ -70,6 +76,8 @@
 ### Image Alt Text:
 - Tom Hendrick
 - Tom Hendrick coaching Narmada via Zoom with an audience simulation background
+- Cognitive Load Simulator showing 110% Red Zone capacity during Session 1
+- Cognitive Load Simulator showing 8% effortless capacity during Session 4
 
 ---
 
