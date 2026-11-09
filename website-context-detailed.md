@@ -49,7 +49,7 @@
 - Client Video Validation
 - Narmada discusses her experience shifting from cognitive overload to autonomous delivery.
 - The Bottleneck: Attempting to manually memorize regulatory scripts pushed Narmada's working memory past 110% capacity, triggering the SAM Axis and shutting down her pacing control.
-- The Breakthrough: By relying on familiar visual stories and Repeat/Count structures, her speech execution dropped to an 8% cognitive load, freeing her brain to command the room dynamically.
+- The Breakthrough: By becoming trained and familiar with the Repeat, Count, Visual and other skills, her cognitive load significantly reduced, allowing her freedom to use her voice in an engaging way despite the pressure of being on stage at the HIH conference.
 - Visualized progression based on client self-reporting mapped to the Fitts & Posner motor-learning model. Not a physical biometric measurement.
 - Unlike basic word-counting scripts, our proprietary THPS.analyzeSpeech engine evaluates spoken audio across multiple biomechanical dimensions in real time:
 - We calculate syllable counts per word token and map gaps against expected syllable unit lengths. A pause is classified as a structural breath or cadence break only when silence exceeds 700ms to 750ms.
