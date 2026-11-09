@@ -1002,8 +1002,10 @@
 ```
 
 **Headings:**
-- H1: The THPS Performance Plan: Premium Online Speech Coaching
+- H1: The THPS Performance Plan
+- H2: Premium Online Speech Coaching
 - H2: Overcome Skill Inhibition with Data-Driven Executive Training
+- H3: See the Math Behind the Theory
 - H2: A 4-Week Online Path to Effortless Delivery Under Pressure
 - H3: Breaking Inhibition & Building Constraints
 - H3: Self-Regulation & Co-Regulation

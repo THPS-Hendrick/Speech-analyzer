@@ -520,6 +520,7 @@
 - Skill Acquisition: After 4 sessions, pacing optimizes to 112 WPM. The historical progress chart stabilizes at 100/100 across multiple high-pressure attempts.
 - You do not have a skill acquisition problem; you have a Skill Inhibition problem. When facing a high-stakes pitch, your amygdala detects a threat, causing you to rush your words or lose your structure.
 - Through deliberate, constraint-based practice like the Repeat & Count framework, we train your brain to execute familiar routines under pressure, bypassing the panic response entirely.
+- What exactly happens to your working memory when you step onto a stage? Map the Fitts & Posner Reverse S-Curve and test your own cognitive capacity limits in real-time.
 - Delivered globally via Zoom, the THPS Performance Plan transitions you from high mental effort to real-time self-correction. We utilize advanced storytelling constraints to drastically increase your cognitive load in practice, meaning the attention required to structure your thoughts during a real presentation drops to near zero. Your delivery becomes composed, and your WPM stabilizes flawlessly.
 - In this initial stage, mental effort is high as we override your biological panic response. We introduce rigid constraint frameworks like Repeat & Count, forcing your brain to declare structure upfront before you are allowed to speak, preventing rambling and rapid pacing.
 - We transition into real-time self-correction. You will learn to use familiar structural prompts (like Problem, Options, Solution) to send calming signals back to your own nervous system (Self-Regulation) while projecting absolute certainty to your audience (Co-Regulation).
@@ -531,11 +532,15 @@
 
 ### Interactables (Links/Buttons):
 - [A] Back to Services Hub
+- [A] View the Full Data-Driven Case Study &rarr;
+- [A] Launch Cognitive Simulator
+- [A] 
 - [A] Book Your Free Assessment
 
 ### Image Alt Text:
 - Mic-Check App showing 51 out of 100 grade, 197 WPM, and 18.8s Runtime
 - Mic-Check App showing 100 out of 100 grade, 112 WPM, and historic progress reaching perfection
+- Preview of THPS Cognitive Capacity Simulator mapping skills to the Reverse S-Curve
 
 ---
 
