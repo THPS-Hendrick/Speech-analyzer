@@ -104,7 +104,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-3 sm:p-5 lg:p-7">
 
-  <!-- Full-Width Header Section (With Complete Horizontal Space) -->
+  <!-- Full-Width Header Section -->
   <header class="max-w-6xl w-full mx-auto mb-3 sm:mb-5 border-b border-slate-800/90 pb-3 sm:pb-4">
     <div class="flex items-center space-x-2.5">
       <span class="px-2.5 py-0.5 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/40 rounded-md">
@@ -115,7 +115,7 @@
       </h1>
     </div>
     <p class="text-xs sm:text-sm text-slate-400 mt-1.5 leading-relaxed max-w-4xl">
-      Demonstrating the <strong class="text-slate-200">Juggler Model</strong>: Skills start in the <span class="text-amber-400 font-semibold">Cognitive (Knowledge)</span> phase with high load (~75%). Drilling them into the <span class="text-emerald-400 font-semibold">Autonomous (Effortless)</span> phase drops their burden to ~3%, freeing up bandwidth to deploy 10+ skills simultaneously.
+      Demonstrating the <strong class="text-slate-200">Juggler Model (Reverse S-Curve)</strong>: Skills stay at peak cognitive load (~110% &rarr; 99%) throughout Phase 1, plunge through Phase 2 as self-correction takes hold, and stabilize at ~3% to 8% in the Autonomous phase.
     </p>
   </header>
 
@@ -127,16 +127,16 @@
       
       <div class="flex items-stretch gap-3 sm:gap-6">
         
-        <!-- LEFT: Cognitive Capacity Tube (Strictly Calibrated 1:1 Scale) -->
+        <!-- LEFT: Cognitive Capacity Tube -->
         <div class="w-20 sm:w-28 shrink-0 flex flex-col items-center">
           <div class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider text-center leading-tight mb-2">
             Cognitive<br>Capacity
           </div>
 
-          <!-- Glass Tube Housing with Exactly Defined Inner Height -->
+          <!-- Glass Tube Housing -->
           <div class="relative w-full flex-1 bg-slate-950/90 rounded-2xl border-2 border-slate-700/80 p-0 overflow-hidden transition-all duration-300" id="tube-container">
             
-            <!-- 100% MAX Threshold Line (scaled relative to container representing 110% total) -->
+            <!-- 100% MAX Threshold Line -->
             <div class="absolute w-full left-0 border-b-2 border-dashed border-red-500 z-20 pointer-events-none" style="bottom: 90.9%;">
               <span class="absolute right-1 -top-3.5 text-[8.5px] sm:text-[9.5px] font-extrabold text-red-400 mono tracking-wider bg-slate-900/90 px-1 rounded">100% MAX</span>
             </div>
@@ -146,16 +146,14 @@
               <span class="absolute right-1 -top-3 text-[8px] sm:text-[9px] font-bold text-sky-400/90 mono bg-slate-900/80 px-1 rounded">50%</span>
             </div>
 
-            <!-- Stacked Tube Fill Area (Bottom Anchored) -->
-            <div class="absolute bottom-0 left-0 right-0 w-full flex flex-col-reverse justify-start items-center transition-all duration-75 z-10 overflow-hidden" id="tube-segments-wrapper" style="height: 100%;">
-              <!-- Dynamically stacked pill rectangles -->
-            </div>
+            <!-- Stacked Tube Fill Area -->
+            <div class="absolute bottom-0 left-0 right-0 w-full flex flex-col-reverse justify-start items-center transition-all duration-75 z-10 overflow-hidden" id="tube-segments-wrapper" style="height: 100%;"></div>
 
             <!-- Red Zone 110% Overload Failsafe Overlay -->
             <div id="red-zone-failsafe-overlay" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center text-center p-2 red-zone-fill transition-all duration-200">
               <i data-lucide="alert-octagon" class="w-7 h-7 sm:w-9 sm:h-9 text-white mb-1.5 animate-bounce"></i>
               <span class="font-black text-white text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">RED ZONED</span>
-              <span class="text-[9px] sm:text-[10px] text-red-100 font-extrabold tracking-wide mt-0.5">&gt; 110% CAPACITY</span>
+              <span class="text-[9px] sm:text-[10px] text-red-100 font-extrabold tracking-wide mt-0.5">&ge; 110% CAPACITY</span>
             </div>
 
             <!-- Empty Tube Placeholder Notice -->
@@ -216,11 +214,11 @@
                   <stop offset="100%" stop-color="#10b981" stop-opacity="0.14"/>
                 </linearGradient>
 
-                <!-- Curve Gradient (Red -> Amber -> Cyan -> Emerald) -->
+                <!-- Curve Gradient -->
                 <linearGradient id="curve-gradient" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stop-color="#ef4444" />
-                  <stop offset="30%" stop-color="#f59e0b" />
-                  <stop offset="65%" stop-color="#38bdf8" />
+                  <stop offset="25%" stop-color="#f59e0b" />
+                  <stop offset="55%" stop-color="#38bdf8" />
                   <stop offset="100%" stop-color="#10b981" />
                 </linearGradient>
               </defs>
@@ -236,18 +234,16 @@
               <line x1="390" y1="25" x2="390" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
               <line x1="670" y1="25" x2="670" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
 
-              <!-- Y-AXIS: Fully Visible with Dedicated Gutter -->
+              <!-- Y-AXIS -->
               <line x1="110" y1="25" x2="110" y2="500" stroke="#64748b" stroke-width="2.5"/>
               <polygon points="110,14 105,27 115,27" fill="#64748b" />
               
-              <!-- Clean, Fully Visible Y-Axis Title & Tick Markers -->
+              <!-- Y-Axis Title & Tick Markers -->
               <g id="y-axis-labels">
-                <!-- Rotated Y-Axis Label positioned safely with ample left margin -->
                 <text x="-260" y="45" fill="#cbd5e1" font-size="14" font-weight="800" letter-spacing="1.5" transform="rotate(-90)" text-anchor="middle">
                   COGNITIVE LOAD
                 </text>
                 
-                <!-- Y-Axis Load Ticks -->
                 <line x1="102" y1="45" x2="110" y2="45" stroke="#94a3b8" stroke-width="2"/>
                 <text x="96" y="50" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">100%</text>
 
@@ -265,22 +261,15 @@
                 STAGES OF SKILL ACQUISITION &rarr;
               </text>
 
-              <!-- Master Mathematical Decay Curve Path -->
+              <!-- Master Reverse S-Curve Path -->
               <path id="curve-path" d="" fill="none" stroke="url(#curve-gradient)" stroke-width="5" filter="url(#glow)"/>
 
-              <!-- Asymptote extension heading straight up towards infinity along Y-axis -->
-              <path id="asymptote-top-path" d="M 112 55 C 111.5 35, 111 20, 111 10" fill="none" stroke="#ef4444" stroke-width="4.5" stroke-dasharray="4 4" stroke-opacity="0.8" />
-              <polygon points="111,3 105,15 117,15" fill="#ef4444" opacity="0.9" />
-              <text x="122" y="24" fill="#f87171" font-size="10" font-weight="800" font-family="'JetBrains Mono', monospace">&infin; (Load &rarr; &infin; as X &rarr; 0)</text>
-
-              <!-- Active Draggable Pill Nodes Layer on SVG -->
+              <!-- Draggable Nodes Layer -->
               <g id="curve-nodes-layer"></g>
             </svg>
 
             <!-- Floating Drag Info Tooltip -->
-            <div id="node-drag-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity bg-slate-900/95 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs mono shadow-2xl -translate-x-1/2 -translate-y-10 z-40">
-              Personal: 42% Load
-            </div>
+            <div id="node-drag-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity bg-slate-900/95 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs mono shadow-2xl -translate-x-1/2 -translate-y-10 z-40"></div>
 
           </div>
         </div>
@@ -289,7 +278,7 @@
 
     </div>
 
-    <!-- ALWAYS VISIBLE Dynamic Speaker Caliber / Overload Status Banner -->
+    <!-- Live Caliber Banner -->
     <div id="caliber-banner" class="w-full mt-3 transition-all duration-300">
       <div id="caliber-banner-inner" class="bg-blue-950/40 border border-blue-500/30 text-blue-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md">
         <div class="flex items-center space-x-3">
@@ -306,14 +295,13 @@
           </div>
         </div>
         
-        <!-- Live Badge Tag -->
         <span id="caliber-banner-badge" class="shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30 mono">
           READY
         </span>
       </div>
     </div>
 
-    <!-- COGNITIVE PRESETS BAR (Repositioned immediately above the Skills Bank) -->
+    <!-- COGNITIVE PRESETS BAR -->
     <div class="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mt-4 mb-2 px-1">
       <div class="flex items-center space-x-2">
         <i data-lucide="sliders" class="w-4 h-4 text-slate-400"></i>
@@ -321,19 +309,16 @@
       </div>
 
       <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-        <!-- Preset 1: Novice -->
         <button onclick="applyPreset('novice')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
           <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span class="font-semibold">Novice (Overload at 2 Skills)</span>
+          <span class="font-semibold">Novice (2 Cognitive Skills &ge; 110%)</span>
         </button>
 
-        <!-- Preset 2: Intermediate -->
         <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
           <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
-          <span class="font-semibold">Intermediate (4 Skills in Associative)</span>
+          <span class="font-semibold">Intermediate (4 Associative Skills)</span>
         </button>
 
-        <!-- Preset 3: Master -->
         <button onclick="applyPreset('master')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
           <i data-lucide="crown" class="w-3.5 h-3.5 text-emerald-400"></i>
           <span class="font-bold">Master (10+ Autonomous Skills)</span>
@@ -344,7 +329,6 @@
     <!-- BOTTOM: Speaking Skills Bank & Controls -->
     <div class="w-full glass-card rounded-2xl p-4 sm:p-5 shadow-xl border border-slate-800">
       
-      <!-- Panel Header & Action Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 border-b border-slate-800 pb-3">
         <div>
           <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
@@ -353,17 +337,15 @@
             <span id="selected-counter" class="text-xs font-normal text-slate-400 ml-2">(1 selected)</span>
           </h2>
           <p class="text-xs text-slate-400 mt-0.5">
-            Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Knowledge). You must move deployed skills rightward to free up capacity before adding more!
+            Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Knowledge). Drag them rightwards into autonomous habit to relieve capacity!
           </p>
         </div>
 
-        <!-- Controls: Select All, Reset, Combine Button -->
         <div class="flex items-center space-x-2">
           <button onclick="toggleAllSkills(false)" class="px-2.5 py-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition font-medium">
             Clear
           </button>
           
-          <!-- Primary Combine Action Button -->
           <button id="btn-combine" onclick="combinePills()" class="px-5 py-2 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center space-x-2">
             <i data-lucide="merge" class="w-4 h-4"></i>
             <span>Combine</span>
@@ -372,9 +354,7 @@
       </div>
 
       <!-- 12 Skill Pills Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="skills-bank">
-        <!-- Rendered via JS -->
-      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="skills-bank"></div>
 
     </div>
 
@@ -382,7 +362,6 @@
 
   <!-- Simulation Logic & Event Handling -->
   <script>
-    // 12 Speaking Skills with distinct high-contrast colors
     const SKILLS_DATA = [
       { id: 'theory', name: '1. Theory', color: '#ef4444', textLight: true },
       { id: 'personal', name: '2. Personal', color: '#f97316', textLight: true },
@@ -398,77 +377,64 @@
       { id: 'w_assoc', name: '12. W.Assoc', color: '#84cc16', textLight: false }
     ];
 
-    // Global State
     const state = {
-      selectedSkillIds: new Set(['theory']), // Initially selected
-      activeMountedSkills: new Map(), // id -> { data, normX: 0..1, loadPct: 0..100 }
+      selectedSkillIds: new Set(['theory']),
+      activeMountedSkills: new Map(),
       isDraggingId: null,
-      spawnNormX: 0.08 // Default initial spawn position along the curve
+      spawnNormX: 0.08
     };
 
-    // SVG Coordinate Setup (1000 x 562.5 viewBox)
     const SVG_CONFIG = {
       viewWidth: 1000,
       viewHeight: 562.5,
-      xMin: 112,   // Near x=0 (hugs vertical axis)
-      xMax: 940,   // Late Effortless phase (Phase 3: Autonomous)
-      yMin: 35,    // High ceiling where curve shoots to infinity
-      yMax: 500    // Base line (0% load)
+      xMin: 110,   // x = 0 (Left Axis)
+      xMax: 960,   // x = 1 (Right Axis limit)
+      yMin: 45,    // 100% Load tick
+      yMax: 500    // 0% Load line
     };
 
-    // Recoupled Curve Formula:
-    // Approaches infinity as x -> 0, smoothly decays through phases:
-    // x ~ 0.01 -> ~80%-100%+
-    // x ~ 0.33 -> ~30-35%
-    // x ~ 0.66 -> ~5-8%
-    // x ~ 0.95 -> ~0.8-1% (infinitely small)
+    // REVERSE S-CURVE (Logistic Sigmoid Decay):
+    // x = 0.00 -> 110.0%
+    // x = 0.20 -> 98.8% (~99%)
+    // x = 0.45 -> 55.0% (Inflection point / severe descent)
+    // x = 0.67 -> 8.3% (~8%)
+    // x = 1.00 -> 3.1% (~3%)
+    // x -> infinity -> 0%
     function calculateCurve(normX) {
-      const clampedX = Math.max(0.0001, Math.min(1, normX));
+      const clampedX = Math.max(0, Math.min(1.0, normX));
 
-      // Asymptotic decay equation: y = c / (x + offset)^alpha + floor
-      const alpha = 1.35;
-      const offset = 0.045;
-      const c = 1.85;
+      const L = 110;        // Initial plateau height at x = 0
+      const x0 = 0.45;      // Inflection midpoint of steep descent
+      const n = 3.6;        // Exponent controlling steepness
       
-      const rawY = c / Math.pow(clampedX + offset, alpha);
-      
-      // Scale so:
-      // at x = 0.01: loadPct ≈ 82%
-      // at x = 0.33: loadPct ≈ 30%
-      // at x = 0.66: loadPct ≈ 8%
-      // at x = 1.0: loadPct ≈ 0.8%
-      const baseLoad = Math.max(0.5, rawY * 1.5 - 0.2);
-      const loadPct = Math.round(baseLoad * 10) / 10;
+      const rawLoad = L / (1 + Math.pow(clampedX / x0, n));
+      const loadPct = Math.round(rawLoad * 10) / 10;
 
-      // Map load directly to coordinate on SVG
-      // 100% load = top tick (yMin), 0% load = bottom axis (yMax)
-      const clampedDisplayLoad = Math.max(0, Math.min(105, loadPct));
-      const normHeightRatio = clampedDisplayLoad / 100;
-      const svgY = Math.max(SVG_CONFIG.yMin, SVG_CONFIG.yMax - normHeightRatio * (SVG_CONFIG.yMax - SVG_CONFIG.yMin));
+      // Coordinate mapping: 100% load = yMin (45), 0% load = yMax (500)
+      const normHeightRatio = loadPct / 100;
+      const svgY = SVG_CONFIG.yMax - normHeightRatio * (SVG_CONFIG.yMax - SVG_CONFIG.yMin);
       const svgX = SVG_CONFIG.xMin + clampedX * (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
 
       return { svgX, svgY, loadPct };
     }
 
-    // Convert SVG X to Normalized [0, 1]
     function svgXToNorm(svgX) {
       const clamped = Math.max(SVG_CONFIG.xMin, Math.min(SVG_CONFIG.xMax, svgX));
       return (clamped - SVG_CONFIG.xMin) / (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
     }
 
-    // Render Master Curve in SVG
+    // Render Reverse S-Curve SVG Path
     function drawCurvePath() {
       const points = [];
-      const steps = 220;
+      const steps = 150;
       for (let i = 0; i <= steps; i++) {
-        const t = Math.pow(i / steps, 1.4); // higher density near x=0 to capture asymptotic steepness
+        const t = i / steps;
         const pt = calculateCurve(t);
         points.push(`${pt.svgX.toFixed(1)},${pt.svgY.toFixed(1)}`);
       }
       document.getElementById('curve-path').setAttribute('d', `M ${points.join(' L ')}`);
     }
 
-    // Calculate Current Total Cognitive Load (%)
     function getTotalCognitiveLoad() {
       let sum = 0;
       state.activeMountedSkills.forEach(skill => {
@@ -477,7 +443,6 @@
       return sum;
     }
 
-    // Render Skills Bank
     function renderSkillsBank() {
       const container = document.getElementById('skills-bank');
       container.innerHTML = '';
@@ -519,7 +484,6 @@
       document.getElementById('selected-counter').textContent = `(${state.selectedSkillIds.size} selected)`;
     }
 
-    // Toggle Skill in Selection Bank
     function toggleSkillSelect(id) {
       if (state.selectedSkillIds.has(id)) {
         state.selectedSkillIds.delete(id);
@@ -529,7 +493,6 @@
       renderSkillsBank();
     }
 
-    // Toggle All Skills in Bank
     function toggleAllSkills(selectAll) {
       if (selectAll) {
         SKILLS_DATA.forEach(s => state.selectedSkillIds.add(s.id));
@@ -539,22 +502,18 @@
       renderSkillsBank();
     }
 
-    // COMBINE PILLS: Free, Unrestricted Placement Anywhere on Curve
     function combinePills() {
-      // Despawn unselected skills
       for (const [id] of state.activeMountedSkills.entries()) {
         if (!state.selectedSkillIds.has(id)) {
           state.activeMountedSkills.delete(id);
         }
       }
 
-      // Spawn newly selected skills anywhere along the curve
       let stagger = 0;
       state.selectedSkillIds.forEach(id => {
         if (!state.activeMountedSkills.has(id)) {
           const meta = SKILLS_DATA.find(s => s.id === id);
-          // Space out across stages naturally
-          const normX = Math.min(0.92, state.spawnNormX + (stagger * 0.07));
+          const normX = Math.min(0.92, state.spawnNormX + (stagger * 0.05));
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(id, {
             data: meta,
@@ -568,20 +527,17 @@
       updateAllVisuals();
       renderSkillsBank();
 
-      // Tactile button feedback
       const btn = document.getElementById('btn-combine');
       btn.classList.add('scale-95');
       setTimeout(() => btn.classList.remove('scale-95'), 120);
     }
 
-    // Master Render: Visuals, Tube, and Explainer Banner
     function updateAllVisuals() {
       updateGraphNodes();
       updateCapacityTube();
       updateCaliberBanner();
     }
 
-    // Render Draggable SVG Nodes on Graph Curve
     function updateGraphNodes() {
       const layer = document.getElementById('curve-nodes-layer');
       layer.innerHTML = '';
@@ -612,7 +568,6 @@
       });
     }
 
-    // UPDATE CAPACITY TUBE (Recoupled Maths & Visuals + Solid 110% Red Zone Failsafe)
     function updateCapacityTube() {
       const container = document.getElementById('tube-segments-wrapper');
       const emptyHint = document.getElementById('empty-tube-hint');
@@ -637,8 +592,6 @@
       const roundedTotal = Math.round(totalLoadPct);
       loadReadout.textContent = `${roundedTotal}% / 100%`;
 
-      // FAILSAFE: Total Load >= 110%
-      // Do NOT show or expand pill heights. Instead show full red tube and "Red Zoned".
       if (roundedTotal >= 110) {
         redZoneOverlay.classList.remove('hidden');
         tubeHousing.classList.add('tube-overload');
@@ -646,17 +599,11 @@
         return;
       }
 
-      // If under 110%, hide overlay and show pills at their respective heights & values
       redZoneOverlay.classList.add('hidden');
 
-      // The container ceiling represents 110% of total cognitive capacity
-      // 100% capacity sits at (100 / 110) * 100% = 90.9% of tube height
       state.activeMountedSkills.forEach((skillState) => {
         const meta = skillState.data;
         const load = skillState.loadPct;
-
-        // Recoupled height: Load % directly dictates segment height in the tube
-        // Scale relative to tube's 110% container height
         const visualHeightPct = (load / 110) * 100;
 
         const segment = document.createElement('div');
@@ -685,7 +632,6 @@
       }
     }
 
-    // UPDATE DYNAMIC SPEAKER CALIBER BANNER
     function updateCaliberBanner() {
       const bannerInner = document.getElementById('caliber-banner-inner');
       const bannerIcon = document.getElementById('caliber-banner-icon');
@@ -697,7 +643,6 @@
       const totalLoad = getTotalCognitiveLoad();
 
       if (totalLoad >= 110) {
-        // Red Zone Overload Banner
         bannerInner.className = 'bg-red-950/80 border-2 border-red-500 text-red-100 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-xl backdrop-blur-md animate-pulse';
         bannerIcon.className = 'p-1.5 rounded-lg bg-red-500/30 text-red-300 shrink-0';
         bannerIcon.innerHTML = `<i data-lucide="flame" class="w-5 h-5 text-red-400"></i>`;
@@ -707,7 +652,6 @@
         bannerBadge.className = 'shrink-0 px-2.5 py-1 text-[11px] font-black rounded-md bg-red-600 text-white mono shadow-lg border border-red-400';
         bannerBadge.textContent = 'RED ZONE';
       } else {
-        // Normal Speaker Caliber Ranking
         bannerInner.className = 'bg-slate-900/90 border border-slate-700/80 text-slate-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md';
         bannerIcon.className = 'p-1.5 rounded-lg bg-blue-500/20 text-blue-400 shrink-0';
         bannerIcon.innerHTML = `<i data-lucide="award" class="w-5 h-5"></i>`;
@@ -748,7 +692,6 @@
       lucide.createIcons();
     }
 
-    // FREE DRAG AND DROP
     const svgEl = document.getElementById('graph-svg');
     const tooltip = document.getElementById('node-drag-tooltip');
 
@@ -788,7 +731,6 @@
       const coords = getSvgCoordinates(e);
       const targetNormX = svgXToNorm(coords.x);
 
-      // Free positioning along curve
       const curveData = calculateCurve(targetNormX);
       skillNode.normX = targetNormX;
       skillNode.loadPct = curveData.loadPct;
@@ -807,9 +749,9 @@
     }
 
     function showTooltip(clientX, clientY, skillNode) {
-      const stageName = skillNode.normX < 0.33 
+      const stageName = skillNode.normX < 0.28 
         ? 'Cognitive' 
-        : (skillNode.normX < 0.66 ? 'Associative' : 'Autonomous');
+        : (skillNode.normX < 0.67 ? 'Associative' : 'Autonomous');
 
       tooltip.innerHTML = `<strong>${skillNode.data.name}</strong> • ${stageName} • <span class="text-amber-300 font-bold">${Math.round(skillNode.loadPct)}% Load</span>`;
       tooltip.style.left = `${clientX}px`;
@@ -821,17 +763,16 @@
       tooltip.style.opacity = '0';
     }
 
-    // PRESETS FOR DEMONSTRATION
     function applyPreset(presetType) {
       state.selectedSkillIds.clear();
       state.activeMountedSkills.clear();
 
       if (presetType === 'novice') {
-        // 2 skills placed at early stage (normX ~ 0.01 and 0.06 => ~80% + ~55% = >110% Overload)
+        // Two skills near the top plateau (>99% each -> triggers Red Zone)
         const skills = ['theory', 'personal'];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
-          const normX = 0.01 + (idx * 0.05);
+          const normX = 0.05 + (idx * 0.08);
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(id, {
@@ -841,11 +782,11 @@
           });
         });
       } else if (presetType === 'intermediate') {
-        // 4 skills in Associative Phase (Self-Correct, loads ~20% each => ~80% total under 100%)
+        // Skills located on the steep downward slope
         const skills = ['theory', 'personal', 'visual', 'pause_var'];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
-          const normX = 0.40 + (idx * 0.06);
+          const normX = 0.46 + (idx * 0.06);
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(id, {
@@ -855,10 +796,10 @@
           });
         });
       } else if (presetType === 'master') {
-        // All 12 skills drilled into Autonomous Phase (load ~1-2% each, comfortably under 25%)
+        // All 12 skills drilled into Effortless/Autonomous range (~3% to 8%)
         SKILLS_DATA.forEach((meta, idx) => {
           state.selectedSkillIds.add(meta.id);
-          const normX = 0.72 + (idx * 0.02);
+          const normX = 0.68 + (idx * 0.025);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(meta.id, {
             data: meta,
@@ -872,12 +813,11 @@
       updateAllVisuals();
     }
 
-    // App Initialization
     window.onload = function() {
       lucide.createIcons();
       drawCurvePath();
       renderSkillsBank();
-      combinePills(); // Mount initial skill
+      combinePills();
     };
   </script>
 </body>
