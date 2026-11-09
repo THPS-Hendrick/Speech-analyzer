@@ -115,7 +115,7 @@
       </h1>
     </div>
     <p class="text-xs sm:text-sm text-slate-400 mt-1.5 leading-relaxed max-w-4xl">
-      Demonstrating the <strong class="text-slate-200">Juggler Model (Reverse S-Curve)</strong>: Skills stay at peak cognitive load (~110% &rarr; 99%) throughout Phase 1, plunge through Phase 2 as self-correction takes hold, and stabilize at ~3% to 8% in the Autonomous phase.
+      Demonstrating the <strong class="text-slate-200">Juggler Model (Calibrated Reverse S-Curve)</strong>: Skills plateau at maximum capacity (~108%) through Knowledge, plunge steeply across Self-correction down to exactly <strong class="text-emerald-400 font-bold">8% at Effortless entry</strong>, allowing 10+ autonomous skills to run simultaneously.
     </p>
   </header>
 
@@ -217,8 +217,8 @@
                 <!-- Curve Gradient -->
                 <linearGradient id="curve-gradient" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stop-color="#ef4444" />
-                  <stop offset="25%" stop-color="#f59e0b" />
-                  <stop offset="55%" stop-color="#38bdf8" />
+                  <stop offset="28%" stop-color="#f59e0b" />
+                  <stop offset="58%" stop-color="#38bdf8" />
                   <stop offset="100%" stop-color="#10b981" />
                 </linearGradient>
               </defs>
@@ -230,7 +230,7 @@
               <rect x="110" y="25" width="280" height="475" fill="url(#grad-cognitive)" />
               <rect x="670" y="25" width="290" height="475" fill="url(#grad-autonomous)" />
 
-              <!-- Phase Vertical Dividing Markers -->
+              <!-- Phase Dividing Markers (x=390 and x=670) -->
               <line x1="390" y1="25" x2="390" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
               <line x1="670" y1="25" x2="670" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
 
@@ -393,19 +393,19 @@
       yMax: 500    // 0% Load line
     };
 
-    // REVERSE S-CURVE (Logistic Sigmoid Decay):
-    // x = 0.00 -> 110.0%
-    // x = 0.20 -> 98.8% (~99%)
-    // x = 0.45 -> 55.0% (Inflection point / severe descent)
-    // x = 0.67 -> 8.3% (~8%)
-    // x = 1.00 -> 3.1% (~3%)
-    // x -> infinity -> 0%
+    // REVERSE S-CURVE CALIBRATION:
+    // x = 0.00 -> 108.0%
+    // x = 0.20 -> 106.3% (Knowledge plateau)
+    // x = 0.33 -> 85.8%  (End of Cognitive / Phase 1 line at x=390)
+    // x = 0.42 -> 54.0%  (Mid-descent inflection)
+    // x = 0.66 -> 8.0%   (EXACT Effortless entry / Phase 3 line at x=670)
+    // x = 1.00 -> 0.8%   (Deep mastery asymptote)
     function calculateCurve(normX) {
       const clampedX = Math.max(0, Math.min(1.0, normX));
 
-      const L = 110;        // Initial plateau height at x = 0
-      const x0 = 0.45;      // Inflection midpoint of steep descent
-      const n = 3.6;        // Exponent controlling steepness
+      const L = 108;       // Initial plateau height in Cognitive phase
+      const x0 = 0.419;    // Inflection point calibrated to land at exactly 8.0% at normX = 0.6588
+      const n = 5.6;       // Steep descent across Self-Correction phase
       
       const rawLoad = L / (1 + Math.pow(clampedX / x0, n));
       const loadPct = Math.round(rawLoad * 10) / 10;
@@ -423,10 +423,9 @@
       return (clamped - SVG_CONFIG.xMin) / (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
     }
 
-    // Render Reverse S-Curve SVG Path
     function drawCurvePath() {
       const points = [];
-      const steps = 150;
+      const steps = 180;
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
         const pt = calculateCurve(t);
@@ -749,9 +748,9 @@
     }
 
     function showTooltip(clientX, clientY, skillNode) {
-      const stageName = skillNode.normX < 0.28 
+      const stageName = skillNode.normX < 0.33 
         ? 'Cognitive' 
-        : (skillNode.normX < 0.67 ? 'Associative' : 'Autonomous');
+        : (skillNode.normX < 0.66 ? 'Associative' : 'Autonomous');
 
       tooltip.innerHTML = `<strong>${skillNode.data.name}</strong> • ${stageName} • <span class="text-amber-300 font-bold">${Math.round(skillNode.loadPct)}% Load</span>`;
       tooltip.style.left = `${clientX}px`;
@@ -768,11 +767,11 @@
       state.activeMountedSkills.clear();
 
       if (presetType === 'novice') {
-        // Two skills near the top plateau (>99% each -> triggers Red Zone)
+        // 2 skills placed in Cognitive phase (loads > 105% each -> > 210% Red Zone)
         const skills = ['theory', 'personal'];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
-          const normX = 0.05 + (idx * 0.08);
+          const normX = 0.05 + (idx * 0.10);
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(id, {
@@ -782,11 +781,12 @@
           });
         });
       } else if (presetType === 'intermediate') {
-        // Skills located on the steep downward slope
+        // 4 skills spaced across the steep Associative slope (~88% total load, under 100%)
         const skills = ['theory', 'personal', 'visual', 'pause_var'];
+        const positions = [0.46, 0.52, 0.58, 0.64];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
-          const normX = 0.46 + (idx * 0.06);
+          const normX = positions[idx];
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(id, {
@@ -796,10 +796,10 @@
           });
         });
       } else if (presetType === 'master') {
-        // All 12 skills drilled into Effortless/Autonomous range (~3% to 8%)
+        // All 12 skills in Autonomous (starting from Effortless entry 8% down to 1%, summing to ~35% green)
         SKILLS_DATA.forEach((meta, idx) => {
           state.selectedSkillIds.add(meta.id);
-          const normX = 0.68 + (idx * 0.025);
+          const normX = 0.67 + (idx * 0.025);
           const curveData = calculateCurve(normX);
           state.activeMountedSkills.set(meta.id, {
             data: meta,
