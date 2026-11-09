@@ -566,3 +566,116 @@
 
 ---
 
+## File: /website/tools/cognitive-simulator.html
+
+### Body Text:
+- Demonstrating the Juggler Model (Calibrated Reverse S-Curve): Skills plateau at maximum capacity (~108%) through Knowledge, plunge steeply across Self-correction down to exactly 8% at Effortless entry, allowing 10+ autonomous skills to run simultaneously.
+- COGNITIVE LOAD
+                  
+                  
+                  
+                  100%
+
+                  
+                  50%
+
+                  
+                  0%
+                
+
+                
+                
+                
+                
+                  STAGES OF SKILL ACQUISITION &rarr;
+                
+
+                
+                
+
+                
+                
+              
+
+              
+              
+
+            
+          
+
+        
+
+      
+
+      
+      
+        
+          
+            
+              
+            
+            
+              
+                Speaker Caliber:
+              
+              
+                Select speaking skills from the bank below and click Combine to deploy.
+              
+            
+          
+          
+          
+            READY
+          
+        
+      
+
+      
+      
+        
+          
+          Cognitive Presets:
+        
+
+        
+          
+            
+            Novice (2 Cognitive Skills &ge; 110%)
+          
+
+          
+            
+            Intermediate (4 Associative Skills)
+          
+
+          
+            
+            Master (10+ Autonomous Skills)
+          
+        
+      
+
+      
+      
+        
+        
+          
+            
+              
+              Speaking Skills Bank
+              (1 selected)
+            
+            
+              Click pills to toggle selection. Click Combine to deploy into Phase 1 (Knowledge). Drag them rightwards into autonomous habit to relieve capacity!
+
+### Interactables (Links/Buttons):
+- [BUTTON] Novice (2 Cognitive Skills &ge; 110%)
+- [BUTTON] Intermediate (4 Associative Skills)
+- [BUTTON] Master (10+ Autonomous Skills)
+- [BUTTON] Clear
+- [BUTTON] Combine
+
+### Image Alt Text:
+
+---
+

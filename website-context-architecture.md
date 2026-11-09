@@ -1115,3 +1115,40 @@
 
 ---
 
+## File: /website/tools/cognitive-simulator.html
+
+**Title:** THPS Skill Acquisition & Cognitive Capacity Simulator
+
+**Schema 1:**
+```json
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "THPS Cognitive Capacity Simulator",
+    "operatingSystem": "Web Browser",
+    "applicationCategory": "EducationalApplication",
+    "description": "An interactive educational simulator mapping cognitive load against skill acquisition using the Juggler Model and Reverse S-Curve to diagnose Skill Inhibition.",
+    "author": {
+      "@type": "Person",
+      "name": "Tom Hendrick",
+      "url": "https://tomhendrick.com/about.html"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Tom Hendrick Public Speaking"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD"
+    }
+  }
+```
+
+**Headings:**
+- H1: Cognitive Load vs. Skill Acquisition
+- H2: Speaking Skills Bank
+              (1 selected)
+
+---
+
