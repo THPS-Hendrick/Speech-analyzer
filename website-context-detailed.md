@@ -584,63 +584,80 @@
 ### Body Text:
 - Demonstrating the Juggler Model: when adding a new skill may cause cognitive overload (dropping skills you can already do).
 - COGNITIVE LOAD
-                  
-                  
-                  
-                  100%
-
-                  
-                  50%
-
-                  
-                  0%
                 
-
+                100%
                 
+                50%
                 
-                
-                
-                  STAGES OF SKILL ACQUISITION &rarr;
-                
-
-                
-                
-
-                
-                
+                0%
               
 
               
               
+              STAGES OF SKILL ACQUISITION &rarr;
+              
+              
+            
 
             
+            
+              Phase
+              Skill Name
+              
+                Load: 0%
+              
+            
           
-
         
 
-      
+        
+        
+          
+          
+            Cognitive Capacity
+            
+              Total Load: 0% / 100%
+            
+          
 
-      
-      
+          
+            
+            
+              0%
+              50%
+              100% MAX
+            
+
+            
+            
+              
+              
+              
+                Fluent
+              
+              
+              
+                Struggling
+                
+                Add a New Skill!
+              
+              
+              
+                Fail
+              
+
+              
+              
+
+              
+              
+                RED ZONED &ge; 110%
+              
+              
+            
+          
         
-          
-            
-              
-            
-            
-              
-                Speaker Caliber:
-              
-              
-                Select speaking skills from the bank below and click Combine to deploy.
-              
-            
-          
-          
-          
-            READY
-          
-        
+
       
 
       
@@ -655,12 +672,10 @@
             
             Novice (Session 1)
           
-
           
             
             Intermediate (End of Session 4)
           
-
           
             
             Advanced (End of Session 10)
@@ -671,7 +686,6 @@
       
       
         
-        
           
             
               
@@ -679,7 +693,7 @@
               (1 selected)
             
             
-              Click pills to toggle selection. Click Combine to deploy into Phase 1 (Knowledge). Drag them rightwards into autonomous habit to relieve capacity!
+              Click pills to toggle selection. Click Combine to deploy into Phase 1 (Aware). Drag them rightwards into autonomous habit to relieve capacity!
 
 ### Interactables (Links/Buttons):
 - [BUTTON] Novice (Session 1)
