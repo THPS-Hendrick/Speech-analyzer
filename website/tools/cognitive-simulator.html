@@ -307,15 +307,15 @@
         <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           <button onclick="applyPreset('novice')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span class="font-semibold">Novice (Session 1)</span>
+            <span class="font-semibold">1 Session/span>
           </button>
           <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
-            <span class="font-semibold">Intermediate (End of Session 4)</span>
+            <span class="font-semibold">4 Sessions</span>
           </button>
           <button onclick="applyPreset('master')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="crown" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span class="font-bold">Advanced (End of Session 10)</span>
+            <span class="font-bold">10 Sessions</span>
           </button>
         </div>
       </div>
@@ -782,7 +782,7 @@
         });
       } else if (presetType === 'intermediate') {
         const skills = ['repeat', 'count', 'theory', 'w_assoc', 'visual', 'personal', 'wpm', 'runtime'];
-        const positions = [0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55];
+        const positions = [0.99, 0.93, 0.87, 0.82, 0.76, 0.69, 0.62, 0.55];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
           const normX = positions[idx];
