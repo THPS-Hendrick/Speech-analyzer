@@ -146,7 +146,7 @@
         </h1>
       </div>
       <p class="text-xs sm:text-sm text-slate-400 mt-1.5 leading-relaxed max-w-4xl">
-        Demonstrating the <strong class="text-slate-200">Juggler Model (Calibrated Reverse S-Curve)</strong>: Skills plateau at maximum capacity (~108%) through Knowledge, plunge steeply across Self-correction down to exactly <strong class="text-emerald-400 font-bold">8% at Effortless entry</strong>, allowing 10+ autonomous skills to run simultaneously.
+        Demonstrating the <strong class="text-slate-200">Juggler Model</strong>: when adding a new skill may cause cognitive overload (dropping skills you can already do). 
       </p>
     </header>
 
@@ -169,12 +169,12 @@
               
               <!-- 100% MAX Threshold Line -->
               <div class="absolute w-full left-0 border-b-2 border-dashed border-red-500 z-20 pointer-events-none" style="bottom: 90.9%;">
-                <span class="absolute right-1 -top-3.5 text-[8.5px] sm:text-[9.5px] font-extrabold text-red-400 mono tracking-wider bg-slate-900/90 px-1 rounded">100% MAX</span>
+                <span class="absolute right-1 -top-3.5 text-[8.5px] sm:text-[9.5px] font-extrabold text-red-400 mono tracking-wider bg-slate-900/90 px-1 rounded">Performance failures</span>
               </div>
 
               <!-- 50% Threshold Line -->
               <div class="absolute w-full left-0 border-b border-dashed border-sky-400/70 z-20 pointer-events-none" style="bottom: 45.45%;">
-                <span class="absolute right-1 -top-3 text-[8px] sm:text-[9px] font-bold text-sky-400/90 mono bg-slate-900/80 px-1 rounded">50%</span>
+                <span class="absolute right-1 -top-3 text-[8px] sm:text-[9px] font-bold text-sky-400/90 mono bg-slate-900/80 px-1 rounded">At risk under pressure</span>
               </div>
 
               <!-- Stacked Tube Fill Area -->
@@ -206,13 +206,13 @@
             <!-- Stage Phase Legend Headers -->
             <div class="grid grid-cols-3 text-center mb-1.5 text-[10px] sm:text-xs font-semibold gap-1">
               <div class="text-amber-400 bg-amber-500/10 border border-amber-500/30 py-1 px-1 rounded">
-                Phase 1: Cognitive <span class="hidden md:inline font-normal text-slate-300">(Knowledge)</span>
+                Unaware <span class="hidden md:inline font-normal text-slate-300">Aware</span>
               </div>
               <div class="text-sky-400 bg-sky-500/10 border border-sky-500/30 py-1 px-1 rounded">
-                Phase 2: Associative <span class="hidden md:inline font-normal text-slate-300">(Self-correct)</span>
+                Phase 2: External Correction <span class="hidden md:inline font-normal text-slate-300">Self Correction</span>
               </div>
               <div class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 py-1 px-1 rounded">
-                Phase 3: Autonomous <span class="hidden md:inline font-normal text-slate-300">(Effortless)</span>
+                Phase 3: Rapid Correction<span class="hidden md:inline font-normal text-slate-300">Effortless</span>
               </div>
             </div>
 
@@ -342,17 +342,17 @@
         <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           <button onclick="applyPreset('novice')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span class="font-semibold">Novice (2 Cognitive Skills &ge; 110%)</span>
+            <span class="font-semibold">Novice (Session 1)</span>
           </button>
 
           <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
-            <span class="font-semibold">Intermediate (4 Associative Skills)</span>
+            <span class="font-semibold">Intermediate (End of Session 4)</span>
           </button>
 
           <button onclick="applyPreset('master')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="crown" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span class="font-bold">Master (10+ Autonomous Skills)</span>
+            <span class="font-bold">Advanced (End of Session 10)</span>
           </button>
         </div>
       </div>
@@ -398,18 +398,18 @@
   <!-- Simulation Logic & Event Handling -->
   <script>
     const SKILLS_DATA = [
-      { id: 'theory', name: '1. Theory', color: '#ef4444', textLight: true },
-      { id: 'personal', name: '2. Personal', color: '#f97316', textLight: true },
-      { id: 'visual', name: '3. Visual', color: '#f59e0b', textLight: false },
-      { id: 'pause_var', name: '4. Pause Var', color: '#10b981', textLight: true },
-      { id: 'vol_var', name: '5. Vol Var', color: '#06b6d4', textLight: true },
-      { id: 'pace_var', name: '6. Pace Var', color: '#3b82f6', textLight: true },
-      { id: 'aware', name: '7. Aware', color: '#6366f1', textLight: true },
+      { id: 'repeat', name: '1. Repeat', color: '#ef4444', textLight: true },
+      { id: 'count', name: '2. Count', color: '#f97316', textLight: true },
+      { id: 'theory', name: '3. Theory', color: '#f59e0b', textLight: false },
+      { id: 'w_assoc', name: '4. W.Assoc', color: '#10b981', textLight: true },
+      { id: 'visual', name: '5. Visual', color: '#06b6d4', textLight: true },
+      { id: 'personal', name: '6. Personal', color: '#3b82f6', textLight: true },
+      { id: 'wpm', name: '7. Word/min', color: '#6366f1', textLight: true },
       { id: 'runtime', name: '8. Runtime', color: '#8b5cf6', textLight: true },
-      { id: 'question', name: '9. Question', color: '#d946ef', textLight: true },
-      { id: 'repeat', name: '10. Repeat', color: '#ec4899', textLight: true },
-      { id: 'count', name: '11. Count', color: '#14b8a6', textLight: true },
-      { id: 'w_assoc', name: '12. W.Assoc', color: '#84cc16', textLight: false }
+      { id: 'pause var', name: '9. Pause Var', color: '#d946ef', textLight: true },
+      { id: 'vol var', name: '10. Volume Var', color: '#ec4899', textLight: true },
+      { id: 'pace var', name: '11. Pace Var', color: '#14b8a6', textLight: true },
+      { id: 'aud_aware', name: '12. Aud.Aware', color: '#84cc16', textLight: false }
     ];
 
     const state = {
@@ -796,7 +796,7 @@
       state.activeMountedSkills.clear();
 
       if (presetType === 'novice') {
-        const skills = ['theory', 'personal'];
+        const skills = ['repeat', 'count'];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
           const normX = 0.05 + (idx * 0.10);
@@ -809,8 +809,8 @@
           });
         });
       } else if (presetType === 'intermediate') {
-        const skills = ['theory', 'personal', 'visual', 'pause_var'];
-        const positions = [0.46, 0.52, 0.58, 0.64];
+        const skills = ['repeat', 'count', 'theory', 'w_assoc', 'visual', 'personal', 'wpm', 'runtime'];
+        const positions = [0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55];
         skills.forEach((id, idx) => {
           state.selectedSkillIds.add(id);
           const normX = positions[idx];
