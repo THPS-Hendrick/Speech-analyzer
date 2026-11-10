@@ -662,15 +662,15 @@
         
           
             
-            Novice (Session 1)
+            1 Session/span>
           
           
             
-            Intermediate (End of Session 4)
+            4 Sessions
           
           
             
-            Advanced (End of Session 10)
+            10 Sessions
           
         
       
@@ -688,9 +688,9 @@
               Click pills to toggle selection. Click Combine to deploy. Tap deployed pills to select them, then tap anywhere on the graph to slide them along the curve!
 
 ### Interactables (Links/Buttons):
-- [BUTTON] Novice (Session 1)
-- [BUTTON] Intermediate (End of Session 4)
-- [BUTTON] Advanced (End of Session 10)
+- [BUTTON] 1 Session/span>
+- [BUTTON] 4 Sessions
+- [BUTTON] 10 Sessions
 - [BUTTON] Clear
 - [BUTTON] Combine
 
