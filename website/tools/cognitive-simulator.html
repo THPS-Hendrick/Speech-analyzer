@@ -32,7 +32,7 @@
   }
   </script>
 
-  <!-- Tailwind CSS CDN (Isolated to this tool page) -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts -->
@@ -67,7 +67,7 @@
     }
     @media (max-width: 640px) {
       .graph-aspect-box {
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 16 / 11;
       }
     }
 
@@ -102,7 +102,6 @@
     /* SVG Draggable Node Styling */
     .draggable-pill {
       cursor: grab;
-      touch-action: none;
       transition: filter 0.15s ease;
     }
     .draggable-pill:active, .draggable-pill.dragging {
@@ -110,9 +109,9 @@
       filter: brightness(1.3) drop-shadow(0 0 14px currentColor);
     }
 
-    /* Smooth Height & Color Transitions */
+    /* Smooth Transitions */
     .tube-segment {
-      transition: height 0.1s linear, background-color 0.2s ease;
+      transition: width 0.1s linear, background-color 0.2s ease;
     }
 
     /* Custom scrollbars */
@@ -131,9 +130,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- INJECT SITE HEADER PARTIAL HERE -->
-  <!-- e.g., <?php include '../partials/header.html'; ?> or your static site generator equivalent -->
-
   <div class="p-3 sm:p-5 lg:p-7 flex-1 flex flex-col">
     <!-- Full-Width Header Section -->
     <header class="max-w-6xl w-full mx-auto mb-3 sm:mb-5 border-b border-slate-800/90 pb-3 sm:pb-4">
@@ -150,168 +146,11 @@
       </p>
     </header>
 
-    <!-- Main Interactive Coordinate Stage & Tube -->
-    <main class="max-w-6xl w-full mx-auto flex-1 flex flex-col items-center justify-center">
+    <main class="max-w-6xl w-full mx-auto flex-1 flex flex-col items-center justify-start">
 
-      <!-- Graph + Capacity Tube Wrapper -->
-      <div class="w-full glass-card rounded-2xl p-3 sm:p-5 shadow-2xl relative">
-        
-        <div class="flex items-stretch gap-3 sm:gap-6">
-          
-          <!-- LEFT: Cognitive Capacity Tube -->
-          <div class="w-20 sm:w-28 shrink-0 flex flex-col items-center">
-            <div class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider text-center leading-tight mb-2">
-              Cognitive<br>Capacity
-            </div>
-
-            <!-- Glass Tube Housing -->
-            <div class="relative w-full flex-1 bg-slate-950/90 rounded-2xl border-2 border-slate-700/80 p-0 overflow-hidden transition-all duration-300" id="tube-container">
-              
-              <!-- 100% MAX Threshold Line -->
-              <div class="absolute w-full left-0 border-b-2 border-dashed border-red-500 z-20 pointer-events-none" style="bottom: 90.9%;">
-                <span class="absolute right-1 -top-3.5 text-[8.5px] sm:text-[9.5px] font-extrabold text-red-400 mono tracking-wider bg-slate-900/90 px-1 rounded">Failure</span>
-              </div>
-
-              <!-- 50% Threshold Line -->
-              <div class="absolute w-full left-0 border-b border-dashed border-sky-400/70 z-20 pointer-events-none" style="bottom: 45.45%;">
-                <span class="absolute right-1 -top-3 text-[8px] sm:text-[9px] font-bold text-sky-400/90 mono bg-slate-900/80 px-1 rounded">Struggle</span>
-              </div>
-
-              <!-- Stacked Tube Fill Area -->
-              <div class="absolute bottom-0 left-0 right-0 w-full flex flex-col-reverse justify-start items-center transition-all duration-75 z-10 overflow-hidden" id="tube-segments-wrapper" style="height: 100%;"></div>
-
-              <!-- Red Zone 110% Overload Failsafe Overlay -->
-              <div id="red-zone-failsafe-overlay" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center text-center p-2 red-zone-fill transition-all duration-200">
-                <i data-lucide="alert-octagon" class="w-7 h-7 sm:w-9 sm:h-9 text-white mb-1.5 animate-bounce"></i>
-                <span class="font-black text-white text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">RED ZONED</span>
-                <span class="text-[9px] sm:text-[10px] text-red-100 font-extrabold tracking-wide mt-0.5">&ge; 110% CAPACITY</span>
-              </div>
-
-              <!-- Empty Tube Placeholder Notice -->
-              <div id="empty-tube-hint" class="absolute inset-0 flex items-center justify-center text-center p-2 text-[10px] text-slate-500 font-medium">
-                Tube Empty.<br>Combine a skill.
-              </div>
-            </div>
-
-            <!-- Total Tube Readout Meter -->
-            <div class="mt-2 text-center">
-              <span class="text-[9px] sm:text-[10px] text-slate-400 font-medium block uppercase tracking-wide">Skill Risk</span>
-              <span id="load-readout" class="mono text-xs sm:text-sm font-extrabold text-emerald-400">0% / 100%</span>
-            </div>
-          </div>
-
-          <!-- RIGHT: Interactive 16:9 X-Y Coordinate Plane -->
-          <div class="flex-1 flex flex-col min-w-0">
-            
-            <!-- Stage Phase Legend Headers -->
-            <div class="grid grid-cols-3 text-center mb-1.5 text-[10px] sm:text-xs font-semibold gap-1">
-              <div class="text-amber-400 bg-amber-500/10 border border-amber-500/30 py-1 px-1 rounded">
-                Phase 1: Aware
-              </div>
-              <div class="text-sky-400 bg-sky-500/10 border border-sky-500/30 py-1 px-1 rounded">
-                Phase 2: Self-Correct
-              </div>
-              <div class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 py-1 px-1 rounded">
-                Phase 3: Effortless
-              </div>
-            </div>
-
-            <!-- 16:9 Aspect Ratio SVG Coordinate Plane -->
-            <div class="graph-aspect-box bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden shadow-inner">
-              
-              <svg id="graph-svg" class="w-full h-full" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
-                <defs>
-                  <!-- Curve Glow Filter -->
-                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="5" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-
-                  <!-- Background Subtle Grid -->
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.035)" stroke-width="1"/>
-                  </pattern>
-
-                  <!-- Zone Gradient Fills -->
-                  <linearGradient id="grad-cognitive" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.12"/>
-                    <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02"/>
-                  </linearGradient>
-                  <linearGradient id="grad-autonomous" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.02"/>
-                    <stop offset="100%" stop-color="#10b981" stop-opacity="0.14"/>
-                  </linearGradient>
-
-                  <!-- Curve Gradient -->
-                  <linearGradient id="curve-gradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#ef4444" />
-                    <stop offset="28%" stop-color="#f59e0b" />
-                    <stop offset="58%" stop-color="#38bdf8" />
-                    <stop offset="100%" stop-color="#10b981" />
-                  </linearGradient>
-                </defs>
-
-                <!-- Subtle Background Grid -->
-                <rect width="1000" height="562.5" fill="url(#grid)" />
-
-                <!-- Phase Shading Areas -->
-                <rect x="110" y="25" width="280" height="475" fill="url(#grad-cognitive)" />
-                <rect x="670" y="25" width="290" height="475" fill="url(#grad-autonomous)" />
-
-                <!-- Phase Dividing Markers (x=390 and x=670) -->
-                <line x1="390" y1="25" x2="390" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
-                <line x1="670" y1="25" x2="670" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
-
-                <!-- Y-AXIS -->
-                <line x1="110" y1="25" x2="110" y2="500" stroke="#64748b" stroke-width="2.5"/>
-                <polygon points="110,14 105,27 115,27" fill="#64748b" />
-                
-                <!-- Y-Axis Title & Tick Markers -->
-                <g id="y-axis-labels">
-                  <text x="-260" y="45" fill="#cbd5e1" font-size="14" font-weight="800" letter-spacing="1.5" transform="rotate(-90)" text-anchor="middle">
-                    COGNITIVE LOAD
-                  </text>
-                  
-                  <line x1="102" y1="45" x2="110" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                  <text x="96" y="50" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">100%</text>
-
-                  <line x1="102" y1="272" x2="110" y2="272" stroke="#94a3b8" stroke-width="2"/>
-                  <text x="96" y="276" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">50%</text>
-
-                  <line x1="102" y1="500" x2="110" y2="500" stroke="#94a3b8" stroke-width="2"/>
-                  <text x="96" y="504" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">0%</text>
-                </g>
-
-                <!-- X-AXIS -->
-                <line x1="110" y1="500" x2="960" y2="500" stroke="#64748b" stroke-width="2.5"/>
-                <polygon points="972,500 958,494 958,506" fill="#64748b" />
-                <text x="540" y="535" fill="#cbd5e1" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="1">
-                  STAGES OF SKILL ACQUISITION &rarr;
-                </text>
-
-                <!-- Master Reverse S-Curve Path -->
-                <path id="curve-path" d="" fill="none" stroke="url(#curve-gradient)" stroke-width="5" filter="url(#glow)"/>
-
-                <!-- Draggable Nodes Layer -->
-                <g id="curve-nodes-layer"></g>
-              </svg>
-
-              <!-- Floating Drag Info Tooltip -->
-              <div id="node-drag-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity bg-slate-900/95 text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs mono shadow-2xl -translate-x-1/2 -translate-y-10 z-40"></div>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Live Caliber Banner -->
-      <div id="caliber-banner" class="w-full mt-3 transition-all duration-300">
-        <div id="caliber-banner-inner" class="bg-blue-950/40 border border-blue-500/30 text-blue-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md">
+      <!-- Live Caliber Banner (Moved Above Graph) -->
+      <div id="caliber-banner" class="w-full mb-4 transition-all duration-300">
+        <div id="caliber-banner-inner" class="bg-slate-900/90 border border-slate-700/80 text-slate-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md">
           <div class="flex items-center space-x-3">
             <div id="caliber-banner-icon" class="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 shrink-0">
               <i data-lucide="award" class="w-5 h-5"></i>
@@ -325,11 +164,146 @@
               </span>
             </div>
           </div>
-          
           <span id="caliber-banner-badge" class="shrink-0 px-2.5 py-1 text-[11px] font-extrabold rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30 mono">
             READY
           </span>
         </div>
+      </div>
+
+      <!-- Graph + Capacity Tube Wrapper -->
+      <div class="w-full glass-card rounded-2xl p-3 sm:p-5 shadow-2xl relative flex flex-col items-center">
+        
+        <!-- Interactive 16:9 X-Y Coordinate Plane (Now spans full width) -->
+        <div class="w-full flex-1 flex flex-col min-w-0">
+          
+          <!-- Stage Phase Legend Headers -->
+          <div class="grid grid-cols-3 text-center mb-1.5 text-[10px] sm:text-xs font-semibold gap-1">
+            <div class="text-amber-400 bg-amber-500/10 border border-amber-500/30 py-1 px-1 rounded">
+              Phase 1: Aware
+            </div>
+            <div class="text-sky-400 bg-sky-500/10 border border-sky-500/30 py-1 px-1 rounded">
+              Phase 2: Self-Correct
+            </div>
+            <div class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 py-1 px-1 rounded">
+              Phase 3: Effortless
+            </div>
+          </div>
+
+          <!-- 16:9 Aspect Ratio SVG Coordinate Plane (Added touch-action: none to allow pure horizontal swiping) -->
+          <div class="graph-aspect-box bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden shadow-inner" style="touch-action: none;">
+            
+            <svg id="graph-svg" class="w-full h-full" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
+              <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 255, 255, 0.035)" stroke-width="1"/>
+                </pattern>
+                <linearGradient id="grad-cognitive" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.12"/>
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.02"/>
+                </linearGradient>
+                <linearGradient id="grad-autonomous" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.02"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.14"/>
+                </linearGradient>
+                <linearGradient id="curve-gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#ef4444" />
+                  <stop offset="28%" stop-color="#f59e0b" />
+                  <stop offset="58%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#10b981" />
+                </linearGradient>
+              </defs>
+
+              <rect width="1000" height="562.5" fill="url(#grid)" />
+              <rect x="110" y="25" width="280" height="475" fill="url(#grad-cognitive)" />
+              <rect x="670" y="25" width="290" height="475" fill="url(#grad-autonomous)" />
+              <line x1="390" y1="25" x2="390" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
+              <line x1="670" y1="25" x2="670" y2="500" stroke="#334155" stroke-dasharray="6 6" stroke-width="1.8"/>
+              <line x1="110" y1="25" x2="110" y2="500" stroke="#64748b" stroke-width="2.5"/>
+              <polygon points="110,14 105,27 115,27" fill="#64748b" />
+              
+              <g id="y-axis-labels">
+                <text x="-260" y="45" fill="#cbd5e1" font-size="14" font-weight="800" letter-spacing="1.5" transform="rotate(-90)" text-anchor="middle">COGNITIVE LOAD</text>
+                <line x1="102" y1="45" x2="110" y2="45" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="50" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">100%</text>
+                <line x1="102" y1="272" x2="110" y2="272" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="276" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">50%</text>
+                <line x1="102" y1="500" x2="110" y2="500" stroke="#94a3b8" stroke-width="2"/>
+                <text x="96" y="504" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">0%</text>
+              </g>
+
+              <line x1="110" y1="500" x2="960" y2="500" stroke="#64748b" stroke-width="2.5"/>
+              <polygon points="972,500 958,494 958,506" fill="#64748b" />
+              <text x="540" y="535" fill="#cbd5e1" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="1">STAGES OF SKILL ACQUISITION &rarr;</text>
+              <path id="curve-path" d="" fill="none" stroke="url(#curve-gradient)" stroke-width="5" filter="url(#glow)"/>
+              <g id="curve-nodes-layer"></g>
+            </svg>
+
+            <!-- PINNED Floating Info Panel (Top Right - Matches Effortless Width) -->
+            <div id="fixed-info-panel" class="absolute top-3 right-3 w-1/4 min-w-[120px] max-w-[200px] bg-slate-900/95 border border-slate-700 shadow-2xl rounded-xl p-2.5 sm:p-3 opacity-0 transition-opacity z-40 pointer-events-none backdrop-blur-md">
+              <div id="info-panel-stage" class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Phase</div>
+              <div id="info-panel-title" class="text-xs sm:text-sm font-black text-white truncate">Skill Name</div>
+              <div class="text-[10px] sm:text-xs font-bold text-slate-300 mt-1 flex justify-between items-center border-t border-slate-700/50 pt-1">
+                Load: <span id="info-panel-load" class="text-amber-400 font-black mono text-xs sm:text-sm">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW HORIZONTAL: Cognitive Capacity Tube (Placed Below Graph) -->
+        <div class="mt-6 w-full flex flex-col">
+          
+          <div class="flex justify-between items-end mb-1">
+            <div class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider">Cognitive Capacity</div>
+            <div class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Total Load: <span id="load-readout" class="text-emerald-400 font-extrabold mono ml-1">0% / 100%</span>
+            </div>
+          </div>
+
+          <div class="relative w-full mt-3">
+            <!-- Scale Markers -->
+            <div class="absolute w-full h-4 -top-4 text-[9px] sm:text-[10px] font-bold text-slate-400 mono pointer-events-none">
+              <span class="absolute left-0">0%</span>
+              <span class="absolute" style="left: 45.45%; transform: translateX(-50%);">50%</span>
+              <span class="absolute text-red-400 font-extrabold" style="left: 90.9%; transform: translateX(-50%);">100% MAX</span>
+            </div>
+
+            <!-- Horizontal Glass Tube -->
+            <div class="relative w-full h-8 sm:h-10 bg-slate-950/90 rounded-lg sm:rounded-xl border-2 border-slate-700/80 overflow-hidden flex transition-all duration-300" id="tube-container">
+              
+              <!-- Background Zones -->
+              <div class="absolute top-0 bottom-0 left-0 border-r border-dashed border-sky-400/50 flex flex-col items-center justify-center pointer-events-none" style="width: 45.45%;">
+                <span class="text-sky-400/40 font-bold uppercase text-[9px] sm:text-[10px] tracking-widest">Fluent</span>
+              </div>
+              
+              <div class="absolute top-0 bottom-0 border-r-2 border-dashed border-red-500/80 flex flex-col items-center justify-center pointer-events-none" style="left: 45.45%; width: 45.45%;">
+                <span class="text-amber-400/40 font-bold uppercase text-[9px] sm:text-[10px] tracking-widest">Struggling</span>
+                <!-- Dynamic Pulse Hint -->
+                <span id="add-skill-hint" class="absolute font-black text-amber-300 text-[10px] sm:text-xs animate-pulse tracking-wide drop-shadow-md hidden z-10">Add a New Skill!</span>
+              </div>
+              
+              <div class="absolute top-0 bottom-0 right-0 red-zone-fill opacity-20 flex flex-col items-center justify-center pointer-events-none" style="width: 9.1%;">
+                <span class="text-red-100 font-bold uppercase text-[8px] sm:text-[9px] tracking-widest sm:rotate-0 -rotate-90">Fail</span>
+              </div>
+
+              <!-- Filled Skill Segments (Horizontal Stack) -->
+              <div class="absolute top-0 bottom-0 left-0 flex flex-row justify-start items-stretch z-20" id="tube-segments-wrapper" style="width: 100%;"></div>
+
+              <!-- Red Zone Failsafe Overlay -->
+              <div id="red-zone-failsafe-overlay" class="hidden absolute inset-0 z-30 flex items-center justify-center text-center p-2 red-zone-fill transition-all duration-200">
+                <span class="font-black text-white text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">RED ZONED &ge; 110%</span>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- COGNITIVE PRESETS BAR -->
@@ -344,12 +318,10 @@
             <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
             <span class="font-semibold">Novice (Session 1)</span>
           </button>
-
           <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
             <span class="font-semibold">Intermediate (End of Session 4)</span>
           </button>
-
           <button onclick="applyPreset('master')" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="crown" class="w-3.5 h-3.5 text-emerald-400"></i>
             <span class="font-bold">Advanced (End of Session 10)</span>
@@ -359,7 +331,6 @@
 
       <!-- BOTTOM: Speaking Skills Bank & Controls -->
       <div class="w-full glass-card rounded-2xl p-4 sm:p-5 shadow-xl border border-slate-800">
-        
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 border-b border-slate-800 pb-3">
           <div>
             <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
@@ -368,7 +339,7 @@
               <span id="selected-counter" class="text-xs font-normal text-slate-400 ml-2">(1 selected)</span>
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">
-              Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Knowledge). Drag them rightwards into autonomous habit to relieve capacity!
+              Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Aware). Drag them rightwards into autonomous habit to relieve capacity!
             </p>
           </div>
 
@@ -376,7 +347,6 @@
             <button onclick="toggleAllSkills(false)" class="px-2.5 py-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition font-medium">
               Clear
             </button>
-            
             <button id="btn-combine" onclick="combinePills()" class="px-5 py-2 text-xs sm:text-sm font-extrabold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center space-x-2">
               <i data-lucide="merge" class="w-4 h-4"></i>
               <span>Combine</span>
@@ -384,18 +354,12 @@
           </div>
         </div>
 
-        <!-- 12 Skill Pills Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="skills-bank"></div>
-
       </div>
 
     </main>
   </div>
 
-  <!-- INJECT SITE FOOTER PARTIAL HERE -->
-  <!-- e.g., <?php include '../partials/footer.html'; ?> or your static site generator equivalent -->
-
-  <!-- Simulation Logic & Event Handling -->
   <script>
     const SKILLS_DATA = [
       { id: 'repeat', name: '1. Repeat', color: '#ef4444', textLight: true },
@@ -422,24 +386,21 @@
     const SVG_CONFIG = {
       viewWidth: 1000,
       viewHeight: 562.5,
-      xMin: 110,   // x = 0 (Left Axis)
-      xMax: 960,   // x = 1 (Right Axis limit)
-      yMin: 45,    // 100% Load tick
-      yMax: 500    // 0% Load line
+      xMin: 110,
+      xMax: 960,
+      yMin: 45,
+      yMax: 500
     };
 
-    // REVERSE S-CURVE CALIBRATION
     function calculateCurve(normX) {
       const clampedX = Math.max(0, Math.min(1.0, normX));
-
-      const L = 108;       // Initial plateau height in Cognitive phase
-      const x0 = 0.419;    // Inflection point calibrated to land at exactly 8.0% at normX = 0.6588
-      const n = 5.6;       // Steep descent across Self-Correction phase
+      const L = 108;       
+      const x0 = 0.419;    
+      const n = 5.6;       
       
       const rawLoad = L / (1 + Math.pow(clampedX / x0, n));
       const loadPct = Math.round(rawLoad * 10) / 10;
 
-      // Coordinate mapping: 100% load = yMin (45), 0% load = yMax (500)
       const normHeightRatio = loadPct / 100;
       const svgY = SVG_CONFIG.yMax - normHeightRatio * (SVG_CONFIG.yMax - SVG_CONFIG.yMin);
       const svgX = SVG_CONFIG.xMin + clampedX * (SVG_CONFIG.xMax - SVG_CONFIG.xMin);
@@ -482,9 +443,7 @@
         const pillBtn = document.createElement('button');
         pillBtn.type = 'button';
         pillBtn.className = `p-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all duration-200 ${
-          isSelected 
-            ? 'ring-2 ring-offset-2 ring-offset-slate-900 border-transparent shadow-md' 
-            : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:border-slate-600'
+          isSelected ? 'ring-2 ring-offset-2 ring-offset-slate-900 border-transparent shadow-md' : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:border-slate-600'
         }`;
         
         if (isSelected) {
@@ -495,7 +454,6 @@
         }
 
         pillBtn.onclick = () => toggleSkillSelect(skill.id);
-
         pillBtn.innerHTML = `
           <div class="flex items-center space-x-2 truncate">
             <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${skill.color}"></span>
@@ -505,7 +463,6 @@
             ${isMounted ? '● LIVE' : '○'}
           </span>
         `;
-
         container.appendChild(pillBtn);
       });
 
@@ -596,34 +553,38 @@
       });
     }
 
+    // UPDATED: Horizontal Capacity Tube Logic
     function updateCapacityTube() {
       const container = document.getElementById('tube-segments-wrapper');
-      const emptyHint = document.getElementById('empty-tube-hint');
       const tubeHousing = document.getElementById('tube-container');
       const loadReadout = document.getElementById('load-readout');
       const redZoneOverlay = document.getElementById('red-zone-failsafe-overlay');
+      const addSkillHint = document.getElementById('add-skill-hint');
 
       container.innerHTML = '';
-
-      if (state.activeMountedSkills.size === 0) {
-        emptyHint.classList.remove('hidden');
-        redZoneOverlay.classList.add('hidden');
-        tubeHousing.classList.remove('tube-overload');
-        loadReadout.textContent = '0% / 100%';
-        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-slate-400';
-        return;
-      }
-
-      emptyHint.classList.add('hidden');
 
       const totalLoadPct = getTotalCognitiveLoad();
       const roundedTotal = Math.round(totalLoadPct);
       loadReadout.textContent = `${roundedTotal}% / 100%`;
 
+      // Show pulse text when safely in fluent zone (< 50%) but only if skills exist
+      if (roundedTotal < 50 && state.activeMountedSkills.size > 0) {
+        addSkillHint.classList.remove('hidden');
+      } else {
+        addSkillHint.classList.add('hidden');
+      }
+
+      if (state.activeMountedSkills.size === 0) {
+        redZoneOverlay.classList.add('hidden');
+        tubeHousing.classList.remove('tube-overload');
+        loadReadout.className = 'mono text-xs sm:text-sm font-extrabold text-slate-400 ml-1';
+        return;
+      }
+
       if (roundedTotal >= 110) {
         redZoneOverlay.classList.remove('hidden');
         tubeHousing.classList.add('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-black text-red-400 animate-pulse';
+        loadReadout.className = 'mono text-xs sm:text-sm font-black text-red-400 animate-pulse ml-1';
         return;
       }
 
@@ -632,31 +593,30 @@
       state.activeMountedSkills.forEach((skillState) => {
         const meta = skillState.data;
         const load = skillState.loadPct;
-        const visualHeightPct = (load / 110) * 100;
+        // The container width represents 110%. So 100% width = 110 load.
+        const visualWidthPct = (load / 110) * 100;
 
         const segment = document.createElement('div');
-        segment.className = 'w-full tube-segment flex items-center justify-between px-1.5 font-bold shadow-sm shrink-0 overflow-hidden rounded-sm';
+        segment.className = 'h-full tube-segment flex items-center justify-center font-bold shadow-sm shrink-0 overflow-hidden border-r border-black/20';
         segment.style.backgroundColor = meta.color;
-        segment.style.height = `${Math.max(1.8, visualHeightPct)}%`;
+        // Ensure a minimum sliver for visibility
+        segment.style.width = `${Math.max(0.5, visualWidthPct)}%`;
         segment.style.color = meta.textLight ? '#ffffff' : '#070a12';
 
-        segment.innerHTML = `
-          <span class="truncate text-[8.5px] leading-tight">${meta.name.replace(/^[0-9]+\.\s*/, '')}</span>
-          <span class="mono text-[8px] opacity-90 ml-1 shrink-0">${Math.round(load)}%</span>
-        `;
+        segment.innerHTML = `<span class="mono text-[9px] sm:text-[11px] font-black">${Math.round(load)}%</span>`;
 
         container.appendChild(segment);
       });
 
       if (roundedTotal > 100) {
         tubeHousing.classList.add('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-black text-amber-400 animate-pulse';
+        loadReadout.className = 'mono text-xs sm:text-sm font-black text-amber-400 animate-pulse ml-1';
       } else if (roundedTotal > 75) {
         tubeHousing.classList.remove('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-amber-400';
+        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-amber-400 ml-1';
       } else {
         tubeHousing.classList.remove('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-emerald-400';
+        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-emerald-400 ml-1';
       }
     }
 
@@ -721,7 +681,6 @@
     }
 
     const svgEl = document.getElementById('graph-svg');
-    const tooltip = document.getElementById('node-drag-tooltip');
 
     function getSvgCoordinates(e) {
       const rect = svgEl.getBoundingClientRect();
@@ -733,15 +692,15 @@
       return { x, y, clientX, clientY };
     }
 
+    // We only need the X coordinate to map to the curve. Dragging horizontally anywhere will lock the pill to the curve!
     function startDrag(e, skillId) {
-      e.preventDefault();
+      e.preventDefault(); 
       state.isDraggingId = skillId;
 
       const skillNode = state.activeMountedSkills.get(skillId);
       if (!skillNode) return;
 
-      const coords = getSvgCoordinates(e);
-      showTooltip(coords.clientX, coords.clientY, skillNode);
+      showFixedInfo(skillNode);
 
       window.addEventListener('mousemove', handleDragMove);
       window.addEventListener('touchmove', handleDragMove, { passive: false });
@@ -751,12 +710,13 @@
 
     function handleDragMove(e) {
       if (!state.isDraggingId) return;
-      e.preventDefault();
+      e.preventDefault(); // Prevents pull-to-refresh on mobile while dragging horizontally
 
       const skillNode = state.activeMountedSkills.get(state.isDraggingId);
       if (!skillNode) return;
 
       const coords = getSvgCoordinates(e);
+      // Notice how we only extract X here. Finger position on Y axis is ignored.
       const targetNormX = svgXToNorm(coords.x);
 
       const curveData = calculateCurve(targetNormX);
@@ -764,31 +724,35 @@
       skillNode.loadPct = curveData.loadPct;
 
       updateAllVisuals();
-      showTooltip(coords.clientX, coords.clientY, skillNode);
+      showFixedInfo(skillNode);
     }
 
     function stopDrag() {
       state.isDraggingId = null;
-      hideTooltip();
+      hideFixedInfo();
       window.removeEventListener('mousemove', handleDragMove);
       window.removeEventListener('touchmove', handleDragMove);
       window.removeEventListener('mouseup', stopDrag);
       window.removeEventListener('touchend', stopDrag);
     }
 
-    function showTooltip(clientX, clientY, skillNode) {
-      const stageName = skillNode.normX < 0.33 
-        ? 'Cognitive' 
-        : (skillNode.normX < 0.66 ? 'Associative' : 'Autonomous');
+    // UPDATED: Fixed Top-Right Info Panel (instead of floating tooltip)
+    function showFixedInfo(skillNode) {
+      const stageName = skillNode.normX < 0.33 ? 'Phase 1: Aware' 
+        : (skillNode.normX < 0.66 ? 'Phase 2: Self-Correct' : 'Phase 3: Effortless');
 
-      tooltip.innerHTML = `<strong>${skillNode.data.name}</strong> • ${stageName} • <span class="text-amber-300 font-bold">${Math.round(skillNode.loadPct)}% Load</span>`;
-      tooltip.style.left = `${clientX}px`;
-      tooltip.style.top = `${clientY}px`;
-      tooltip.style.opacity = '1';
+      const panel = document.getElementById('fixed-info-panel');
+      document.getElementById('info-panel-stage').textContent = stageName;
+      document.getElementById('info-panel-title').textContent = skillNode.data.name;
+      document.getElementById('info-panel-title').style.color = skillNode.data.color;
+      document.getElementById('info-panel-load').textContent = `${Math.round(skillNode.loadPct)}%`;
+      
+      panel.style.opacity = '1';
     }
 
-    function hideTooltip() {
-      tooltip.style.opacity = '0';
+    function hideFixedInfo() {
+      const panel = document.getElementById('fixed-info-panel');
+      panel.style.opacity = '0';
     }
 
     function applyPreset(presetType) {
@@ -802,11 +766,7 @@
           const normX = 0.05 + (idx * 0.10);
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
-          state.activeMountedSkills.set(id, {
-            data: meta,
-            normX,
-            loadPct: curveData.loadPct
-          });
+          state.activeMountedSkills.set(id, { data: meta, normX, loadPct: curveData.loadPct });
         });
       } else if (presetType === 'intermediate') {
         const skills = ['repeat', 'count', 'theory', 'w_assoc', 'visual', 'personal', 'wpm', 'runtime'];
@@ -816,22 +776,14 @@
           const normX = positions[idx];
           const meta = SKILLS_DATA.find(s => s.id === id);
           const curveData = calculateCurve(normX);
-          state.activeMountedSkills.set(id, {
-            data: meta,
-            normX,
-            loadPct: curveData.loadPct
-          });
+          state.activeMountedSkills.set(id, { data: meta, normX, loadPct: curveData.loadPct });
         });
       } else if (presetType === 'master') {
         SKILLS_DATA.forEach((meta, idx) => {
           state.selectedSkillIds.add(meta.id);
           const normX = 0.67 + (idx * 0.025);
           const curveData = calculateCurve(normX);
-          state.activeMountedSkills.set(meta.id, {
-            data: meta,
-            normX,
-            loadPct: curveData.loadPct
-          });
+          state.activeMountedSkills.set(meta.id, { data: meta, normX, loadPct: curveData.loadPct });
         });
       }
 
