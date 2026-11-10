@@ -178,13 +178,13 @@
           <!-- Stage Phase Legend Headers -->
           <div class="grid grid-cols-3 text-center mb-1.5 text-[10px] sm:text-xs font-semibold gap-1">
             <div class="text-amber-400 bg-amber-500/10 border border-amber-500/30 py-1 px-1 rounded">
-              Phase 1: Aware
+              Aware
             </div>
             <div class="text-sky-400 bg-sky-500/10 border border-sky-500/30 py-1 px-1 rounded">
-              Phase 2: Self-Correct
+              Self-Correct
             </div>
             <div class="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 py-1 px-1 rounded">
-              Phase 3: Effortless
+              Effortless
             </div>
           </div>
 
@@ -261,7 +261,6 @@
             <div class="flex w-full relative h-4">
               <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-sky-400/70" style="left: 0; width: 45.45%;">Fluent</div>
               <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-amber-400/70" style="left: 45.45%; width: 45.45%;">Struggling</div>
-              <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-black tracking-widest uppercase text-red-500/90" style="left: 90.9%; width: 9.1%;">Fail</div>
             </div>
 
             <!-- Total Load Output -->
@@ -278,11 +277,13 @@
               <div class="absolute top-0 bottom-0 left-0 border-r border-dashed border-sky-400/50 pointer-events-none" style="width: 45.45%;"></div>
               
               <div class="absolute top-0 bottom-0 border-r-2 border-dashed border-red-500/80 flex items-center justify-center pointer-events-none" style="left: 45.45%; width: 45.45%;">
+                
                 <!-- Dynamic Pulse Hint -->
                 <span id="add-skill-hint" class="font-black text-amber-300 text-[10px] sm:text-xs animate-pulse tracking-wide drop-shadow-md hidden z-10">Add a New Skill!</span>
               </div>
               
               <div class="absolute top-0 bottom-0 right-0 red-zone-fill opacity-20 pointer-events-none" style="width: 9.1%;"></div>
+              <span class="text-red-100 font-bold uppercase text-[8px] sm:text-[9px] tracking-widest sm:rotate-0 -rotate-90">Fail</span>
 
               <!-- Filled Skill Segments -->
               <div class="absolute top-0 bottom-0 left-0 flex flex-row justify-start items-stretch z-20" id="tube-segments-wrapper" style="width: 100%;"></div>
@@ -307,7 +308,7 @@
         <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           <button onclick="applyPreset('novice')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span class="font-semibold">1 Session/span>
+            <span class="font-semibold">1 Session</span>
           </button>
           <button onclick="applyPreset('intermediate')" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition flex items-center space-x-1.5 shadow-sm active:scale-95 whitespace-nowrap">
             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-sky-400"></i>
@@ -592,8 +593,8 @@
       }
 
       const skillNode = state.activeMountedSkills.get(state.activePillId);
-      const stageName = skillNode.normX < 0.33 ? 'Phase 1: Aware' 
-        : (skillNode.normX < 0.66 ? 'Phase 2: Self-Correct' : 'Phase 3: Effortless');
+      const stageName = skillNode.normX < 0.33 ? 'Aware' 
+        : (skillNode.normX < 0.66 ? 'Self-Correct' : 'Effortless');
 
       panelContent.innerHTML = `
         <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${stageName}</div>
