@@ -1,0 +1,379 @@
+<!-- 
+  Squarespace Installation Instructions:
+  1. Edit your page and add a new "Code" block.
+  2. Ensure the setting in the block is set to "HTML".
+  3. Copy and paste all of the code below into the block.
+  4. Save the page. (Note: Squarespace sometimes disables scripts while in the editor preview, so you may need to view the live/published page to test it).
+-->
+
+<div class="qr-tool-wrapper" id="qrToolWrapper">
+  <div class="qr-header">
+    <h3 style="margin-top: 0; margin-bottom: 8px;">Bulk QR Code Generator</h3>
+    <p style="margin: 0; font-size: 14px; color: #666;">Paste your URLs below (one per line) to generate and download QR codes.</p>
+  </div>
+
+  <textarea 
+    id="qrInputUrls" 
+    class="qr-textarea" 
+    placeholder="https://example.com&#10;https://yourwebsite.com/page&#10;https://another-link.com"
+  ></textarea>
+
+  <div class="qr-controls">
+    <button id="qrGenerateBtn" class="qr-btn qr-btn-primary">Generate QR Codes</button>
+    <button id="qrDownloadAllBtn" class="qr-btn qr-btn-secondary" style="display: none;">Download All (ZIP)</button>
+  </div>
+
+  <div id="qrResults" class="qr-results-grid"></div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="qrToast" class="qr-toast">Message here</div>
+
+<!-- External Libraries for QR Generation and ZIP creation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+  /* Scoped CSS to prevent interference with Squarespace themes */
+  .qr-tool-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #eaeaea;
+    box-sizing: border-box;
+  }
+  
+  .qr-tool-wrapper * {
+    box-sizing: border-box;
+  }
+
+  .qr-header {
+    margin-bottom: 20px;
+  }
+
+  .qr-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 16px;
+    background: #fafafa;
+    color: #333;
+    transition: border-color 0.2s;
+  }
+
+  .qr-textarea:focus {
+    outline: none;
+    border-color: #333;
+    background: #fff;
+  }
+
+  .qr-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .qr-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .qr-btn:active {
+    transform: scale(0.98);
+  }
+
+  .qr-btn-primary {
+    background: #000000;
+    color: #ffffff;
+  }
+  
+  .qr-btn-primary:hover {
+    background: #333333;
+  }
+
+  .qr-btn-secondary {
+    background: #f0f0f0;
+    color: #333333;
+  }
+
+  .qr-btn-secondary:hover {
+    background: #e0e0e0;
+  }
+
+  .qr-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  .qr-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .qr-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .qr-card-title {
+    font-size: 12px;
+    color: #666;
+    word-break: break-all;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 34px;
+  }
+
+  .qr-card-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .qr-card-btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .qr-card-btn:hover {
+    background: #f9f9f9;
+  }
+
+  /* Toast notification styles */
+  .qr-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-family: sans-serif;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .qr-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const inputUrls = document.getElementById('qrInputUrls');
+    const generateBtn = document.getElementById('qrGenerateBtn');
+    const downloadAllBtn = document.getElementById('qrDownloadAllBtn');
+    const resultsGrid = document.getElementById('qrResults');
+    const toast = document.getElementById('qrToast');
+
+    let generatedCodes = []; // Store data for ZIP
+
+    // Toast notification function
+    function showToast(message, duration = 3000) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // Helper: Copy image to clipboard
+    async function copyToClipboard(dataUrl) {
+      try {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        
+        // Clipboard API for Images
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]);
+        showToast("QR Code copied to clipboard!");
+      } catch (err) {
+        console.error("Clipboard copy failed:", err);
+        showToast("Preview mode blocks copying. Try right-clicking the image!");
+      }
+    }
+
+    // Helper: Download single image
+    function downloadSingle(dataUrl, filename) {
+      try {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Download started!");
+      } catch (err) {
+        showToast("Preview mode blocks downloads. Try right-clicking to save!");
+      }
+    }
+
+    // Main Generate Logic
+    generateBtn.addEventListener('click', async () => {
+      const text = inputUrls.value;
+      if (!text.trim()) {
+        showToast("Please enter at least one URL.");
+        return;
+      }
+
+      // Split by line breaks, trim spaces, and remove empty lines
+      const urls = text.split(/\r?\n/).map(u => u.trim()).filter(u => u.length > 0);
+      
+      if (urls.length === 0) return;
+
+      // Reset state
+      resultsGrid.innerHTML = '';
+      generatedCodes = [];
+      generateBtn.textContent = "Generating...";
+      generateBtn.disabled = true;
+
+      try {
+        for (let i = 0; i < urls.length; i++) {
+          const url = urls[i];
+          
+          // Generate QR code using QRious to avoid Squarespace conflicts
+          const qr = new QRious({
+            value: url,
+            size: 300,
+            padding: 15,
+            level: 'H'
+          });
+          const qrDataUrl = qr.toDataURL('image/png');
+
+          // Save for ZIP
+          const safeName = `qrcode-${i+1}.png`;
+          generatedCodes.push({ url, dataUrl: qrDataUrl, filename: safeName });
+
+          // Build UI Card
+          const card = document.createElement('div');
+          card.className = 'qr-card';
+          
+          const img = document.createElement('img');
+          img.src = qrDataUrl;
+          img.alt = `QR for ${url}`;
+
+          const title = document.createElement('div');
+          title.className = 'qr-card-title';
+          title.textContent = url;
+
+          const actions = document.createElement('div');
+          actions.className = 'qr-card-actions';
+
+          const copyBtn = document.createElement('button');
+          copyBtn.className = 'qr-card-btn';
+          copyBtn.innerHTML = '📋 Copy';
+          copyBtn.onclick = () => copyToClipboard(qrDataUrl);
+
+          const dlBtn = document.createElement('button');
+          dlBtn.className = 'qr-card-btn';
+          dlBtn.innerHTML = '⬇️ Save';
+          dlBtn.onclick = () => downloadSingle(qrDataUrl, safeName);
+
+          actions.appendChild(copyBtn);
+          actions.appendChild(dlBtn);
+          
+          card.appendChild(img);
+          card.appendChild(title);
+          card.appendChild(actions);
+          
+          resultsGrid.appendChild(card);
+        }
+
+        // Show Download All button if there's more than 1 code
+        if (generatedCodes.length > 1) {
+          downloadAllBtn.style.display = 'inline-block';
+        } else {
+          downloadAllBtn.style.display = 'none';
+        }
+
+        showToast(`Generated ${urls.length} QR Code(s) successfully.`);
+
+      } catch (err) {
+        console.error(err);
+        showToast("Error generating QR codes.");
+      } finally {
+        generateBtn.textContent = "Generate QR Codes";
+        generateBtn.disabled = false;
+      }
+    });
+
+    // Download All (ZIP) Logic
+    downloadAllBtn.addEventListener('click', async () => {
+      if (generatedCodes.length === 0) return;
+      
+      downloadAllBtn.textContent = "Zipping...";
+      downloadAllBtn.disabled = true;
+
+      try {
+        const zip = new JSZip();
+        
+        generatedCodes.forEach(code => {
+          // dataUrl is "data:image/png;base64,iVBORw0KGgo..."
+          const base64Data = code.dataUrl.split(',')[1];
+          zip.file(code.filename, base64Data, {base64: true});
+        });
+
+        const content = await zip.generateAsync({type:"blob"});
+        
+        // Trigger download
+        const url = window.URL.createObjectURL(content);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "qrcodes.zip";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        showToast("ZIP file download triggered!");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to create ZIP. Previews may block downloads.");
+      } finally {
+        downloadAllBtn.textContent = "Download All (ZIP)";
+        downloadAllBtn.disabled = false;
+      }
+    });
+  });
+</script>
