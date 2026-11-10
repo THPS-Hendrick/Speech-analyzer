@@ -616,7 +616,6 @@
             
               Fluent
               Struggling
-              Fail
             
 
             
@@ -634,10 +633,12 @@
               
               
                 
+                
                 Add a New Skill!
               
               
               
+              Fail
 
               
               
@@ -662,7 +663,7 @@
         
           
             
-            1 Session/span>
+            1 Session
           
           
             
@@ -688,7 +689,7 @@
               Click pills to toggle selection. Click Combine to deploy. Tap deployed pills to select them, then tap anywhere on the graph to slide them along the curve!
 
 ### Interactables (Links/Buttons):
-- [BUTTON] 1 Session/span>
+- [BUTTON] 1 Session
 - [BUTTON] 4 Sessions
 - [BUTTON] 10 Sessions
 - [BUTTON] Clear
