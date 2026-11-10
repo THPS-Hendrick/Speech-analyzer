@@ -101,17 +101,16 @@
 
     /* SVG Draggable Node Styling */
     .draggable-pill {
-      cursor: grab;
-      transition: filter 0.15s ease;
+      cursor: pointer;
+      transition: filter 0.15s ease, transform 0.15s ease;
     }
-    .draggable-pill:active, .draggable-pill.dragging {
-      cursor: grabbing;
-      filter: brightness(1.3) drop-shadow(0 0 14px currentColor);
+    .draggable-pill:active {
+      transform: scale(0.95);
     }
 
     /* Smooth Transitions */
     .tube-segment {
-      transition: width 0.1s linear, background-color 0.2s ease;
+      transition: width 0.2s ease-out, background-color 0.2s ease;
     }
 
     /* Custom scrollbars */
@@ -148,7 +147,7 @@
 
     <main class="max-w-6xl w-full mx-auto flex-1 flex flex-col items-center justify-start">
 
-      <!-- Live Caliber Banner (Moved Above Graph) -->
+      <!-- Live Caliber Banner -->
       <div id="caliber-banner" class="w-full mb-4 transition-all duration-300">
         <div id="caliber-banner-inner" class="bg-slate-900/90 border border-slate-700/80 text-slate-200 px-4 py-3 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm shadow-md backdrop-blur-md">
           <div class="flex items-center space-x-3">
@@ -173,7 +172,7 @@
       <!-- Graph + Capacity Tube Wrapper -->
       <div class="w-full glass-card rounded-2xl p-3 sm:p-5 shadow-2xl relative flex flex-col items-center">
         
-        <!-- Interactive 16:9 X-Y Coordinate Plane (Now spans full width) -->
+        <!-- Interactive 16:9 X-Y Coordinate Plane -->
         <div class="w-full flex-1 flex flex-col min-w-0">
           
           <!-- Stage Phase Legend Headers -->
@@ -189,8 +188,8 @@
             </div>
           </div>
 
-          <!-- 16:9 Aspect Ratio SVG Coordinate Plane (Added touch-action: none to allow pure horizontal swiping) -->
-          <div class="graph-aspect-box bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden shadow-inner" style="touch-action: none;">
+          <!-- 16:9 Aspect Ratio SVG Coordinate Plane (Tap-To-Move enabled) -->
+          <div class="graph-aspect-box bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden shadow-inner cursor-crosshair">
             
             <svg id="graph-svg" class="w-full h-full" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
               <defs>
@@ -231,75 +230,67 @@
               <g id="y-axis-labels">
                 <text x="-260" y="45" fill="#cbd5e1" font-size="14" font-weight="800" letter-spacing="1.5" transform="rotate(-90)" text-anchor="middle">COGNITIVE LOAD</text>
                 <line x1="102" y1="45" x2="110" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="96" y="50" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">100%</text>
                 <line x1="102" y1="272" x2="110" y2="272" stroke="#94a3b8" stroke-width="2"/>
-                <text x="96" y="276" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">50%</text>
                 <line x1="102" y1="500" x2="110" y2="500" stroke="#94a3b8" stroke-width="2"/>
-                <text x="96" y="504" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="end" font-family="'JetBrains Mono', monospace">0%</text>
               </g>
 
               <line x1="110" y1="500" x2="960" y2="500" stroke="#64748b" stroke-width="2.5"/>
               <polygon points="972,500 958,494 958,506" fill="#64748b" />
               <text x="540" y="535" fill="#cbd5e1" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="1">STAGES OF SKILL ACQUISITION &rarr;</text>
               <path id="curve-path" d="" fill="none" stroke="url(#curve-gradient)" stroke-width="5" filter="url(#glow)"/>
+              
+              <!-- Draggable Nodes Layer -->
               <g id="curve-nodes-layer"></g>
             </svg>
 
-            <!-- PINNED Floating Info Panel (Top Right - Matches Effortless Width) -->
-            <div id="fixed-info-panel" class="absolute top-3 right-3 w-1/4 min-w-[120px] max-w-[200px] bg-slate-900/95 border border-slate-700 shadow-2xl rounded-xl p-2.5 sm:p-3 opacity-0 transition-opacity z-40 pointer-events-none backdrop-blur-md">
-              <div id="info-panel-stage" class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Phase</div>
-              <div id="info-panel-title" class="text-xs sm:text-sm font-black text-white truncate">Skill Name</div>
-              <div class="text-[10px] sm:text-xs font-bold text-slate-300 mt-1 flex justify-between items-center border-t border-slate-700/50 pt-1">
-                Load: <span id="info-panel-load" class="text-amber-400 font-black mono text-xs sm:text-sm">0%</span>
+            <!-- PINNED Floating Info Panel -->
+            <div id="fixed-info-panel" class="absolute top-3 right-3 w-1/4 min-w-[125px] max-w-[200px] bg-slate-900/95 border border-slate-700 shadow-2xl rounded-xl p-2.5 sm:p-3 z-40 backdrop-blur-md">
+              <div id="info-panel-content">
+                <!-- Content injected via JS -->
               </div>
             </div>
+
           </div>
         </div>
 
-        <!-- NEW HORIZONTAL: Cognitive Capacity Tube (Placed Below Graph) -->
-        <div class="mt-6 w-full flex flex-col">
+        <!-- NEW HORIZONTAL: Cognitive Capacity Tube -->
+        <div class="mt-5 w-full flex flex-col">
           
           <div class="flex justify-between items-end mb-1">
-            <div class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider">Cognitive Capacity</div>
-            <div class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <!-- Label Row -->
+            <div class="flex w-full relative h-4">
+              <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-sky-400/70" style="left: 0; width: 45.45%;">Fluent</div>
+              <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-amber-400/70" style="left: 45.45%; width: 45.45%;">Struggling</div>
+              <div class="absolute bottom-0 flex justify-center text-[9px] sm:text-[10px] font-black tracking-widest uppercase text-red-500/90" style="left: 90.9%; width: 9.1%;">Fail</div>
+            </div>
+
+            <!-- Total Load Output -->
+            <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 whitespace-nowrap pl-4 pt-1">
               Total Load: <span id="load-readout" class="text-emerald-400 font-extrabold mono ml-1">0% / 100%</span>
             </div>
           </div>
 
-          <div class="relative w-full mt-3">
-            <!-- Scale Markers -->
-            <div class="absolute w-full h-4 -top-4 text-[9px] sm:text-[10px] font-bold text-slate-400 mono pointer-events-none">
-              <span class="absolute left-0">0%</span>
-              <span class="absolute" style="left: 45.45%; transform: translateX(-50%);">50%</span>
-              <span class="absolute text-red-400 font-extrabold" style="left: 90.9%; transform: translateX(-50%);">100% MAX</span>
-            </div>
-
+          <div class="relative w-full">
             <!-- Horizontal Glass Tube -->
             <div class="relative w-full h-8 sm:h-10 bg-slate-950/90 rounded-lg sm:rounded-xl border-2 border-slate-700/80 overflow-hidden flex transition-all duration-300" id="tube-container">
               
-              <!-- Background Zones -->
-              <div class="absolute top-0 bottom-0 left-0 border-r border-dashed border-sky-400/50 flex flex-col items-center justify-center pointer-events-none" style="width: 45.45%;">
-                <span class="text-sky-400/40 font-bold uppercase text-[9px] sm:text-[10px] tracking-widest">Fluent</span>
-              </div>
+              <!-- Background Zone Dividers -->
+              <div class="absolute top-0 bottom-0 left-0 border-r border-dashed border-sky-400/50 pointer-events-none" style="width: 45.45%;"></div>
               
-              <div class="absolute top-0 bottom-0 border-r-2 border-dashed border-red-500/80 flex flex-col items-center justify-center pointer-events-none" style="left: 45.45%; width: 45.45%;">
-                <span class="text-amber-400/40 font-bold uppercase text-[9px] sm:text-[10px] tracking-widest">Struggling</span>
+              <div class="absolute top-0 bottom-0 border-r-2 border-dashed border-red-500/80 flex items-center justify-center pointer-events-none" style="left: 45.45%; width: 45.45%;">
                 <!-- Dynamic Pulse Hint -->
-                <span id="add-skill-hint" class="absolute font-black text-amber-300 text-[10px] sm:text-xs animate-pulse tracking-wide drop-shadow-md hidden z-10">Add a New Skill!</span>
+                <span id="add-skill-hint" class="font-black text-amber-300 text-[10px] sm:text-xs animate-pulse tracking-wide drop-shadow-md hidden z-10">Add a New Skill!</span>
               </div>
               
-              <div class="absolute top-0 bottom-0 right-0 red-zone-fill opacity-20 flex flex-col items-center justify-center pointer-events-none" style="width: 9.1%;">
-                <span class="text-red-100 font-bold uppercase text-[8px] sm:text-[9px] tracking-widest sm:rotate-0 -rotate-90">Fail</span>
-              </div>
+              <div class="absolute top-0 bottom-0 right-0 red-zone-fill opacity-20 pointer-events-none" style="width: 9.1%;"></div>
 
-              <!-- Filled Skill Segments (Horizontal Stack) -->
+              <!-- Filled Skill Segments -->
               <div class="absolute top-0 bottom-0 left-0 flex flex-row justify-start items-stretch z-20" id="tube-segments-wrapper" style="width: 100%;"></div>
 
               <!-- Red Zone Failsafe Overlay -->
               <div id="red-zone-failsafe-overlay" class="hidden absolute inset-0 z-30 flex items-center justify-center text-center p-2 red-zone-fill transition-all duration-200">
                 <span class="font-black text-white text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">RED ZONED &ge; 110%</span>
               </div>
-              
             </div>
           </div>
         </div>
@@ -339,7 +330,7 @@
               <span id="selected-counter" class="text-xs font-normal text-slate-400 ml-2">(1 selected)</span>
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">
-              Click pills to toggle selection. Click <strong>Combine</strong> to deploy into Phase 1 (Aware). Drag them rightwards into autonomous habit to relieve capacity!
+              Click pills to toggle selection. Click <strong>Combine</strong> to deploy. Tap deployed pills to select them, then tap anywhere on the graph to slide them along the curve!
             </p>
           </div>
 
@@ -379,7 +370,7 @@
     const state = {
       selectedSkillIds: new Set(['theory']),
       activeMountedSkills: new Map(),
-      isDraggingId: null,
+      activePillId: null, // Holds the currently selected node for tap-to-move
       spawnNormX: 0.08
     };
 
@@ -491,10 +482,14 @@
       for (const [id] of state.activeMountedSkills.entries()) {
         if (!state.selectedSkillIds.has(id)) {
           state.activeMountedSkills.delete(id);
+          // If we removed the actively selected pill, unselect it
+          if (state.activePillId === id) state.activePillId = null;
         }
       }
 
       let stagger = 0;
+      let lastAddedId = null;
+
       state.selectedSkillIds.forEach(id => {
         if (!state.activeMountedSkills.has(id)) {
           const meta = SKILLS_DATA.find(s => s.id === id);
@@ -505,9 +500,15 @@
             normX: normX,
             loadPct: curveData.loadPct
           });
+          lastAddedId = id;
           stagger++;
         }
       });
+
+      // Auto-select the newly added skill to instantly prepare for movement
+      if (lastAddedId) {
+        state.activePillId = lastAddedId;
+      }
 
       updateAllVisuals();
       renderSkillsBank();
@@ -521,6 +522,14 @@
       updateGraphNodes();
       updateCapacityTube();
       updateCaliberBanner();
+      updateInfoPanel();
+    }
+
+    // Tap to Select Logic
+    function handlePillTap(e, id) {
+      e.stopPropagation(); // Stop tap from triggering graph background (which would move it)
+      state.activePillId = id;
+      updateAllVisuals();
     }
 
     function updateGraphNodes() {
@@ -531,6 +540,16 @@
         const { svgX, svgY } = calculateCurve(skillState.normX);
         const meta = skillState.data;
 
+        const isActive = (id === state.activePillId);
+        const strokeColor = isActive ? '#ffffff' : meta.color;
+        const strokeWidth = isActive ? '3.5' : '2.5';
+        const fillOpacity = isActive ? '0.5' : '0.25';
+
+        // Add a pulsing glow ring around the dot if it is actively selected
+        const pulseRing = isActive 
+          ? `<circle cx="-27" cy="0" r="9" fill="none" stroke="#ffffff" stroke-width="2" class="animate-pulse" />` 
+          : '';
+
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('class', 'draggable-pill');
         g.setAttribute('data-skill-id', id);
@@ -538,22 +557,92 @@
 
         g.innerHTML = `
           <line x1="0" y1="0" x2="0" y2="${SVG_CONFIG.yMax - svgY}" stroke="${meta.color}" stroke-opacity="0.4" stroke-dasharray="3 3" stroke-width="1.8" />
-          <circle cx="0" cy="0" r="17" fill="${meta.color}" fill-opacity="0.25" />
-          <rect x="-44" y="-15" width="88" height="30" rx="15" fill="#090d16" stroke="${meta.color}" stroke-width="2.5" />
+          <circle cx="0" cy="0" r="17" fill="${meta.color}" fill-opacity="${fillOpacity}" />
+          <rect x="-44" y="-15" width="88" height="30" rx="15" fill="#090d16" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
+          ${pulseRing}
           <circle cx="-27" cy="0" r="5" fill="${meta.color}" />
           <text x="-16" y="4.5" fill="#ffffff" font-size="11" font-weight="700" font-family="'Inter', sans-serif">
             ${meta.name.replace(/^[0-9]+\.\s*/, '')}
           </text>
         `;
 
-        g.addEventListener('mousedown', (e) => startDrag(e, id));
-        g.addEventListener('touchstart', (e) => startDrag(e, id), { passive: false });
+        g.addEventListener('mousedown', (e) => handlePillTap(e, id));
+        g.addEventListener('touchstart', (e) => handlePillTap(e, id), { passive: false });
 
-        layer.appendChild(g);
+        // Ensure the active pill renders on top of the others
+        if (isActive) {
+          layer.appendChild(g);
+        } else {
+          layer.insertBefore(g, layer.firstChild);
+        }
       });
     }
 
-    // UPDATED: Horizontal Capacity Tube Logic
+    // New persistent info panel logic
+    function updateInfoPanel() {
+      const panelContent = document.getElementById('info-panel-content');
+      
+      if (!state.activePillId || !state.activeMountedSkills.has(state.activePillId)) {
+        panelContent.innerHTML = `
+          <div class="text-[10px] sm:text-xs font-semibold text-slate-400 text-center py-2 leading-relaxed">
+            Tap a deployed skill pill to view details & move it.
+          </div>
+        `;
+        return;
+      }
+
+      const skillNode = state.activeMountedSkills.get(state.activePillId);
+      const stageName = skillNode.normX < 0.33 ? 'Phase 1: Aware' 
+        : (skillNode.normX < 0.66 ? 'Phase 2: Self-Correct' : 'Phase 3: Effortless');
+
+      panelContent.innerHTML = `
+        <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${stageName}</div>
+        <div class="text-xs sm:text-sm font-black text-white truncate" style="color: ${skillNode.data.color}">${skillNode.data.name}</div>
+        <div class="text-[10px] sm:text-xs font-bold text-slate-300 mt-1 flex justify-between items-center border-t border-slate-700/50 pt-1">
+          Load: <span class="text-amber-400 font-black mono text-xs sm:text-sm">${Math.round(skillNode.loadPct)}%</span>
+        </div>
+      `;
+    }
+
+    // Tap to Move Logic for the SVG Canvas
+    const svgEl = document.getElementById('graph-svg');
+
+    function getSvgCoordinates(e) {
+      const rect = svgEl.getBoundingClientRect();
+      let clientX;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      } else {
+        clientX = e.clientX;
+      }
+      const x = ((clientX - rect.left) / rect.width) * SVG_CONFIG.viewWidth;
+      return { x };
+    }
+
+    function handleGraphTap(e) {
+      if (!state.activePillId) return;
+      
+      const coords = getSvgCoordinates(e);
+      const targetNormX = svgXToNorm(coords.x);
+      const skillNode = state.activeMountedSkills.get(state.activePillId);
+      
+      if (skillNode) {
+        const curveData = calculateCurve(targetNormX);
+        skillNode.normX = targetNormX;
+        skillNode.loadPct = curveData.loadPct;
+        updateAllVisuals();
+      }
+    }
+
+    // Listen to taps anywhere on the canvas
+    svgEl.addEventListener('mousedown', handleGraphTap);
+    svgEl.addEventListener('touchstart', (e) => { 
+      // Prevent pull-to-refresh on touch if we are moving a pill
+      if (state.activePillId) e.preventDefault(); 
+      handleGraphTap(e); 
+    }, { passive: false });
+
+
     function updateCapacityTube() {
       const container = document.getElementById('tube-segments-wrapper');
       const tubeHousing = document.getElementById('tube-container');
@@ -567,7 +656,6 @@
       const roundedTotal = Math.round(totalLoadPct);
       loadReadout.textContent = `${roundedTotal}% / 100%`;
 
-      // Show pulse text when safely in fluent zone (< 50%) but only if skills exist
       if (roundedTotal < 50 && state.activeMountedSkills.size > 0) {
         addSkillHint.classList.remove('hidden');
       } else {
@@ -577,14 +665,14 @@
       if (state.activeMountedSkills.size === 0) {
         redZoneOverlay.classList.add('hidden');
         tubeHousing.classList.remove('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-extrabold text-slate-400 ml-1';
+        loadReadout.className = 'mono text-[10px] sm:text-[11px] font-extrabold text-slate-400 ml-1';
         return;
       }
 
       if (roundedTotal >= 110) {
         redZoneOverlay.classList.remove('hidden');
         tubeHousing.classList.add('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-black text-red-400 animate-pulse ml-1';
+        loadReadout.className = 'mono text-[10px] sm:text-[11px] font-black text-red-400 animate-pulse ml-1';
         return;
       }
 
@@ -593,13 +681,11 @@
       state.activeMountedSkills.forEach((skillState) => {
         const meta = skillState.data;
         const load = skillState.loadPct;
-        // The container width represents 110%. So 100% width = 110 load.
         const visualWidthPct = (load / 110) * 100;
 
         const segment = document.createElement('div');
         segment.className = 'h-full tube-segment flex items-center justify-center font-bold shadow-sm shrink-0 overflow-hidden border-r border-black/20';
         segment.style.backgroundColor = meta.color;
-        // Ensure a minimum sliver for visibility
         segment.style.width = `${Math.max(0.5, visualWidthPct)}%`;
         segment.style.color = meta.textLight ? '#ffffff' : '#070a12';
 
@@ -610,13 +696,13 @@
 
       if (roundedTotal > 100) {
         tubeHousing.classList.add('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-black text-amber-400 animate-pulse ml-1';
+        loadReadout.className = 'mono text-[10px] sm:text-[11px] font-black text-amber-400 animate-pulse ml-1';
       } else if (roundedTotal > 75) {
         tubeHousing.classList.remove('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-amber-400 ml-1';
+        loadReadout.className = 'mono text-[10px] sm:text-[11px] font-bold text-amber-400 ml-1';
       } else {
         tubeHousing.classList.remove('tube-overload');
-        loadReadout.className = 'mono text-xs sm:text-sm font-bold text-emerald-400 ml-1';
+        loadReadout.className = 'mono text-[10px] sm:text-[11px] font-bold text-emerald-400 ml-1';
       }
     }
 
@@ -680,84 +766,10 @@
       lucide.createIcons();
     }
 
-    const svgEl = document.getElementById('graph-svg');
-
-    function getSvgCoordinates(e) {
-      const rect = svgEl.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      
-      const x = ((clientX - rect.left) / rect.width) * SVG_CONFIG.viewWidth;
-      const y = ((clientY - rect.top) / rect.height) * SVG_CONFIG.viewHeight;
-      return { x, y, clientX, clientY };
-    }
-
-    // We only need the X coordinate to map to the curve. Dragging horizontally anywhere will lock the pill to the curve!
-    function startDrag(e, skillId) {
-      e.preventDefault(); 
-      state.isDraggingId = skillId;
-
-      const skillNode = state.activeMountedSkills.get(skillId);
-      if (!skillNode) return;
-
-      showFixedInfo(skillNode);
-
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('touchmove', handleDragMove, { passive: false });
-      window.addEventListener('mouseup', stopDrag);
-      window.addEventListener('touchend', stopDrag);
-    }
-
-    function handleDragMove(e) {
-      if (!state.isDraggingId) return;
-      e.preventDefault(); // Prevents pull-to-refresh on mobile while dragging horizontally
-
-      const skillNode = state.activeMountedSkills.get(state.isDraggingId);
-      if (!skillNode) return;
-
-      const coords = getSvgCoordinates(e);
-      // Notice how we only extract X here. Finger position on Y axis is ignored.
-      const targetNormX = svgXToNorm(coords.x);
-
-      const curveData = calculateCurve(targetNormX);
-      skillNode.normX = targetNormX;
-      skillNode.loadPct = curveData.loadPct;
-
-      updateAllVisuals();
-      showFixedInfo(skillNode);
-    }
-
-    function stopDrag() {
-      state.isDraggingId = null;
-      hideFixedInfo();
-      window.removeEventListener('mousemove', handleDragMove);
-      window.removeEventListener('touchmove', handleDragMove);
-      window.removeEventListener('mouseup', stopDrag);
-      window.removeEventListener('touchend', stopDrag);
-    }
-
-    // UPDATED: Fixed Top-Right Info Panel (instead of floating tooltip)
-    function showFixedInfo(skillNode) {
-      const stageName = skillNode.normX < 0.33 ? 'Phase 1: Aware' 
-        : (skillNode.normX < 0.66 ? 'Phase 2: Self-Correct' : 'Phase 3: Effortless');
-
-      const panel = document.getElementById('fixed-info-panel');
-      document.getElementById('info-panel-stage').textContent = stageName;
-      document.getElementById('info-panel-title').textContent = skillNode.data.name;
-      document.getElementById('info-panel-title').style.color = skillNode.data.color;
-      document.getElementById('info-panel-load').textContent = `${Math.round(skillNode.loadPct)}%`;
-      
-      panel.style.opacity = '1';
-    }
-
-    function hideFixedInfo() {
-      const panel = document.getElementById('fixed-info-panel');
-      panel.style.opacity = '0';
-    }
-
     function applyPreset(presetType) {
       state.selectedSkillIds.clear();
       state.activeMountedSkills.clear();
+      state.activePillId = null;
 
       if (presetType === 'novice') {
         const skills = ['repeat', 'count'];
