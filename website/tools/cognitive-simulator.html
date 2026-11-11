@@ -277,13 +277,16 @@
               <div class="absolute top-0 bottom-0 left-0 border-r border-dashed border-sky-400/50 pointer-events-none" style="width: 45.45%;"></div>
               
               <div class="absolute top-0 bottom-0 border-r-2 border-dashed border-red-500/80 flex items-center justify-center pointer-events-none" style="left: 45.45%; width: 45.45%;">
-                
                 <!-- Dynamic Pulse Hint -->
                 <span id="add-skill-hint" class="font-black text-amber-300 text-[10px] sm:text-xs animate-pulse tracking-wide drop-shadow-md hidden z-10">Add a New Skill!</span>
               </div>
               
               <div class="absolute top-0 bottom-0 right-0 red-zone-fill opacity-20 pointer-events-none" style="width: 9.1%;"></div>
-              <span class="text-red-100 font-bold uppercase text-[8px] sm:text-[9px] tracking-widest sm:rotate-0 -rotate-90">Fail</span>
+              
+              <!-- Fail Text centered specifically in the 9.1% block -->
+              <div class="absolute top-0 bottom-0 right-0 flex items-center justify-center pointer-events-none z-30" style="width: 9.1%;">
+                <span class="text-red-200/80 font-black uppercase text-[8px] sm:text-[9px] tracking-widest">FAIL</span>
+              </div>
 
               <!-- Filled Skill Segments -->
               <div class="absolute top-0 bottom-0 left-0 flex flex-row justify-start items-stretch z-20" id="tube-segments-wrapper" style="width: 100%;"></div>
