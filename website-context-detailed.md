@@ -633,12 +633,15 @@
               
               
                 
-                
                 Add a New Skill!
               
               
               
-              Fail
+              
+              
+              
+                FAIL
+              
 
               
               
