@@ -489,6 +489,7 @@
 **Title:** Log In or Sign Up | Mic-Check App by Tom Hendrick
 
 **Headings:**
+- H3: Authenticating...
 - H1: Log in or create an account
 - H2: Unlock Mic-Check Pro for $9.90/mo
 
