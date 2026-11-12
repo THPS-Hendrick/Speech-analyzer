@@ -304,8 +304,22 @@
 ## File: /website/members/progress.html
 
 ### Body Text:
+- Complete your diagnostic exercises to build your data profile.
+- Overall Progress
+- Discover your specific presentation anxiety triggers by analyzing your neuro-hormonal response across 4 distinct types of pressure.
+- Map your cognitive imagery profile to see if your brain relies on vivid visual concepts or rigid structural rules when speaking unscripted.
+- Benchmark your ability to modulate pitch and volume on command to break out of a monotone comfort zone.
+- Using the Mic-Check App, we capture your baseline WPM and visual descriptor percentages when prompted solely by imagery.
+- Test how quickly you lose composure under complex Q&A rules to measure your working memory capacity under cognitive load.
+- Review your final aggregate data profile and unlock the blueprint for your 4-week Performance Plan.
 
 ### Interactables (Links/Buttons):
+- [A] Start Lesson
+- [A] Start Lesson
+- [A] Start Lesson
+- [A] Start Lesson
+- [A] Start Lesson
+- [A] Complete Prior Lessons First
 
 ### Image Alt Text:
 

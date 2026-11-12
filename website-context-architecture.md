@@ -583,8 +583,17 @@
 
 ## File: /website/members/progress.html
 
+**Title:** My Coaching Progress | THPS Member Portal
+
 **Headings:**
-- None found
+- H2: Syncing your progress...
+- H1: Welcome back, Member.
+- H3: The SAMS Test
+- H3: The VVIQ Test
+- H3: The Vocal Inhibition Test
+- H3: Image-Based Speaking Test
+- H3: Rules-Based Speaking Test
+- H3: Understanding Your Assessment
 
 ---
 
