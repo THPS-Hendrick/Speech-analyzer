@@ -1,1 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Coaching Progress | THPS Member Portal</title>
+    <meta name="description" content="Track your THPS Performance Plan progress, complete your speech diagnostic lessons, and review your biometric scores.">
+    
+    <!-- SEO Protection: Utility pages should not be indexed -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#106030',
+                            dark: '#0c4a25',
+                            gold: '#FFCC00',
+                            offwhite: '#FAF9F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Central Firebase Engine -->
+    <!-- Adjust path if you saved it elsewhere -->
+    <script type="module" src="/js/firebase-client.js"></script>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative">
 
+    <!-- INJECT_HEADER -->
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-brand-offwhite z-40 flex flex-col items-center justify-center transition-opacity duration-500">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-green mb-4"></i>
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Syncing your progress...</h2>
+    </div>
+
+    <!-- MAIN DASHBOARD AREA -->
+    <main class="flex-grow w-full pb-24 pt-8 md:pt-12 relative z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <header class="mb-12 border-b border-gray-200 pb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-layer-group"></i> Training Curriculum
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Welcome back, <span id="welcome-name">Member</span>.</h1>
+                    <p class="text-gray-600 text-lg">Complete your diagnostic exercises to build your data profile.</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Overall Progress</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="progress-bar-fill" class="h-full bg-brand-green w-0 transition-all duration-1000"></div>
+                        </div>
+                        <span id="progress-text" class="font-extrabold text-slate-900">0/6</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Lessons Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Lesson 1 -->
+                <div id="lesson-card-sams-test" class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-brand-green text-brand-gold rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">1</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                            <i class="fa-regular fa-clock mr-1"></i> Pending
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">The SAMS Test</h3>
+                    <p class="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">Discover your specific presentation anxiety triggers by analyzing your neuro-hormonal response across 4 distinct types of pressure.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+                        <!-- Score injected here by JS -->
+                    </div>
+
+                    <a href="/articles/sams-test.html" class="lesson-cta w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                        Start Lesson
+                    </a>
+                </div>
+
+                <!-- Lesson 2 -->
+                <div id="lesson-card-vviq-test" class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-brand-green text-brand-gold rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">2</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                            <i class="fa-regular fa-clock mr-1"></i> Pending
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">The VVIQ Test</h3>
+                    <p class="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">Map your cognitive imagery profile to see if your brain relies on vivid visual concepts or rigid structural rules when speaking unscripted.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6"></div>
+
+                    <a href="/articles/vviq-test.html" class="lesson-cta w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                        Start Lesson
+                    </a>
+                </div>
+
+                <!-- Lesson 3 -->
+                <div id="lesson-card-vocal-inhibition" class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-brand-green text-brand-gold rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">3</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                            <i class="fa-regular fa-clock mr-1"></i> Pending
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">The Vocal Inhibition Test</h3>
+                    <p class="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">Benchmark your ability to modulate pitch and volume on command to break out of a monotone comfort zone.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6"></div>
+
+                    <a href="/articles/vocal-inhibition.html" class="lesson-cta w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                        Start Lesson
+                    </a>
+                </div>
+
+                <!-- Lesson 4 -->
+                <div id="lesson-card-image-based" class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-brand-green text-brand-gold rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">4</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                            <i class="fa-regular fa-clock mr-1"></i> Pending
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Image-Based Speaking Test</h3>
+                    <p class="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">Using the Mic-Check App, we capture your baseline WPM and visual descriptor percentages when prompted solely by imagery.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6"></div>
+
+                    <a href="/articles/image-based-speaking.html" class="lesson-cta w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                        Start Lesson
+                    </a>
+                </div>
+
+                <!-- Lesson 5 -->
+                <div id="lesson-card-rules-based" class="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-12 h-12 bg-brand-green text-brand-gold rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">5</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                            <i class="fa-regular fa-clock mr-1"></i> Pending
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Rules-Based Speaking Test</h3>
+                    <p class="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">Test how quickly you lose composure under complex Q&A rules to measure your working memory capacity under cognitive load.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6"></div>
+
+                    <a href="/articles/rules-based-speaking.html" class="lesson-cta w-full text-center bg-brand-green text-white font-bold py-3.5 px-6 rounded-full hover:bg-brand-dark transition-colors shadow-sm">
+                        Start Lesson
+                    </a>
+                </div>
+
+                <!-- Lesson 6 -->
+                <div id="lesson-card-understanding-assessment" class="bg-brand-dark text-white rounded-3xl p-8 border border-brand-green shadow-xl flex flex-col relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-bl-full pointer-events-none"></div>
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div class="w-12 h-12 bg-brand-gold text-brand-dark rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">6</div>
+                        <div class="lesson-status text-xs font-bold uppercase tracking-widest bg-white/10 text-white/50 px-3 py-1 rounded-full border border-white/10">
+                            <i class="fa-solid fa-lock mr-1"></i> Locked
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2 relative z-10">Understanding Your Assessment</h3>
+                    <p class="text-slate-300 mb-6 flex-grow text-sm leading-relaxed relative z-10">Review your final aggregate data profile and unlock the blueprint for your 4-week Performance Plan.</p>
+                    
+                    <div class="lesson-score hidden flex justify-between items-center bg-black/20 p-4 rounded-xl border border-white/10 mb-6 relative z-10"></div>
+
+                    <a href="/articles/understanding-assessment.html" class="lesson-cta w-full text-center bg-white/10 text-white/50 border border-white/20 font-bold py-3.5 px-6 rounded-full transition-colors shadow-sm relative z-10 cursor-not-allowed pointer-events-none">
+                        Complete Prior Lessons First
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- INJECT_FOOTER -->
+
+    <!-- Dynamic Dashboard Logic -->
+    <script type="module">
+        import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        // Wait for the global thpsAuth and thpsDb to be initialized by firebase-client.js
+        const checkAuthReady = setInterval(async () => {
+            if (window.thpsAuth && window.thpsDb) {
+                clearInterval(checkAuthReady);
+                
+                window.thpsAuth.onAuthStateChanged(async (user) => {
+                    if (!user) {
+                        // Unauthenticated users are booted back to login
+                        window.location.href = '/members/login.html'; 
+                        return;
+                    }
+                    
+                    // Populate UI Name
+                    const firstName = user.displayName ? user.displayName.split(' ')[0] : 'Member';
+                    document.getElementById('welcome-name').innerText = firstName;
+                    
+                    // Fetch Progress Data
+                    const docRef = doc(window.thpsDb, "Members", user.uid);
+                    try {
+                        const snap = await getDoc(docRef);
+                        let completedCount = 0;
+                        
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            const progress = data.progress || {};
+                            
+                            // Map progress to specific UI cards
+                            if (updateLessonUI('sams-test', progress['sams-test'])) completedCount++;
+                            if (updateLessonUI('vviq-test', progress['vviq-test'])) completedCount++;
+                            if (updateLessonUI('vocal-inhibition', progress['vocal-inhibition'])) completedCount++;
+                            if (updateLessonUI('image-based', progress['image-based'])) completedCount++;
+                            if (updateLessonUI('rules-based', progress['rules-based'])) completedCount++;
+                            
+                            // Unlock Lesson 6 if prior 5 are done
+                            if (completedCount === 5) {
+                                unlockFinalLesson(progress['understanding-assessment']);
+                                if (progress['understanding-assessment']?.completed) completedCount++;
+                            }
+                        }
+                        
+                        // Update Overall Progress Bar
+                        document.getElementById('progress-text').innerText = `${completedCount}/6`;
+                        document.getElementById('progress-bar-fill').style.width = `${(completedCount / 6) * 100}%`;
+                        
+                        // Fade out loading screen
+                        const loader = document.getElementById('loading-overlay');
+                        loader.classList.add('opacity-0');
+                        setTimeout(() => loader.remove(), 500);
+
+                    } catch(e) {
+                        console.error("Failed to load dashboard data:", e);
+                    }
+                });
+            }
+        }, 100);
+
+        function updateLessonUI(lessonId, lessonData) {
+            const card = document.getElementById(`lesson-card-${lessonId}`);
+            if (!card) return false;
+            
+            if (lessonData && lessonData.completed) {
+                // Swap pending badge for Completed badge
+                const statusBadge = card.querySelector('.lesson-status');
+                statusBadge.className = "text-xs font-bold uppercase tracking-widest bg-green-50 border border-green-200 text-brand-green px-3 py-1 rounded-full shadow-inner";
+                statusBadge.innerHTML = `<i class="fa-solid fa-check-circle mr-1 text-brand-gold"></i> Completed`;
+                
+                // Swap active CTA for Review CTA
+                const ctaBtn = card.querySelector('.lesson-cta');
+                ctaBtn.className = "w-full text-center bg-gray-50 border border-gray-200 text-slate-600 font-bold py-3.5 px-6 rounded-full hover:bg-gray-100 transition-colors shadow-sm";
+                ctaBtn.innerHTML = `Review Results`;
+                
+                // Inject score if applicable
+                if (lessonData.scoreData !== undefined && lessonData.scoreData !== null) {
+                    const scoreDisplay = card.querySelector('.lesson-score');
+                    if (scoreDisplay) {
+                        scoreDisplay.classList.remove('hidden');
+                        scoreDisplay.innerHTML = `<span class="text-xs font-bold uppercase tracking-widest text-slate-500">Score Data:</span> <span class="text-lg font-black text-brand-green">${lessonData.scoreData}</span>`;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function unlockFinalLesson(lessonData) {
+            const card = document.getElementById('lesson-card-understanding-assessment');
+            
+            const statusBadge = card.querySelector('.lesson-status');
+            statusBadge.className = "text-xs font-bold uppercase tracking-widest bg-brand-gold border border-brand-gold text-brand-dark px-3 py-1 rounded-full shadow-inner";
+            statusBadge.innerHTML = `<i class="fa-solid fa-unlock mr-1"></i> Unlocked`;
+            
+            const ctaBtn = card.querySelector('.lesson-cta');
+            ctaBtn.className = "w-full text-center bg-brand-gold text-brand-dark font-extrabold py-3.5 px-6 rounded-full hover:bg-yellow-400 transition-colors shadow-lg";
+            ctaBtn.innerHTML = `Reveal Assessment`;
+            ctaBtn.classList.remove('cursor-not-allowed', 'pointer-events-none');
+            
+            if (lessonData && lessonData.completed) {
+                statusBadge.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Completed`;
+                ctaBtn.innerHTML = `Review Full Report`;
+                ctaBtn.className = "w-full text-center bg-slate-800 border border-slate-700 text-slate-300 font-bold py-3.5 px-6 rounded-full hover:bg-slate-700 transition-colors shadow-sm";
+            }
+        }
+    </script>
+</body>
+</html>
