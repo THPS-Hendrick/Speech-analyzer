@@ -509,6 +509,9 @@
 - [A] Transformations Hub
 - [A] Case Studies
 - [A] Glossary
+- [A] Nerves
+- [A] VVIQ
+- [A] Voice
 - [A] About
 - [A] Contact
 - [BUTTON] Member Portal
@@ -529,6 +532,9 @@
 - [A] Transformations Hub
 - [A] Case Studies
 - [A] Glossary
+- [A] Nerves
+- [A] VVIQ
+- [A] Voice
 - [A] About
 - [A] Contact
 - [BUTTON] Member Portal
