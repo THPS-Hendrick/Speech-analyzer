@@ -1,1 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Speak Without a Script: The Image-Based Test | Tom Hendrick</title>
+    <meta name="description" content="Stop memorizing presentations. Learn how to use mental imagery to speak without a script and test your cognitive word-finding ability under pressure.">
+    <link rel="canonical" href="https://tomhendrick.com/articles/speak-without-script-image-test.html" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Schema.org Article and FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "How to Speak Without a Script: The Image-Based Test",
+          "description": "Learn the cognitive mechanics of generating a 'mental movie' to speak effortlessly without a script, tailored to your VVIQ profile.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is it better to memorize a script or speak without one?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Reading a word-perfect script can make you sound clunky and unnatural, and it is highly impractical for 'anytime' speaking like interviews or Q&A sessions. It is better to use structured frameworks or mental imagery to speak extemporaneously."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I use mental images to speak without a script?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Instead of recalling memorized text, you play a 'mental movie' or visualize a specific image in your head. Your brain then naturally word-associates to describe what you are seeing, lowering cognitive load and increasing sensory descriptions."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why is storytelling hard for some speakers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Storytelling requires generating vivid imagery. For speakers with Hypophantasia or Aphantasia, generating mental images requires immense cognitive effort. They must rely on automated structural rules to free up enough working memory to tell a story."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
+    <!-- Google Fonts & Tailwind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { green: '#106030', dark: '#0c4a25', gold: '#FFCC00', offwhite: '#FAF9F5' } }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Central Firebase Engine -->
+    <script type="module" src="/js/firebase-client.js"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- INJECT_HEADER -->
+
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Breadcrumb -->
+            <a href="/members/progress.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
+                <i class="fa-solid fa-arrow-left"></i> Member Hub
+            </a>
+
+            <!-- Header -->
+            <header class="mb-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-regular fa-image"></i> Lesson 4
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4 tracking-tight">Image-Based Speaking Test</h1>
+                <p class="text-xl text-gray-600">Test how well you control your thoughts, words, and delivery without a script.</p>
+            </header>
+
+            <!-- DO-ABLE: Interactive Micro-App -->
+            <div id="test-container" class="bg-white rounded-3xl p-6 md:p-12 shadow-xl border border-gray-200 mb-16 relative overflow-hidden transition-all duration-300 min-h-[500px] flex flex-col justify-center">
+                
+                <!-- Progress Bar -->
+                <div id="test-progress-container" class="hidden absolute top-0 left-0 w-full h-1.5 bg-gray-100">
+                    <div id="test-progress-bar" class="h-full bg-brand-green w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Intro Screen -->
+                <div id="screen-intro" class="text-center">
+                    <div class="w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center mx-auto text-2xl mb-6 shadow-md"><i class="fa-solid fa-microphone"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">No Script Image Test</h2>
+                    <p class="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">This is a test to see how well you currently control your thoughts, words, and delivery without a script. You will be prompted with an image and required to speak aloud. <strong>Microphone access is required.</strong></p>
+                    <button onclick="requestMicAndStart()" id="btn-start" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md active:scale-95 text-lg">Start Image Test</button>
+                    <p id="mic-error" class="hidden text-red-600 text-sm font-bold mt-4">Microphone access is required to proceed.</p>
+                </div>
+
+                <!-- Active Test Screen -->
+                <div id="screen-active-test" class="hidden flex-col w-full max-w-3xl mx-auto items-center">
+                    <div class="flex justify-between w-full items-center mb-4">
+                        <div class="text-brand-green font-bold text-sm uppercase tracking-widest" id="test-counter">Level 1 of 3</div>
+                        <div id="test-goals-badge" class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 uppercase tracking-widest">
+                            Goal: <span id="goal-wpm" class="mr-2">WPM < 120</span> <span id="goal-vis">VIS > 50%</span>
+                        </div>
+                    </div>
+                    
+                    <h3 id="test-title" class="text-2xl font-bold text-slate-900 mb-2 text-center w-full"></h3>
+                    <div id="test-instructions" class="text-gray-600 text-sm mb-6 text-center w-full bg-gray-50 p-4 rounded-xl border border-gray-200 leading-relaxed font-medium"></div>
+
+                    <!-- Image Prompt Box -->
+                    <div class="w-full h-64 md:h-80 bg-slate-100 rounded-xl overflow-hidden shadow-inner mb-6 relative border border-slate-200 flex items-center justify-center">
+                        <img id="test-image" src="" alt="Test Prompt" class="w-full h-full object-cover hidden">
+                        <div id="test-image-blank" class="hidden text-slate-400 font-medium italic">Visualize the scene in your mind...</div>
+                    </div>
+
+                    <!-- Live Timer Bar -->
+                    <div class="w-full flex flex-col gap-1 mb-8">
+                        <div class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                            <span>0s</span>
+                            <span class="text-brand-green">Target: 60s - 80s</span>
+                            <span>90s MAX</span>
+                        </div>
+                        <div class="w-full h-6 bg-gray-100 rounded-full relative overflow-hidden border border-gray-200">
+                            <!-- The 60-80s target zone (66.6% to 88.8% of 90s max) -->
+                            <div class="absolute top-0 bottom-0 bg-green-100 border-l-2 border-r-2 border-brand-green" style="left: 66.6%; width: 22.2%;"></div>
+                            <div class="absolute inset-0 flex items-center justify-end pr-12 text-[10px] font-black text-brand-green tracking-widest z-10">FINISH</div>
+                            <!-- The live fill -->
+                            <div id="live-timer-fill" class="h-full bg-slate-400 w-0 transition-all duration-100 ease-linear absolute top-0 left-0 z-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- Score Pills (Revealed Post-Analysis) -->
+                    <div id="score-pills-container" class="hidden w-full flex justify-center gap-4 mb-8">
+                        <div id="pill-wpm" class="flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 bg-gray-50 border-gray-200 transition-colors">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Speed</span>
+                            <span id="score-wpm-val" class="text-2xl font-black text-slate-800">0 <span class="text-xs font-bold">WPM</span></span>
+                        </div>
+                        <div id="pill-vis" class="flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 bg-gray-50 border-gray-200 transition-colors">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Visuals</span>
+                            <span id="score-vis-val" class="text-2xl font-black text-slate-800">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex flex-col items-center justify-center w-full">
+                        <button id="btn-master-control" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-rose-600 text-white flex items-center justify-center text-3xl shadow-lg hover:bg-rose-500 transition-transform active:scale-95">
+                            <i id="master-icon" class="fa-solid fa-microphone"></i>
+                        </button>
+                        <p id="control-label" class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-3">Start Speaking</p>
+                        
+                        <button id="btn-next-level" onclick="nextLevel()" class="hidden mt-6 bg-slate-800 text-white font-bold py-3.5 px-8 rounded-full hover:bg-slate-700 transition-all shadow-md active:scale-95 text-sm uppercase tracking-widest flex items-center gap-2">
+                            Next Level <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Processing Screen -->
+                <div id="screen-loading" class="hidden text-center flex-col items-center justify-center">
+                    <div class="relative flex items-center justify-center mb-4 w-16 h-16 bg-blue-100 rounded-full shadow-inner mx-auto">
+                        <i class="fa-solid fa-circle-notch fa-spin w-8 h-8 text-blue-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Transcribing & Analyzing...</h3>
+                    <p class="text-sm text-gray-500 mt-2">Connecting to Google Cloud Speech-to-Text.</p>
+                </div>
+
+                <!-- Final Results Screen -->
+                <div id="screen-results" class="hidden text-center flex-col w-full">
+                    <div class="w-16 h-16 bg-brand-gold text-brand-dark rounded-full flex items-center justify-center mx-auto text-2xl mb-4 shadow-sm"><i class="fa-solid fa-flag-checkered"></i></div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Test Complete</h2>
+                    <p class="text-gray-500 mb-8">Results safely stored to your CRM.</p>
+                    
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-xl mx-auto w-full mb-8">
+                        <h4 class="text-sm font-bold text-brand-green uppercase tracking-widest mb-4 border-b border-gray-100 pb-2 text-left">Your Results</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">Level 1 (Full Image)</span>
+                                <div class="flex gap-4">
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Speed:</span> <span id="res-l1-wpm" class="text-slate-800"></span></span>
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Visuals:</span> <span id="res-l1-vis" class="text-slate-800"></span></span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">Level 2 (Half Image)</span>
+                                <div class="flex gap-4">
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Speed:</span> <span id="res-l2-wpm" class="text-slate-800"></span></span>
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Visuals:</span> <span id="res-l2-vis" class="text-slate-800"></span></span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">Level 3 (Imagine)</span>
+                                <div class="flex gap-4">
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Speed:</span> <span id="res-l3-wpm" class="text-slate-800"></span></span>
+                                    <span class="text-sm font-bold"><span class="text-gray-400">Visuals:</span> <span id="res-l3-vis" class="text-slate-800"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="/members/progress.html" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md text-center">Back to Member Progress</a>
+                    </div>
+                    
+                    <div id="auth-prompt" class="hidden mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-800 text-sm">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> You are not logged in. <a href="/members/login.html" class="font-bold hover:underline text-brand-dark">Sign up for a free account</a> to save this profile and track your progress.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mb-16">
+                <i class="fa-solid fa-arrow-down text-2xl text-gray-300 animate-bounce"></i>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Read below to see how thinking in images helps speak without a script</p>
+            </div>
+
+            <!-- READABLE: SEO / Educational Content -->
+            <article class="prose prose-lg max-w-none text-gray-700 mb-20 space-y-8">
+                
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Pitfalls of the Word-Perfect Script</h2>
+                <p>Many people overprepare for presentations by spending hours writing a word-perfect script. However, the act of reading a word-perfect script can be extremely impractical. If you're not a professionally trained voice actor, reading makes you sound clunky and unnatural, which is highly disengaging for the audience.</p>
+                <p>More importantly, it is impossible to have a fully prepared written script for all occasions. To become an "anytime speaker"—where you can speak well anytime in front of an interview panel, when cameras unexpectedly turn on, or in front of a thousand people—we need to solve for where you pull your information from on the fly.</p>
+
+                <h2 class="text-3xl font-bold text-slate-900 mt-12 mb-4">How to Read an "Image Script"</h2>
+                <p>If you have taken the VVIQ test, you know whether your brain leans toward Aphantasia, Hypophantasia, Phantasia, or Hyperphantasia. For everyone except Aphantasia speakers, you have some capacity to generate images in your head to help you find words to speak.</p>
+                <p>Images in your head are a very powerful way of finding words that, in turn, can generate an image in your audience's mind. If you can tell a story or explain something so vividly that they can physically "see" it, you deliver incredibly information-rich and engaging content compared to dry, abstract data.</p>
+                
+                <div class="bg-gray-50 border-l-4 border-brand-green p-6 rounded-r-xl my-8">
+                    <p class="font-medium text-slate-800 m-0"><strong>The Mental Movie:</strong> Your ability to generate images in your head and use that as your "script" is the secret to speaking without one. When you imagine what the scene looks like, you are doing what natural public speaking is: generating a memory, playing a movie in your head, and letting the descriptive words naturally fall out of your mouth.</p>
+                </div>
+
+                <h2 class="text-3xl font-bold text-slate-900 mt-12 mb-6">Navigating Your Cognitive Imagery Profile</h2>
+                <p>However, generating mental images can take a massive cognitive toll and be incredibly difficult to do under pressure if you don't know how to balance your working memory.</p>
+
+                <div class="space-y-10 mt-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">For Hypophantasia Speakers (High Effort)</h3>
+                        <p class="leading-relaxed">For people who struggle to visualize naturally, you must become perfectly effortless at other structural speaking skills so that your remaining cognitive capacity can be spent entirely on generating images.</p>
+                        <p class="leading-relaxed mt-2">Hypophantasia speakers tend to be exceptionally good at following structured rules or frameworks (like the Repeat & Count method) to find word categories easily. By leaning into this rules-based superpower to anchor the speech, they free up the necessary brainpower to generate a story in their head and get it out of their mouth.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">For Hyperphantasia Speakers (The Visual Superpower)</h3>
+                        <p class="leading-relaxed">If you are a hyperphantasia speaker, generating rich images is effortless. It would be silly not to use that skill set when you speak without a script.</p>
+                        <p class="leading-relaxed mt-2">Sometimes hyperphantasia speakers are better off not writing a single word on a cue card or script when preparing for a speech. Forcing non-visual dot points interrupts their flow. They are far better off vividly imagining or reimagining stories and diagrams, and simply speaking aloud to describe what they see in their mind's eye.</p>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- AEO / FAQ SECTION -->
+            <section class="border-t border-gray-200 pt-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
+                
+                <div class="space-y-4">
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            Is it better to memorize a script or speak without one?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            Reading a word-perfect script can make you sound clunky and unnatural, and it is highly impractical for 'anytime' speaking like interviews or Q&A sessions. It is better to use structured frameworks or mental imagery to speak extemporaneously.
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            How do I use mental images to speak without a script?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            Instead of recalling memorized text, you play a 'mental movie' or visualize a specific scene in your head. Your brain then naturally word-associates to describe what you are seeing, lowering cognitive load and increasing vivid sensory descriptions.
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            Why is storytelling hard for some speakers?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            Storytelling requires generating vivid imagery. For speakers with Hypophantasia or Aphantasia, generating mental images requires immense cognitive effort. They must rely on automated structural rules to free up enough working memory to tell a story fluently.
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- INJECT_FOOTER -->
+
+    <!-- Micro-App State & Audio Logic -->
+    <script>
+        const levels = [
+            {
+                id: 1,
+                title: "Slow + Full Image",
+                instructions: "Speak for 60-80 seconds. Speak slowly (below 120 WPM). Say only words you can see in the image (e.g., Yellow bag, brown handle).",
+                image: "/image/bag.webp",
+                cssClass: "w-full h-full object-cover",
+                wpmRule: { max: 120, label: "< 120" },
+                visRule: { min: 50, label: "> 50%" }
+            },
+            {
+                id: 2,
+                title: "Slow + Imagine",
+                instructions: "Speak for 60-80 seconds. Speak slowly (below 120 WPM). Imagine the house were fixed. Say only what could be seen (e.g., Clean red bricks, white picket fence).",
+                image: "/image/house.webp",
+                cssClass: "w-1/2 h-full object-cover object-left", // Crops right 50%
+                wpmRule: { max: 120, label: "< 120" },
+                visRule: { min: 50, label: "> 50%" }
+            },
+            {
+                id: 3,
+                title: "Fast + Imagine",
+                instructions: "Speak for 60-80 seconds. Speak quickly (above 150 WPM). Describe what you see if you left a hotel to go home from holiday (e.g., Press elevator button, inside are 3 people). Name as many colours and objects as possible.",
+                image: "", // Blank
+                wpmRule: { min: 150, label: "> 150" },
+                visRule: { min: 50, label: "> 50%" }
+            }
+        ];
+
+        let currentLevel = 0;
+        let isRecording = false;
+        let startTime = 0;
+        let timerInterval = null;
+        let elapsedSecs = 0;
+        
+        let audioCtx = null;
+        let sourceNode = null;
+        let processorNode = null;
+        let audioBuffers = [];
+        let totalSamplesRecorded = 0;
+
+        let visualDictionary = new Set();
+        let testResults = [];
+
+        // Fetch dictionary silently on load
+        fetch('https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json')
+            .then(res => res.json())
+            .then(data => {
+                if (data["Visual Words"]) {
+                    data["Visual Words"].forEach(w => visualDictionary.add(w.toLowerCase()));
+                }
+            }).catch(e => console.warn("Could not load visual dict", e));
+
+        const screens = {
+            intro: document.getElementById('screen-intro'),
+            active: document.getElementById('screen-active-test'),
+            loading: document.getElementById('screen-loading'),
+            results: document.getElementById('screen-results')
+        };
+        const pContainer = document.getElementById('test-progress-container');
+        const pBar = document.getElementById('test-progress-bar');
+
+        async function requestMicAndStart() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+                window.audioStream = stream; // Keep alive
+                
+                screens.intro.classList.add('hidden');
+                pContainer.classList.remove('hidden');
+                screens.active.classList.remove('hidden');
+                screens.active.classList.add('flex');
+                
+                loadLevel();
+            } catch (err) {
+                console.error("Mic error:", err);
+                document.getElementById('mic-error').classList.remove('hidden');
+            }
+        }
+
+        function loadLevel() {
+            if (currentLevel >= levels.length) {
+                finishDiagnostic();
+                return;
+            }
+
+            const lvl = levels[currentLevel];
+            pBar.style.width = `${(currentStageProgress())}%`;
+
+            document.getElementById('test-counter').innerText = `Level ${lvl.id} of 3`;
+            document.getElementById('test-title').innerText = lvl.title;
+            document.getElementById('test-instructions').innerText = lvl.instructions;
+            
+            document.getElementById('goal-wpm').innerText = `WPM ${lvl.wpmRule.label}`;
+            document.getElementById('goal-vis').innerText = `VIS ${lvl.visRule.label}`;
+
+            const imgEl = document.getElementById('test-image');
+            const blankEl = document.getElementById('test-image-blank');
+            
+            if (lvl.image) {
+                imgEl.src = lvl.image;
+                imgEl.className = lvl.cssClass;
+                imgEl.classList.remove('hidden');
+                blankEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                blankEl.classList.remove('hidden');
+            }
+
+            // Reset UI
+            document.getElementById('live-timer-fill').style.width = '0%';
+            document.getElementById('score-pills-container').classList.add('hidden');
+            document.getElementById('score-pills-container').classList.remove('flex');
+            document.getElementById('btn-next-level').classList.add('hidden');
+            
+            document.getElementById('btn-master-control').disabled = false;
+            document.getElementById('btn-master-control').classList.remove('opacity-50');
+            document.getElementById('btn-master-control').classList.replace('bg-slate-800', 'bg-rose-600');
+            document.getElementById('master-icon').className = "fa-solid fa-microphone";
+            document.getElementById('control-label').innerText = "Start Speaking";
+            
+            elapsedSecs = 0;
+            audioBuffers = [];
+            totalSamplesRecorded = 0;
+        }
+        
+        function currentStageProgress() {
+            return (currentLevel / 3) * 100;
+        }
+
+        function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopAndProcess();
+            }
+        }
+
+        async function startRecording() {
+            isRecording = true;
+            document.getElementById('btn-master-control').classList.replace('bg-rose-600', 'bg-slate-800');
+            document.getElementById('master-icon').className = "fa-solid fa-stop";
+            document.getElementById('control-label').innerText = "Stop Recording";
+            
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass({ sampleRate: 16000 });
+            sourceNode = audioCtx.createMediaStreamSource(window.audioStream);
+            processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+
+            processorNode.onaudioprocess = function(e) {
+                if (!isRecording) return;
+                const channelData = e.inputBuffer.getChannelData(0);
+                if (elapsedSecs <= 90) { 
+                    audioBuffers.push(new Float32Array(channelData));
+                    totalSamplesRecorded += channelData.length;
+                }
+            };
+
+            sourceNode.connect(processorNode);
+            processorNode.connect(audioCtx.destination); 
+            
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                elapsedSecs = (Date.now() - startTime) / 1000;
+                let fillPercent = Math.min((elapsedSecs / 90) * 100, 100);
+                document.getElementById('live-timer-fill').style.width = `${fillPercent}%`;
+                
+                if (elapsedSecs >= 90) {
+                    stopAndProcess();
+                }
+            }, 50);
+        }
+
+        // --- Audio Encoding Utilities ---
+        function floatTo16BitPCM(output, offset, input) {
+            for (let i = 0; i < input.length; i++, offset += 2) {
+                let s = Math.max(-1, Math.min(1, input[i]));
+                output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            }
+        }
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+        }
+        function encodeWAV(samples, sampleRate) {
+            let buffer = new ArrayBuffer(44 + samples.length * 2);
+            let view = new DataView(buffer);
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + samples.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); 
+            view.setUint16(22, 1, true); 
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, samples.length * 2, true);
+            floatTo16BitPCM(view, 44, samples);
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        async function stopAndProcess() {
+            isRecording = false;
+            clearInterval(timerInterval);
+            
+            // Lock controls
+            document.getElementById('btn-master-control').disabled = true;
+            document.getElementById('btn-master-control').classList.add('opacity-50');
+            document.getElementById('master-icon').className = "fa-solid fa-spinner fa-spin";
+            document.getElementById('control-label').innerText = "Processing...";
+            
+            screens.active.classList.add('hidden');
+            screens.active.classList.remove('flex');
+            screens.loading.classList.remove('hidden');
+            screens.loading.classList.add('flex');
+
+            if (processorNode) { processorNode.disconnect(); processorNode = null; }
+            if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
+
+            let masterFloatArray = new Float32Array(totalSamplesRecorded);
+            let writeOffset = 0;
+            for(let i = 0; i < audioBuffers.length; i++) {
+                masterFloatArray.set(audioBuffers[i], writeOffset);
+                writeOffset += audioBuffers[i].length;
+            }
+
+            const wavBlob = encodeWAV(masterFloatArray, 16000);
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(wavBlob);
+            reader.onloadend = async () => {
+                const base64data = reader.result.split(',')[1];
+                let transcript = "";
+                
+                try {
+                    const response = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ audioContent: base64data, mimeType: 'audio/wav' })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        transcript = data.transcript ? data.transcript.trim() : '';
+                    }
+                } catch (e) {
+                    console.error("Vercel error:", e);
+                }
+
+                evaluateLevel(transcript, elapsedSecs);
+            };
+        }
+
+        function evaluateLevel(text, seconds) {
+            const words = text.split(/\s+/).filter(w => w.trim().length > 0);
+            const totalWords = Math.max(1, words.length);
+            
+            let visCount = 0;
+            words.forEach(w => {
+                let clean = w.toLowerCase().replace(/[^a-z']/g, '');
+                let root = clean.replace(/(?:s|es|ed|ing)$/, '');
+                if (visualDictionary.has(clean) || visualDictionary.has(root)) {
+                    visCount++;
+                }
+            });
+
+            const wpm = Math.round((totalWords / Math.max(1, seconds)) * 60);
+            const visPct = Math.round((visCount / totalWords) * 100);
+            
+            const lvl = levels[currentLevel];
+            let wpmPass = lvl.wpmRule.max ? wpm <= lvl.wpmRule.max : wpm >= lvl.wpmRule.min;
+            let visPass = visPct >= lvl.visRule.min;
+            
+            // Record result
+            testResults.push({ wpm, wpmPass, visPct, visPass });
+
+            // Display feedback UI on active screen
+            screens.loading.classList.add('hidden');
+            screens.loading.classList.remove('flex');
+            screens.active.classList.remove('hidden');
+            screens.active.classList.add('flex');
+            
+            const pWpm = document.getElementById('pill-wpm');
+            const pVis = document.getElementById('pill-vis');
+            
+            document.getElementById('score-wpm-val').innerHTML = `${wpm} <span class="text-xs font-bold">WPM</span>`;
+            document.getElementById('score-vis-val').innerText = `${visPct}%`;
+
+            pWpm.className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${wpmPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
+            pVis.className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${visPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
+
+            document.getElementById('score-pills-container').classList.remove('hidden');
+            document.getElementById('score-pills-container').classList.add('flex');
+            
+            document.getElementById('btn-master-control').classList.add('hidden');
+            document.getElementById('control-label').classList.add('hidden');
+            
+            document.getElementById('btn-next-level').classList.remove('hidden');
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            
+            document.getElementById('btn-master-control').classList.remove('hidden');
+            document.getElementById('control-label').classList.remove('hidden');
+            
+            loadLevel();
+        }
+
+        function finishDiagnostic() {
+            screens.active.classList.add('hidden');
+            screens.active.classList.remove('flex');
+            pBar.style.width = '100%';
+            
+            // Populate Results
+            for(let i=0; i<3; i++) {
+                let res = testResults[i] || { wpm: 0, wpmPass: false, visPct: 0, visPass: false };
+                document.getElementById(`res-l${i+1}-wpm`).innerHTML = `<span class="${res.wpmPass ? 'text-green-600' : 'text-red-500'}">${res.wpm}</span>`;
+                document.getElementById(`res-l${i+1}-vis`).innerHTML = `<span class="${res.visPass ? 'text-green-600' : 'text-red-500'}">${res.visPct}%</span>`;
+            }
+
+            // Format payload
+            let str = `L1: WPM ${testResults[0]?.wpm}, VIS ${testResults[0]?.visPct}% | L2: WPM ${testResults[1]?.wpm}, VIS ${testResults[1]?.visPct}% | L3: WPM ${testResults[2]?.wpm}, VIS ${testResults[2]?.visPct}%`;
+
+            if (window.saveLessonProgress) {
+                window.saveLessonProgress('image-based', str).then((success) => {
+                    if (!success) document.getElementById('auth-prompt').classList.remove('hidden');
+                });
+            } else {
+                document.getElementById('auth-prompt').classList.remove('hidden');
+            }
+            
+            screens.results.classList.remove('hidden');
+            screens.results.classList.add('flex');
+            
+            // Turn off mic
+            if (window.audioStream) { window.audioStream.getTracks().forEach(t => t.stop()); }
+        }
+    </script>
+</body>
+</html>
