@@ -62,7 +62,7 @@
                             <a href="/members/mic-check.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Mic-Check Dashboard</a>
                             <a href="/members/progress.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-green">Historical Progress</a>
                             <a href="/members/account.html" class="block px-4 py-2 text-sm font-bold text-brand-green bg-gray-50">Account Management</a>
-                            <div class="auth-in"><button class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium border-t border-gray-100 mt-1">Log Out</button></div>
+                            <div class="auth-in"><button onclick="if(window.handleLogout) window.handleLogout()" class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium border-t border-gray-100 mt-1">Log Out</button></div>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                     <a href="/members/mic-check.html" class="block py-2 text-sm text-gray-600">Mic-Check Dashboard</a>
                     <a href="/members/progress.html" class="block py-2 text-sm text-gray-600">Historical Progress</a>
                     <a href="/members/account.html" class="block py-2 text-sm text-gray-600">Account Management</a>
-                    <div class="auth-in border-t border-gray-200 mt-2 pt-1"><button class="block w-full text-left py-2 text-sm text-red-600 font-bold">Log Out</button></div>
+                    <div class="auth-in border-t border-gray-200 mt-2 pt-1"><button onclick="if(window.handleLogout) window.handleLogout()" class="block w-full text-left py-2 text-sm text-red-600 font-bold">Log Out</button></div>
                 </div>
             </div>
         </div>
@@ -129,15 +129,6 @@
 <script>
     // Header Logic: Execute immediately
     (function() {
-        // --- Lightweight Auth State Check (Zero Jank) ---
-        const mockUserSession = { firstName: "Executive" }; // Set to null to simulate logged out
-        if (mockUserSession) {
-            document.body.classList.add('logged-in');
-            document.querySelectorAll('.auth-user-name').forEach(el => {
-                el.innerText = mockUserSession.firstName;
-            });
-        }
-
         // --- Mobile Menu Toggle ---
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenuPanel = document.getElementById('mobile-menu-panel');
