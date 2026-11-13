@@ -405,7 +405,6 @@
 - [A] Glossary
 - [A] About
 - [A] Contact
-- [A] Sign in
 - [BUTTON] Member Portal
 - [A] Login / Sign-up
 - [A] Mic-Check Dashboard
@@ -426,7 +425,7 @@
 - [A] Glossary
 - [A] About
 - [A] Contact
-- [BUTTON] Member Portal Sign in
+- [BUTTON] Member Portal
 - [A] Login / Sign-up
 - [A] Mic-Check Dashboard
 - [A] Historical Progress
