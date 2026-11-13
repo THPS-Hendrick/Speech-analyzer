@@ -369,12 +369,23 @@
         }
 
         function selectLevel10Option(key) {
-            if (key === "yesMore") {
+            // Fix: Re-distribute final level answer back into core categories
+            if (key === "noFuzzy") {
+                counts.hard++;
+                if (counts.hard >= 3) {
+                    finalClassification = "Hypophantasia";
+                } else {
+                    finalClassification = "Phantasia";
+                }
+            } else if (key === "noWritten") {
+                counts.easy++;
+                finalClassification = "Phantasia";
+            } else if (key === "yesMore") {
+                counts.easy++;
                 counts.more++;
                 finalClassification = "Hyperphantasia";
-            } else {
-                finalClassification = "Phantasia";
             }
+            
             totalAnswered++;
             finishSurvey();
         }
