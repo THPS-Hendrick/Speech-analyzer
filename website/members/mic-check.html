@@ -1,1 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mic-Check App Native Hub | THPS</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Central Firebase Engine -->
+    <script type="module" src="/js/firebase-client.js"></script>
 
+    <!-- UI Libs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+
+    <!-- Compromise NLP for the Analyzer -->
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { green: '#106030', dark: '#0c4a25', gold: '#FFCC00', offwhite: '#FAF9F5' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles from the original analyzer app */
+        :fullscreen { overflow-y: auto !important; background-color: #f8fafc; }
+        :-webkit-full-screen { overflow-y: auto !important; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative">
+
+    <!-- INJECT_HEADER -->
+
+    <!-- Auth Guard Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-brand-offwhite z-[60] flex flex-col items-center justify-center transition-opacity duration-500">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-green mb-4"></i>
+        <h2 id="loading-text" class="text-xl font-bold text-slate-900 tracking-tight">Authenticating...</h2>
+        <div id="error-message" class="hidden mt-4 text-red-600 font-medium text-sm text-center max-w-md px-4"></div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="flex-grow w-full pb-20 pt-8 relative z-10" id="main-app-container">
+        
+        <!-- We use the same structural DOM elements the THPS analyzer expects, but without the iframe wrapping it -->
+        <div class="max-w-7xl mx-auto px-2 sm:px-4">
+            
+            <header class="mb-6 flex justify-between items-end border-b border-gray-200 pb-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900">Mic-Check Dashboard</h1>
+                    <p class="text-gray-500 text-sm">Welcome back, <span class="auth-user-name">Member</span>.</p>
+                </div>
+            </header>
+
+            <div id="cba-wrapper" class="w-full">
+                <!-- Native UI container where the web components will mount -->
+                <div id="cba-resultsContainer" class="flex flex-col space-y-6">
+                    <div id="thps-dashboard-grid" class="flex flex-wrap gap-4 w-full items-start min-h-[150px]">
+                        
+                        <!-- Core Layout matching Option A architecture -->
+                        <div class="w-full relative group">
+                            <thps-main-dash></thps-main-dash>
+                        </div>
+                        
+                        <div class="w-full md:w-[calc(50%-0.5rem)] relative group">
+                            <thps-timer-med></thps-timer-med>
+                        </div>
+                        
+                        <div class="w-full md:w-[calc(50%-0.5rem)] relative group">
+                            <thps-upload-speech-med></thps-upload-speech-med>
+                        </div>
+                        
+                        <div class="w-full relative group">
+                            <thps-voice-timeline></thps-voice-timeline>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+            <textarea id="cba-inputText" class="hidden"></textarea>
+            
+        </div>
+    </main>
+
+    <!-- INJECT_FOOTER -->
+
+    <!-- Load the Analyzer Engines (Delayed slightly so DOM can parse) -->
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-processor.js"></script>
+    
+    <!-- Load Core Web Components natively -->
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/dashboard-manager.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/main-dash.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/timer-med.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/medium/upload-med.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/large/voice-timeline.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-wps.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pause.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-pace.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-personal.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-visual.js"></script>
+    <script defer src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/components/small/pill-intangible.js"></script>
+
+    <!-- Native App Execution Logic -->
+    <script>
+        // 1. Auth Guard
+        const checkAuthReady = setInterval(() => {
+            if (window.thpsAuth) {
+                clearInterval(checkAuthReady);
+                
+                window.thpsAuth.onAuthStateChanged((user) => {
+                    if (!user) {
+                        window.location.href = '/members/login.html'; 
+                    } else {
+                        // User is authenticated, remove loading overlay
+                        const loader = document.getElementById('loading-overlay');
+                        loader.classList.add('opacity-0');
+                        setTimeout(() => loader.remove(), 500);
+                        
+                        // Initialize icons
+                        if (window.lucide) lucide.createIcons();
+                    }
+                });
+            }
+        }, 100);
+
+        // 2. Mocking the required global state variables from analyzer-app.html
+        window.gameTimerInterval = null;
+        window.isActive = false;
+        window.thps_lastPayload = null;
+
+        // 3. The Core Save/Analyze Bridge
+        // We override the window.analyze function (normally attached by the iframed app)
+        // so that instead of just updating the UI, it natively saves to our new Members collection
+        window.analyze = function() {
+            console.log("Analyzing audio natively...");
+            // Because we loaded nlp-scorer.js and audio-processor.js in the head,
+            // we can trigger the NLP engine directly here if needed, or rely on the components.
+            
+            // Example of bridging the event payload generated by the components:
+            if (window.thps_lastPayload && window.saveLessonProgress) {
+                 console.log("Attempting to save global progress...", window.thps_lastPayload);
+                 // We could define this as a "freestyle" lesson to just build history,
+                 // or link it to a specific course tracking ID
+                 window.saveLessonProgress('freestyle-practice', window.thps_lastPayload.totalPoints || 0);
+            }
+        };
+
+        // Standard recording toggles required by your web components
+        window.toggleRecording = function() {
+            if (window.isActive) {
+                window.isActive = false;
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.stopRecordingProcess === 'function') {
+                    window.THPS.Audio.stopRecordingProcess();
+                }
+            } else {
+                window.isActive = true;
+                if (window.THPS && window.THPS.Audio && typeof window.THPS.Audio.startRecordingProcess === 'function') {
+                    window.THPS.Audio.startRecordingProcess();
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
