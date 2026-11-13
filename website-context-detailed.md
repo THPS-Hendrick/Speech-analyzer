@@ -177,37 +177,46 @@
 ## File: /website/articles/vocal-inhibition.html
 
 ### Body Text:
-- Measure your ability to vary your voice on command under pressure.
-- This test measures how much discomfort you feel moving your voice in extreme ways. The best speakers can vary their voice at will under pressure. You will need your microphone.
-- Microphone access is required to take this test.
+- Measure your ability to command pacing and volume under pressure.
+- Vocal Inhibition tests how much discomfort you feel moving your voice in different ways. The best speakers can vary their voice at will under pressure. This test requires microphone access.
+- Microphone access is required to proceed.
 - 
+- Start Recording
 - Results safely stored to your CRM.
 - Read below to see how Vocal Inhibition affects performance
-- Everyone can yell, whisper, speak fast, and speak slow. However, when it comes to public speaking under pressure, the critical question is: when does the voice you have get taken away from you?
-- Many professionals are physically capable of moving their voice but suffer from Vocal Inhibition—an internal friction that prevents them from varying their pitch or volume when all eyes are on them. To become a confident, anytime speaker, you need a massive surplus of vocal ability. It's not enough to yell or be deadly serious in the comfort of your own home; you need your sympathetic adreno-medullary system (SAM Axis) to not fight you when you try to do it in front of a crowd.
-- The Gym Analogy: If you struggle to hit these vocal extremes without pressure, you will completely lock up when pressure is applied. It is similar to someone who can deadlift 200 kg in the gym. Lifting 200 kg is an extreme, exhausting action, but because they have built that massive surplus of strength, they can do normal things—like play with their children all day—without ever getting tired or injured.
-- This system categorizes the intensity of your speech. Hitting these extremes in practice removes your internal inhibition.
-- Speaking so slowly, quietly, and seriously that it would feel weird in a casual environment. Highly important information travels on this sound wave. This is how you convey absolute gravitas when explaining a problem that must never happen again.
-- Speaking slightly slower or more serious than your everyday voice. Crucial for delivering constructive feedback or anchoring a key business point in a meeting.
-- Your standard conversational baseline. The mastery here is the ability to instantly return to Level 3 after hitting a Level 1 or 5, demonstrating you have recovered without any residual fluster.
-- Faster, louder, and bubbly. This is required in professional environments when complimenting a team member or pitching an exciting opportunity.
-- Very animated, very fast, very loud. While yelling is out of place in a standard boardroom, having the capacity to conjure this intensity on command means you can effortlessly speak over the top of a noisy crowd when needed.
-- Content and delivery are like diet and exercise. You can't outrun a bad diet, and you can't get strong on food alone. If you hand an incredible speech to a bad speaker, it becomes a bad presentation.
-- It is not enough to use passionate words if you don't sound passionate. Unintuitively, the human ear does not simply listen to sound—it listens to changes in sound.
-- Think of a refrigerator that is humming. It is technically making sound, but your ear easily tunes it out. However, if that fridge were to suddenly turn off, your ear would immediately notice the change from some sound to no sound. This is exactly why monotone speakers are excruciating to listen to, and why a well-timed pause forces an audience to pay attention.
-- When you change your sound (pitch, volume, pacing, or pausing), you grab fresh attention from the audience. What you do with that fresh attention determines whether your sound change boosted the signal of your message or destructively interfered with it.
-- Vocal Inhibition is the psychological or biological resistance a speaker feels when trying to move their voice away from their normal baseline under pressure. Everyone can yell or whisper when alone, but doing so deliberately in front of an audience triggers discomfort and often results in a rigid, monotone delivery.
-- The human ear does not passively listen to constant sound; it is biologically wired to detect changes in sound. A monotone voice (like the constant hum of a refrigerator) is easily tuned out by the brain. To get fresh attention, a speaker must deliberately change their vocal sound (volume, pace, or pause).
-- It is a framework to measure vocal intensity from 1 to 5. Level 1 is extremely slow and quiet (for grave warnings), Level 3 is your normal conversational voice, and Level 5 is extremely loud and fast (yelling to rally a crowd). A confident speaker must be able to hit these extremes on command without feeling flustered.
+- Everyone can yell, whisper, speak fast, and speak slow. However, when it comes to public speaking, the critical question is: when does the voice you have get taken away from you?
+- A lot of professionals are physically able to move their voice but feel psychologically inhibited from doing so when they are under pressure.
+- To become a confident anytime speaker, you need to have a massive surplus of ability to move your voice. It is not enough to be able to yell or be deadly serious in the comfort of your own home when no one is watching. You need to be able to do these things anytime, and for your sympathetic adreno-medullary system (SAM Axis) to not fight you when you try to move your voice deliberately.
+- The 200kg Gym Analogy: Think of someone who can lift 200 kg in the gym. That seems like an excessive amount of weight to move around. But because they possess that surplus capacity, they can do normal things—like play with their children all day—and never get tired or injured. This vocal inhibition test shows if you have that same surplus of ability to move your voice without internal friction.
+- More importantly, it is critical to be able to hit these extremes at will, on command. When you have mastered these extremes, you leave yourself plenty of room to move your voice in subtle, deliberate ways under high pressure.
+- Speaking so slowly and quietly that it would be weird to speak this way in a professional environment like a meeting. However, really important information travels on the sound wave when you speak at this intensity. Problems, or things that must never happen again, need to be said in this tone to convey absolute gravitas.
+- Speaking a little bit more slowly or seriously than you would ordinarily sound. This is crucial in professional settings when giving constructive feedback or making a serious point.
+- Just how you normally sound. It is incredibly important to be able to return to your normal speaking voice when recovering from a Level 1 or a Level 5, without retaining any residual feelings of being flustered.
+- A bit faster, a bit louder, bubbly, or frustrated. It is important to be able to do this in a professional environment, for instance, when you are complimenting someone or projecting positive energy.
+- Yelling, very fast, very loud. It would be out of place to speak this way in a standard meeting, but you must be able to conjure up this intensity on command when speaking over the top of a crowd or rallying people to an important cause.
+- There are two practical reasons why moving your voice deliberately under pressure is vital.
+- First, information travels on the sound wave. If I give the exact same speech to two different speakers—and it's a good speech, but one delivers it badly—then it's a bad presentation. Content and delivery are like diet and exercise. You can't outrun a bad diet, and you can't get strong on food alone.
+- How you sound dictates your personality, sarcasm, and your literal intent with words. It is not enough to use passionate words if you don't sound passionate; it is not enough to explain the seriousness of a problem if you don't sound serious. Minor and major fluctuations in your voice make comprehension easier for the audience and ensure the magnitude of your ideas is conveyed.
+- Unintuitively, the human ear does not simply listen to sound. It listens to changes in sound. When it detects a change, it alerts the brain and prioritizes that new data. This is why monotone speakers are incredibly hard to listen to (think of the worst, most monotone teacher you ever had).
+- Think of a fridge that is humming. It is technically making a sound, but your ear easily tunes it out. But if that fridge were to suddenly turn off and stop humming, you would instantly notice the change from some sound to no sound. That is exactly what it is like to pause in a speech.
+- When we pause, we signal to people that something important has happened. We get their attention. But then they will notice what is conveyed by that pause. For example, if you're talking and then you suddenly drop all your cue cards and stop talking, the change in sound will alert people—but they will notice that you've done something unprofessional.
+- Sound change is all about timing and delivery. When you change the sound, you get fresh attention from the audience, but how you move your voice determines whether what you said boosted the signal of your message or deconstructively interfered with it.
+- Vocal inhibition is the psychological and physical friction a speaker feels when attempting to move their voice to the extremes (very slow, very loud) under pressure. An inhibited speaker retreats to a monotone delivery.
+- The human ear does not passively record continuous sound; it acts as an anatomical alert system that only prioritizes changes in sound. A monotone speaker provides no variance, causing the listener's brain to tune them out, similar to the constant hum of a refrigerator.
+- It is a framework classifying vocal intensity from 1 to 5. Level 1 is painfully slow and serious, while Level 5 is extremely loud and fast. A confident, anytime speaker must have a surplus of ability to hit these extremes on command.
 
 ### Interactables (Links/Buttons):
 - [A] Member Hub
-- [BUTTON] Allow Mic & Start Test
+- [BUTTON] Start Vocal Inhibition Test
 - [BUTTON] 
+- [BUTTON] None
+- [BUTTON] Some
+- [BUTTON] A lot
+- [BUTTON] Couldn't do it
 - [A] Back to Member Progress
 - [A] Sign up for a free account
 - [SUMMARY] What is Vocal Inhibition in public speaking?
-- [SUMMARY] Why is a monotone voice bad for public speaking?
+- [SUMMARY] Why are monotone speakers hard to listen to?
 - [SUMMARY] What is the 5-Step Sound Change System?
 
 ### Image Alt Text:

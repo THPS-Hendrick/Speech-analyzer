@@ -432,8 +432,8 @@
       "@graph": [
         {
           "@type": "Article",
-          "headline": "The Vocal Inhibition Test: Moving Your Voice Under Pressure",
-          "description": "A guide and interactive test to measure a speaker's ability to overcome internal resistance and deliberately change their vocal intensity, volume, and pacing to command an audience.",
+          "headline": "The Vocal Inhibition Test: The Neuroscience of Sound Change",
+          "description": "Learn why the human ear prioritizes changes in sound, and how to eliminate the internal friction preventing you from speaking dynamically under pressure.",
           "author": {
             "@type": "Person",
             "name": "Tom Hendrick",
@@ -448,15 +448,15 @@
               "name": "What is Vocal Inhibition in public speaking?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Vocal Inhibition is the psychological or biological resistance a speaker feels when trying to move their voice away from their normal baseline under pressure. Everyone can yell or whisper when alone, but doing so deliberately in front of an audience triggers discomfort and often results in a rigid, monotone delivery."
+                "text": "Vocal inhibition is the psychological and physical friction a speaker feels when attempting to move their voice to the extremes (very slow, very loud) under pressure. An inhibited speaker retreats to a monotone delivery."
               }
             },
             {
               "@type": "Question",
-              "name": "Why is a monotone voice bad for public speaking?",
+              "name": "Why are monotone speakers hard to listen to?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "The human ear does not passively listen to constant sound; it is biologically wired to detect changes in sound. A monotone voice (like the constant hum of a refrigerator) is easily tuned out by the brain. To get fresh attention, a speaker must deliberately change their vocal sound (volume, pace, or pause)."
+                "text": "The human ear does not passively record continuous sound; it acts as an anatomical alert system that only prioritizes changes in sound. A monotone speaker provides no variance, causing the listener's brain to tune them out, similar to the constant hum of a refrigerator."
               }
             },
             {
@@ -464,7 +464,7 @@
               "name": "What is the 5-Step Sound Change System?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "It is a framework to measure vocal intensity from 1 to 5. Level 1 is extremely slow and quiet (for grave warnings), Level 3 is your normal conversational voice, and Level 5 is extremely loud and fast (yelling to rally a crowd). A confident speaker must be able to hit these extremes on command without feeling flustered."
+                "text": "It is a framework classifying vocal intensity from 1 to 5. Level 1 is painfully slow and serious, while Level 5 is extremely loud and fast. A confident, anytime speaker must have a surplus of ability to hit these extremes on command."
               }
             }
           ]
@@ -475,19 +475,21 @@
 
 **Headings:**
 - H1: The Vocal Inhibition Test
-- H2: Vocal Inhibition Test
-- H3: Say these lines very slowly with long pauses (30s total).
+- H2: Are you vocally inhibited?
 - H3: 
-- H3: Analyzing vocal telemetry...
-- H2: Vocal Profile Captured
-- H2: The Danger of a Constant Voice
+- H3: 
+- H3: Calculating your metrics...
+- H2: Your Diagnostic Results
+- H2: Why Vocal Inhibition Destroys Public Speaking
+- H3: The "Anytime Speaker" vs. The Living Room Speaker
 - H2: The 5-Step Sound Change System
-- H3: Level 1: The Grave Warning
-- H3: Level 2: The Serious Point
-- H3: Level 3: Normal Conversation
-- H3: Level 4: Elevated Positivity
-- H3: Level 5: The Rally
-- H2: Why Information Travels on the Sound Wave
+- H3: Level 1 (Painfully Slow & Serious)
+- H3: Level 2 (Measured)
+- H3: Level 3 (Baseline)
+- H3: Level 4 (Elevated)
+- H3: Level 5 (Animated & Elated)
+- H2: Signal vs. Noise: Why Delivery Matters
+- H3: The Refrigerator Analogy: How the Ear Works
 - H2: Frequently Asked Questions
 
 ---
