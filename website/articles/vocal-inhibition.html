@@ -138,7 +138,7 @@
                             <span class="text-xs font-bold text-slate-500 w-8">VOL</span>
                             <div class="flex-grow h-3 bg-slate-800 rounded-full overflow-hidden relative">
                                 <div id="db-fill" class="h-full w-0 bg-blue-500 transition-all duration-75"></div>
-                                <div class="absolute top-0 bottom-0 border-r border-white/50" style="left: 70%;" title="Target Threshold (-24dB)"></div>
+                                <div class="absolute top-0 bottom-0 border-r border-white/50" style="left: 70%;" title="Target Threshold (-28dB)"></div>
                             </div>
                             <span id="db-hit-count" class="text-xs font-bold text-slate-500 w-12 text-right">0 hits</span>
                         </div>
@@ -526,9 +526,9 @@
             const dbPercent = Math.min((average / 150) * 100, 100); 
             document.getElementById('db-fill').style.width = `${dbPercent}%`;
             
-            // If it crosses threshold (70%), register a hit, but throttle it so a long yell doesn't count as 100 hits
+            // If it crosses threshold (65%), register a hit, but throttle it so a long yell doesn't count as 100 hits
             // Simple throttle: only count if it was low the frame before (simulated by random chance here for lightweight native feel, or pure frame check)
-            if (dbPercent > 70) {
+            if (dbPercent > 65) {
                 // Hacky throttle for visual effect without complex state arrays
                 if (Math.random() > 0.8) { 
                     currentDbHits++;
