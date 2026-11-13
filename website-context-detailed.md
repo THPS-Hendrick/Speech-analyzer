@@ -122,69 +122,7 @@
 
 ---
 
-## File: /website/articles/sams-test.html
-
-### Body Text:
-- Discover exactly when and why your brain triggers presentation anxiety.
-- This survey takes 2 minutes and will help you map your specific psychological pressure profile. Your data will be saved to your dashboard.
-- Results safely stored to your CRM.
-- Read below to learn how pressure affects your performance
-- Public speaking is not just a psychological event; it is a biomechanical and neurological one. To fully understand why your voice shakes, why you ramble, or why you go completely blank under pressure, we must look at the biological systems in your brain.
-- This is your body's unconscious threat detection network. Because your primitive brain (specifically the amygdala and hypothalamus) does not conceptually understand "public speaking," it interprets the physical environment—standing alone, blinded by lights, facing a social majority—as an immediate survival threat (being surrounded by predators).
-- Your brain divides its control between conscious actions (the voluntary system) and automatic, life-sustaining functions (the involuntary system). A speaker's success under pressure is dictated entirely by how well they manage the division of labor between these two.
-- When the SAM Axis perceives a severe threat, your brain initiates a ruthless energy trade-off. Think of a city's power grid during a severe winter storm. When total collapse is imminent, the city intentionally cuts power to the suburbs (the language and reasoning centers of the cerebral cortex) to ensure the hospitals and water pumps (the primitive survival centers) have 100% of the remaining electricity.
-- Once a speaker breaches this "Red Zone," their language and reasoning faculties are biologically forced offline. You cannot logic your way out of the Red Zone. A Red-Zoned speaker is physically incapable of generative language. This is exactly why you "blank out."
-- The untrained speaker attempts to run their entire presentation through conscious, manual effort—trying to control exact word choice, pacing, and body language simultaneously. This severely overloads working memory.
-- Through deliberate, constraint-based practice (like the THPS Vocal Mechanics Method), we train your brain to execute familiar routines under pressure, signaling "predictive success" to your amygdala. When the primitive brain feels safe, it stops the cortisol flow, preventing the hijack and keeping your language centers fully powered.
-- The Sympathetic Adreno-medullary System (SAM Axis) is the biological pathway that controls your fight-or-flight response. In public speaking, it is responsible for the physical symptoms of nervousness, such as a racing heart, shallow breathing, and mental blanking when facing an audience.
-- Going blank is caused by cognitive overload pushing your brain into the "Red Zone." Your amygdala detects a threat and pulls blood and electrical priority away from your prefrontal cortex (the part of your brain that generates language), leaving you temporarily unable to access your vocabulary or structure.
-- You cannot logic your way out of biological nerves. The best way to eliminate presentation anxiety is to build automated muscle memory (like the THPS Repeat and Count framework). When your speaking structure becomes autonomous, your brain registers safety, and the nervous system remains calm under pressure.
-
-### Interactables (Links/Buttons):
-- [A] Member Hub
-- [BUTTON] Start Survey (Speaking Nerves)
-- [A] Back to Member Progress
-- [A] Sign up for a free account
-- [SUMMARY] What is the SAM Axis in public speaking?
-- [SUMMARY] Why do I go completely blank during a presentation?
-- [SUMMARY] How do I get rid of public speaking nerves?
-
-### Image Alt Text:
-
----
-
-## File: /website/articles/speak-without-script-rules-test.html
-
-### Body Text:
-
-### Interactables (Links/Buttons):
-
-### Image Alt Text:
-
----
-
-## File: /website/articles/transformations-hub.html
-
-### Body Text:
-- Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
-- "When I started, I was juggling words and rushing. Using the Mic-Check App, we tracked my pace from 180 down to the ideal 145-150 WPM range, completely transforming my delivery."
-- "Tom was incredibly knowledgeable teaching professional pitching. Utilizing Repeat-Count training drastically reduced cognitive load, allowing for confident, measured answers under pressure."
-- "For financial brokers, data can be dry. We used the app's content analyzer to ensure 60% of the speech relied on visual and personal framing, completely shifting audience retention."
-
-### Interactables (Links/Buttons):
-- [BUTTON] All Transformations
-- [BUTTON] Pacing & Delivery (WPM)
-- [BUTTON] Pressure & Q&A Mastery
-- [BUTTON] Content & Engagement
-- [A] Read Data
-- [A] Read Data
-- [A] Read Data
-
-### Image Alt Text:
-
----
-
-## File: /website/articles/vocal-inhibition.html
+## File: /website/articles/improve-speaking-voice-inhibition.html
 
 ### Body Text:
 - Measure your ability to command pacing and volume under pressure.
@@ -228,6 +166,78 @@
 - [SUMMARY] What is Vocal Inhibition in public speaking?
 - [SUMMARY] Why are monotone speakers hard to listen to?
 - [SUMMARY] What is the 5-Step Sound Change System?
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/sams-test.html
+
+### Body Text:
+- Discover exactly when and why your brain triggers presentation anxiety.
+- This survey takes 2 minutes and will help you map your specific psychological pressure profile. Your data will be saved to your dashboard.
+- Results safely stored to your CRM.
+- Read below to learn how pressure affects your performance
+- Public speaking is not just a psychological event; it is a biomechanical and neurological one. To fully understand why your voice shakes, why you ramble, or why you go completely blank under pressure, we must look at the biological systems in your brain.
+- This is your body's unconscious threat detection network. Because your primitive brain (specifically the amygdala and hypothalamus) does not conceptually understand "public speaking," it interprets the physical environment—standing alone, blinded by lights, facing a social majority—as an immediate survival threat (being surrounded by predators).
+- Your brain divides its control between conscious actions (the voluntary system) and automatic, life-sustaining functions (the involuntary system). A speaker's success under pressure is dictated entirely by how well they manage the division of labor between these two.
+- When the SAM Axis perceives a severe threat, your brain initiates a ruthless energy trade-off. Think of a city's power grid during a severe winter storm. When total collapse is imminent, the city intentionally cuts power to the suburbs (the language and reasoning centers of the cerebral cortex) to ensure the hospitals and water pumps (the primitive survival centers) have 100% of the remaining electricity.
+- Once a speaker breaches this "Red Zone," their language and reasoning faculties are biologically forced offline. You cannot logic your way out of the Red Zone. A Red-Zoned speaker is physically incapable of generative language. This is exactly why you "blank out."
+- The untrained speaker attempts to run their entire presentation through conscious, manual effort—trying to control exact word choice, pacing, and body language simultaneously. This severely overloads working memory.
+- Through deliberate, constraint-based practice (like the THPS Vocal Mechanics Method), we train your brain to execute familiar routines under pressure, signaling "predictive success" to your amygdala. When the primitive brain feels safe, it stops the cortisol flow, preventing the hijack and keeping your language centers fully powered.
+- The Sympathetic Adreno-medullary System (SAM Axis) is the biological pathway that controls your fight-or-flight response. In public speaking, it is responsible for the physical symptoms of nervousness, such as a racing heart, shallow breathing, and mental blanking when facing an audience.
+- Going blank is caused by cognitive overload pushing your brain into the "Red Zone." Your amygdala detects a threat and pulls blood and electrical priority away from your prefrontal cortex (the part of your brain that generates language), leaving you temporarily unable to access your vocabulary or structure.
+- You cannot logic your way out of biological nerves. The best way to eliminate presentation anxiety is to build automated muscle memory (like the THPS Repeat and Count framework). When your speaking structure becomes autonomous, your brain registers safety, and the nervous system remains calm under pressure.
+
+### Interactables (Links/Buttons):
+- [A] Member Hub
+- [BUTTON] Start Survey (Speaking Nerves)
+- [A] Back to Member Progress
+- [A] Sign up for a free account
+- [SUMMARY] What is the SAM Axis in public speaking?
+- [SUMMARY] Why do I go completely blank during a presentation?
+- [SUMMARY] How do I get rid of public speaking nerves?
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/speak-without-script-image-test.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/speak-without-script-rules-test.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/transformations-hub.html
+
+### Body Text:
+- Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
+- "When I started, I was juggling words and rushing. Using the Mic-Check App, we tracked my pace from 180 down to the ideal 145-150 WPM range, completely transforming my delivery."
+- "Tom was incredibly knowledgeable teaching professional pitching. Utilizing Repeat-Count training drastically reduced cognitive load, allowing for confident, measured answers under pressure."
+- "For financial brokers, data can be dry. We used the app's content analyzer to ensure 60% of the speech relied on visual and personal framing, completely shifting audience retention."
+
+### Interactables (Links/Buttons):
+- [BUTTON] All Transformations
+- [BUTTON] Pacing & Delivery (WPM)
+- [BUTTON] Pressure & Q&A Mastery
+- [BUTTON] Content & Engagement
+- [A] Read Data
+- [A] Read Data
+- [A] Read Data
 
 ### Image Alt Text:
 

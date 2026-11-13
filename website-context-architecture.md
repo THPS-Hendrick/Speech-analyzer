@@ -300,135 +300,7 @@
 
 ---
 
-## File: /website/articles/sams-test.html
-
-**Title:** Why Do I Get Nervous When I Present? The SAMS Test | Tom Hendrick
-
-**Schema 1:**
-```json
-{
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Article",
-          "headline": "Why Do I Get Nervous When I Present? Understanding the SAMS Test",
-          "description": "Learn the biological reasons behind public speaking nerves and how the Sympathetic Adreno-medullary System (SAM Axis) triggers skill inhibition.",
-          "author": {
-            "@type": "Person",
-            "name": "Tom Hendrick",
-            "url": "https://tomhendrick.com/about.html"
-          }
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Why do I get nervous when I present?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Public speaking nerves are triggered by the Sympathetic Adreno-medullary System (SAM Axis). Because the primitive brain does not conceptually understand 'public speaking,' it interprets the physical environment of standing alone facing a group as a survival threat, triggering an involuntary fight-or-flight response."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "What is the SAMS Test for public speaking?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "The SAMS Test is a diagnostic framework by Tom Hendrick Public Speaking that maps a speaker's nervous system response across four distinct types of pressure: Preparation, Presentation, Giving Conflict, and Receiving Conflict."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Why do I go blank during a presentation?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Going blank, known as hitting the 'Red Zone,' is a Neurological Resource Trade-Off. When the amygdala detects a severe threat, it pulls energy away from the prefrontal cortex (responsible for language and reasoning) to feed primitive survival centers, physically preventing you from generating words."
-              }
-            }
-          ]
-        }
-      ]
-    }
-```
-
-**Headings:**
-- H1: The SAMS Test: Identify Your Speaking Nerves
-- H2: Speaking Nerves Survey
-- H3: 
-- H3: Calculating your profile...
-- H2: Your Speaking Pressure Profile
-- H2: Why Do I Get Nervous When I Present?
-- H3: The SAM Axis (Sympathetic Adreno-medullary System)
-- H3: Voluntary vs. Involuntary Control
-- H3: The "Red Zone" and The Neurological Resource Trade-Off
-- H3: How to Stop Getting Flustered
-- H2: Frequently Asked Questions
-
----
-
-## File: /website/articles/speak-without-script-rules-test.html
-
-**Headings:**
-- None found
-
----
-
-## File: /website/articles/transformations-hub.html
-
-**Title:** Data-Driven Public Speaking Transformations | Tom Hendrick
-
-**Schema 1:**
-```json
-{
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "Tom Hendrick",
-      "legalName": "Thomas Geoffrey Hendrick",
-      "url": "https://tomhendrick.com",
-      "telephone": "+61419499331",
-      "vatID": "56949157639",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Suite 110, 147 Pirie Street",
-        "addressLocality": "Adelaide",
-        "addressRegion": "SA",
-        "postalCode": "5000",
-        "addressCountry": "AU"
-    },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "-34.9252",
-        "longitude": "138.6063"
-      }
-    }
-```
-
-**Schema 2:**
-```json
-{
-      "@context": "https://schema.org/",
-      "@type": "LocalBusiness",
-      "name": "Tom Hendrick Public Speaking",
-      "image": "/image/thps-logo-tom-hendrick-public-speaking.svg",
-      "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5.0",
-        "reviewCount": "68"
-      }
-    }
-```
-
-**Headings:**
-- H1: Data-Driven Public Speaking Transformations
-- H2: Optimized Executive Pace to 150 WPM
-- H3: Mastering Professional Pitching & Q&A
-- H3: Hitting the 60% Visual Engagement Rule
-
----
-
-## File: /website/articles/vocal-inhibition.html
+## File: /website/articles/improve-speaking-voice-inhibition.html
 
 **Title:** The Vocal Inhibition Test: Moving Your Voice Under Pressure | Tom Hendrick
 
@@ -498,6 +370,141 @@
 - H2: Signal vs. Noise: Why Delivery Matters
 - H3: The Refrigerator Analogy: How the Ear Works
 - H2: Frequently Asked Questions
+
+---
+
+## File: /website/articles/sams-test.html
+
+**Title:** Why Do I Get Nervous When I Present? The SAMS Test | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Why Do I Get Nervous When I Present? Understanding the SAMS Test",
+          "description": "Learn the biological reasons behind public speaking nerves and how the Sympathetic Adreno-medullary System (SAM Axis) triggers skill inhibition.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Why do I get nervous when I present?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Public speaking nerves are triggered by the Sympathetic Adreno-medullary System (SAM Axis). Because the primitive brain does not conceptually understand 'public speaking,' it interprets the physical environment of standing alone facing a group as a survival threat, triggering an involuntary fight-or-flight response."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the SAMS Test for public speaking?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The SAMS Test is a diagnostic framework by Tom Hendrick Public Speaking that maps a speaker's nervous system response across four distinct types of pressure: Preparation, Presentation, Giving Conflict, and Receiving Conflict."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why do I go blank during a presentation?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Going blank, known as hitting the 'Red Zone,' is a Neurological Resource Trade-Off. When the amygdala detects a severe threat, it pulls energy away from the prefrontal cortex (responsible for language and reasoning) to feed primitive survival centers, physically preventing you from generating words."
+              }
+            }
+          ]
+        }
+      ]
+    }
+```
+
+**Headings:**
+- H1: The SAMS Test: Identify Your Speaking Nerves
+- H2: Speaking Nerves Survey
+- H3: 
+- H3: Calculating your profile...
+- H2: Your Speaking Pressure Profile
+- H2: Why Do I Get Nervous When I Present?
+- H3: The SAM Axis (Sympathetic Adreno-medullary System)
+- H3: Voluntary vs. Involuntary Control
+- H3: The "Red Zone" and The Neurological Resource Trade-Off
+- H3: How to Stop Getting Flustered
+- H2: Frequently Asked Questions
+
+---
+
+## File: /website/articles/speak-without-script-image-test.html
+
+**Headings:**
+- None found
+
+---
+
+## File: /website/articles/speak-without-script-rules-test.html
+
+**Headings:**
+- None found
+
+---
+
+## File: /website/articles/transformations-hub.html
+
+**Title:** Data-Driven Public Speaking Transformations | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+    },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org/",
+      "@type": "LocalBusiness",
+      "name": "Tom Hendrick Public Speaking",
+      "image": "/image/thps-logo-tom-hendrick-public-speaking.svg",
+      "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "68"
+      }
+    }
+```
+
+**Headings:**
+- H1: Data-Driven Public Speaking Transformations
+- H2: Optimized Executive Pace to 150 WPM
+- H3: Mastering Professional Pitching & Q&A
+- H3: Hitting the 60% Visual Engagement Rule
 
 ---
 
