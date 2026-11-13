@@ -272,6 +272,7 @@
 ## File: /website/members/mic-check.html
 
 ### Body Text:
+- Welcome back, Member.
 
 ### Interactables (Links/Buttons):
 

@@ -497,8 +497,11 @@
 
 ## File: /website/members/mic-check.html
 
+**Title:** Mic-Check App Native Hub | THPS
+
 **Headings:**
-- None found
+- H2: Authenticating...
+- H1: Mic-Check Dashboard
 
 ---
 
