@@ -1,0 +1,19 @@
+
+1. Lexical Taxonomies (WordNet)
+
+WordNet is a massive lexical database of English that organizes words into semantic hierarchies called "lexicographer files." Unlike Compromise, which only tells you apples is a noun, WordNet tells you what kind of noun or adjective it is.
+• How it maps your sentence: WordNet groups words into 45 distinct semantic categories. It explicitly tags words under categories like noun.object, noun.artifact, verb.motion, verb.contact (hit), and adj.all (which links to attribute nouns like color, shape, and size).
+• How to use it: You can access WordNet in Python via NLTK (nltk.corpus.wordnet) or in JavaScript using packages like natural or wordpos. You simply look up a word's "lexname" to see if it falls into a physical or visual bucket.
+
+2. Concreteness & Imageability Datasets
+
+In cognitive science and NLP, researchers measure how easily a word creates a mental picture. This is scored on a scale (usually 1 to 5) across two metrics: Concreteness (physical existence) and Imageability (visual vividness).
+• Brysbaert Concreteness Ratings: A free, widely used dataset of 40,000 English words rated by humans for physical concreteness. Words like apple (5.0) and red (4.2) score near the top, while abstract words like justice (1.4) score at the bottom.
+• Lancaster Sensorimotor Norms: An even more detailed dataset covering 40,000 words that scores each word separately across the five senses—including a dedicated Visual strength score from 0 to 5.
+• How to use it: Both datasets are available as simple CSV or JSON lookup tables. You can load them into a JavaScript dictionary or Python script to instantly score every word in a sentence for visual strength.
+
+3. Zero-Shot Classification (Transformers.js)
+
+If you want to classify words into your exact custom categories (colour, size, shape, object, action, position) without manually building word lists, use a small neural model via Transformers.js in JavaScript or Hugging Face in Python.
+• How it works: Using a Natural Language Inference (NLI) model (such as Xenova/mobilebert-uncased-mnli), you feed the model a word and your custom list of labels. The model calculates a probability score for each category based on context.
+• Why it helps: Context matters for visual words. The word green is a visual colour in "green apple," but an abstract concept in "green energy." A neural classifier distinguishes between the two, whereas a simple dictionary lookup canno
