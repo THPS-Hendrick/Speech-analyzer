@@ -174,6 +174,41 @@
 
 ---
 
+## File: /website/articles/vviq-test.html
+
+### Body Text:
+- Discover your cognitive imagery profile and stop going blank under pressure.
+- This survey shows how you prefer to think and speak without a script. Some people ‘see’ images in their mind, some people see nothing but think in rules & categories. Keep your eyes open and try to ‘see’ what is described.
+- Results safely stored to your CRM.
+- Read below to learn how your imagery profile affects your speaking
+- The purpose of this page is to gauge whether the user/speaker prefers to think in images when they think and speak, or in rules/concepts. We plot where they land on the cognitive imagery spectrum.
+- A major pitfall speakers fall into is they don't know if they have Aphantasia, Hypophantasia, Phantasia, or Hyperphantasia. Consequently, when it comes to thinking and speaking without a script, they try to think and speak against the grain of how their brain fluently operates.
+- Example: A hyperphantasia person can effortlessly (and involuntarily) find words by associating them with images and memories. They say a word like "house" and lots of vivid details quickly come to mind. However, if that speaker gets nervous during preparation about forgetting their content, they might force themselves to memorize rigid dot points. Because non-visual dot points run completely against the grain of their hyperphantasia preference, they are highly likely to go blank when prompted by that cue under pressure.
+- According to current clinical statistics on population distributions, approximately 0.9% of the population has Aphantasia, 3.3% have Hypophantasia, 89.7% have typical imagery ability (Phantasia), and 6.1% possess Hyperphantasia.
+- An inability to see images in your mind. People with Aphantasia are often effortlessly able to use multiple speaking skills when they speak, but struggle to improvise, or give vivid, personal, or specific examples.
+- Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind.
+- Hypophantasia means it takes effort to see images in your mind and those images might be disobedient and not vivid (Tom Hendrick has Hypophantasia, leaning toward Aphantasia).
+- Hypophantasia speakers are often good at using multiple speaking skills when they speak, but find it hard (but not impossible) to give vivid, personal, and specific examples when speaking. Hypophantasia speakers tend to improve these image-based skills faster than Aphantasia speakers.
+- The average person can recall or see images in their mind easily when speaking. Although they may not initially excel at juggling multiple speaking skills at once, or giving vivid, personal, and specific examples—they tend to learn and improve all of these skills the fastest.
+- Effortlessly seeing images in one’s mind. A Hyperphantasia speaker can quickly conjure an image in their mind from word or image prompts—and does so effortlessly to the point multiple images or a ‘mental movie’ plays in their head involuntarily.
+- Hyperphantasia speakers tend to excel the most at giving vivid, personal, and specific examples, but can struggle the most with structuring a speech or using multiple speaking skills at the same time. When no image comes to mind they are at risk of going blank unless they learn non-image-based skills (like the Repeat & Count framework).
+- The VVIQ is a psychological assessment tool used to measure a speaker's capacity for visual thinking, placing them on a spectrum from Aphantasia (no mental imagery) to Hyperphantasia (extremely vivid mental imagery).
+- An inability to see images in your mind. Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind.
+- You should not memorize a script. Instead, you should prompt yourself using methods that match your VVIQ profile. Hyperphantasic speakers should use visual cues, while Aphantasic speakers should rely on structural frameworks like the Repeat and Count method.
+
+### Interactables (Links/Buttons):
+- [A] Member Hub
+- [BUTTON] Start VVIQ Survey
+- [A] Back to Member Progress
+- [A] Sign up for a free account
+- [SUMMARY] What is the Vividness of Visual Imagery Questionnaire (VVIQ)?
+- [SUMMARY] How does Aphantasia affect public speaking?
+- [SUMMARY] What is the best way to memorize a speech without a script?
+
+### Image Alt Text:
+
+---
+
 ## File: /website/contact.html
 
 ### Body Text:

@@ -421,6 +421,74 @@
 
 ---
 
+## File: /website/articles/vviq-test.html
+
+**Title:** How to Speak Without a Script: The VVIQ Test | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "How to Speak Without a Script: The VVIQ Test",
+          "description": "Discover how your brain's natural imagery ability (from Aphantasia to Hyperphantasia) dictates how you should prepare and deliver unscripted presentations.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is the Vividness of Visual Imagery Questionnaire (VVIQ)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The VVIQ is a psychological assessment tool used to measure a speaker's capacity for visual thinking, placing them on a spectrum from Aphantasia (no mental imagery) to Hyperphantasia (extremely vivid mental imagery)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Aphantasia affect public speaking?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "An inability to see images in your mind. Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the best way to memorize a speech without a script?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You should not memorize a script. Instead, you should prompt yourself using methods that match your VVIQ profile. Hyperphantasic speakers should use visual cues, while Aphantasic speakers should rely on structural frameworks like the Repeat and Count method."
+              }
+            }
+          ]
+        }
+      ]
+    }
+```
+
+**Headings:**
+- H1: The VVIQ Test: How to Speak Without a Script
+- H2: Vividness of Visual Imagery Questionnaire
+- H3: 
+- H3: Calculating your profile...
+- H2: Your Imagery Profile:
+- H2: Visualizing Words: Why You Go Blank Under Pressure
+- H2: What is Your Cognitive Imagery Profile?
+- H3: The Aphantasia Speaker
+- H3: The Hypophantasia Speaker
+- H3: The Phantasia Speaker
+- H3: The Hyperphantasia Speaker
+- H2: Frequently Asked Questions
+
+---
+
 ## File: /website/contact.html
 
 **Title:** Contact Tom Hendrick | Book Your Speech Assessment
