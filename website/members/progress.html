@@ -45,7 +45,6 @@
     </script>
     
     <!-- Central Firebase Engine -->
-    <!-- Adjust path if you saved it elsewhere -->
     <script type="module" src="/js/firebase-client.js"></script>
 </head>
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen relative">
@@ -55,7 +54,8 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 bg-brand-offwhite z-40 flex flex-col items-center justify-center transition-opacity duration-500">
         <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-green mb-4"></i>
-        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Syncing your progress...</h2>
+        <h2 id="loading-text" class="text-xl font-bold text-slate-900 tracking-tight">Syncing your progress...</h2>
+        <div id="error-message" class="hidden mt-4 text-red-600 font-medium text-sm text-center max-w-md px-4"></div>
     </div>
 
     <!-- MAIN DASHBOARD AREA -->
@@ -256,6 +256,15 @@
 
                     } catch(e) {
                         console.error("Failed to load dashboard data:", e);
+                        // Fix for the endless syncing: show the error instead of spinning forever
+                        const spinnerIcon = document.querySelector('#loading-overlay .fa-circle-notch');
+                        if (spinnerIcon) {
+                            spinnerIcon.classList.remove('fa-spin', 'fa-circle-notch');
+                            spinnerIcon.classList.add('fa-triangle-exclamation', 'text-red-500');
+                        }
+                        document.getElementById('loading-text').innerText = "Database Connection Failed";
+                        document.getElementById('error-message').innerText = "We could not access your member profile. This is likely a Firestore Security Rules issue. Please contact your administrator.";
+                        document.getElementById('error-message').classList.remove('hidden');
                     }
                 });
             }
