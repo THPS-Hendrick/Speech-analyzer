@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Speak Without a Script: The VVIQ Test | Tom Hendrick</title>
+    <meta name="description" content="Stop going blank during presentations. Take the VVIQ Test to discover your cognitive imagery profile and learn how to speak confidently without a script.">
+    <link rel="canonical" href="https://tomhendrick.com/articles/vviq-test.html" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Schema.org Article and FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "How to Speak Without a Script: The VVIQ Test",
+          "description": "Discover how your brain's natural imagery ability (from Aphantasia to Hyperphantasia) dictates how you should prepare and deliver unscripted presentations.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is the Vividness of Visual Imagery Questionnaire (VVIQ)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The VVIQ is a psychological assessment tool used to measure a speaker's capacity for visual thinking, placing them on a spectrum from Aphantasia (no mental imagery) to Hyperphantasia (extremely vivid mental imagery)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Aphantasia affect public speaking?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "An inability to see images in your mind. Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the best way to memorize a speech without a script?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You should not memorize a script. Instead, you should prompt yourself using methods that match your VVIQ profile. Hyperphantasic speakers should use visual cues, while Aphantasic speakers should rely on structural frameworks like the Repeat and Count method."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google Fonts & Tailwind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { green: '#106030', dark: '#0c4a25', gold: '#FFCC00', offwhite: '#FAF9F5' } }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Central Firebase Engine -->
+    <script type="module" src="/js/firebase-client.js"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- INJECT_HEADER -->
+
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Breadcrumb -->
+            <a href="/members/progress.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
+                <i class="fa-solid fa-arrow-left"></i> Member Hub
+            </a>
+
+            <!-- Header -->
+            <header class="mb-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-solid fa-brain"></i> Lesson 2
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4 tracking-tight">The VVIQ Test: How to Speak Without a Script</h1>
+                <p class="text-xl text-gray-600">Discover your cognitive imagery profile and stop going blank under pressure.</p>
+            </header>
+
+            <!-- DO-ABLE: Interactive Survey -->
+            <div id="survey-container" class="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200 mb-16 relative overflow-hidden transition-all duration-300 min-h-[450px] flex flex-col justify-center">
+                
+                <!-- Progress Bar -->
+                <div id="survey-progress-container" class="hidden absolute top-0 left-0 w-full h-1.5 bg-gray-100">
+                    <div id="survey-progress-bar" class="h-full bg-brand-green w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Intro Screen -->
+                <div id="screen-intro" class="text-center">
+                    <div class="w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center mx-auto text-2xl mb-6 shadow-md"><i class="fa-solid fa-eye"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">Vividness of Visual Imagery Questionnaire</h2>
+                    <p class="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">This survey shows how you prefer to think and speak without a script. Some people ‘see’ images in their mind, some people see nothing but think in rules & categories. Keep your eyes open and try to ‘see’ what is described.</p>
+                    <button onclick="startSurvey()" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md active:scale-95 text-lg">Start VVIQ Survey</button>
+                </div>
+
+                <!-- Question Screen -->
+                <div id="screen-question" class="hidden flex-col w-full max-w-2xl mx-auto">
+                    <div class="text-brand-green font-bold text-sm uppercase tracking-widest mb-3" id="q-counter">Level 1</div>
+                    <h3 id="q-text" class="text-xl md:text-2xl font-bold text-slate-900 mb-8 leading-relaxed"></h3>
+                    <div id="q-options" class="flex flex-col gap-3">
+                        <!-- Options generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Saving Screen -->
+                <div id="screen-loading" class="hidden text-center flex-col items-center justify-center">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-green mb-4"></i>
+                    <h3 class="text-xl font-bold text-slate-900">Calculating your profile...</h3>
+                </div>
+
+                <!-- Results Screen -->
+                <div id="screen-results" class="hidden text-center flex-col w-full">
+                    <div class="w-16 h-16 bg-brand-gold text-brand-dark rounded-full flex items-center justify-center mx-auto text-2xl mb-4 shadow-sm"><i class="fa-solid fa-check"></i></div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Your Imagery Profile: <span id="res-classification" class="text-brand-green"></span></h2>
+                    <p class="text-gray-500 mb-8">Results safely stored to your CRM.</p>
+                    
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 flex flex-wrap justify-center gap-6 mb-8 text-center max-w-2xl mx-auto w-full">
+                        <div>
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">None</div>
+                            <div id="res-none" class="text-2xl font-black text-slate-800"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Hard</div>
+                            <div id="res-hard" class="text-2xl font-black text-slate-800"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Easy</div>
+                            <div id="res-easy" class="text-2xl font-black text-slate-800"></div>
+                        </div>
+                        <div id="res-more-block" class="hidden border-l border-gray-200 pl-6">
+                            <div class="text-xs font-bold text-brand-green uppercase tracking-widest mb-1">Saw More</div>
+                            <div id="res-more" class="text-2xl font-black text-brand-green"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="/members/progress.html" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md text-center">Back to Member Progress</a>
+                    </div>
+                    
+                    <div id="auth-prompt" class="hidden mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-800 text-sm">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> You are not logged in. <a href="/members/login.html" class="font-bold hover:underline text-brand-dark">Sign up for a free account</a> to save this profile and track your progress.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mb-16">
+                <i class="fa-solid fa-arrow-down text-2xl text-gray-300 animate-bounce"></i>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Read below to learn how your imagery profile affects your speaking</p>
+            </div>
+
+            <!-- READABLE: SEO / Educational Content -->
+            <article class="prose prose-lg max-w-none text-gray-700 mb-20 space-y-8">
+                
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Visualizing Words: Why You Go Blank Under Pressure</h2>
+                <p>The purpose of this page is to gauge whether the user/speaker prefers to think in images when they think and speak, or in rules/concepts. We plot where they land on the cognitive imagery spectrum.</p>
+                <p>A major pitfall speakers fall into is they don't know if they have Aphantasia, Hypophantasia, Phantasia, or Hyperphantasia. Consequently, when it comes to thinking and speaking without a script, they try to think and speak against the grain of how their brain fluently operates.</p>
+                
+                <div class="bg-gray-50 border-l-4 border-brand-green p-6 rounded-r-xl my-8">
+                    <p class="font-medium text-slate-800 m-0"><strong>Example:</strong> A hyperphantasia person can effortlessly (and involuntarily) find words by associating them with images and memories. They say a word like "house" and lots of vivid details quickly come to mind. However, if that speaker gets nervous during preparation about forgetting their content, they might force themselves to memorize rigid dot points. Because non-visual dot points run completely against the grain of their hyperphantasia preference, they are highly likely to go blank when prompted by that cue under pressure.</p>
+                </div>
+                
+                <p>According to current clinical statistics on population distributions, approximately 0.9% of the population has Aphantasia, 3.3% have Hypophantasia, 89.7% have typical imagery ability (Phantasia), and 6.1% possess Hyperphantasia.</p>
+
+                <h2 class="text-3xl font-bold text-slate-900 mt-12 mb-6">What is Your Cognitive Imagery Profile?</h2>
+
+                <div class="space-y-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Aphantasia Speaker</h3>
+                        <p class="leading-relaxed">An inability to see images in your mind. People with Aphantasia are often effortlessly able to use multiple speaking skills when they speak, but struggle to improvise, or give vivid, personal, or specific examples.</p>
+                        <p class="leading-relaxed mt-2">Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Hypophantasia Speaker</h3>
+                        <p class="leading-relaxed">Hypophantasia means it takes effort to see images in your mind and those images might be disobedient and not vivid (Tom Hendrick has Hypophantasia, leaning toward Aphantasia). </p>
+                        <p class="leading-relaxed mt-2">Hypophantasia speakers are often good at using multiple speaking skills when they speak, but find it hard (but not impossible) to give vivid, personal, and specific examples when speaking. Hypophantasia speakers tend to improve these image-based skills faster than Aphantasia speakers.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Phantasia Speaker</h3>
+                        <p class="leading-relaxed">The average person can recall or see images in their mind easily when speaking. Although they may not initially excel at juggling multiple speaking skills at once, or giving vivid, personal, and specific examples—they tend to learn and improve all of these skills the fastest.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Hyperphantasia Speaker</h3>
+                        <p class="leading-relaxed">Effortlessly seeing images in one’s mind. A Hyperphantasia speaker can quickly conjure an image in their mind from word or image prompts—and does so effortlessly to the point multiple images or a ‘mental movie’ plays in their head involuntarily.</p>
+                        <p class="leading-relaxed mt-2">Hyperphantasia speakers tend to excel the most at giving vivid, personal, and specific examples, but can struggle the most with structuring a speech or using multiple speaking skills at the same time. When no image comes to mind they are at risk of going blank unless they learn non-image-based skills (like the Repeat & Count framework).</p>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- AEO / FAQ SECTION -->
+            <section class="border-t border-gray-200 pt-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
+                
+                <div class="space-y-4">
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            What is the Vividness of Visual Imagery Questionnaire (VVIQ)?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            The VVIQ is a psychological assessment tool used to measure a speaker's capacity for visual thinking, placing them on a spectrum from Aphantasia (no mental imagery) to Hyperphantasia (extremely vivid mental imagery).
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            How does Aphantasia affect public speaking?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            An inability to see images in your mind. Aphantasia speakers tend to improve rules-based (non-image-based) skills faster than the other speaker types. When no structure or process comes to mind they are at risk of going blank, because they have no way to generate images in their mind.
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            What is the best way to memorize a speech without a script?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            You should not memorize a script. Instead, you should prompt yourself using methods that match your VVIQ profile. Hyperphantasic speakers should use visual cues, while Aphantasic speakers should rely on structural frameworks like the Repeat and Count method.
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- INJECT_FOOTER -->
+
+    <!-- Interactive Survey Logic -->
+    <script>
+        const questions = [
+            { q: "Level 1: Picture an ordinary red apple against a black background.", label: "Level 1" },
+            { q: "Level 2: Picture that red apple with a brown stem and healthy green leaf growing from it.", label: "Level 2" },
+            { q: "Level 3: The red apple disappears. The brown stem and green leaf float in space.", label: "Level 3" },
+            { q: "Level 4: The brown stem and green leaf are growing from a diamond instead of an apple.", label: "Level 4" },
+            { q: "Level 5: Change the colour of the diamond to red, keep the brown stem and green leaf.", label: "Level 5" },
+            { q: "Level 6: Craft the red diamond into the shape of an apple, keep brown stem and green leaf.", label: "Level 6" },
+            { q: "Level 7: Make the red diamond, stem & leaf rotate as painfully slowly as possible.", label: "Level 7" },
+            { q: "Level 8: As it rotates, notice light sparkling off diamond apple and leaf tip changing direction.", label: "Level 8" },
+            { q: "Level 9: While everything rotates and sparkles, imagine it rising up and down like a yo-yo.", label: "Level 9" }
+        ];
+
+        const standardOptions = [
+            { text: "Can't see it", key: "none", color: "text-slate-600 bg-slate-50 border-slate-200 hover:border-brand-green" },
+            { text: "Hard to see", key: "hard", color: "text-blue-600 bg-blue-50 border-blue-200 hover:border-brand-green" },
+            { text: "Easy to see", key: "easy", color: "text-brand-green bg-green-50 border-green-200 hover:border-brand-dark" }
+        ];
+
+        const level10Question = {
+            q: "Did your brain see or imagine more than what was described? (e.g. a word coming from the apple, a jewellery store, etc)",
+            label: "Level 10"
+        };
+        const level10Options = [
+            { text: "No (fuzzy)", key: "noFuzzy", color: "text-slate-600 bg-slate-50 border-slate-200 hover:border-brand-green" },
+            { text: "No (as written)", key: "noWritten", color: "text-blue-600 bg-blue-50 border-blue-200 hover:border-brand-green" },
+            { text: "Yes (I saw more)", key: "yesMore", color: "text-brand-green bg-green-50 border-green-200 hover:border-brand-dark" }
+        ];
+
+        let currentIndex = 0;
+        let counts = { none: 0, hard: 0, easy: 0, more: 0 };
+        let totalAnswered = 0;
+        let finalClassification = "";
+
+        function startSurvey() {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('survey-progress-container').classList.remove('hidden');
+            document.getElementById('screen-question').classList.remove('hidden');
+            document.getElementById('screen-question').classList.add('flex');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            // Check Early Exits
+            if (counts.none >= 3) {
+                finalClassification = "Aphantasia";
+                finishSurvey();
+                return;
+            }
+            if (counts.hard >= 3) {
+                finalClassification = "Hypophantasia";
+                finishSurvey();
+                return;
+            }
+
+            // Update Progress Bar
+            const prog = (currentIndex / 10) * 100; // Assume max 10 levels for progress visual
+            document.getElementById('survey-progress-bar').style.width = `${prog}%`;
+
+            const optionsContainer = document.getElementById('q-options');
+            optionsContainer.innerHTML = '';
+
+            if (currentIndex < 9) {
+                // Levels 1-9
+                const qData = questions[currentIndex];
+                document.getElementById('q-counter').innerText = qData.label;
+                document.getElementById('q-text').innerText = qData.q;
+                
+                standardOptions.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left p-4 rounded-xl border-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-opacity-50 active:scale-[0.98] ${opt.color}`;
+                    btn.innerText = opt.text;
+                    btn.onclick = () => selectStandardOption(opt.key);
+                    optionsContainer.appendChild(btn);
+                });
+            } else if (currentIndex === 9) {
+                // Level 10 Logic: Only show if easy >= 6
+                if (counts.easy >= 6) {
+                    document.getElementById('q-counter').innerText = level10Question.label;
+                    document.getElementById('q-text').innerText = level10Question.q;
+                    
+                    level10Options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = `w-full text-left p-4 rounded-xl border-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-opacity-50 active:scale-[0.98] ${opt.color}`;
+                        btn.innerText = opt.text;
+                        btn.onclick = () => selectLevel10Option(opt.key);
+                        optionsContainer.appendChild(btn);
+                    });
+                } else {
+                    // Didn't qualify for Level 10, default classification
+                    finalClassification = "Phantasia";
+                    finishSurvey();
+                }
+            }
+        }
+
+        function selectStandardOption(key) {
+            counts[key]++;
+            totalAnswered++;
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function selectLevel10Option(key) {
+            if (key === "yesMore") {
+                counts.more++;
+                finalClassification = "Hyperphantasia";
+            } else {
+                finalClassification = "Phantasia";
+            }
+            totalAnswered++;
+            finishSurvey();
+        }
+
+        function finishSurvey() {
+            document.getElementById('screen-question').classList.add('hidden');
+            document.getElementById('screen-question').classList.remove('flex');
+            document.getElementById('survey-progress-bar').style.width = '100%';
+            
+            document.getElementById('screen-loading').classList.remove('hidden');
+            document.getElementById('screen-loading').classList.add('flex');
+
+            // Calculate Percentages
+            const pNone = Math.round((counts.none / totalAnswered) * 100) || 0;
+            const pHard = Math.round((counts.hard / totalAnswered) * 100) || 0;
+            const pEasy = Math.round((counts.easy / totalAnswered) * 100) || 0;
+            let pMoreText = "0%";
+            if (finalClassification === "Hyperphantasia") pMoreText = "Yes";
+
+            // Format data payload for Firebase CRM display
+            const stringifiedProfile = `[${finalClassification}] None: ${pNone}% | Hard: ${pHard}% | Easy: ${pEasy}%`;
+
+            // Attempt to save to Firebase if window.saveLessonProgress is available
+            if (window.saveLessonProgress) {
+                window.saveLessonProgress('vviq-test', stringifiedProfile).then((success) => {
+                    setTimeout(() => {
+                        showResults(success, pNone, pHard, pEasy, pMoreText);
+                    }, 800); // Artificial delay for UX
+                });
+            } else {
+                setTimeout(() => {
+                    showResults(false, pNone, pHard, pEasy, pMoreText);
+                }, 800);
+            }
+        }
+
+        function showResults(isSaved, pNone, pHard, pEasy, pMoreText) {
+            document.getElementById('screen-loading').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('flex');
+            document.getElementById('survey-progress-container').classList.add('hidden');
+
+            document.getElementById('screen-results').classList.remove('hidden');
+            document.getElementById('screen-results').classList.add('flex');
+
+            document.getElementById('res-classification').innerText = finalClassification;
+            document.getElementById('res-none').innerText = pNone + '%';
+            document.getElementById('res-hard').innerText = pHard + '%';
+            document.getElementById('res-easy').innerText = pEasy + '%';
+
+            if (finalClassification === "Hyperphantasia") {
+                document.getElementById('res-more-block').classList.remove('hidden');
+                document.getElementById('res-more').innerText = pMoreText;
+            }
+
+            if (!isSaved) {
+                document.getElementById('auth-prompt').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
