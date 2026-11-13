@@ -421,6 +421,77 @@
 
 ---
 
+## File: /website/articles/vocal-inhibition.html
+
+**Title:** The Vocal Inhibition Test: Moving Your Voice Under Pressure | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "The Vocal Inhibition Test: Moving Your Voice Under Pressure",
+          "description": "A guide and interactive test to measure a speaker's ability to overcome internal resistance and deliberately change their vocal intensity, volume, and pacing to command an audience.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Vocal Inhibition in public speaking?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Vocal Inhibition is the psychological or biological resistance a speaker feels when trying to move their voice away from their normal baseline under pressure. Everyone can yell or whisper when alone, but doing so deliberately in front of an audience triggers discomfort and often results in a rigid, monotone delivery."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why is a monotone voice bad for public speaking?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The human ear does not passively listen to constant sound; it is biologically wired to detect changes in sound. A monotone voice (like the constant hum of a refrigerator) is easily tuned out by the brain. To get fresh attention, a speaker must deliberately change their vocal sound (volume, pace, or pause)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the 5-Step Sound Change System?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "It is a framework to measure vocal intensity from 1 to 5. Level 1 is extremely slow and quiet (for grave warnings), Level 3 is your normal conversational voice, and Level 5 is extremely loud and fast (yelling to rally a crowd). A confident speaker must be able to hit these extremes on command without feeling flustered."
+              }
+            }
+          ]
+        }
+      ]
+    }
+```
+
+**Headings:**
+- H1: The Vocal Inhibition Test
+- H2: Vocal Inhibition Test
+- H3: Say these lines very slowly with long pauses (30s total).
+- H3: 
+- H3: Analyzing vocal telemetry...
+- H2: Vocal Profile Captured
+- H2: The Danger of a Constant Voice
+- H2: The 5-Step Sound Change System
+- H3: Level 1: The Grave Warning
+- H3: Level 2: The Serious Point
+- H3: Level 3: Normal Conversation
+- H3: Level 4: Elevated Positivity
+- H3: Level 5: The Rally
+- H2: Why Information Travels on the Sound Wave
+- H2: Frequently Asked Questions
+
+---
+
 ## File: /website/articles/vviq-test.html
 
 **Title:** How to Speak Without a Script: The VVIQ Test | Tom Hendrick
