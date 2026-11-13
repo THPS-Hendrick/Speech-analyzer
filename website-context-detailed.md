@@ -171,7 +171,7 @@
 
 ---
 
-## File: /website/articles/sams-test.html
+## File: /website/articles/presentation-nerves-sams-test.html
 
 ### Body Text:
 - Discover exactly when and why your brain triggers presentation anxiety.
@@ -222,28 +222,7 @@
 
 ---
 
-## File: /website/articles/transformations-hub.html
-
-### Body Text:
-- Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
-- "When I started, I was juggling words and rushing. Using the Mic-Check App, we tracked my pace from 180 down to the ideal 145-150 WPM range, completely transforming my delivery."
-- "Tom was incredibly knowledgeable teaching professional pitching. Utilizing Repeat-Count training drastically reduced cognitive load, allowing for confident, measured answers under pressure."
-- "For financial brokers, data can be dry. We used the app's content analyzer to ensure 60% of the speech relied on visual and personal framing, completely shifting audience retention."
-
-### Interactables (Links/Buttons):
-- [BUTTON] All Transformations
-- [BUTTON] Pacing & Delivery (WPM)
-- [BUTTON] Pressure & Q&A Mastery
-- [BUTTON] Content & Engagement
-- [A] Read Data
-- [A] Read Data
-- [A] Read Data
-
-### Image Alt Text:
-
----
-
-## File: /website/articles/vviq-test.html
+## File: /website/articles/speak-without-script-vviq-test.html
 
 ### Body Text:
 - Discover your cognitive imagery profile and stop going blank under pressure.
@@ -273,6 +252,27 @@
 - [SUMMARY] What is the Vividness of Visual Imagery Questionnaire (VVIQ)?
 - [SUMMARY] How does Aphantasia affect public speaking?
 - [SUMMARY] What is the best way to memorize a speech without a script?
+
+### Image Alt Text:
+
+---
+
+## File: /website/articles/transformations-hub.html
+
+### Body Text:
+- Over 68 executives and professionals have optimized their delivery metrics using the Mic-Check App. Filter by specific speaking challenges to see the data, the process, and the results.
+- "When I started, I was juggling words and rushing. Using the Mic-Check App, we tracked my pace from 180 down to the ideal 145-150 WPM range, completely transforming my delivery."
+- "Tom was incredibly knowledgeable teaching professional pitching. Utilizing Repeat-Count training drastically reduced cognitive load, allowing for confident, measured answers under pressure."
+- "For financial brokers, data can be dry. We used the app's content analyzer to ensure 60% of the speech relied on visual and personal framing, completely shifting audience retention."
+
+### Interactables (Links/Buttons):
+- [BUTTON] All Transformations
+- [BUTTON] Pacing & Delivery (WPM)
+- [BUTTON] Pressure & Q&A Mastery
+- [BUTTON] Content & Engagement
+- [A] Read Data
+- [A] Read Data
+- [A] Read Data
 
 ### Image Alt Text:
 

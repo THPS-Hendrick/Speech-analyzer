@@ -373,7 +373,7 @@
 
 ---
 
-## File: /website/articles/sams-test.html
+## File: /website/articles/presentation-nerves-sams-test.html
 
 **Title:** Why Do I Get Nervous When I Present? The SAMS Test | Tom Hendrick
 
@@ -454,61 +454,7 @@
 
 ---
 
-## File: /website/articles/transformations-hub.html
-
-**Title:** Data-Driven Public Speaking Transformations | Tom Hendrick
-
-**Schema 1:**
-```json
-{
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "Tom Hendrick",
-      "legalName": "Thomas Geoffrey Hendrick",
-      "url": "https://tomhendrick.com",
-      "telephone": "+61419499331",
-      "vatID": "56949157639",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Suite 110, 147 Pirie Street",
-        "addressLocality": "Adelaide",
-        "addressRegion": "SA",
-        "postalCode": "5000",
-        "addressCountry": "AU"
-    },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "-34.9252",
-        "longitude": "138.6063"
-      }
-    }
-```
-
-**Schema 2:**
-```json
-{
-      "@context": "https://schema.org/",
-      "@type": "LocalBusiness",
-      "name": "Tom Hendrick Public Speaking",
-      "image": "/image/thps-logo-tom-hendrick-public-speaking.svg",
-      "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5.0",
-        "reviewCount": "68"
-      }
-    }
-```
-
-**Headings:**
-- H1: Data-Driven Public Speaking Transformations
-- H2: Optimized Executive Pace to 150 WPM
-- H3: Mastering Professional Pitching & Q&A
-- H3: Hitting the 60% Visual Engagement Rule
-
----
-
-## File: /website/articles/vviq-test.html
+## File: /website/articles/speak-without-script-vviq-test.html
 
 **Title:** How to Speak Without a Script: The VVIQ Test | Tom Hendrick
 
@@ -573,6 +519,60 @@
 - H3: The Phantasia Speaker
 - H3: The Hyperphantasia Speaker
 - H2: Frequently Asked Questions
+
+---
+
+## File: /website/articles/transformations-hub.html
+
+**Title:** Data-Driven Public Speaking Transformations | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Tom Hendrick",
+      "legalName": "Thomas Geoffrey Hendrick",
+      "url": "https://tomhendrick.com",
+      "telephone": "+61419499331",
+      "vatID": "56949157639",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Suite 110, 147 Pirie Street",
+        "addressLocality": "Adelaide",
+        "addressRegion": "SA",
+        "postalCode": "5000",
+        "addressCountry": "AU"
+    },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-34.9252",
+        "longitude": "138.6063"
+      }
+    }
+```
+
+**Schema 2:**
+```json
+{
+      "@context": "https://schema.org/",
+      "@type": "LocalBusiness",
+      "name": "Tom Hendrick Public Speaking",
+      "image": "/image/thps-logo-tom-hendrick-public-speaking.svg",
+      "description": "Data-driven executive speech coaching and real-time vocal diagnostics via the Mic-Check App.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "68"
+      }
+    }
+```
+
+**Headings:**
+- H1: Data-Driven Public Speaking Transformations
+- H2: Optimized Executive Pace to 150 WPM
+- H3: Mastering Professional Pitching & Q&A
+- H3: Hitting the 60% Visual Engagement Rule
 
 ---
 
