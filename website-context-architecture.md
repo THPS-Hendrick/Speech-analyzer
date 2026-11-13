@@ -442,8 +442,68 @@
 
 ## File: /website/articles/speak-without-script-image-test.html
 
+**Title:** How to Speak Without a Script: The Image-Based Test | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "How to Speak Without a Script: The Image-Based Test",
+          "description": "Learn the cognitive mechanics of generating a 'mental movie' to speak effortlessly without a script, tailored to your VVIQ profile.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is it better to memorize a script or speak without one?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Reading a word-perfect script can make you sound clunky and unnatural, and it is highly impractical for 'anytime' speaking like interviews or Q&A sessions. It is better to use structured frameworks or mental imagery to speak extemporaneously."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I use mental images to speak without a script?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Instead of recalling memorized text, you play a 'mental movie' or visualize a specific image in your head. Your brain then naturally word-associates to describe what you are seeing, lowering cognitive load and increasing sensory descriptions."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why is storytelling hard for some speakers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Storytelling requires generating vivid imagery. For speakers with Hypophantasia or Aphantasia, generating mental images requires immense cognitive effort. They must rely on automated structural rules to free up enough working memory to tell a story."
+              }
+            }
+          ]
+        }
+      ]
+    }
+```
+
 **Headings:**
-- None found
+- H1: Image-Based Speaking Test
+- H2: No Script Image Test
+- H3: 
+- H3: Transcribing & Analyzing...
+- H2: Test Complete
+- H2: The Pitfalls of the Word-Perfect Script
+- H2: How to Read an "Image Script"
+- H2: Navigating Your Cognitive Imagery Profile
+- H3: For Hypophantasia Speakers (High Effort)
+- H3: For Hyperphantasia Speakers (The Visual Superpower)
+- H2: Frequently Asked Questions
 
 ---
 

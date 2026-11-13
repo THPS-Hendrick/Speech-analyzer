@@ -205,10 +205,40 @@
 ## File: /website/articles/speak-without-script-image-test.html
 
 ### Body Text:
+- Test how well you control your thoughts, words, and delivery without a script.
+- This is a test to see how well you currently control your thoughts, words, and delivery without a script. You will be prompted with an image and required to speak aloud. Microphone access is required.
+- Microphone access is required to proceed.
+- Start Speaking
+- Connecting to Google Cloud Speech-to-Text.
+- Results safely stored to your CRM.
+- Read below to see how thinking in images helps speak without a script
+- Many people overprepare for presentations by spending hours writing a word-perfect script. However, the act of reading a word-perfect script can be extremely impractical. If you're not a professionally trained voice actor, reading makes you sound clunky and unnatural, which is highly disengaging for the audience.
+- More importantly, it is impossible to have a fully prepared written script for all occasions. To become an "anytime speaker"—where you can speak well anytime in front of an interview panel, when cameras unexpectedly turn on, or in front of a thousand people—we need to solve for where you pull your information from on the fly.
+- If you have taken the VVIQ test, you know whether your brain leans toward Aphantasia, Hypophantasia, Phantasia, or Hyperphantasia. For everyone except Aphantasia speakers, you have some capacity to generate images in your head to help you find words to speak.
+- Images in your head are a very powerful way of finding words that, in turn, can generate an image in your audience's mind. If you can tell a story or explain something so vividly that they can physically "see" it, you deliver incredibly information-rich and engaging content compared to dry, abstract data.
+- The Mental Movie: Your ability to generate images in your head and use that as your "script" is the secret to speaking without one. When you imagine what the scene looks like, you are doing what natural public speaking is: generating a memory, playing a movie in your head, and letting the descriptive words naturally fall out of your mouth.
+- However, generating mental images can take a massive cognitive toll and be incredibly difficult to do under pressure if you don't know how to balance your working memory.
+- For people who struggle to visualize naturally, you must become perfectly effortless at other structural speaking skills so that your remaining cognitive capacity can be spent entirely on generating images.
+- Hypophantasia speakers tend to be exceptionally good at following structured rules or frameworks (like the Repeat & Count method) to find word categories easily. By leaning into this rules-based superpower to anchor the speech, they free up the necessary brainpower to generate a story in their head and get it out of their mouth.
+- If you are a hyperphantasia speaker, generating rich images is effortless. It would be silly not to use that skill set when you speak without a script.
+- Sometimes hyperphantasia speakers are better off not writing a single word on a cue card or script when preparing for a speech. Forcing non-visual dot points interrupts their flow. They are far better off vividly imagining or reimagining stories and diagrams, and simply speaking aloud to describe what they see in their mind's eye.
+- Reading a word-perfect script can make you sound clunky and unnatural, and it is highly impractical for 'anytime' speaking like interviews or Q&A sessions. It is better to use structured frameworks or mental imagery to speak extemporaneously.
+- Instead of recalling memorized text, you play a 'mental movie' or visualize a specific scene in your head. Your brain then naturally word-associates to describe what you are seeing, lowering cognitive load and increasing vivid sensory descriptions.
+- Storytelling requires generating vivid imagery. For speakers with Hypophantasia or Aphantasia, generating mental images requires immense cognitive effort. They must rely on automated structural rules to free up enough working memory to tell a story fluently.
 
 ### Interactables (Links/Buttons):
+- [A] Member Hub
+- [BUTTON] Start Image Test
+- [BUTTON] 
+- [BUTTON] Next Level
+- [A] Back to Member Progress
+- [A] Sign up for a free account
+- [SUMMARY] Is it better to memorize a script or speak without one?
+- [SUMMARY] How do I use mental images to speak without a script?
+- [SUMMARY] Why is storytelling hard for some speakers?
 
 ### Image Alt Text:
+- Test Prompt
 
 ---
 
