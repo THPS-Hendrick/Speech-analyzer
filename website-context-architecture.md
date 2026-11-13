@@ -367,6 +367,13 @@
 
 ---
 
+## File: /website/articles/speak-without-script-rules-test.html
+
+**Headings:**
+- None found
+
+---
+
 ## File: /website/articles/transformations-hub.html
 
 **Title:** Data-Driven Public Speaking Transformations | Tom Hendrick

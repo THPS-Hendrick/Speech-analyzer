@@ -153,6 +153,16 @@
 
 ---
 
+## File: /website/articles/speak-without-script-rules-test.html
+
+### Body Text:
+
+### Interactables (Links/Buttons):
+
+### Image Alt Text:
+
+---
+
 ## File: /website/articles/transformations-hub.html
 
 ### Body Text:
