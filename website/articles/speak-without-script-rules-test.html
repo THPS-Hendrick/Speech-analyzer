@@ -1,1 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Load in Public Speaking: The Rules-Based Test | Tom Hendrick</title>
+    <meta name="description" content="Test your cognitive load capacity while speaking. Discover how the Fitts & Posner skill acquisition model explains why you go blank under pressure.">
+    <link rel="canonical" href="https://tomhendrick.com/articles/speak-without-script-rules-test.html" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/image/thps-logo-golden-wreath.svg">
+    
+    <!-- Schema.org Article and FAQ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Cognitive Load in Public Speaking: The Rules-Based Test",
+          "description": "Discover why bolting on untrained speaking 'tips' overloads your working memory, and how to reach the autonomous phase of skill acquisition.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Why do I forget everything when I stand up to speak?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Forgetting what to say is caused by cognitive overload. When you try to manually manage too many untrained skills at once (like pacing, body language, and word choice), your working memory maxes out and crashes under pressure."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I stop overthinking my presentations?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You must drill a small number of core speaking frameworks (like Repeat & Count) until they reach the Autonomous Phase of skill acquisition, meaning your cerebellum executes them automatically with zero conscious thought."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Should I copy the speaking style of famous speakers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Constantly reinventing yourself to mimic others traps you in the high-effort Cognitive Phase of learning. You must groove your own unique, consistent style so that your intrinsic feedback can self-correct you effortlessly."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google Fonts & Tailwind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { green: '#106030', dark: '#0c4a25', gold: '#FFCC00', offwhite: '#FAF9F5' } }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Central Firebase Engine -->
+    <script type="module" src="/js/firebase-client.js"></script>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
+
+    <!-- INJECT_HEADER -->
+
+    <main class="flex-grow w-full pb-20 pt-12 md:pt-16 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Breadcrumb -->
+            <a href="/members/progress.html" class="text-brand-green text-sm font-bold mb-8 inline-flex items-center gap-2 hover:underline tracking-wide uppercase">
+                <i class="fa-solid fa-arrow-left"></i> Member Hub
+            </a>
+
+            <!-- Header -->
+            <header class="mb-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                    <i class="fa-solid fa-list-check"></i> Lesson 5
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4 tracking-tight">Rules-Based Speaking Test</h1>
+                <p class="text-xl text-gray-600">Test how many cognitive constraints you can juggle before your working memory breaks.</p>
+            </header>
+
+            <!-- DO-ABLE: Interactive Micro-App -->
+            <div id="test-container" class="bg-white rounded-3xl p-6 md:p-12 shadow-xl border border-gray-200 mb-16 relative overflow-hidden transition-all duration-300 min-h-[500px] flex flex-col justify-center">
+                
+                <!-- Progress Bar -->
+                <div id="test-progress-container" class="hidden absolute top-0 left-0 w-full h-1.5 bg-gray-100">
+                    <div id="test-progress-bar" class="h-full bg-brand-green w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Intro Screen -->
+                <div id="screen-intro" class="text-center">
+                    <div class="w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center mx-auto text-2xl mb-6 shadow-md"><i class="fa-solid fa-brain"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">Cognitive Load Sprint</h2>
+                    <p class="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">This is a fast-paced game testing your working memory. You have 30 seconds per level to answer 5 prompts by following increasingly complex rules. <strong>Requires a Google Chrome browser and microphone.</strong></p>
+                    <button onclick="requestMicAndStart()" id="btn-start" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md active:scale-95 text-lg">Start Rules Test</button>
+                    <p id="mic-error" class="hidden text-red-600 text-sm font-bold mt-4">Microphone or Web Speech API access failed.</p>
+                </div>
+
+                <!-- Active Test Screen -->
+                <div id="screen-active-test" class="hidden flex-col w-full max-w-3xl mx-auto items-center">
+                    <div class="flex justify-between w-full items-center mb-4">
+                        <div class="text-brand-green font-bold text-sm uppercase tracking-widest" id="test-counter">Level 1 of 5</div>
+                        <div class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 uppercase tracking-widest" id="score-counter">
+                            Score: 0 / 5
+                        </div>
+                    </div>
+                    
+                    <h3 id="test-title" class="text-xl font-bold text-slate-900 mb-2 text-center w-full"></h3>
+                    <div id="test-instructions" class="text-brand-dark text-sm mb-6 text-center w-full bg-green-50 p-4 rounded-xl border border-green-200 leading-relaxed font-bold"></div>
+
+                    <!-- Target Prompt Box -->
+                    <div class="w-full min-h-[120px] bg-slate-900 text-white rounded-xl shadow-inner mb-6 relative border border-slate-700 flex flex-col items-center justify-center p-6 text-center">
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Prompt:</div>
+                        <div id="test-prompt" class="text-2xl md:text-3xl font-black">Would you invest in a BAKERY?</div>
+                    </div>
+
+                    <!-- Live Transcription & Hardware -->
+                    <div class="w-full flex flex-col md:flex-row gap-4 mb-8">
+                        <div class="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-4 relative">
+                            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Live Transcript:</div>
+                            <div id="live-transcript" class="text-sm font-medium text-slate-700 italic min-h-[40px]">Listening...</div>
+                        </div>
+                        <div class="w-full md:w-32 bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col justify-center items-center">
+                            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Volume</div>
+                            <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden relative">
+                                <div class="absolute top-0 bottom-0 left-[70%] w-px bg-red-500 z-10"></div>
+                                <div id="live-db-fill" class="h-full bg-blue-400 w-0 transition-all duration-75"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Timer Bar -->
+                    <div class="w-full flex flex-col gap-1 mb-8">
+                        <div class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                            <span>30s Sprint</span>
+                            <span id="countdown-text" class="text-brand-green font-black">30s remaining</span>
+                        </div>
+                        <div class="w-full h-4 bg-gray-100 rounded-full relative overflow-hidden border border-gray-200">
+                            <div id="live-timer-fill" class="h-full bg-brand-green w-full transition-all duration-100 ease-linear"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="btn-manual-advance" onclick="manualAdvance()" class="text-[10px] text-gray-400 uppercase font-bold hover:text-brand-green tracking-widest transition-colors">Skip Prompt (Browser didn't hear me)</button>
+                </div>
+
+                <!-- Level Score Screen -->
+                <div id="screen-level-score" class="hidden flex-col items-center justify-center text-center">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Level <span id="level-complete-num">1</span> Complete</h2>
+                    <p class="text-gray-500 mb-8">Your cognitive processing speed under pressure.</p>
+                    
+                    <div class="flex flex-col items-center justify-center p-6 rounded-2xl border-4 bg-gray-50 border-gray-200 mb-8 w-64 h-64 shadow-inner">
+                        <span class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Prompts Cleared</span>
+                        <span id="level-score-val" class="text-6xl font-black text-slate-800">0 / 5</span>
+                    </div>
+
+                    <button id="btn-next-level" onclick="nextLevel()" class="bg-slate-800 text-white font-bold py-3.5 px-8 rounded-full hover:bg-slate-700 transition-all shadow-md active:scale-95 text-lg uppercase tracking-widest flex items-center gap-2">
+                        Next Level <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Final Results Screen -->
+                <div id="screen-results" class="hidden text-center flex-col w-full">
+                    <div class="w-16 h-16 bg-brand-gold text-brand-dark rounded-full flex items-center justify-center mx-auto text-2xl mb-4 shadow-sm"><i class="fa-solid fa-flag-checkered"></i></div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Test Complete</h2>
+                    <p class="text-gray-500 mb-8">Results safely stored to your CRM.</p>
+                    
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-xl mx-auto w-full mb-8">
+                        <h4 class="text-sm font-bold text-brand-green uppercase tracking-widest mb-4 border-b border-gray-100 pb-2 text-left">Cognitive Load Capacity</h4>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">L1 (1 Rule):</span> <span id="res-l1" class="font-black text-slate-800"></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">L2 (2 Rules):</span> <span id="res-l2" class="font-black text-slate-800"></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">L3 (3 Rules):</span> <span id="res-l3" class="font-black text-slate-800"></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">L4 (4 Rules):</span> <span id="res-l4" class="font-black text-slate-800"></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                <span class="font-bold text-slate-700">L5 (5 Rules):</span> <span id="res-l5" class="font-black text-slate-800"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="/members/progress.html" class="bg-brand-green text-white font-bold py-3.5 px-8 rounded-full hover:bg-brand-dark transition-all shadow-md text-center">Back to Member Progress</a>
+                    </div>
+                    
+                    <div id="auth-prompt" class="hidden mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-800 text-sm">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> You are not logged in. <a href="/members/login.html" class="font-bold hover:underline text-brand-dark">Sign up for a free account</a> to save this profile and track your progress.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mb-16">
+                <i class="fa-solid fa-arrow-down text-2xl text-gray-300 animate-bounce"></i>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Read below to learn why cognitive load causes you to go blank</p>
+            </div>
+
+            <!-- READABLE: SEO / Educational Content -->
+            <article class="prose prose-lg max-w-none text-gray-700 mb-20 space-y-8">
+                
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Juggler Analogy: Why Speaking "Tips" Cause You to Fail</h2>
+                <p>The reason why developing your <em>effortlessness</em> in speaking is crucial is because the best speakers in the world are able to juggle a massive amount of skills simultaneously. It is not enough to simply know these skills conceptually.</p>
+                <p>Untrained speakers often go looking for quick "tips and tricks," and those tips become cognitive additions to their skill set. But because they are not neurologically trained to the autonomous phase, they demand massive amounts of working memory. When pressure is introduced (like standing in front of an audience), the pressure acts as another heavy ball to juggle. The speaker's working memory becomes overwhelmed, causing them to completely crumble and go blank.</p>
+                
+                <h2 class="text-3xl font-bold text-slate-900 mt-12 mb-4">The Science of Effortless Speaking</h2>
+                <p>If you refer to the Fitts and Posner (1967) model of skill acquisition and subsequent publications like John Sweller's Cognitive Load Theory, you can see that there is a distinct trade-off over time through training.</p>
+                
+                <div class="space-y-8 mt-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Stages of Skill Acquisition</h3>
+                        <p class="leading-relaxed">When you are first learning a skill theoretically (the Cognitive Phase), your cognitive attention is incredibly high. You must actively think about every single word and breath. Through drilled practice, your strain and delay to execute or correct the skill goes down (the Associative Phase).</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-dark mb-3">The Cerebellum and Intrinsic Feedback</h3>
+                        <p class="leading-relaxed">As you practice, you develop intrinsic feedback, usually housed in the cerebellum of the brain. The cerebellum begins predicting if that skill felt "right" or not, and it starts to unconsciously and very quickly self-correct. In public speaking, it might sound like you're about to say a wrong word, but the cerebellum physically stops your vocal cords so that you can comply with a structural rule.</p>
+                        <p class="leading-relaxed mt-2">Eventually, you wake up one day in the effortless phase (the Autonomous Phase). Just as it feels weird to not hold a pen correctly after years of writing, it becomes weird <em>not</em> to speak in your unique, structured style correctly. It requires zero cognitive load.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white rounded-2xl p-8 shadow-xl my-10">
+                    <h3 class="text-2xl font-bold text-brand-gold mb-3 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> The Reinvention Pitfall</h3>
+                    <p class="text-slate-300 leading-relaxed m-0">
+                        A massive pitfall that people fall into when training any skill—whether it's golf, piano, or public speaking—is that they are constantly reinventing themselves rather than grooving their own unique way of doing it. By reinventing themselves (or trying to copy famous speakers), they perpetually trap themselves in the early Cognitive Phase. These high-effort phases break down the moment the SAM Axis introduces biological pressure.
+                    </p>
+                </div>
+
+                <p>When we want to develop a speaker that is resistant to pressure, we are looking to get them exceptionally "grooved" at a select number of foundational skills (like the Repeat and Count). By getting those skills into the effortless phase, they accrue very low cognitive debt, ensuring the rest of their cognitive bandwidth can be spent actively reading the audience, managing pressure, and performing brilliantly.</p>
+
+            </article>
+
+            <!-- AEO / FAQ SECTION -->
+            <section class="border-t border-gray-200 pt-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
+                
+                <div class="space-y-4">
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            Why do I forget everything when I stand up to speak?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            Forgetting what to say is caused by cognitive overload. When you try to manually manage too many untrained skills at once (like pacing, body language, and word choice), your working memory maxes out and crashes under pressure.
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            How do I stop overthinking my presentations?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            You must drill a small number of core speaking frameworks (like Repeat & Count) until they reach the Autonomous Phase of skill acquisition, meaning your cerebellum executes them automatically with zero conscious thought.
+                        </p>
+                    </details>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-2xl shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-slate-900 font-bold hover:text-brand-green transition-colors">
+                            Should I copy the speaking style of famous speakers?
+                            <span class="relative size-5 shrink-0 text-brand-green">
+                                <i class="fa-solid fa-plus absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity flex items-center justify-center"></i>
+                                <i class="fa-solid fa-minus absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity flex items-center justify-center"></i>
+                            </span>
+                        </summary>
+                        <p class="px-6 pb-6 text-gray-600 text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2">
+                            No. Constantly reinventing yourself to mimic others traps you in the high-effort Cognitive Phase of learning. You must groove your own unique, consistent style so that your intrinsic feedback can self-correct you effortlessly.
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- INJECT_FOOTER -->
+
+    <!-- Micro-App Logic: Speech Recognition & Volume Tracking -->
+    <script>
+        const levelsData = [
+            {
+                id: 1, title: "Level 1: 1 Rule", rulesText: "Say ONLY the ALL CAPS word.",
+                questions: [
+                    { prompt: "Would you invest in a BAKERY?", target: "bakery" },
+                    { prompt: "Would you INVEST in a florist?", target: "invest" },
+                    { prompt: "What's BETTER, tea or coffee?", target: "better" },
+                    { prompt: "How do you save MONEY?", target: "money" },
+                    { prompt: "WHY is the sky blue?", target: "why" }
+                ],
+                // Just needs the word
+                evaluate: (transcript, prompt, maxDb) => transcript.toLowerCase().includes(prompt.target)
+            },
+            {
+                id: 2, title: "Level 2: 2 Rules", rulesText: "Say EXACTLY ONE word from the sentence + Speak louder than -30dB.",
+                questions: [
+                    { prompt: "Would you invest in a theme park?", words: ["would","you","invest","in","a","theme","park"] },
+                    { prompt: "Would you buy an empty warehouse?", words: ["would","you","buy","an","empty","warehouse"] },
+                    { prompt: "White chocolate or dark chocolate?", words: ["white","chocolate","or","dark"] },
+                    { prompt: "How do you save for retirement?", words: ["how","do","you","save","for","retirement"] },
+                    { prompt: "How does quantum physics work?", words: ["how","does","quantum","physics","work"] }
+                ],
+                evaluate: (transcript, prompt, maxDb) => {
+                    if (maxDb < -30) return false;
+                    const txt = transcript.toLowerCase();
+                    let matchCount = prompt.words.filter(w => txt.includes(w)).length;
+                    return matchCount === 1;
+                }
+            },
+            {
+                id: 3, title: "Level 3: 3 Rules", rulesText: "Ask a question from YOUR perspective (I/my) + 1 Word > -30dB + Rest < -30dB.",
+                questions: [
+                    { prompt: "Would you buy a sports car?" },
+                    { prompt: "Do you prefer summer or winter?" },
+                    { prompt: "Why do we need sleep?" },
+                    { prompt: "How do you stay focused?" },
+                    { prompt: "What makes a good leader?" }
+                ],
+                evaluate: (transcript, prompt, maxDb) => {
+                    if (maxDb < -30) return false; 
+                    const txt = transcript.toLowerCase();
+                    // Heuristic: Must contain self-reference and sound like a question
+                    return (txt.includes('i ') || txt.includes(' my ')) && 
+                           (txt.includes('?') || txt.match(/^(would|do|why|what|how|is|are|am|can) /));
+                }
+            },
+            {
+                id: 4, title: "Level 4: 4 Rules", rulesText: "Make a statement (NO question mark) + Complete sentence + 1 Word > -30dB + Rest < -30dB.",
+                questions: [
+                    { prompt: "Would you invest in cryptocurrency?" },
+                    { prompt: "Is remote work better than an office?" },
+                    { prompt: "How do you handle failure?" },
+                    { prompt: "What is the best way to learn?" },
+                    { prompt: "Why do people fear public speaking?" }
+                ],
+                evaluate: (transcript, prompt, maxDb) => {
+                    if (maxDb < -30) return false; 
+                    const txt = transcript.toLowerCase();
+                    const wordCount = txt.split(' ').filter(w => w.trim().length > 0).length;
+                    // Heuristic: No question words at start, >= 3 words
+                    return !txt.includes('?') && !txt.match(/^(would|do|why|what|how|is|are|can) /) && wordCount >= 3;
+                }
+            },
+            {
+                id: 5, title: "Level 5: 5 Rules", rulesText: "Include 'small' & 'big' (separated) + Statement + Complete sentence + 1 Word > -30dB + Rest < -30dB.",
+                questions: [
+                    { prompt: "Would you start a new business?" },
+                    { prompt: "How do you plan a vacation?" },
+                    { prompt: "What makes a great team?" },
+                    { prompt: "Why should we hire you?" },
+                    { prompt: "How do you solve complex problems?" }
+                ],
+                evaluate: (transcript, prompt, maxDb) => {
+                    if (maxDb < -30) return false; 
+                    const txt = transcript.toLowerCase();
+                    const hasWords = txt.includes('small') && txt.includes('big');
+                    const wordCount = txt.split(' ').filter(w => w.trim().length > 0).length;
+                    return hasWords && !txt.includes('?') && wordCount >= 3;
+                }
+            }
+        ];
+
+        let currentLevelIdx = 0;
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let levelScores = [0, 0, 0, 0, 0];
+        
+        let isActive = false;
+        let timerInterval = null;
+        let timeRemaining = 30.0;
+        
+        // Audio & Speech API
+        let audioCtx = null;
+        let analyser = null;
+        let microphone = null;
+        let reqFrame = null;
+        let recognition = null;
+        let maxDbInWindow = -100;
+
+        const screens = {
+            intro: document.getElementById('screen-intro'),
+            active: document.getElementById('screen-active-test'),
+            levelScore: document.getElementById('screen-level-score'),
+            results: document.getElementById('screen-results')
+        };
+        const pContainer = document.getElementById('test-progress-container');
+        const pBar = document.getElementById('test-progress-bar');
+
+        async function requestMicAndStart() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                window.audioStream = stream; 
+                
+                // Init Web Speech API
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) throw new Error("SpeechRecognition API not supported.");
+                
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                
+                recognition.onresult = handleSpeechResult;
+                recognition.onerror = (e) => console.warn("Speech Rec Error:", e);
+                recognition.onend = () => { if (isActive) recognition.start(); }; // Keep alive
+
+                // Init Audio Context for Volume
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+                analyser = audioCtx.createAnalyser();
+                microphone = audioCtx.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                analyser.fftSize = 256;
+
+                screens.intro.classList.add('hidden');
+                pContainer.classList.remove('hidden');
+                screens.active.classList.remove('hidden');
+                screens.active.classList.add('flex');
+                
+                startLevel();
+            } catch (err) {
+                console.error("Init error:", err);
+                document.getElementById('mic-error').classList.remove('hidden');
+            }
+        }
+
+        function startLevel() {
+            const lvl = levelsData[currentLevelIdx];
+            currentQuestionIdx = 0;
+            score = 0;
+            timeRemaining = 30.0;
+            isActive = true;
+            maxDbInWindow = -100;
+
+            pBar.style.width = `${(currentLevelIdx / 5) * 100}%`;
+            
+            document.getElementById('test-counter').innerText = `Level ${lvl.id} of 5`;
+            document.getElementById('test-title').innerText = lvl.title;
+            document.getElementById('test-instructions').innerText = lvl.rulesText;
+            document.getElementById('score-counter').innerText = `Score: 0 / 5`;
+            
+            loadQuestion();
+            
+            // Start APIs
+            try { recognition.start(); } catch(e) {}
+            startVolumeTracker();
+
+            // 30 Second Countdown
+            document.getElementById('live-timer-fill').style.width = '100%';
+            timerInterval = setInterval(() => {
+                timeRemaining -= 0.05;
+                if (timeRemaining <= 0) {
+                    endLevel();
+                } else {
+                    document.getElementById('countdown-text').innerText = `${Math.ceil(timeRemaining)}s remaining`;
+                    document.getElementById('live-timer-fill').style.width = `${(timeRemaining / 30) * 100}%`;
+                }
+            }, 50);
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIdx >= 5) {
+                endLevel();
+                return;
+            }
+            const q = levelsData[currentLevelIdx].questions[currentQuestionIdx];
+            document.getElementById('test-prompt').innerText = q.prompt;
+            document.getElementById('live-transcript').innerText = "Listening...";
+            maxDbInWindow = -100; // Reset evaluation window
+        }
+
+        function handleSpeechResult(event) {
+            if (!isActive) return;
+            
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+            
+            const liveText = finalTranscript || interimTranscript;
+            if (liveText.trim().length > 0) {
+                document.getElementById('live-transcript').innerText = liveText;
+                
+                // Evaluate logic
+                const lvl = levelsData[currentLevelIdx];
+                const q = lvl.questions[currentQuestionIdx];
+                
+                if (lvl.evaluate(liveText, q, maxDbInWindow)) {
+                    // Passed Rule!
+                    score++;
+                    document.getElementById('score-counter').innerText = `Score: ${score} / 5`;
+                    
+                    // Flash Green
+                    const promptBox = document.getElementById('test-prompt').parentElement;
+                    promptBox.classList.replace('bg-slate-900', 'bg-green-600');
+                    setTimeout(() => {
+                        if (promptBox.classList.contains('bg-green-600')) {
+                            promptBox.classList.replace('bg-green-600', 'bg-slate-900');
+                        }
+                    }, 300);
+
+                    currentQuestionIdx++;
+                    loadQuestion();
+                }
+            }
+        }
+
+        function startVolumeTracker() {
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                if (!isActive) return;
+                reqFrame = requestAnimationFrame(draw);
+                analyser.getByteTimeDomainData(dataArray);
+
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    let v = dataArray[i] / 128.0; 
+                    let c = v - 1;
+                    sum += c * c;
+                }
+                let rms = Math.sqrt(sum / bufferLength);
+                let db = 20 * Math.log10(Math.max(rms, 0.0001));
+                
+                if (db > maxDbInWindow) maxDbInWindow = db;
+
+                let minDb = -50;
+                let maxDbBound = -10;
+                let dbVisual = ((db - minDb) / (maxDbBound - minDb)) * 100;
+                dbVisual = Math.max(0, Math.min(dbVisual, 100));
+
+                const fillEl = document.getElementById('live-db-fill');
+                fillEl.style.width = `${dbVisual}%`;
+                
+                if (db > -30) fillEl.classList.replace('bg-blue-400', 'bg-red-500');
+                else fillEl.classList.replace('bg-red-500', 'bg-blue-400');
+            }
+            draw();
+        }
+
+        function manualAdvance() {
+            // For if the browser STT gets stuck or user mumbles
+            if (!isActive) return;
+            currentQuestionIdx++;
+            loadQuestion();
+        }
+
+        function endLevel() {
+            isActive = false;
+            clearInterval(timerInterval);
+            if (reqFrame) cancelAnimationFrame(reqFrame);
+            try { recognition.stop(); } catch(e) {}
+            
+            levelScores[currentLevelIdx] = score;
+
+            screens.active.classList.add('hidden');
+            screens.active.classList.remove('flex');
+            
+            if (currentLevelIdx < 4) {
+                screens.levelScore.classList.remove('hidden');
+                screens.levelScore.classList.add('flex');
+                document.getElementById('level-complete-num').innerText = currentLevelIdx + 1;
+                document.getElementById('level-score-val').innerText = `${score} / 5`;
+            } else {
+                finishDiagnostic();
+            }
+        }
+
+        function nextLevel() {
+            screens.levelScore.classList.add('hidden');
+            screens.levelScore.classList.remove('flex');
+            screens.active.classList.remove('hidden');
+            screens.active.classList.add('flex');
+            
+            currentLevelIdx++;
+            startLevel();
+        }
+
+        function finishDiagnostic() {
+            pBar.style.width = '100%';
+            
+            // Populate Results
+            for(let i=0; i<5; i++) {
+                document.getElementById(`res-l${i+1}`).innerText = `${levelScores[i]} / 5`;
+            }
+
+            // Format payload
+            let str = `L1: ${levelScores[0]}/5 | L2: ${levelScores[1]}/5 | L3: ${levelScores[2]}/5 | L4: ${levelScores[3]}/5 | L5: ${levelScores[4]}/5`;
+
+            if (window.saveLessonProgress) {
+                window.saveLessonProgress('rules-based', str).then((success) => {
+                    if (!success) document.getElementById('auth-prompt').classList.remove('hidden');
+                });
+            } else {
+                document.getElementById('auth-prompt').classList.remove('hidden');
+            }
+            
+            screens.results.classList.remove('hidden');
+            screens.results.classList.add('flex');
+            
+            if (window.audioStream) { window.audioStream.getTracks().forEach(t => t.stop()); }
+            if (audioCtx && audioCtx.state !== 'closed') audioCtx.close();
+        }
+    </script>
+</body>
+</html>
+
 
