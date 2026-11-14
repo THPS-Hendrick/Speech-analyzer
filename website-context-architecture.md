@@ -509,8 +509,68 @@
 
 ## File: /website/articles/speak-without-script-rules-test.html
 
+**Title:** Cognitive Load in Public Speaking: The Rules-Based Test | Tom Hendrick
+
+**Schema 1:**
+```json
+{
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Cognitive Load in Public Speaking: The Rules-Based Test",
+          "description": "Discover why bolting on untrained speaking 'tips' overloads your working memory, and how to reach the autonomous phase of skill acquisition.",
+          "author": {
+            "@type": "Person",
+            "name": "Tom Hendrick",
+            "url": "https://tomhendrick.com/about.html"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Why do I forget everything when I stand up to speak?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Forgetting what to say is caused by cognitive overload. When you try to manually manage too many untrained skills at once (like pacing, body language, and word choice), your working memory maxes out and crashes under pressure."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I stop overthinking my presentations?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You must drill a small number of core speaking frameworks (like Repeat & Count) until they reach the Autonomous Phase of skill acquisition, meaning your cerebellum executes them automatically with zero conscious thought."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Should I copy the speaking style of famous speakers?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Constantly reinventing yourself to mimic others traps you in the high-effort Cognitive Phase of learning. You must groove your own unique, consistent style so that your intrinsic feedback can self-correct you effortlessly."
+              }
+            }
+          ]
+        }
+      ]
+    }
+```
+
 **Headings:**
-- None found
+- H1: Rules-Based Speaking Test
+- H2: Cognitive Load Sprint
+- H3: 
+- H2: Level 1 Complete
+- H2: Test Complete
+- H2: The Juggler Analogy: Why Speaking "Tips" Cause You to Fail
+- H2: The Science of Effortless Speaking
+- H3: The Stages of Skill Acquisition
+- H3: The Cerebellum and Intrinsic Feedback
+- H3: The Reinvention Pitfall
+- H2: Frequently Asked Questions
 
 ---
 

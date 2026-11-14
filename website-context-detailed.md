@@ -245,8 +245,34 @@
 ## File: /website/articles/speak-without-script-rules-test.html
 
 ### Body Text:
+- Test how many cognitive constraints you can juggle before your working memory breaks.
+- This is a fast-paced game testing your working memory. You have 30 seconds per level to answer 5 prompts by following increasingly complex rules. Requires a Google Chrome browser and microphone.
+- Microphone or Web Speech API access failed.
+- Your cognitive processing speed under pressure.
+- Results safely stored to your CRM.
+- Read below to learn why cognitive load causes you to go blank
+- The reason why developing your effortlessness in speaking is crucial is because the best speakers in the world are able to juggle a massive amount of skills simultaneously. It is not enough to simply know these skills conceptually.
+- Untrained speakers often go looking for quick "tips and tricks," and those tips become cognitive additions to their skill set. But because they are not neurologically trained to the autonomous phase, they demand massive amounts of working memory. When pressure is introduced (like standing in front of an audience), the pressure acts as another heavy ball to juggle. The speaker's working memory becomes overwhelmed, causing them to completely crumble and go blank.
+- If you refer to the Fitts and Posner (1967) model of skill acquisition and subsequent publications like John Sweller's Cognitive Load Theory, you can see that there is a distinct trade-off over time through training.
+- When you are first learning a skill theoretically (the Cognitive Phase), your cognitive attention is incredibly high. You must actively think about every single word and breath. Through drilled practice, your strain and delay to execute or correct the skill goes down (the Associative Phase).
+- As you practice, you develop intrinsic feedback, usually housed in the cerebellum of the brain. The cerebellum begins predicting if that skill felt "right" or not, and it starts to unconsciously and very quickly self-correct. In public speaking, it might sound like you're about to say a wrong word, but the cerebellum physically stops your vocal cords so that you can comply with a structural rule.
+- Eventually, you wake up one day in the effortless phase (the Autonomous Phase). Just as it feels weird to not hold a pen correctly after years of writing, it becomes weird not to speak in your unique, structured style correctly. It requires zero cognitive load.
+- A massive pitfall that people fall into when training any skill—whether it's golf, piano, or public speaking—is that they are constantly reinventing themselves rather than grooving their own unique way of doing it. By reinventing themselves (or trying to copy famous speakers), they perpetually trap themselves in the early Cognitive Phase. These high-effort phases break down the moment the SAM Axis introduces biological pressure.
+- When we want to develop a speaker that is resistant to pressure, we are looking to get them exceptionally "grooved" at a select number of foundational skills (like the Repeat and Count). By getting those skills into the effortless phase, they accrue very low cognitive debt, ensuring the rest of their cognitive bandwidth can be spent actively reading the audience, managing pressure, and performing brilliantly.
+- Forgetting what to say is caused by cognitive overload. When you try to manually manage too many untrained skills at once (like pacing, body language, and word choice), your working memory maxes out and crashes under pressure.
+- You must drill a small number of core speaking frameworks (like Repeat & Count) until they reach the Autonomous Phase of skill acquisition, meaning your cerebellum executes them automatically with zero conscious thought.
+- No. Constantly reinventing yourself to mimic others traps you in the high-effort Cognitive Phase of learning. You must groove your own unique, consistent style so that your intrinsic feedback can self-correct you effortlessly.
 
 ### Interactables (Links/Buttons):
+- [A] Member Hub
+- [BUTTON] Start Rules Test
+- [BUTTON] Skip Prompt (Browser didn't hear me)
+- [BUTTON] Next Level
+- [A] Back to Member Progress
+- [A] Sign up for a free account
+- [SUMMARY] Why do I forget everything when I stand up to speak?
+- [SUMMARY] How do I stop overthinking my presentations?
+- [SUMMARY] Should I copy the speaking style of famous speakers?
 
 ### Image Alt Text:
 
