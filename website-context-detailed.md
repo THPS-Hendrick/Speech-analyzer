@@ -597,6 +597,8 @@
 - [A] Nerves
 - [A] VVIQ
 - [A] Voice
+- [A] Image Script
+- [A] Rules Script
 - [A] About
 - [A] Contact
 - [BUTTON] Member Portal
@@ -620,6 +622,8 @@
 - [A] Nerves
 - [A] VVIQ
 - [A] Voice
+- [A] Image Script
+- [A] Rules Script
 - [A] About
 - [A] Contact
 - [BUTTON] Member Portal
