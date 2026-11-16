@@ -9,8 +9,10 @@ class ThpsEditMode extends HTMLElement {
         this.syllableGroups = [];
         this.repeatGroups = []; 
         this.clarityGroups = []; 
-        this.familiarGroups = []; // NEW: Stores asynchronous familiarity data
-        this.familiarityAvg = null; // NEW: Stores overall zipf score
+        this.familiarGroups = []; // Stores asynchronous familiarity data
+        this.familiarityAvg = null; // Stores overall zipf score
+        this.visualGroups = []; // Stores 1–5 concreteness tiers
+        this.visualAvg = null; // Stores overall 1–5 concreteness average
         
         this.currentMode = "edit-speech"; // Default mode
         this.isEditing = false; // Toggle state for the editor
@@ -77,7 +79,8 @@ class ThpsEditMode extends HTMLElement {
                             <option value="syllables">Syllables / Word</option>
                             <option value="repeat">Repeated Words</option>
                             <option value="clarity">Clarity %</option>
-                            <option value="familiarity">Familiar %</option> <!-- NEW -->
+                            <option value="familiarity">Familiar %</option>
+                            <option value="visual">Visual</option>
                         </select>
 
                         <!-- Filters Dropdown -->
@@ -133,7 +136,6 @@ class ThpsEditMode extends HTMLElement {
         // Setup Filter Toggles
         this.querySelectorAll('.filter-toggle').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
-                // Find the main glass-panel wrapper and toggle the specific class
                 const wrapper = this.querySelector('.glass-panel');
                 wrapper.classList.toggle(e.target.value, e.target.checked);
             });
@@ -151,11 +153,9 @@ class ThpsEditMode extends HTMLElement {
             const btn = e.target.closest('.toggle-edit-btn');
             if (btn) {
                 if (this.isEditing) {
-                    // Exiting Edit Mode
                     this.isEditing = false;
                     this.syncToEngine(); 
                 } else {
-                    // Entering Edit Mode
                     this.isEditing = true;
                     this.renderDOM();
                 }
@@ -175,8 +175,6 @@ class ThpsEditMode extends HTMLElement {
         
         if (window.lucide) window.lucide.createIcons({ root: this });
         window.addEventListener('thps-dashboard-update', (e) => this.processData(e.detail));
-        
-        // NEW: Listen for the asynchronous familiarity payload
         window.addEventListener('thps-familiarity-update', (e) => this.processFamiliarity(e.detail));
 
         if (window.thps_lastPayload) {
@@ -202,7 +200,6 @@ class ThpsEditMode extends HTMLElement {
     }
 
     processData(data) {
-        // SAFETY: Do not overwrite the user's text if an external update triggers while typing.
         if (this.isEditing && !this.ignoreNextUpdate) return; 
 
         if (this.ignoreNextUpdate) {
@@ -218,8 +215,10 @@ class ThpsEditMode extends HTMLElement {
             this.syllableGroups = [];
             this.repeatGroups = [];
             this.clarityGroups = [];
-            this.familiarGroups = []; // Clear familiarity on new empty text
+            this.familiarGroups = [];
             this.familiarityAvg = null;
+            this.visualGroups = [];
+            this.visualAvg = null;
             this.renderDOM();
             return;
         }
@@ -230,6 +229,9 @@ class ThpsEditMode extends HTMLElement {
         if (data.familiarity) {
             this.processFamiliarity(data.familiarity);
         }
+
+        // Process 1–5 Visual / Concreteness Tiers
+        this.processConcreteness(data);
 
         // Parse Sentences using plain text so sort matches word count
         const rawSentences = data.text.match(/[^.!?]+[.!?]*/g) || [data.text];
@@ -270,7 +272,7 @@ class ThpsEditMode extends HTMLElement {
         // Process Repeat Mode
         let wordCounts = {};
         allWords.forEach(word => {
-            const cleanWord = word.toLowerCase().replace(/[^a-z']/g, ''); // Keep letters and apostrophes
+            const cleanWord = word.toLowerCase().replace(/[^a-z']/g, '');
             if (cleanWord) {
                 wordCounts[cleanWord] = (wordCounts[cleanWord] || 0) + 1;
             }
@@ -278,7 +280,7 @@ class ThpsEditMode extends HTMLElement {
 
         let repeatMap = {};
         for (const [word, count] of Object.entries(wordCounts)) {
-            const repeats = count - 1; // 1st instance doesn't count as a repeat
+            const repeats = count - 1;
             if (repeats >= 1) {
                 if (!repeatMap[repeats]) repeatMap[repeats] = [];
                 repeatMap[repeats].push(word);
@@ -287,11 +289,11 @@ class ThpsEditMode extends HTMLElement {
 
         this.repeatGroups = Object.keys(repeatMap)
             .map(Number)
-            .sort((a, b) => b - a) // Sort left column from largest to smallest
+            .sort((a, b) => b - a)
             .map(repeatCount => {
                 return {
                     repeats: repeatCount,
-                    words: repeatMap[repeatCount].sort() // Sort right column alphabetically
+                    words: repeatMap[repeatCount].sort()
                 };
             });
 
@@ -326,12 +328,12 @@ class ThpsEditMode extends HTMLElement {
 
         this.clarityGroups = Object.keys(clarityMap)
             .map(Number)
-            .sort((a, b) => b - a) // Highest clarity ranges float to the top
+            .sort((a, b) => b - a)
             .map(key => {
                 return {
                     label: clarityMap[key].label,
                     sortKey: key,
-                    words: clarityMap[key].words.sort() // Sort words alphabetically, retaining duplicates
+                    words: clarityMap[key].words.sort()
                 };
             });
 
@@ -339,17 +341,65 @@ class ThpsEditMode extends HTMLElement {
         this.renderDOM();
     }
 
-    // NEW: Processes the delayed Familiarity % payload
+    // Processes 1–5 Concreteness Tiers from payload (or live NLP fallback)
+    processConcreteness(data) {
+        let scoresMap = data.concretenessScores;
+        let avgScore = data.avgConcreteness;
+
+        // Fallback if payload was cached before nlp-scorer attached concretenessScores
+        if ((!scoresMap || Object.keys(scoresMap).length === 0) && window.THPS?.NLP?.analyzeTranscript && data.text) {
+            const freshNlp = window.THPS.NLP.analyzeTranscript(data.text);
+            scoresMap = freshNlp.concretenessScores || {};
+            avgScore = freshNlp.avgConcreteness;
+        }
+
+        if (!scoresMap || Object.keys(scoresMap).length === 0) {
+            this.visualGroups = [];
+            this.visualAvg = null;
+            return;
+        }
+
+        this.visualAvg = avgScore !== undefined && avgScore !== null ? Number(avgScore).toFixed(2) : null;
+
+        const tiers = {
+            5: { level: 5, label: "Level 5 (4.5–5.0)", words: [] },
+            4: { level: 4, label: "Level 4 (3.8–4.4)", words: [] },
+            3: { level: 3, label: "Level 3 (2.8–3.7)", words: [] },
+            2: { level: 2, label: "Level 2 (1.8–2.7)", words: [] },
+            1: { level: 1, label: "Level 1 (1.0–1.7)", words: [] }
+        };
+
+        for (const [word, rawScore] of Object.entries(scoresMap)) {
+            const score = Number(rawScore);
+            if (isNaN(score)) continue;
+
+            let tierNum = 1;
+            if (score >= 4.5) tierNum = 5;
+            else if (score >= 3.8) tierNum = 4;
+            else if (score >= 2.8) tierNum = 3;
+            else if (score >= 1.8) tierNum = 2;
+
+            tiers[tierNum].words.push(`${word} (${score.toFixed(1)})`);
+        }
+
+        this.visualGroups = [5, 4, 3, 2, 1]
+            .filter(lvl => tiers[lvl].words.length > 0)
+            .map(lvl => ({
+                level: lvl,
+                label: tiers[lvl].label,
+                words: tiers[lvl].words.sort()
+            }));
+    }
+
+    // Processes the delayed Familiarity % payload
     processFamiliarity(famData) {
         if (!famData || !famData.wordScores) return;
         
         this.familiarityAvg = famData.averageFamiliarity;
         let bucketMap = {};
 
-        // Group words by their rounded familiarity score (e.g. 8.2 becomes 8)
         for (const [word, score] of Object.entries(famData.wordScores)) {
             let roundedScore = Math.round(score);
-            // Zipf rarely exceeds 8, so we cap it there for visual consistency
             if (roundedScore > 8) roundedScore = 8; 
             
             if (!bucketMap[roundedScore]) bucketMap[roundedScore] = [];
@@ -358,7 +408,7 @@ class ThpsEditMode extends HTMLElement {
 
         this.familiarGroups = Object.keys(bucketMap)
             .map(Number)
-            .sort((a, b) => b - a) // Highest familiarity drops to the top
+            .sort((a, b) => b - a)
             .map(key => {
                 return {
                     level: key,
@@ -366,7 +416,6 @@ class ThpsEditMode extends HTMLElement {
                 };
             });
 
-        // Only re-render if the user is currently looking at this specific mode
         if (this.currentMode === "familiarity") {
             this.renderDOM();
         }
@@ -394,7 +443,6 @@ class ThpsEditMode extends HTMLElement {
         const modeSelect = this.querySelector('#edit-mode-select');
         const filtersBtn = this.querySelector('#filters-dropdown-container');
         
-        // Apply UI Locks if editing
         if (this.isEditing) {
             modeSelect.disabled = true;
             modeSelect.classList.add('opacity-50', 'cursor-not-allowed');
@@ -413,7 +461,6 @@ class ThpsEditMode extends HTMLElement {
         let htmlOutput = '<div class="py-2 relative">';
 
         if (this.currentMode === "edit-speech") {
-            // Edit Mode renders static header followed by HTML
             htmlOutput += `
                 <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-between items-center rounded-t-lg">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-2">Speech Text</span>
@@ -442,7 +489,6 @@ class ThpsEditMode extends HTMLElement {
             });
         } 
         else if (this.currentMode === "repeat") {
-            // Contextual header for Repeat Mode
             const headerText = this.repeatGroups.length === 0 
                 ? "No repeated words found" 
                 : "These are words you said more than once";
@@ -478,7 +524,6 @@ class ThpsEditMode extends HTMLElement {
                 `;
             } else {
                 this.clarityGroups.forEach(group => {
-                    // Highlights any clarity bucket below the perfect 91-100 range
                     let gutterClass = group.sortKey < 90 ? "metric-highlight" : "text-slate-400";
                     htmlOutput += `
                         <div class="github-line">
@@ -507,10 +552,8 @@ class ThpsEditMode extends HTMLElement {
                     </div>
                 `;
                 this.familiarGroups.forEach(group => {
-                    // Highlight technical/rare words (score of 3 or lower)
                     let gutterClass = group.level <= 3 ? "metric-highlight" : "text-slate-400";
                     
-                    // Format labels for context (e.g., Level 8 is ultra-common, Level 2 is rare)
                     let label = `Level ${group.level}`;
                     if (group.level >= 7) label += " (Everyday)";
                     if (group.level <= 3) label += " (Niche)";
@@ -519,6 +562,35 @@ class ThpsEditMode extends HTMLElement {
                         <div class="github-line">
                             <div class="github-gutter ${gutterClass}" title="${group.words.length} words in this threshold">
                                 ${label}
+                            </div>
+                            <div class="github-content leading-relaxed">
+                                ${group.words.join(', ')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+        else if (this.currentMode === "visual") {
+            if (this.visualGroups.length === 0) {
+                htmlOutput += `
+                    <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">No concreteness dictionary loaded</span>
+                    </div>
+                `;
+            } else {
+                htmlOutput += `
+                    <div class="bg-slate-50 border-b border-slate-200 p-2 -mt-2 -mx-2 mb-2 flex justify-center items-center rounded-t-lg">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider text-center">Avg Concreteness: ${this.visualAvg} / 5.0 (Red &ge; 3.8)</span>
+                    </div>
+                `;
+                this.visualGroups.forEach(group => {
+                    // Highlight abstract tiers (Level 1 and Level 2) in red in the gutter
+                    let gutterClass = group.level <= 2 ? "metric-highlight" : "text-slate-400";
+                    htmlOutput += `
+                        <div class="github-line">
+                            <div class="github-gutter ${gutterClass}" title="${group.words.length} words in ${group.label}">
+                                ${group.label}
                             </div>
                             <div class="github-content leading-relaxed">
                                 ${group.words.join(', ')}
@@ -537,12 +609,9 @@ class ThpsEditMode extends HTMLElement {
                 let gutterValue = this.currentMode === "long-short" ? item.wordCount : item.originalIndex;
                 let gutterClass = (this.currentMode === "long-short" && item.wordCount >= 15) ? "metric-highlight" : "text-slate-400";
                 
-                // We inject the original HTML string into the re-ordered sentences to retain highlights in Long-Short mode!
-                // We use a quick regex match to pull the highlighted sentence from the payload based on the plain text.
                 let sentenceHTML = item.text;
                 if (this.lastDataPayload.highlightedHTML) {
-                    const cleanItemText = item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex chars
-                    // Create a flexible regex that allows HTML tags between words
+                    const cleanItemText = item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     const flexibleRegexStr = cleanItemText.split(/\s+/).join('(?:\\s|<[^>]*>)+');
                     const match = this.lastDataPayload.highlightedHTML.match(new RegExp(flexibleRegexStr, 'i'));
                     if (match) sentenceHTML = match[0];
