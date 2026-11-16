@@ -62,7 +62,14 @@ window.THPS.Audio.startRecordingProcess = async function() {
     window.THPS.Audio.volumeData = []; 
 
     try {
-        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+        window.THPS.Audio.audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: { 
+                channelCount: 1,
+                autoGainControl: false,
+                noiseSuppression: false,
+                echoCancellation: false
+            } 
+        });
         
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContextClass({ sampleRate: 16000 });
@@ -189,7 +196,8 @@ window.THPS.Audio.stopRecordingProcess = async function() {
                     finalStitchedWords.push({
                         word: w.word,
                         start: w.start + (chunk.index * 30),
-                        end: w.end + (chunk.index * 30)
+                        end: w.end + (chunk.index * 30),
+                        confidence: w.confidence
                     });
                 });
             }
