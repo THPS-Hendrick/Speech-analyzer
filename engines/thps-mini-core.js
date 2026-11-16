@@ -294,6 +294,8 @@ window.analyze = async function(textOverride = null) {
         unifiedSimpleCount: unifiedSimpleCount,
         readability: readability,
         pauseEvents: masterData.pauseEvents || [],
+        concretenessScores: masterData.concretenessScores || {},
+        avgConcreteness: masterData.avgConcreteness ?? null,
         runPaces: masterData.runPaces || [],
         runBuckets: masterData.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 },
         volumeBuckets: masterData.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 },
