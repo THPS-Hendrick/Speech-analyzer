@@ -78,6 +78,15 @@
     <!-- Central Firebase Engine -->
     <script type="module" src="/js/firebase-client.js"></script>
     <link rel="stylesheet" href="/style.css">
+
+    <!-- Lightweight THPS Mini-App Engines -->
+    <script>
+        window.THPS_MINI_CONFIG = { maxDuration: 90, enableFamiliarity: false };
+    </script>
+    <script src="https://unpkg.com/compromise@14.14.3/builds/compromise.min.js"></script>
+    <script src="/engines/audio-engine-headless.js"></script>
+    <script src="/engines/nlp-scorer.js"></script>
+    <script src="/engines/thps-mini-core.js"></script>
 </head>
 <body class="bg-brand-offwhite font-sans text-slate-900 antialiased flex flex-col min-h-screen">
 
@@ -119,35 +128,36 @@
 
                 <!-- Active Test Screen -->
                 <div id="screen-active-test" class="hidden flex-col w-full max-w-3xl mx-auto items-center">
-                    <div class="flex justify-between w-full items-center mb-4">
-                        <div class="text-brand-green font-bold text-sm uppercase tracking-widest" id="test-counter">Level 1 of 3</div>
-                        <div id="test-goals-badge" class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 uppercase tracking-widest">
-                            Goal: <span id="goal-wpm" class="mr-2">WPM < 120</span> <span id="goal-vis">VIS > 50%</span>
+                    <div class="flex flex-wrap justify-between w-full items-center gap-2 mb-4">
+                        <div class="text-brand-green font-bold text-sm uppercase tracking-widest whitespace-nowrap" id="test-counter">Level 1 of 3</div>
+                        <div id="test-goals-badge" class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 uppercase tracking-widest whitespace-nowrap">
+                            Goal: <span id="goal-wpm" class="mr-2">WPM &lt; 120</span> <span id="goal-vis">VIS &gt; 50%</span>
                         </div>
                     </div>
                     
                     <h3 id="test-title" class="text-2xl font-bold text-slate-900 mb-2 text-center w-full"></h3>
                     <div id="test-instructions" class="text-gray-600 text-sm mb-6 text-center w-full bg-gray-50 p-4 rounded-xl border border-gray-200 leading-relaxed font-medium"></div>
 
-                    <!-- Image Prompt Box -->
+                    <!-- Full Image Prompt Box -->
                     <div class="w-full h-64 md:h-80 bg-slate-100 rounded-xl overflow-hidden shadow-inner mb-6 relative border border-slate-200 flex items-center justify-center">
                         <img id="test-image" src="" alt="Test Prompt" class="w-full h-full object-cover hidden">
                         <div id="test-image-blank" class="hidden text-slate-400 font-medium italic">Visualize the scene in your mind...</div>
                     </div>
 
-                    <!-- Live Timer Bar -->
+                    <!-- Live Timer Bar (60s-80s Target Zone Centered on Desktop & Mobile) -->
                     <div class="w-full flex flex-col gap-1 mb-8">
                         <div class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                             <span>0s</span>
                             <span class="text-brand-green">Target: 60s - 80s</span>
                             <span>90s MAX</span>
                         </div>
-                        <div class="w-full h-6 bg-gray-100 rounded-full relative overflow-hidden border border-gray-200">
-                            <!-- The 60-80s target zone (66.6% to 88.8% of 90s max) -->
-                            <div class="absolute top-0 bottom-0 bg-green-100 border-l-2 border-r-2 border-brand-green" style="left: 66.6%; width: 22.2%;"></div>
-                            <div class="absolute inset-0 flex items-center justify-end pr-12 text-[10px] font-black text-brand-green tracking-widest z-10">FINISH</div>
+                        <div class="w-full h-7 bg-gray-100 rounded-full relative overflow-hidden border border-gray-200">
+                            <!-- The 60-80s target zone (66.67% to 88.89% of 90s max) -->
+                            <div class="absolute top-0 bottom-0 bg-green-100 border-l-2 border-r-2 border-brand-green flex items-center justify-center z-10 pointer-events-none" style="left: 66.67%; width: 22.22%;">
+                                <span class="text-[9px] sm:text-[10px] font-black text-brand-green tracking-wider uppercase leading-none">FINISH</span>
+                            </div>
                             <!-- The live fill -->
-                            <div id="live-timer-fill" class="h-full bg-slate-400 w-0 transition-all duration-100 ease-linear absolute top-0 left-0 z-0"></div>
+                            <div id="live-timer-fill" class="h-full bg-slate-400/60 w-0 transition-all duration-100 ease-linear absolute top-0 left-0 z-0"></div>
                         </div>
                     </div>
 
@@ -165,13 +175,13 @@
 
                     <!-- Controls -->
                     <div class="flex flex-col items-center justify-center w-full">
-                        <button id="btn-master-control" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-rose-600 text-white flex items-center justify-center text-3xl shadow-lg hover:bg-rose-500 transition-transform active:scale-95">
+                        <button id="btn-master-control" onclick="window.toggleRecording()" class="w-20 h-20 rounded-full bg-rose-600 text-white flex items-center justify-center text-3xl shadow-lg hover:bg-rose-500 transition-transform active:scale-95">
                             <i id="master-icon" class="fa-solid fa-microphone"></i>
                         </button>
                         <p id="control-label" class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-3">Start Speaking</p>
                         
                         <button id="btn-next-level" onclick="nextLevel()" class="hidden mt-6 bg-slate-800 text-white font-bold py-3.5 px-8 rounded-full hover:bg-slate-700 transition-all shadow-md active:scale-95 text-sm uppercase tracking-widest flex items-center gap-2">
-                            Next Level <i class="fa-solid fa-arrow-right"></i>
+                            <span id="btn-next-label">Next Level</span> <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -203,14 +213,14 @@
                                 </div>
                             </div>
                             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                <span class="font-bold text-slate-700">Level 2 (Half Image)</span>
+                                <span class="font-bold text-slate-700">Level 2 (Imagine)</span>
                                 <div class="flex gap-4">
                                     <span class="text-sm font-bold"><span class="text-gray-400">Speed:</span> <span id="res-l2-wpm" class="text-slate-800"></span></span>
                                     <span class="text-sm font-bold"><span class="text-gray-400">Visuals:</span> <span id="res-l2-vis" class="text-slate-800"></span></span>
                                 </div>
                             </div>
                             <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                <span class="font-bold text-slate-700">Level 3 (Imagine)</span>
+                                <span class="font-bold text-slate-700">Level 3 (Fast + Imagine)</span>
                                 <div class="flex gap-4">
                                     <span class="text-sm font-bold"><span class="text-gray-400">Speed:</span> <span id="res-l3-wpm" class="text-slate-800"></span></span>
                                     <span class="text-sm font-bold"><span class="text-gray-400">Visuals:</span> <span id="res-l3-vis" class="text-slate-800"></span></span>
@@ -319,7 +329,7 @@
 
     <!-- INJECT_FOOTER -->
 
-    <!-- Micro-App State & Audio Logic -->
+    <!-- Lightweight Lesson Controller (Powered by thps-mini-core.js) -->
     <script>
         const levels = [
             {
@@ -327,7 +337,6 @@
                 title: "Slow + Full Image",
                 instructions: "Speak for 60-80 seconds. Speak slowly (below 120 WPM). Say only words you can see in the image (e.g., Yellow bag, brown handle).",
                 image: "/image/bag.webp",
-                cssClass: "w-full h-full object-cover",
                 wpmRule: { max: 120, label: "< 120" },
                 visRule: { min: 50, label: "> 50%" }
             },
@@ -336,7 +345,6 @@
                 title: "Slow + Imagine",
                 instructions: "Speak for 60-80 seconds. Speak slowly (below 120 WPM). Imagine the house were fixed. Say only what could be seen (e.g., Clean red bricks, white picket fence).",
                 image: "/image/house.webp",
-                cssClass: "w-1/2 h-full object-cover object-left", // Crops right 50%
                 wpmRule: { max: 120, label: "< 120" },
                 visRule: { min: 50, label: "> 50%" }
             },
@@ -344,35 +352,16 @@
                 id: 3,
                 title: "Fast + Imagine",
                 instructions: "Speak for 60-80 seconds. Speak quickly (above 150 WPM). Describe what you see if you left a hotel to go home from holiday (e.g., Press elevator button, inside are 3 people). Name as many colours and objects as possible.",
-                image: "", // Blank
+                image: "",
                 wpmRule: { min: 150, label: "> 150" },
                 visRule: { min: 50, label: "> 50%" }
             }
         ];
 
         let currentLevel = 0;
-        let isRecording = false;
-        let startTime = 0;
-        let timerInterval = null;
-        let elapsedSecs = 0;
-        
-        let audioCtx = null;
-        let sourceNode = null;
-        let processorNode = null;
-        let audioBuffers = [];
-        let totalSamplesRecorded = 0;
-
-        let visualDictionary = new Set();
+        let uiTimerInterval = null;
         let testResults = [];
-
-        // Fetch dictionary silently on load
-        fetch('https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json')
-            .then(res => res.json())
-            .then(data => {
-                if (data["Visual Words"]) {
-                    data["Visual Words"].forEach(w => visualDictionary.add(w.toLowerCase()));
-                }
-            }).catch(e => console.warn("Could not load visual dict", e));
+        let awaitingResult = false;
 
         const screens = {
             intro: document.getElementById('screen-intro'),
@@ -385,14 +374,15 @@
 
         async function requestMicAndStart() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
-                window.audioStream = stream; // Keep alive
-                
+                // Verify mic permissions upfront, then release stream so audio-engine-headless manages it cleanly
+                const checkStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+                checkStream.getTracks().forEach(t => t.stop());
+
                 screens.intro.classList.add('hidden');
                 pContainer.classList.remove('hidden');
                 screens.active.classList.remove('hidden');
                 screens.active.classList.add('flex');
-                
+
                 loadLevel();
             } catch (err) {
                 console.error("Mic error:", err);
@@ -407,21 +397,20 @@
             }
 
             const lvl = levels[currentLevel];
-            pBar.style.width = `${(currentStageProgress())}%`;
+            pBar.style.width = `${(currentLevel / levels.length) * 100}%`;
 
-            document.getElementById('test-counter').innerText = `Level ${lvl.id} of 3`;
+            document.getElementById('test-counter').innerText = `Level ${lvl.id} of ${levels.length}`;
             document.getElementById('test-title').innerText = lvl.title;
             document.getElementById('test-instructions').innerText = lvl.instructions;
-            
             document.getElementById('goal-wpm').innerText = `WPM ${lvl.wpmRule.label}`;
             document.getElementById('goal-vis').innerText = `VIS ${lvl.visRule.label}`;
 
             const imgEl = document.getElementById('test-image');
             const blankEl = document.getElementById('test-image-blank');
-            
+
             if (lvl.image) {
                 imgEl.src = lvl.image;
-                imgEl.className = lvl.cssClass;
+                imgEl.className = "w-full h-full object-cover";
                 imgEl.classList.remove('hidden');
                 blankEl.classList.add('hidden');
             } else {
@@ -429,206 +418,105 @@
                 blankEl.classList.remove('hidden');
             }
 
-            // Reset UI
+            // Reset UI state for the level
             document.getElementById('live-timer-fill').style.width = '0%';
             document.getElementById('score-pills-container').classList.add('hidden');
             document.getElementById('score-pills-container').classList.remove('flex');
             document.getElementById('btn-next-level').classList.add('hidden');
-            
-            document.getElementById('btn-master-control').disabled = false;
-            document.getElementById('btn-master-control').classList.remove('opacity-50');
-            document.getElementById('btn-master-control').classList.replace('bg-slate-800', 'bg-rose-600');
+
+            const masterBtn = document.getElementById('btn-master-control');
+            masterBtn.disabled = false;
+            masterBtn.classList.remove('hidden', 'opacity-50', 'bg-slate-800');
+            masterBtn.classList.add('bg-rose-600');
             document.getElementById('master-icon').className = "fa-solid fa-microphone";
-            document.getElementById('control-label').innerText = "Start Speaking";
-            
-            elapsedSecs = 0;
-            audioBuffers = [];
-            totalSamplesRecorded = 0;
-        }
-        
-        function currentStageProgress() {
-            return (currentLevel / 3) * 100;
+
+            const label = document.getElementById('control-label');
+            label.classList.remove('hidden');
+            label.innerText = "Start Speaking";
         }
 
-        function toggleRecording() {
-            if (!isRecording) {
-                startRecording();
-            } else {
-                stopAndProcess();
+        // Sync UI with thps-mini-core recording lifecycle
+        window.addEventListener('thps-recording-state', (e) => {
+            const { status } = e.detail;
+            const masterBtn = document.getElementById('btn-master-control');
+
+            if (status === 'recording') {
+                awaitingResult = true;
+                masterBtn.classList.replace('bg-rose-600', 'bg-slate-800');
+                document.getElementById('master-icon').className = "fa-solid fa-stop";
+                document.getElementById('control-label').innerText = "Stop Recording";
+
+                if (uiTimerInterval) clearInterval(uiTimerInterval);
+                uiTimerInterval = setInterval(() => {
+                    if (!window.isActive || !window.THPS?.Audio?.recordStartTime) return;
+                    const elapsed = (Date.now() - window.THPS.Audio.recordStartTime) / 1000;
+                    const fillPercent = Math.min((elapsed / 90) * 100, 100);
+                    document.getElementById('live-timer-fill').style.width = `${fillPercent}%`;
+                }, 50);
+            } else if (status === 'processing') {
+                if (uiTimerInterval) clearInterval(uiTimerInterval);
+                masterBtn.disabled = true;
+                masterBtn.classList.add('opacity-50');
+                screens.active.classList.add('hidden');
+                screens.active.classList.remove('flex');
+                screens.loading.classList.remove('hidden');
+                screens.loading.classList.add('flex');
             }
-        }
+        });
 
-        async function startRecording() {
-            isRecording = true;
-            document.getElementById('btn-master-control').classList.replace('bg-rose-600', 'bg-slate-800');
-            document.getElementById('master-icon').className = "fa-solid fa-stop";
-            document.getElementById('control-label').innerText = "Stop Recording";
-            
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContextClass({ sampleRate: 16000 });
-            sourceNode = audioCtx.createMediaStreamSource(window.audioStream);
-            processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
-
-            processorNode.onaudioprocess = function(e) {
-                if (!isRecording) return;
-                const channelData = e.inputBuffer.getChannelData(0);
-                if (elapsedSecs <= 90) { 
-                    audioBuffers.push(new Float32Array(channelData));
-                    totalSamplesRecorded += channelData.length;
-                }
-            };
-
-            sourceNode.connect(processorNode);
-            processorNode.connect(audioCtx.destination); 
-            
-            startTime = Date.now();
-            timerInterval = setInterval(() => {
-                elapsedSecs = (Date.now() - startTime) / 1000;
-                let fillPercent = Math.min((elapsedSecs / 90) * 100, 100);
-                document.getElementById('live-timer-fill').style.width = `${fillPercent}%`;
-                
-                if (elapsedSecs >= 90) {
-                    stopAndProcess();
-                }
-            }, 50);
-        }
-
-        // --- Audio Encoding Utilities ---
-        function floatTo16BitPCM(output, offset, input) {
-            for (let i = 0; i < input.length; i++, offset += 2) {
-                let s = Math.max(-1, Math.min(1, input[i]));
-                output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-            }
-        }
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-        }
-        function encodeWAV(samples, sampleRate) {
-            let buffer = new ArrayBuffer(44 + samples.length * 2);
-            let view = new DataView(buffer);
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + samples.length * 2, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true); 
-            view.setUint16(22, 1, true); 
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(view, 36, 'data');
-            view.setUint32(40, samples.length * 2, true);
-            floatTo16BitPCM(view, 44, samples);
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-        async function stopAndProcess() {
-            isRecording = false;
-            clearInterval(timerInterval);
-            
-            // Lock controls
-            document.getElementById('btn-master-control').disabled = true;
-            document.getElementById('btn-master-control').classList.add('opacity-50');
-            document.getElementById('master-icon').className = "fa-solid fa-spinner fa-spin";
-            document.getElementById('control-label').innerText = "Processing...";
-            
-            screens.active.classList.add('hidden');
-            screens.active.classList.remove('flex');
-            screens.loading.classList.remove('hidden');
-            screens.loading.classList.add('flex');
-
-            if (processorNode) { processorNode.disconnect(); processorNode = null; }
-            if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-            if (audioCtx && audioCtx.state !== 'closed') { audioCtx.close(); }
-
-            let masterFloatArray = new Float32Array(totalSamplesRecorded);
-            let writeOffset = 0;
-            for(let i = 0; i < audioBuffers.length; i++) {
-                masterFloatArray.set(audioBuffers[i], writeOffset);
-                writeOffset += audioBuffers[i].length;
-            }
-
-            const wavBlob = encodeWAV(masterFloatArray, 16000);
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(wavBlob);
-            reader.onloadend = async () => {
-                const base64data = reader.result.split(',')[1];
-                let transcript = "";
-                
-                try {
-                    const response = await fetch('https://mic-check-backend.vercel.app/api/transcribe', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ audioContent: base64data, mimeType: 'audio/wav' })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        transcript = data.transcript ? data.transcript.trim() : '';
-                    }
-                } catch (e) {
-                    console.error("Vercel error:", e);
-                }
-
-                evaluateLevel(transcript, elapsedSecs);
-            };
-        }
-
-        function evaluateLevel(text, seconds) {
-            const words = text.split(/\s+/).filter(w => w.trim().length > 0);
-            const totalWords = Math.max(1, words.length);
-            
-            let visCount = 0;
-            words.forEach(w => {
-                let clean = w.toLowerCase().replace(/[^a-z']/g, '');
-                let root = clean.replace(/(?:s|es|ed|ing)$/, '');
-                if (visualDictionary.has(clean) || visualDictionary.has(root)) {
-                    visCount++;
-                }
-            });
-
-            const wpm = Math.round((totalWords / Math.max(1, seconds)) * 60);
-            const visPct = Math.round((visCount / totalWords) * 100);
-            
-            const lvl = levels[currentLevel];
-            let wpmPass = lvl.wpmRule.max ? wpm <= lvl.wpmRule.max : wpm >= lvl.wpmRule.min;
-            let visPass = visPct >= lvl.visRule.min;
-            
-            // Record result
-            testResults.push({ wpm, wpmPass, visPct, visPass });
-
-            // Display feedback UI on active screen
+        window.addEventListener('thps-recording-error', (e) => {
+            if (uiTimerInterval) clearInterval(uiTimerInterval);
+            awaitingResult = false;
             screens.loading.classList.add('hidden');
             screens.loading.classList.remove('flex');
             screens.active.classList.remove('hidden');
             screens.active.classList.add('flex');
-            
-            const pWpm = document.getElementById('pill-wpm');
-            const pVis = document.getElementById('pill-vis');
-            
+
+            const errEl = document.getElementById('mic-error');
+            errEl.innerText = e.detail?.message || "Microphone error occurred.";
+            errEl.classList.remove('hidden');
+            loadLevel();
+        });
+
+        // Receive scored metrics from thps-mini-core / nlp-scorer
+        window.addEventListener('thps-dashboard-update', (e) => {
+            if (!awaitingResult) return;
+            awaitingResult = false;
+
+            const data = e.detail || {};
+            const wpm = data.wpm || 0;
+            const visPct = data.visual || 0;
+
+            const lvl = levels[currentLevel];
+            const wpmPass = lvl.wpmRule.max ? (wpm > 0 && wpm <= lvl.wpmRule.max) : (wpm >= lvl.wpmRule.min);
+            const visPass = visPct >= lvl.visRule.min;
+
+            testResults[currentLevel] = { wpm, wpmPass, visPct, visPass };
+
+            // Swap back to active screen and reveal WPM + Visual score pills
+            screens.loading.classList.add('hidden');
+            screens.loading.classList.remove('flex');
+            screens.active.classList.remove('hidden');
+            screens.active.classList.add('flex');
+
             document.getElementById('score-wpm-val').innerHTML = `${wpm} <span class="text-xs font-bold">WPM</span>`;
             document.getElementById('score-vis-val').innerText = `${visPct}%`;
 
-            pWpm.className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${wpmPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
-            pVis.className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${visPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
+            document.getElementById('pill-wpm').className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${wpmPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
+            document.getElementById('pill-vis').className = `flex flex-col items-center justify-center p-3 px-6 rounded-xl border-2 transition-colors ${visPass ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`;
 
             document.getElementById('score-pills-container').classList.remove('hidden');
             document.getElementById('score-pills-container').classList.add('flex');
-            
+
             document.getElementById('btn-master-control').classList.add('hidden');
             document.getElementById('control-label').classList.add('hidden');
-            
+
+            document.getElementById('btn-next-label').innerText = currentLevel === levels.length - 1 ? "See Results" : "Next Level";
             document.getElementById('btn-next-level').classList.remove('hidden');
-        }
+        });
 
         function nextLevel() {
             currentLevel++;
-            
-            document.getElementById('btn-master-control').classList.remove('hidden');
-            document.getElementById('control-label').classList.remove('hidden');
-            
             loadLevel();
         }
 
@@ -636,16 +524,14 @@
             screens.active.classList.add('hidden');
             screens.active.classList.remove('flex');
             pBar.style.width = '100%';
-            
-            // Populate Results
-            for(let i=0; i<3; i++) {
-                let res = testResults[i] || { wpm: 0, wpmPass: false, visPct: 0, visPass: false };
-                document.getElementById(`res-l${i+1}-wpm`).innerHTML = `<span class="${res.wpmPass ? 'text-green-600' : 'text-red-500'}">${res.wpm}</span>`;
-                document.getElementById(`res-l${i+1}-vis`).innerHTML = `<span class="${res.visPass ? 'text-green-600' : 'text-red-500'}">${res.visPct}%</span>`;
+
+            for (let i = 0; i < 3; i++) {
+                const res = testResults[i] || { wpm: 0, wpmPass: false, visPct: 0, visPass: false };
+                document.getElementById(`res-l${i + 1}-wpm`).innerHTML = `<span class="${res.wpmPass ? 'text-green-600' : 'text-red-500'}">${res.wpm}</span>`;
+                document.getElementById(`res-l${i + 1}-vis`).innerHTML = `<span class="${res.visPass ? 'text-green-600' : 'text-red-500'}">${res.visPct}%</span>`;
             }
 
-            // Format payload
-            let str = `L1: WPM ${testResults[0]?.wpm}, VIS ${testResults[0]?.visPct}% | L2: WPM ${testResults[1]?.wpm}, VIS ${testResults[1]?.visPct}% | L3: WPM ${testResults[2]?.wpm}, VIS ${testResults[2]?.visPct}%`;
+            const str = `L1: WPM ${testResults[0]?.wpm || 0}, VIS ${testResults[0]?.visPct || 0}% | L2: WPM ${testResults[1]?.wpm || 0}, VIS ${testResults[1]?.visPct || 0}% | L3: WPM ${testResults[2]?.wpm || 0}, VIS ${testResults[2]?.visPct || 0}%`;
 
             if (window.saveLessonProgress) {
                 window.saveLessonProgress('image-based', str).then((success) => {
@@ -654,12 +540,9 @@
             } else {
                 document.getElementById('auth-prompt').classList.remove('hidden');
             }
-            
+
             screens.results.classList.remove('hidden');
             screens.results.classList.add('flex');
-            
-            // Turn off mic
-            if (window.audioStream) { window.audioStream.getTracks().forEach(t => t.stop()); }
         }
     </script>
 </body>
