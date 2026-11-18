@@ -14,32 +14,46 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, message: 'Only POST requests allowed' });
     }
 
-    const { clientName, clientEmail, clientAddress, inclusions, paymentStructure, targetDate, gstMode, lineItems } = req.body;
+    const { clientName, clientEmail, clientAddress, inclusions, paymentStructure, targetDate, gstMode, applyGst, lineItems } = req.body;
 
     if (!clientName || !clientEmail || !lineItems || lineItems.length === 0) {
         return res.status(400).json({ success: false, message: 'Missing required contract fields or line items.' });
     }
 
     try {
-        let subtotal = 0;
-        let adjustedLineItems = [];
+        // Resolve GST mode safely (defaults to inclusive)
+        const mode = gstMode || (applyGst === false ? "none" : "inclusive");
 
-        // Apply inclusive/exclusive math line-by-line
-        lineItems.forEach(item => {
-            let actualRate = item.rate;
-            if (gstMode === "inclusive") {
-                actualRate = parseFloat((item.rate / 1.1).toFixed(2));
-            }
-            subtotal += (actualRate * item.qty);
-            adjustedLineItems.push({ ...item, rate: actualRate });
+        // 1. Sum line items using exact entered rates (no pre-division)
+        let rawSubtotal = 0;
+        const cleanLineItems = lineItems.map(item => {
+            const rate = parseFloat(item.rate) || 0;
+            const qty = parseFloat(item.qty) || 0;
+            rawSubtotal += (rate * qty);
+            return {
+                name: item.name || "",
+                desc: item.desc || "",
+                rate: rate,
+                qty: qty
+            };
         });
-        
-        let gstAmount = 0;
-        if (gstMode === "inclusive" || gstMode === "exclusive") {
-            gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
-        }
-        const totalFee = parseFloat((subtotal + gstAmount).toFixed(2));
 
+        const subtotal = Math.max(0, rawSubtotal);
+
+        let gstAmount = 0;
+        let totalFee = 0;
+
+        if (mode === "inclusive") {
+            totalFee = parseFloat(subtotal.toFixed(2));
+            gstAmount = parseFloat((totalFee / 11).toFixed(2));
+        } else if (mode === "exclusive") {
+            gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
+            totalFee = parseFloat((subtotal + gstAmount).toFixed(2));
+        } else {
+            totalFee = parseFloat(subtotal.toFixed(2));
+        }
+
+        // 2. Save the Contract document
         const docRef = await db.collection("Contracts").add({
             clientName,
             clientEmail,
@@ -47,28 +61,30 @@ export default async function handler(req, res) {
             inclusions,
             paymentStructure,
             targetDate,
-            gstMode: gstMode,
-            applyGst: (gstMode !== "none"),
-            lineItems: adjustedLineItems, // Save the properly calculated rates
-            totalFee: totalFee, 
+            gstMode: mode,
+            applyGst: (mode !== "none"),
+            lineItems: cleanLineItems,
+            totalFee: totalFee,
             status: "pending",
             createdAt: new Date().toISOString()
         });
 
         const contractId = docRef.id;
+        const magicLink = `https://thps-crm.vercel.app/contract.html?id=${contractId}`;
 
-        // Log the full contract generation to the CRM card
+        // 3. Log clickable contract entry & increment Total Charged on the Client record
         const clientRef = db.collection("Clients").doc(clientEmail.toLowerCase());
-        await clientRef.update({
+        await clientRef.set({
             activity_log: admin.firestore.FieldValue.arrayUnion({
                 type: "admin",
                 action: `Generated Full Contract: $${totalFee.toFixed(2)}`,
+                url: magicLink,
                 timestamp: new Date().toISOString()
-            })
-        });
+            }),
+            totalCharged: admin.firestore.FieldValue.increment(totalFee)
+        }, { merge: true });
 
-        const magicLink = `https://thps-crm.vercel.app/contract.html?id=${contractId}`;
-
+        // 4. Send Service Agreement email via Gmail API
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET
@@ -78,7 +94,7 @@ export default async function handler(req, res) {
 
         const subject = "Your Service Agreement from Tom Hendrick";
         const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
-        
+
         const emailHtml = `
             <p>Hi ${clientName.split(' ')[0]},</p>
             <p>I have prepared the Service Agreement for our upcoming public speaking coaching.</p>
@@ -93,7 +109,7 @@ export default async function handler(req, res) {
 
         const messageParts = [
             `To: ${clientEmail}`,
-            `Bcc: tom@tomhendrick.com`, 
+            `Bcc: tom@tomhendrick.com`,
             `Subject: ${utf8Subject}`,
             'Content-Type: text/html; charset=utf-8',
             '',
