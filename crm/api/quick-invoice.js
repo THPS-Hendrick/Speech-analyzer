@@ -19,38 +19,57 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, message: 'Only POST requests allowed' });
     }
 
-    const { clientEmail, clientName, description, amount } = req.body;
+    const { clientEmail, clientName, description, units, rate, discount, applyGst } = req.body;
 
-    if (!clientEmail || !clientName || !description || !amount) {
+    if (!clientEmail || !clientName || !description || !units || !rate) {
         return res.status(400).json({ success: false, message: 'Missing required invoice fields.' });
     }
 
     try {
-        const parsedAmount = parseFloat(amount);
-        const gstAmount = parsedAmount * 0.10;
-        const totalFee = parsedAmount + gstAmount;
+        const parsedUnits = parseInt(units) || 1;
+        const parsedRate = parseFloat(rate) || 0;
+        const parsedDiscount = parseFloat(discount) || 0;
+        
+        // The Math Strategy
+        const baseAmount = parsedUnits * parsedRate;
+        const subtotal = Math.max(0, baseAmount - parsedDiscount); // Prevents accidental negative subtotals
+        const gstAmount = applyGst ? (subtotal * 0.10) : 0;
+        const totalFee = subtotal + gstAmount;
 
-        // 1. Create a lightweight "Contract" document to hold the invoice data
-        // We use a random ID here so a client can have multiple invoices over time
+        // Construct Line Items array
+        let lineItems = [{
+            name: "Coaching Services",
+            desc: description,
+            rate: parsedRate,
+            qty: parsedUnits
+        }];
+
+        // Inject the negative discount line item if applicable
+        if (parsedDiscount > 0) {
+            lineItems.push({
+                name: "Discount",
+                desc: "Fixed discount applied",
+                rate: -Math.abs(parsedDiscount), // Forces it to be negative for rendering
+                qty: 1
+            });
+        }
+
+        // 1. Create a lightweight document tagged as "invoice_only"
         const invoiceId = `inv_${Date.now()}`;
         const contractRef = doc(db, "Contracts", invoiceId);
         
         await setDoc(contractRef, {
             clientName,
             clientEmail,
-            clientAddress: "Address on file", // Quick invoice skips asking for this
-            inclusions: "Quick Invoice",
+            clientAddress: "Address on file",
+            inclusions: description,
             paymentStructure: "100% Upfront",
             targetDate: new Date().toISOString().split('T')[0],
-            applyGst: true,
-            lineItems: [{
-                name: "Ad Hoc Service",
-                desc: description,
-                rate: parsedAmount,
-                qty: 1
-            }],
-            totalFee,
-            status: "signed", // Forces the contract page to skip the signature block and go straight to the invoice
+            applyGst: applyGst,
+            lineItems: lineItems,
+            totalFee: totalFee,
+            status: "signed",      // Bypasses the signature workflow
+            type: "invoice_only",  // Triggers the frontend stealth bypass for the legal text
             createdAt: new Date().toISOString()
         });
 
@@ -64,7 +83,7 @@ export default async function handler(req, res) {
             })
         });
 
-        // 3. Email the invoice link to the client
+        // 3. Email the secure invoice link to the client
         const magicLink = `https://thps-crm.vercel.app/contract.html?id=${invoiceId}`;
 
         const oauth2Client = new google.auth.OAuth2(
@@ -74,17 +93,22 @@ export default async function handler(req, res) {
         oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
         const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-        const subject = "New Invoice from Tom Hendrick";
+        const subject = "Tax Invoice from Tom Hendrick";
         const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
         
         const emailHtml = `
-            <p>Hi ${clientName.split(' ')[0]},</p>
-            <p>I have generated a new invoice for ${description}.</p>
-            <p>You can view the itemized breakdown and payment details securely at the link below:</p>
-            <p><a href="${magicLink}" style="background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">View Tax Invoice</a></p>
-            <br>
-            <p>Best regards,</p>
-            <p><strong>Tom Hendrick</strong></p>
+            <div style="font-family: sans-serif; color: #334155; max-width: 600px; margin: 0 auto;">
+                <p>Hi ${clientName.split(' ')[0]},</p>
+                <p>I have generated a new tax invoice for <strong>${description}</strong>.</p>
+                <p>You can view the itemized breakdown and payment details securely at the link below:</p>
+                
+                <div style="text-align: center; margin: 35px 0;">
+                    <a href="${magicLink}" style="background-color: #16a34a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">View Tax Invoice</a>
+                </div>
+                
+                <p>Best regards,</p>
+                <p><strong>Tom Hendrick</strong></p>
+            </div>
         `;
 
         const messageParts = [
