@@ -261,6 +261,35 @@ btnFullContract.addEventListener('click', () => {
 
 // Path B: Reveal Mini-Form
 btnQuickInvoiceToggle.addEventListener('click', () => {
+    quickInvoiceForm.innerHTML = `
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Service Description</label>
+            <input type="text" id="qi-desc" required placeholder="e.g., 1x Ad-hoc Coaching" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Units (Hrs/Qty)</label>
+                <input type="number" id="qi-units" required min="1" value="1" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Rate ($)</label>
+                <input type="number" id="qi-rate" required min="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Fixed Discount ($)</label>
+            <input type="number" id="qi-discount" min="0" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+        </div>
+        <div class="mt-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">GST Configuration</label>
+            <select id="qi-gst-mode" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none bg-white">
+                <option value="exclusive">Apply 10% GST (Exclusive)</option>
+                <option value="inclusive">GST Included (Inclusive)</option>
+                <option value="none">No GST</option>
+            </select>
+        </div>
+        <button type="submit" id="qi-submit" class="w-full bg-green-700 text-white font-bold py-3 rounded shadow hover:bg-green-800 transition-colors mt-4 text-sm">Generate PDF Invoice</button>
+    `;
     quickInvoiceForm.classList.toggle('hidden');
 });
 
@@ -278,7 +307,7 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
         units: document.getElementById('qi-units').value,
         rate: document.getElementById('qi-rate').value,
         discount: document.getElementById('qi-discount').value,
-        applyGst: document.getElementById('qi-gst').checked
+        gstMode: document.getElementById('qi-gst-mode').value
     };
 
     try {
@@ -294,17 +323,24 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
             quickInvoiceForm.reset();
             quickInvoiceForm.classList.add('hidden');
             
-            // Log it locally so the modal updates instantly without waiting for a database pull
             if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
             currentFocusClient.activity_log.push({
                 type: "admin",
-                action: `Sent Quick Invoice for ${payload.description}`,
+                action: `Generated Quick Invoice: ${payload.description}`,
                 timestamp: new Date().toISOString()
             });
             
             loadClients(); 
             openFocusModal(currentFocusClient);
-            alert("Tax Invoice Generated and Sent!");
+            
+            // Open the standalone invoice PDF layout in a new tab
+            const newWindow = window.open(result.magicLink, '_blank');
+            
+            // Pop-up blocker fallback
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                alert(`Invoice generated successfully!\n\nYour browser blocked the automatic pop-up. Please copy this link and open it in a new tab:\n\n${result.magicLink}`);
+            }
+
         } else {
             alert("Failed to send invoice: " + (result.error || result.message));
         }
@@ -313,10 +349,9 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
         alert("An error occurred while generating the invoice.");
     } finally {
         submitBtn.disabled = false;
-        submitBtn.innerText = "Send Tax Invoice";
+        submitBtn.innerText = "Generate PDF Invoice";
     }
 });
-
 
 // 6. New Client Modal Logic
 const newClientBtn = document.getElementById('new-client-btn');
