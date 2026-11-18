@@ -1,21 +1,24 @@
 const { google } = require('googleapis');
-const { initializeApp, getApps } = require('firebase/app');
-const { getFirestore, collection, addDoc } = require('firebase/firestore');
+const admin = require('firebase-admin');
 
-// 1. Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
-    authDomain: "thps-crm.firebaseapp.com",
-    projectId: "thps-crm",
-    storageBucket: "thps-crm.firebasestorage.app",
-    messagingSenderId: "297605373498",
-    appId: "1:297605373498:web:606241a173f3150a16df03"
-};
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+// 1. Safely initialize Firebase Admin "God Mode"
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+    });
+}
+const db = admin.firestore();
 
 export default async function handler(req, res) {
+    // Allow cross-origin requests from tomhendrick.com
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Only POST requests allowed' });
     }
@@ -23,73 +26,78 @@ export default async function handler(req, res) {
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
-        return res.status(400).json({ success: false, message: 'Missing required fields.' });
+        return res.status(400).json({ success: false, message: 'Missing required enquiry fields.' });
     }
 
     try {
-        // 2. Add Client Record to Firebase CRM
-        await addDoc(collection(db, "Clients"), {
-            name: name,
-            email: email,
-            notes: `Enquiry Message: ${message}`,
+        const nowIso = new Date().toISOString();
+        const clientId = email.trim().toLowerCase();
+        const clientRef = db.collection("Clients").doc(clientId);
+
+        // 2. Upsert client record into "Enquiry Received" and log the enquiry
+        await clientRef.set({
+            name: name.trim(),
+            email: email.trim(),
             stage: "Enquiry Received",
-            tags: ["Website Enquiry"],
-            last_contact_date: new Date().toISOString(),
-            created_at: new Date().toISOString()
-        });
+            manualStageOverride: null,
+            tags: admin.firestore.FieldValue.arrayUnion("Website Enquiry"),
+            last_contact_date: nowIso,
+            activity_log: admin.firestore.FieldValue.arrayUnion({
+                type: "client",
+                action: `Website Enquiry:\n${message.trim()}`,
+                timestamp: nowIso
+            })
+        }, { merge: true });
 
-        // 3. Initialize Google Workspace Connection (Gmail API)
-        const oauth2Client = new google.auth.OAuth2(
-            process.env.GOOGLE_CLIENT_ID,
-            process.env.GOOGLE_CLIENT_SECRET,
-            "https://developers.google.com/oauthplayground"
-        );
-        oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
-        const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+        // 3. Send email notification to Tom (non-blocking if email fails)
+        try {
+            if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+                const oauth2Client = new google.auth.OAuth2(
+                    process.env.GOOGLE_CLIENT_ID,
+                    process.env.GOOGLE_CLIENT_SECRET
+                );
+                oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+                const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-        // 4. Construct the Auto-Reply Email
-        const subject = "Thanks for your enquiry!";
-        const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
-        
-        // You can customize this HTML message however you like!
-        const emailHtml = `
-            <p>Hi ${name.split(' ')[0]},</p>
-            <p>Thank you for reaching out! This is just a quick note to confirm that I have received your enquiry regarding public speaking coaching.</p>
-            <p>I will review your message and get back to you shortly with next steps.</p>
-            <br>
-            <p>Best regards,</p>
-            <p><strong>Tom Hendrick</strong></p>
-        `;
+                const subject = `New Website Enquiry from ${name.trim()}`;
+                const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
 
-        const messageParts = [
-            `To: ${email}`,
-            `Subject: ${utf8Subject}`,
-            'Content-Type: text/html; charset=utf-8',
-            '',
-            emailHtml
-        ];
+                const emailHtml = `
+                    <p><strong>New Contact Form Enquiry</strong></p>
+                    <p><strong>Name:</strong> ${name.trim()}</p>
+                    <p><strong>Email:</strong> ${email.trim()}</p>
+                    <p><strong>Message:</strong></p>
+                    <pre style="font-family: sans-serif; white-space: pre-wrap; background: #f8fafc; padding: 12px; border-radius: 6px;">${message.trim()}</pre>
+                `;
 
-        const messageContent = messageParts.join('\n');
-        
-        // Gmail requires Base64URL encoding
-        const encodedMessage = Buffer.from(messageContent)
-            .toString('base64')
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=+$/, '');
+                const messageParts = [
+                    `To: tom@tomhendrick.com`,
+                    `Reply-To: ${email.trim()}`,
+                    `Subject: ${utf8Subject}`,
+                    'Content-Type: text/html; charset=utf-8',
+                    '',
+                    emailHtml
+                ];
 
-        // 5. Send the Email
-        await gmail.users.messages.send({
-            userId: 'me', // 'me' tells Google to use your authenticated account
-            requestBody: {
-                raw: encodedMessage
+                const encodedMessage = Buffer.from(messageParts.join('\n'))
+                    .toString('base64')
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+
+                await gmail.users.messages.send({
+                    userId: 'me',
+                    requestBody: { raw: encodedMessage }
+                });
             }
-        });
+        } catch (emailErr) {
+            console.error("Enquiry Notification Email Warning:", emailErr);
+        }
 
-        res.status(200).json({ success: true, message: "Enquiry submitted and email sent!" });
+        res.status(200).json({ success: true, message: 'Enquiry received!' });
 
     } catch (error) {
-        console.error("Enquiry Submission Error:", error);
+        console.error("Submit Enquiry Error:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 }
