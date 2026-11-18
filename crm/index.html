@@ -20,7 +20,7 @@
         </div>
     </header>
 
-    <!-- Kanban Board Container -->
+    <!-- Kanban Board Container (5 Automated & Manual Columns) -->
     <main class="flex-1 overflow-x-auto overflow-y-hidden p-6 flex space-x-6" id="kanban-board">
         
         <!-- Column 1: Enquiry Received -->
@@ -28,74 +28,44 @@
             <div class="p-3 border-b border-gray-300">
                 <h2 class="font-semibold text-gray-700">Enquiry Received</h2>
             </div>
-            <!-- Unique ID: col-enquiry -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-enquiry">
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-enquiry"></div>
         </div>
 
-        <!-- NEW Column 1.5: Online Classes -->
+        <!-- Column 2: Online Classes -->
         <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
             <div class="p-3 border-b border-gray-300">
                 <h2 class="font-semibold text-gray-700">Online Classes</h2>
             </div>
-            <!-- Unique ID: col-online-classes -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-online-classes">
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-online-classes"></div>
         </div>
 
-        <!-- Column 2: Assessment Booked -->
+        <!-- Column 3: Active -->
         <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
             <div class="p-3 border-b border-gray-300">
-                <h2 class="font-semibold text-gray-700">Assessment Booked</h2>
+                <h2 class="font-semibold text-gray-700">Active</h2>
             </div>
-            <!-- Unique ID: col-assessment -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-assessment">
-            </div>
-        </div>
-        
-        <!-- Column 3: Session 1 Booked -->
-        <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
-            <div class="p-3 border-b border-gray-300">
-                <h2 class="font-semibold text-gray-700">Session 1 Booked</h2>
-            </div>
-            <!-- Unique ID: col-session1 -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-session1">
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-active"></div>
         </div>
 
-        <!-- Column 4: Session 2 -->
+        <!-- Column 4: Cold (7+ Days Inactive) -->
         <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
             <div class="p-3 border-b border-gray-300">
-                <h2 class="font-semibold text-gray-700">Session 2 Booked</h2>
+                <h2 class="font-semibold text-gray-700">Cold</h2>
             </div>
-            <!-- Unique ID: col-session2 -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-session2">
-            </div>
-        </div>
-        
-        <!-- Column 5: Session 3 Booked -->
-        <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
-            <div class="p-3 border-b border-gray-300">
-                <h2 class="font-semibold text-gray-700">Session 3 Booked</h2>
-            </div>
-            <!-- Unique ID: col-session3 -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-session3">
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-cold"></div>
         </div>
 
-        <!-- Column 6: Session 4 -->
+        <!-- Column 5: Dormant (30+ Days Inactive) -->
         <div class="w-80 flex-shrink-0 bg-gray-200 rounded-lg flex flex-col max-h-full">
             <div class="p-3 border-b border-gray-300">
-                <h2 class="font-semibold text-gray-700">Session 4 Booked</h2>
+                <h2 class="font-semibold text-gray-700">Dormant</h2>
             </div>
-            <!-- Unique ID: col-session4 -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-session4">
-            </div>
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="col-dormant"></div>
         </div>
         
     </main>
 
-    <!-- NEW CLIENT FOCUS MODAL (Activity Log & Routing) -->
+    <!-- CLIENT FOCUS MODAL (Activity Log, Routing & Billing) -->
     <div id="client-focus-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden">
             
@@ -122,30 +92,28 @@
                         <label class="block text-sm font-bold text-gray-700 mb-2">Move Pipeline Stage</label>
                         <select id="focus-stage-select" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-600 bg-gray-50 cursor-pointer text-slate-800 font-medium">
                             <option value="Enquiry Received">Enquiry Received</option>
-                            <option value="Friday Class RSVP">Online Classes</option>
-                            <option value="Assessment Booked">Assessment Booked</option>
-                            <option value="Session 1 Booked">Session 1 Booked</option>
-                            <option value="Session 2 Booked">Session 2 Booked</option>
-                            <option value="Session 3 Booked">Session 3 Booked</option>
-                            <option value="Session 4 Booked">Session 4 Booked</option>
+                            <option value="Online Classes">Online Classes</option>
+                            <option value="Active">Active</option>
+                            <option value="Cold">Cold</option>
+                            <option value="Dormant">Dormant</option>
                         </select>
                     </div>
                     
                     <div class="border-t border-gray-200 pt-6 flex-grow">
-                        <a id="btn-drive-folder" target="_blank" class="hidden w-full text-center border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-md hover:bg-blue-50 transition-colors flex justify-center items-center mb-6">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                            Open Client Drive Folder
-                        </a>
+                        <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Client Actions</h3>
 
-                        <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Billing Actions</h3>
+                        <!-- Dynamic Drive Toggle Button (Generate Drive / Go to Drive) -->
+                        <button id="btn-drive-toggle" type="button" class="w-full mb-3 border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-md hover:bg-blue-50 transition-colors flex justify-center items-center">
+                            Generate Drive
+                        </button>
                         
                         <!-- Path A: Full Contract -->
-                        <button id="btn-full-contract" class="w-full mb-3 bg-slate-800 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-slate-900 transition-colors">
+                        <button id="btn-full-contract" type="button" class="w-full mb-3 bg-slate-800 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-slate-900 transition-colors">
                             Generate Full Contract
                         </button>
 
                         <!-- Path B: Quick Invoice -->
-                        <button id="btn-quick-invoice-toggle" class="w-full mb-3 bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-green-700 transition-colors">
+                        <button id="btn-quick-invoice-toggle" type="button" class="w-full mb-3 bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-green-700 transition-colors">
                             Quick Invoice (No Contract)
                         </button>
 
@@ -162,18 +130,22 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 mb-1">Rate ($)</label>
-                                    <input type="number" id="qi-rate" required min="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+                                    <input type="number" id="qi-rate" required min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 mb-1">Fixed Discount ($)</label>
-                                <input type="number" id="qi-discount" min="0" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+                                <input type="number" id="qi-discount" min="0" step="0.01" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
                             </div>
-                            <label class="flex items-center space-x-2 cursor-pointer mt-2 bg-white border border-gray-200 p-2 rounded">
-                                <input type="checkbox" id="qi-gst" checked class="h-4 w-4 text-green-600 rounded focus:ring-green-500 cursor-pointer">
-                                <span class="text-xs font-bold text-gray-700">Apply 10% GST (Australia)</span>
-                            </label>
-                            <button type="submit" id="qi-submit" class="w-full bg-green-700 text-white font-bold py-3 rounded shadow hover:bg-green-800 transition-colors mt-2 text-sm">Send Tax Invoice</button>
+                            <div class="mt-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">GST Configuration</label>
+                                <select id="qi-gst-mode" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none bg-white">
+                                    <option value="inclusive" selected>GST Included (Inclusive)</option>
+                                    <option value="exclusive">Apply 10% GST (Exclusive)</option>
+                                    <option value="none">No GST</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="qi-submit" class="w-full bg-green-700 text-white font-bold py-3 rounded shadow hover:bg-green-800 transition-colors mt-2 text-sm">Generate PDF Invoice</button>
                         </form>
                     </div>
                 </div>
@@ -209,7 +181,7 @@
         </div>
     </div>
 
-    <!-- Link your JavaScript file via Githack -->
+    <!-- Link your JavaScript file -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
