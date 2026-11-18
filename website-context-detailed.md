@@ -384,7 +384,7 @@
 - [A] Class
 - [A] You
 - [BUTTON] 
-- [A] Book Free Assessment
+- [A] Get Coaching
 - [A] Try the Free App
 - [A] Explore the Mic-Check App
 - [A] View Performance Plan
