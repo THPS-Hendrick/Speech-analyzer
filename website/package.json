@@ -6,7 +6,9 @@
   },
   "dependencies": {
     "firebase": "^10.8.0",
+    "firebase-admin": "^12.7.0",
     "googleapis": "^144.0.0",
+    "stripe": "^17.3.1",
     "tailwindcss": "^3.4.1"
   }
 }
