@@ -129,11 +129,20 @@
             <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <h3 class="text-xl font-bold mb-2">Contract Sent!</h3>
             <p class="text-md mb-6">The magic link has been emailed to the client and the invoice data is securely saved.</p>
-            <button onclick="location.reload()" class="bg-white text-green-800 border border-green-300 px-6 py-2 rounded font-medium hover:bg-green-100 transition-colors">Create Another</button>
+            <button onclick="window.location.href='index.html'" class="bg-white text-green-800 border border-green-300 px-6 py-2 rounded font-medium hover:bg-green-100 transition-colors">Return to Dashboard</button>
         </div>
     </div>
 
     <script>
+        // NEW: Auto-fill fields from URL parameters passed by the Kanban board
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('name')) {
+            document.getElementById('client-name').value = urlParams.get('name');
+        }
+        if (urlParams.has('email')) {
+            document.getElementById('client-email').value = urlParams.get('email');
+        }
+
         document.getElementById('contract-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
