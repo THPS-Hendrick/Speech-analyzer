@@ -409,25 +409,37 @@
 
 ### Body Text:
 - Manage your subscription, profile details, and integration settings.
-- Need to change your email? Contact Support to securely migrate your history.
-- Billed $9.90 AUD monthly
-- Next billing date: 14 Nov 2026
+- Log in with your Google account to view your profile, start your 7-day free trial, or manage your Mic-Check Pro subscription.
+- Signed in via Google Authentication. Need to migrate your history? Contact Support.
+- Your account is secured through Google Sign-In. Password and two-factor settings are managed via your Google Account.
+- Action Required: Subscription Payment Failed
+- Access to Mic-Check Pro is currently paused. Click Manage Subscription below to update your card or bank account and restore access immediately.
+- Checking membership status...
+- 
+- Unlock unlimited speech diagnostics, real-time pacing feedback, filler-word tracking, and cloud progress history. Cancel anytime before your trial ends.
+- GST inclusive. Billed monthly after your trial; cancel anytime.
+- GST inclusive. Renews annually on your signup anniversary.
+- Accepts Credit/Debit Cards, Apple Pay, Google Pay, and Australian Bank Direct Debit (AU BECS).
+- View your complete payment history, update your card or BECS Direct Debit bank account, and download PDF receipts directly via Stripe.
+- No billing history yet. Your receipts will appear in the Stripe Customer Portal once your subscription starts.
 - Linking your account allows your Mic-Check App progress to sync with your coach's dashboard for professional review during your Performance Plan sessions.
 - Active Connection
-- Unlinking your account will immediately stop sending diagnostic data to your coach. Only do this if your 4-week program has concluded.
+- Not Linked to a 1:1 Coaching Plan
+- Enrolled in a 1:1 Performance Plan? Your coach can link your account email () directly to your CRM profile during your session.
 
 ### Interactables (Links/Buttons):
+- [BUTTON] Sign in with Google
 - [BUTTON] Profile Details
-- [BUTTON] Billing & Plan
+- [BUTTON] Billing &amp; Plan
 - [BUTTON] CRM Link
-- [BUTTON] Legal & Session
+- [BUTTON] Legal &amp; Session
 - [A] Contact Support
-- [BUTTON] Send Password Reset Link
 - [BUTTON] Save Changes
-- [A] Manage Subscription
-- [A] PDF
-- [A] PDF
-- [BUTTON] Unlink Account
+- [BUTTON] Manage Subscription
+- [A] Open Mic-Check
+- [BUTTON] Start 7-Day Free Trial — Monthly
+- [BUTTON] Start 7-Day Free Trial — Yearly
+- [BUTTON] Open Billing History &amp; Receipts
 - [A] Terms of Service
 - [A] Privacy Policy
 - [BUTTON] Log Out

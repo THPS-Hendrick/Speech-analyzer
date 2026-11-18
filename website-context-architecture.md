@@ -817,12 +817,14 @@
 
 **Headings:**
 - H1: Account Management
+- H2: Sign in to manage your account
 - H2: Profile Details
-- H2: Billing & Plan
-- H3: Mic-Check Pro
-- H3: Billing History
+- H2: Billing &amp; Plan
+- H3: Loading subscription...
+- H3: Upgrade to Mic-Check Pro
+- H3: Invoices &amp; Tax Receipts
 - H2: Coaching Integration (CRM)
-- H2: Legal & Session
+- H2: Legal &amp; Session
 
 ---
 
