@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, message: 'Only POST requests allowed' });
     }
 
-    const { clientName, clientEmail, clientAddress, inclusions, paymentStructure, targetDate, applyGst, lineItems } = req.body;
+    const { clientName, clientEmail, clientAddress, inclusions, paymentStructure, targetDate, gstMode, lineItems } = req.body;
 
     if (!clientName || !clientEmail || !lineItems || lineItems.length === 0) {
         return res.status(400).json({ success: false, message: 'Missing required contract fields or line items.' });
@@ -22,14 +22,24 @@ export default async function handler(req, res) {
 
     try {
         let subtotal = 0;
+        let adjustedLineItems = [];
+
+        // Apply inclusive/exclusive math line-by-line
         lineItems.forEach(item => {
-            subtotal += (item.rate * item.qty);
+            let actualRate = item.rate;
+            if (gstMode === "inclusive") {
+                actualRate = parseFloat((item.rate / 1.1).toFixed(2));
+            }
+            subtotal += (actualRate * item.qty);
+            adjustedLineItems.push({ ...item, rate: actualRate });
         });
         
-        const gstAmount = applyGst ? (subtotal * 0.10) : 0;
-        const totalFee = subtotal + gstAmount;
+        let gstAmount = 0;
+        if (gstMode === "inclusive" || gstMode === "exclusive") {
+            gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
+        }
+        const totalFee = parseFloat((subtotal + gstAmount).toFixed(2));
 
-        // Use Admin syntax to add a new document
         const docRef = await db.collection("Contracts").add({
             clientName,
             clientEmail,
@@ -37,14 +47,26 @@ export default async function handler(req, res) {
             inclusions,
             paymentStructure,
             targetDate,
-            applyGst,
-            lineItems,
-            totalFee, 
+            gstMode: gstMode,
+            applyGst: (gstMode !== "none"),
+            lineItems: adjustedLineItems, // Save the properly calculated rates
+            totalFee: totalFee, 
             status: "pending",
             createdAt: new Date().toISOString()
         });
 
         const contractId = docRef.id;
+
+        // Log the full contract generation to the CRM card
+        const clientRef = db.collection("Clients").doc(clientEmail.toLowerCase());
+        await clientRef.update({
+            activity_log: admin.firestore.FieldValue.arrayUnion({
+                type: "admin",
+                action: `Generated Full Contract: $${totalFee.toFixed(2)}`,
+                timestamp: new Date().toISOString()
+            })
+        });
+
         const magicLink = `https://thps-crm.vercel.app/contract.html?id=${contractId}`;
 
         const oauth2Client = new google.auth.OAuth2(
