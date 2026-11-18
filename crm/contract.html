@@ -187,7 +187,7 @@
                 <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
                 <div class="text-right">
                     <h1 class="text-3xl font-bold text-yellow-600">Tax Invoice</h1>
-                    <p class="text-lg font-semibold mt-2" id="outTotalTop">AUD $0</p>
+                    <p class="text-lg font-semibold mt-2" id="outTotalTop">AUD $0.00</p>
                 </div>
             </div>
 
@@ -236,12 +236,12 @@
             <div class="flex justify-end mb-8">
                 <div class="w-64">
                     <div class="flex justify-between py-1 border-b" id="gstRow">
-                        <span class="font-bold text-gray-600">GST (10%)</span>
-                        <span id="outGst">$0</span>
+                        <span class="font-bold text-gray-600" id="gstLabel">GST (10%)</span>
+                        <span id="outGst">$0.00</span>
                     </div>
                     <div class="flex justify-between py-2 border-b-4 border-yellow-500 font-bold text-xl">
                         <span>Total:</span>
-                        <span id="outTotalBottom">$0</span>
+                        <span id="outTotalBottom">$0.00</span>
                     </div>
                 </div>
             </div>
@@ -493,17 +493,19 @@
             const formatDate = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             document.getElementById('outDate').innerText = formatDate(today);
             document.getElementById('outDueDate').innerText = formatDate(due);
-            document.getElementById('outInvoiceNum').innerText = generateInvoiceNumber(c.clientName, today.toISOString());
+
+            const invoiceNum = generateInvoiceNumber(c.clientName, today.toISOString());
+            document.getElementById('outInvoiceNum').innerText = invoiceNum;
+            document.title = invoiceNum; // Sets default Save-as-PDF filename to e.g. TH20261118.pdf
 
             const tbody = document.getElementById('invoice-rows');
             tbody.innerHTML = ''; 
             
-            let subtotal = 0;
+            let rawSubtotal = 0;
             if (c.lineItems && Array.isArray(c.lineItems)) {
                 c.lineItems.forEach(item => {
-                    // Because the backend modified the rates for inclusive GST, we just sum them strictly to 2 decimal places.
                     const rowTotal = parseFloat((item.rate * item.qty).toFixed(2));
-                    subtotal += rowTotal;
+                    rawSubtotal += rowTotal;
                     
                     const textColor = item.rate < 0 ? 'text-red-600' : 'text-gray-900';
 
@@ -520,6 +522,8 @@
                 });
             }
 
+            const subtotal = Math.max(0, rawSubtotal);
+
             // Fallback for legacy database contracts
             let mode = c.gstMode;
             if (!mode) {
@@ -527,10 +531,19 @@
             }
 
             let gstAmount = 0;
-            if (mode === "inclusive" || mode === "exclusive") {
+            let finalTotal = 0;
+
+            if (mode === "inclusive") {
+                finalTotal = parseFloat(subtotal.toFixed(2));
+                gstAmount = parseFloat((finalTotal / 11).toFixed(2));
+                document.getElementById('gstLabel').innerText = "Includes GST (10%)";
+            } else if (mode === "exclusive") {
                 gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
+                finalTotal = parseFloat((subtotal + gstAmount).toFixed(2));
+                document.getElementById('gstLabel').innerText = "GST (10%)";
+            } else {
+                finalTotal = parseFloat(subtotal.toFixed(2));
             }
-            const finalTotal = parseFloat((subtotal + gstAmount).toFixed(2));
 
             document.getElementById('gstRow').style.display = (mode !== "none") ? 'flex' : 'none';
             document.getElementById('outGst').innerText = formatCurrency(gstAmount);
