@@ -1,10 +1,10 @@
 const { google } = require('googleapis');
 const { initializeApp, getApps } = require('firebase/app');
-const { getFirestore, collection, addDoc } = require('firebase/firestore');
+const { getFirestore, doc, setDoc, arrayUnion } = require('firebase/firestore');
 
 // 1. Firebase Configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
+    apiKey: process.env.FIREBASE_API_KEY || "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
     authDomain: "thps-crm.firebaseapp.com",
     projectId: "thps-crm",
     storageBucket: "thps-crm.firebasestorage.app",
@@ -63,15 +63,34 @@ export default async function handler(req, res) {
             sendUpdates: 'all' // Automatically emails calendar invite + Meet link to client
         });
 
-        // 5. Add Client Record to Firebase Firestore
-        await addDoc(collection(db, "Clients"), {
-            name: name,
-            email: email,
-            stage: "Assessment Booked",
-            tags: ["Speech Assessment booked"],
-            last_contact_date: new Date().toISOString(),
-            created_at: new Date().toISOString()
+        // 5. Upsert Client Record into "Active", append bookedSessions (S:#), and log activity
+        const nowIso = new Date().toISOString();
+        const clientId = email.trim().toLowerCase();
+        const clientRef = doc(db, "Clients", clientId);
+
+        const readableSession = startTime.toLocaleString('en-AU', {
+            timeZone: 'Australia/Adelaide',
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
+
+        await setDoc(clientRef, {
+            name: name.trim(),
+            email: email.trim(),
+            stage: "Active",
+            manualStageOverride: null,
+            tags: arrayUnion("Speech Assessment booked"),
+            bookedSessions: arrayUnion(selectedIso),
+            last_contact_date: nowIso,
+            activity_log: arrayUnion({
+                type: "client",
+                action: `Booked 1-on-1 Speech Assessment (${readableSession})`,
+                timestamp: nowIso
+            })
+        }, { merge: true });
 
         res.status(200).json({
             success: true,
