@@ -1,18 +1,13 @@
 const { google } = require('googleapis');
-const { initializeApp, getApps } = require('firebase/app');
-const { getFirestore, collection, addDoc } = require('firebase/firestore');
+const admin = require('firebase-admin');
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
-    authDomain: "thps-crm.firebaseapp.com",
-    projectId: "thps-crm",
-    storageBucket: "thps-crm.firebasestorage.app",
-    messagingSenderId: "297605373498",
-    appId: "1:297605373498:web:606241a173f3150a16df03"
-};
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+// Safely initialize Firebase Admin "God Mode"
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+    });
+}
+const db = admin.firestore();
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -34,7 +29,8 @@ export default async function handler(req, res) {
         const gstAmount = applyGst ? (subtotal * 0.10) : 0;
         const totalFee = subtotal + gstAmount;
 
-        const docRef = await addDoc(collection(db, "Contracts"), {
+        // Use Admin syntax to add a new document
+        const docRef = await db.collection("Contracts").add({
             clientName,
             clientEmail,
             clientAddress,
@@ -53,8 +49,7 @@ export default async function handler(req, res) {
 
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
-            process.env.GOOGLE_CLIENT_SECRET,
-            "https://developers.google.com/oauthplayground"
+            process.env.GOOGLE_CLIENT_SECRET
         );
         oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
         const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
@@ -76,7 +71,7 @@ export default async function handler(req, res) {
 
         const messageParts = [
             `To: ${clientEmail}`,
-            `Bcc: tom@tomhendrick.com`, // Added this line so you get a copy!
+            `Bcc: tom@tomhendrick.com`, 
             `Subject: ${utf8Subject}`,
             'Content-Type: text/html; charset=utf-8',
             '',
