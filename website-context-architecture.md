@@ -796,11 +796,11 @@
 
 **Headings:**
 - H1: The Premier Online Public Speaking Coach for Data-Driven Professionals
-- H2: Why the Best Executives Train with Objective Speech Metrics
 - H2: Online Coaching, Classes, and Software to Master Your Voice
 - H3: Measured Practice
 - H3: Professional Coaching
 - H3: Group Practice
+- H2: Why the Best Executives Train with Objective Speech Metrics
 - H2: The Mic-Check App: A Launch Monitor for Public Speaking
 - H3: Monitor Pace, Pauses, and Vocal Variety in Real-Time
 - H3: Practice with Guided Daily Training Courses

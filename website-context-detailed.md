@@ -355,13 +355,13 @@
 ### Body Text:
 - Welcome to THPS. We are the premier online coaching service for executives and professionals who want to eliminate stage fright and build predictable confidence. We replace subjective feedback with hard speech biometrics, allowing you to train your voice with the same precision an athlete trains their body.
 - Recognized Industry Leader
-- Methodology
-- Data-Backed Diagnostics
-- Telling a professional to "just be more confident" does not work. True communication training requires measuring the actual mechanics of your voice. We track your exact WPM, Pause %, and Runtime to identify exactly where you lose your audience under pressure, giving you the mechanical control needed to eliminate nerves.
 - Select the feedback style that best fits your schedule and learning preferences. Whether you prefer 1-on-1 premium coaching via the THPS Performance Plan, group practice in our weekly Fun Fridays classes, or self-paced private practice, the THPS ecosystem is available online globally.
 - Self-paced, private practice powered by real-time audio data. Track your WPM and Runtime consistency.
 - The fastest route. A 4-week, 1-on-1 intensive guided by expert clinical feedback to permanently break Skill Inhibition.
 - Learn dynamically through community exercises. Join our free weekly "Fun Fridays" classes for peer review and gamified prompts.
+- Methodology
+- Data-Backed Diagnostics
+- Telling a professional to "just be more confident" does not work. True communication training requires measuring the actual mechanics of your voice. We track your exact WPM, Pause %, and Runtime to identify exactly where you lose your audience under pressure, giving you the mechanical control needed to eliminate nerves.
 - Track your progress with the Mic-Check App, a real-time vocal diagnostic tool engineered for professionals. Similar to how a launch monitor tracks a golf swing, the Mic-Check App provides live audio data, instantly plotting your WPM, SPS, and Pause % on a visual dashboard so you can measure your improvement.
 - Track your progress directly in your browser. Instantly see your WPM, SPS, and Pause % on a live Voice Graph.
 - Access specialized modules like "Mic-Check Daily," "Repeat + Count," and "ESL Level 1: Pronunciation" to build permanent muscle memory.
