@@ -55,9 +55,13 @@
             <!-- 2. Invoice Line Items -->
             <h3 class="font-bold border-b pb-2 text-lg text-slate-800 mt-8">2. Invoice Line Items</h3>
             
-            <div class="flex items-center mb-4 bg-yellow-50 p-3 rounded border border-yellow-200">
-                <input type="checkbox" id="applyGst" checked class="w-5 h-5 mr-3 text-yellow-600 rounded focus:ring-yellow-500">
-                <label class="text-sm font-bold text-yellow-900">Apply 10% GST (Australia) to this invoice</label>
+            <div class="mb-6 bg-yellow-50 p-4 rounded border border-yellow-200">
+                <label class="block text-sm font-bold text-yellow-900 mb-2">GST Configuration (Australia)</label>
+                <select id="applyGstMode" class="w-full md:w-1/2 p-2 border border-yellow-300 rounded focus:ring-2 focus:ring-yellow-500 bg-white text-yellow-900 font-medium">
+                    <option value="exclusive">Apply 10% GST (Exclusive)</option>
+                    <option value="inclusive">GST Included (Inclusive)</option>
+                    <option value="none">No GST</option>
+                </select>
             </div>
 
             <!-- Service 1 -->
@@ -134,7 +138,6 @@
     </div>
 
     <script>
-        // NEW: Auto-fill fields from URL parameters passed by the Kanban board
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('name')) {
             document.getElementById('client-name').value = urlParams.get('name');
@@ -148,7 +151,6 @@
             
             const submitBtn = document.getElementById('submit-btn');
             
-            // Gather the dynamic line items (only grab rows where Qty > 0)
             const lineItems = [];
             for (let i = 1; i <= 3; i++) {
                 const qty = parseInt(document.getElementById(`svcQty${i}`).value) || 0;
@@ -177,8 +179,8 @@
                 inclusions: document.getElementById('inclusions').value,
                 paymentStructure: document.getElementById('payment-structure').value,
                 targetDate: document.getElementById('target-date').value,
-                applyGst: document.getElementById('applyGst').checked,
-                lineItems: lineItems // Sending the bundled array to the backend
+                gstMode: document.getElementById('applyGstMode').value, // Use the new dropdown
+                lineItems: lineItems 
             };
 
             try {
