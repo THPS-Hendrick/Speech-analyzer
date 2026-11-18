@@ -43,6 +43,36 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+// ==========================================
+// RECENCY & STAGE RESOLUTION HELPERS
+// ==========================================
+function getLastActivityTimestamp(client) {
+    if (Array.isArray(client.activity_log) && client.activity_log.length > 0) {
+        const latest = client.activity_log.reduce((max, entry) => {
+            const t = new Date(entry.timestamp).getTime();
+            return (!isNaN(t) && t > max) ? t : max;
+        }, 0);
+        if (latest > 0) return latest;
+    }
+    const fallback = client.last_contact_date || client.createdAt || client.created_at;
+    const fallbackTime = fallback ? new Date(fallback).getTime() : NaN;
+    return !isNaN(fallbackTime) ? fallbackTime : Date.now();
+}
+
+function resolveClientStage(client) {
+    if (client.manualStageOverride === "Cold" || client.manualStageOverride === "Dormant") {
+        return client.manualStageOverride;
+    }
+
+    const daysInactive = (Date.now() - getLastActivityTimestamp(client)) / (1000 * 60 * 60 * 24);
+    if (daysInactive >= 30) return "Dormant";
+    if (daysInactive >= 7) return "Cold";
+
+    if (client.stage === "Enquiry Received") return "Enquiry Received";
+    if (client.stage === "Online Classes" || client.stage === "Friday Class RSVP") return "Online Classes";
+    return "Active";
+}
+
 // 3. HTML Card Builder
 function createClientCard(client) {
     let tagsHtml = (client.tags || []).map(tag => 
@@ -50,6 +80,8 @@ function createClientCard(client) {
     ).join('');
 
     const emailKey = client.email.toLowerCase();
+    const sessionsCount = Array.isArray(client.bookedSessions) ? client.bookedSessions.length : 0;
+    const classesCount = Array.isArray(client.bookedDates) ? client.bookedDates.length : 0;
     const totalChargedFormatted = parseFloat(client.totalCharged || 0).toLocaleString('en-AU', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -62,19 +94,22 @@ function createClientCard(client) {
         <div class="flex flex-wrap gap-2">
             ${tagsHtml}
         </div>
-        <div class="mt-3 pt-2 border-t border-gray-100 text-xs font-semibold text-slate-600">
+        <div class="mt-2.5 flex items-center gap-2 text-xs font-bold text-slate-700">
+            <span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">S:${sessionsCount} C:${classesCount}</span>
+        </div>
+        <div class="mt-2 pt-2 border-t border-gray-100 text-xs font-semibold text-slate-600">
             Total Charged: $${totalChargedFormatted}
         </div>
     `;
 
-    if (client.stage === "Friday Class RSVP" && client.bookedDates && client.bookedDates.length > 0) {
+    if (client.bookedDates && client.bookedDates.length > 0) {
         const dateListItems = client.bookedDates.map(iso => {
             const readableDate = new Date(iso).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' });
             return `<li>${readableDate}</li>`;
         }).join('');
         
         cardHtml += `
-        <details class="text-sm border border-gray-200 rounded-md p-2 mt-4 bg-gray-50 card-details-stop">
+        <details class="text-sm border border-gray-200 rounded-md p-2 mt-3 bg-gray-50 card-details-stop">
             <summary class="font-medium text-blue-600 cursor-pointer outline-none select-none">
                 Classes Booked (${client.bookedDates.length})
             </summary>
@@ -94,32 +129,37 @@ async function loadClients() {
     try {
         const querySnapshot = await getDocs(collection(db, "Clients"));
         
-        const cols = ["col-enquiry", "col-online-classes", "col-assessment", "col-session1", "col-session2", "col-session3", "col-session4"];
+        const cols = ["col-enquiry", "col-online-classes", "col-active", "col-cold", "col-dormant"];
         cols.forEach(col => {
             const el = document.getElementById(col);
-            if(el) el.innerHTML = "";
+            if (el) el.innerHTML = "";
         });
         
         clientsMap = {}; 
 
-        querySnapshot.forEach((doc) => {
-            const clientData = doc.data();
+        querySnapshot.forEach((docSnap) => {
+            const clientData = docSnap.data();
+            if (!clientData.email) return;
             const emailKey = clientData.email.toLowerCase();
-            clientsMap[emailKey] = clientData; 
-            
-            let colId = "";
-            if (clientData.stage === "Enquiry Received") colId = "col-enquiry";
-            if (clientData.stage === "Friday Class RSVP") colId = "col-online-classes";
-            if (clientData.stage === "Assessment Booked") colId = "col-assessment";
-            if (clientData.stage === "Session 1 Booked") colId = "col-session1";
-            if (clientData.stage === "Session 2 Booked") colId = "col-session2";
-            if (clientData.stage === "Session 3 Booked") colId = "col-session3";
-            if (clientData.stage === "Session 4 Booked") colId = "col-session4";
-            
-            if (colId) {
-                const columnElement = document.getElementById(colId);
-                if (columnElement) columnElement.innerHTML += createClientCard(clientData);
+
+            // Prefer canonical email-keyed document if legacy duplicates exist
+            if (!clientsMap[emailKey] || docSnap.id === emailKey) {
+                clientsMap[emailKey] = clientData;
             }
+        });
+
+        Object.values(clientsMap).forEach((clientData) => {
+            const resolvedStage = resolveClientStage(clientData);
+            
+            let colId = "col-active";
+            if (resolvedStage === "Enquiry Received") colId = "col-enquiry";
+            if (resolvedStage === "Online Classes") colId = "col-online-classes";
+            if (resolvedStage === "Active") colId = "col-active";
+            if (resolvedStage === "Cold") colId = "col-cold";
+            if (resolvedStage === "Dormant") colId = "col-dormant";
+            
+            const columnElement = document.getElementById(colId);
+            if (columnElement) columnElement.innerHTML += createClientCard(clientData);
         });
 
         document.querySelectorAll('.client-card').forEach(card => {
@@ -138,36 +178,41 @@ async function loadClients() {
     }
 }
 
-// 5. Client Focus Modal Logic (Activity Log, Routing & Billing)
+// 5. Client Focus Modal Logic (Activity Log, Routing, Drive Toggle & Billing)
 const focusModal = document.getElementById('client-focus-modal');
 const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
-const btnDriveFolder = document.getElementById('btn-drive-folder');
+const btnDriveToggle = document.getElementById('btn-drive-toggle');
 
 // Billing Elements
 const btnFullContract = document.getElementById('btn-full-contract');
 const btnQuickInvoiceToggle = document.getElementById('btn-quick-invoice-toggle');
 const quickInvoiceForm = document.getElementById('quick-invoice-form');
 
+function updateDriveToggleButton(client) {
+    if (!btnDriveToggle) return;
+    if (client.driveFolderUrl) {
+        btnDriveToggle.innerText = "Go to Drive";
+        btnDriveToggle.className = "w-full mb-3 bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-blue-700 transition-colors flex justify-center items-center";
+    } else {
+        btnDriveToggle.innerText = "Generate Drive";
+        btnDriveToggle.className = "w-full mb-3 border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-md hover:bg-blue-50 transition-colors flex justify-center items-center";
+    }
+}
+
 function openFocusModal(client) {
     currentFocusClient = client;
     
     document.getElementById('focus-name').innerText = client.name;
     document.getElementById('focus-email').innerText = client.email;
-    focusStageSelect.value = client.stage;
+    focusStageSelect.value = resolveClientStage(client);
 
     // Reset the mini-form state every time the modal opens
     quickInvoiceForm.reset();
     quickInvoiceForm.classList.add('hidden');
 
-    if (client.driveFolderUrl) {
-        btnDriveFolder.href = client.driveFolderUrl;
-        btnDriveFolder.classList.remove('hidden');
-        btnDriveFolder.classList.add('flex');
-    } else {
-        btnDriveFolder.classList.add('hidden');
-        btnDriveFolder.classList.remove('flex');
-    }
+    // Sync Generate Drive / Go to Drive button state
+    updateDriveToggleButton(client);
 
     const logContainer = document.getElementById('focus-activity-log');
     logContainer.innerHTML = '';
@@ -228,42 +273,50 @@ closeFocusModalBtn.addEventListener('click', () => {
     currentFocusClient = null;
 });
 
-// Stage Routing & Drive Automation
+// Manual Stage Routing
 focusStageSelect.addEventListener('change', async (e) => {
     if (!currentFocusClient) return;
     
     const newStage = e.target.value;
     const clientId = currentFocusClient.email.toLowerCase();
     const clientRef = doc(db, "Clients", clientId);
+    const nowIso = new Date().toISOString();
 
     try {
-        await updateDoc(clientRef, {
-            stage: newStage,
-            activity_log: arrayUnion({
+        if (newStage === "Cold" || newStage === "Dormant") {
+            // Set manual override without resetting inactivity timestamp
+            await setDoc(clientRef, {
+                stage: newStage,
+                manualStageOverride: newStage
+            }, { merge: true });
+
+            currentFocusClient.stage = newStage;
+            currentFocusClient.manualStageOverride = newStage;
+        } else {
+            // Clear manual override and log fresh activity timestamp
+            await setDoc(clientRef, {
+                stage: newStage,
+                manualStageOverride: null,
+                last_contact_date: nowIso,
+                activity_log: arrayUnion({
+                    type: "admin",
+                    action: `Moved stage to: ${newStage}`,
+                    timestamp: nowIso
+                })
+            }, { merge: true });
+
+            currentFocusClient.stage = newStage;
+            currentFocusClient.manualStageOverride = null;
+            currentFocusClient.last_contact_date = nowIso;
+            if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
+            currentFocusClient.activity_log.push({
                 type: "admin",
                 action: `Moved stage to: ${newStage}`,
-                timestamp: new Date().toISOString()
-            })
-        });
-
-        currentFocusClient.stage = newStage;
-        if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
-        currentFocusClient.activity_log.push({
-            type: "admin",
-            action: `Moved stage to: ${newStage}`,
-            timestamp: new Date().toISOString()
-        });
-
-        const qualifiesForDrive = (newStage === "Assessment Booked" || newStage === "Session 1 Booked");
-        if (qualifiesForDrive && !currentFocusClient.driveFolderUrl) {
-            fetch('/api/create-drive', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: clientId, name: currentFocusClient.name })
+                timestamp: nowIso
             });
         }
 
-        loadClients();
+        await loadClients();
         openFocusModal(currentFocusClient); 
         
     } catch (error) {
@@ -271,6 +324,64 @@ focusStageSelect.addEventListener('change', async (e) => {
         alert("Failed to update stage.");
     }
 });
+
+// ==========================================
+// GOOGLE DRIVE TOGGLE LOGIC
+// ==========================================
+if (btnDriveToggle) {
+    btnDriveToggle.addEventListener('click', async () => {
+        if (!currentFocusClient) return;
+
+        // If folder already exists, open it in a new tab
+        if (currentFocusClient.driveFolderUrl) {
+            window.open(currentFocusClient.driveFolderUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
+        btnDriveToggle.disabled = true;
+        btnDriveToggle.innerText = "Generating Drive...";
+
+        try {
+            const res = await fetch('/api/create-drive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: currentFocusClient.email,
+                    name: currentFocusClient.name
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.success && result.folderUrl) {
+                const nowIso = new Date().toISOString();
+                currentFocusClient.driveFolderUrl = result.folderUrl;
+                currentFocusClient.manualStageOverride = null;
+                currentFocusClient.last_contact_date = nowIso;
+
+                if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
+                currentFocusClient.activity_log.push({
+                    type: "admin",
+                    action: "Generated Google Drive folder",
+                    url: result.folderUrl,
+                    timestamp: nowIso
+                });
+
+                await loadClients();
+                openFocusModal(currentFocusClient);
+            } else {
+                alert("Failed to generate Drive folder: " + (result.error || result.message));
+                updateDriveToggleButton(currentFocusClient);
+            }
+        } catch (err) {
+            console.error("Drive toggle error:", err);
+            alert("An error occurred while generating the Google Drive folder.");
+            updateDriveToggleButton(currentFocusClient);
+        } finally {
+            btnDriveToggle.disabled = false;
+        }
+    });
+}
 
 // ==========================================
 // BILLING ACTIONS LOGIC
@@ -345,7 +456,6 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
         const result = await res.json();
         
         if (result.success) {
-            // Calculate local total for immediate UI update
             const baseAmount = (parseInt(payload.units) || 1) * (parseFloat(payload.rate) || 0);
             const subtotal = Math.max(0, baseAmount - (parseFloat(payload.discount) || 0));
             const totalFee = payload.gstMode === "exclusive"
@@ -363,6 +473,7 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
                 timestamp: new Date().toISOString()
             });
             currentFocusClient.totalCharged = (parseFloat(currentFocusClient.totalCharged) || 0) + totalFee;
+            currentFocusClient.manualStageOverride = null;
             
             await loadClients(); 
             openFocusModal(currentFocusClient);
@@ -416,19 +527,23 @@ if (newClientForm) {
             const rawEmail = document.getElementById('modal-email').value;
             const clientId = rawEmail.toLowerCase();
             const clientRef = doc(db, "Clients", clientId);
+            const nowIso = new Date().toISOString();
 
             await setDoc(clientRef, {
                 name: document.getElementById('modal-name').value,
                 email: rawEmail,
                 tags: arrayUnion(document.getElementById('modal-source').value), 
                 stage: "Enquiry Received",
+                manualStageOverride: null,
                 totalCharged: 0,
-                createdAt: new Date().toISOString(),
-                last_contact_date: new Date().toISOString(),
+                bookedSessions: [],
+                bookedDates: [],
+                createdAt: nowIso,
+                last_contact_date: nowIso,
                 activity_log: arrayUnion({
                     type: "admin",
                     action: "Manually added to CRM Pipeline",
-                    timestamp: new Date().toISOString()
+                    timestamp: nowIso
                 })
             }, { merge: true });
 
