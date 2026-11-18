@@ -6,12 +6,12 @@
     <title>Contract Timeline & Agreement</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .fade-enter { opacity: 0; transform: translateY(10px); }
         .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms ease-out, transform 300ms ease-out; }
         
-        /* This print block is the magic for ATO Invoice compliance */
         @media print {
             .no-print { display: none !important; }
             body { background-color: white !important; }
@@ -22,16 +22,19 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- EXPLAINER HEADER (Hidden on Print & Hidden on Quick Invoice) -->
-    <header class="bg-slate-900 text-white py-8 px-6 shadow-md no-print">
+    <!-- Global Status Banner for Payments -->
+    <div id="payment-banner" class="hidden bg-green-600 text-white font-semibold text-center py-3 px-4 shadow-md no-print"></div>
+
+    <!-- EXPLAINER HEADER -->
+    <header id="explainer-header" class="bg-slate-900 text-white py-8 px-6 shadow-md no-print">
         <div class="max-w-6xl mx-auto">
             <h1 class="text-3xl font-bold tracking-tight">Services Agreement Map</h1>
             <p class="mt-2 text-slate-300 text-lg">Click through the timeline to understand how our partnership works, step-by-step.</p>
         </div>
     </header>
 
-    <!-- EXPLAINER MAIN (Hidden on Print & Hidden on Quick Invoice) -->
-    <main class="flex-grow max-w-6xl mx-auto w-full p-6 flex flex-col md:flex-row gap-8 mt-6 no-print">
+    <!-- EXPLAINER MAIN -->
+    <main id="explainer-main" class="flex-grow max-w-6xl mx-auto w-full p-6 flex flex-col md:flex-row gap-8 mt-6 no-print">
         <section class="w-full md:w-1/3 lg:w-2/5 flex-shrink-0">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-xl font-semibold mb-6 text-slate-800">Contract Summary (Plain English)</h2>
@@ -61,7 +64,7 @@
         </section>
     </main>
 
-    <!-- FORMAL LEGAL CONTRACT SECTION (Hidden on Print & Hidden on Quick Invoice) -->
+    <!-- FORMAL LEGAL CONTRACT SECTION -->
     <div id="legal-container" class="max-w-4xl mx-auto w-full p-6 mt-8 mb-16 no-print">
         <div id="loading" class="text-center py-10 text-gray-500 font-semibold bg-white rounded-xl shadow-sm border border-gray-200">
             Loading your secure document...
@@ -87,6 +90,7 @@
 
             <h2 class="text-xl font-bold border-b pb-2 mt-8">TERMS AND CONDITIONS</h2>
             
+            <!-- Standard terms truncated for brevity, same as original -->
             <h3 class="font-bold mt-4">1. SCOPE OF SERVICES</h3>
             <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services below. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
 
@@ -171,27 +175,32 @@
                     Accept & Sign Contract
                 </button>
             </div>
-
-            <div id="signed-state" class="hidden bg-green-50 text-green-800 p-8 rounded-lg border border-green-200 text-center">
-                <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <h3 class="text-2xl font-bold mb-2">Contract Signed</h3>
-                <p class="text-md">Thank you. A finalized, time-stamped copy has been emailed to both parties for their records.</p>
-            </div>
         </div>
     </div>
 
-    <!-- INVOICE WRAPPER (Always visible; Only block printed) -->
+    <!-- ONLINE PAYMENT BLOCK (Injected via JS based on state) -->
+    <div id="payment-action-block" class="max-w-4xl mx-auto w-full px-6 mb-8 hidden no-print">
+        <!-- Content filled dynamically -->
+    </div>
+
+    <!-- INVOICE WRAPPER -->
     <div id="invoice-wrapper" class="max-w-4xl mx-auto mb-16 px-6">
-        <div class="bg-white p-10 rounded shadow-lg print-shadow-none" id="invoicePage">
+        <div class="bg-white p-10 rounded-2xl shadow-lg print-shadow-none relative overflow-hidden" id="invoicePage">
+            
+            <!-- PAID STAMP (Hidden by default) -->
+            <div id="paid-stamp" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 -rotate-12 border-4 border-green-500 text-green-500 font-black text-4xl py-2 px-6 rounded opacity-80 pointer-events-none uppercase tracking-widest z-10">
+                Paid in Full
+            </div>
+
             <div class="flex justify-between items-start border-b-2 border-yellow-500 pb-6 mb-6">
                 <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
-                <div class="text-right">
+                <div class="text-right relative z-20">
                     <h1 class="text-3xl font-bold text-yellow-600">Tax Invoice</h1>
                     <p class="text-lg font-semibold mt-2" id="outTotalTop">AUD $0.00</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-8 mb-8">
+            <div class="grid grid-cols-2 gap-8 mb-8 relative z-20">
                 <div>
                     <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Service Provider details</h3>
                     <p class="font-bold">Tom Hendrick</p>
@@ -219,7 +228,7 @@
                 </div>
             </div>
 
-            <table class="w-full mb-8 text-left border-collapse">
+            <table class="w-full mb-8 text-left border-collapse relative z-20">
                 <thead>
                     <tr class="bg-gray-100 border-b-2 border-yellow-500">
                         <th class="py-2 px-3 w-1/4">Services</th>
@@ -229,11 +238,10 @@
                         <th class="py-2 px-3 text-right">Amount</th>
                     </tr>
                 </thead>
-                <!-- Rows injected dynamically via JS -->
                 <tbody id="invoice-rows"></tbody>
             </table>
 
-            <div class="flex justify-end mb-8">
+            <div class="flex justify-end mb-8 relative z-20">
                 <div class="w-64">
                     <div class="flex justify-between py-1 border-b" id="gstRow">
                         <span class="font-bold text-gray-600" id="gstLabel">GST (10%)</span>
@@ -246,8 +254,9 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-6 rounded border">
-                <h3 class="font-bold text-lg mb-4 border-b pb-2">Payment Methods</h3>
+            <!-- Manual Payment Details (Fallback) -->
+            <div class="bg-gray-50 p-6 rounded-xl border relative z-20">
+                <h3 class="font-bold text-lg mb-4 border-b pb-2">Manual Payment Fallback</h3>
                 <div class="grid grid-cols-2 gap-6">
                     <div>
                         <p class="font-bold text-gray-700">PayID:</p>
@@ -268,10 +277,9 @@
             </div>
         </div>
 
-        <div class="mt-6 flex justify-center no-print">
+        <div class="mt-6 flex justify-center no-print relative z-20">
             <button onclick="window.print()" class="bg-yellow-600 text-white px-8 py-3 rounded-md font-bold hover:bg-yellow-700 transition-colors shadow-sm inline-flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                Print / Save as PDF
+                <i class="fa-solid fa-print mr-2"></i> Print / Save as PDF
             </button>
             <p class="ml-4 text-sm text-gray-500 flex items-center">Select "Save as PDF" in your print dialog.</p>
         </div>
@@ -360,12 +368,29 @@
 
             if (index === 5) {
                 const sigBlock = document.getElementById('signature-block');
-                if(sigBlock) sigBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if(sigBlock && !sigBlock.classList.contains('hidden')) {
+                    sigBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         }
 
         const urlParams = new URLSearchParams(window.location.search);
         const contractId = urlParams.get('id');
+        let currentContract = null;
+
+        // Check for Stripe redirect flags
+        const paymentFlag = urlParams.get('payment');
+        if (paymentFlag === 'success') {
+            const banner = document.getElementById('payment-banner');
+            banner.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> Payment Successful! Thank you.';
+            banner.classList.remove('hidden');
+        } else if (paymentFlag === 'canceled') {
+            const banner = document.getElementById('payment-banner');
+            banner.classList.remove('bg-green-600');
+            banner.classList.add('bg-slate-700');
+            banner.innerHTML = '<i class="fa-solid fa-circle-info mr-2"></i> Checkout was canceled. Invoice remains unpaid.';
+            banner.classList.remove('hidden');
+        }
 
         async function loadContract() {
             if (!contractId) {
@@ -378,38 +403,32 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    const c = data.contract;
-                    
-                    // Always populate invoice data immediately so they can view the draft
-                    populateInvoiceData(c); 
+                    currentContract = data.contract;
+                    populateInvoiceData(currentContract); 
                     
                     // STEALTH BYPASS: If this is a quick invoice, hide the legal stuff
-                    if (c.type === "invoice_only") {
-                        const explainerHeader = document.querySelector('header');
-                        const explainerMain = document.querySelector('main');
-                        const legalContainer = document.getElementById('legal-container');
-                        
-                        if (explainerHeader) explainerHeader.style.display = 'none';
-                        if (explainerMain) explainerMain.style.display = 'none';
-                        if (legalContainer) legalContainer.style.display = 'none';
-                        
+                    if (currentContract.type === "invoice_only") {
+                        document.getElementById('explainer-header').style.display = 'none';
+                        document.getElementById('explainer-main').style.display = 'none';
+                        document.getElementById('legal-container').style.display = 'none';
                         document.getElementById('loading').classList.add('hidden');
+                        renderPaymentState(currentContract);
                     } else {
                         // Standard Contract Flow
-                        if (c.status === "signed") {
+                        if (currentContract.status === "signed" || currentContract.status === "paid") {
                             document.getElementById('signature-block').classList.add('hidden');
-                            document.getElementById('signed-state').classList.remove('hidden');
+                            renderPaymentState(currentContract);
                         }
 
-                        const dateObj = new Date(c.createdAt);
+                        const dateObj = new Date(currentContract.createdAt);
                         document.getElementById('dyn-date').innerText = dateObj.toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-                        document.getElementById('dyn-client-name').innerText = c.clientName;
-                        document.getElementById('dyn-client-address').innerText = c.clientAddress || "Address on file";
-                        document.getElementById('dyn-inclusions').innerText = c.inclusions;
-                        document.getElementById('dyn-fee').innerText = formatCurrency(c.totalFee || 0);
-                        document.getElementById('dyn-payment').innerText = c.paymentStructure;
-                        document.getElementById('dyn-target').innerText = c.targetDate;
-                        document.getElementById('dyn-agree-name').innerText = c.clientName;
+                        document.getElementById('dyn-client-name').innerText = currentContract.clientName;
+                        document.getElementById('dyn-client-address').innerText = currentContract.clientAddress || "Address on file";
+                        document.getElementById('dyn-inclusions').innerText = currentContract.inclusions;
+                        document.getElementById('dyn-fee').innerText = formatCurrency(currentContract.totalFee || 0);
+                        document.getElementById('dyn-payment').innerText = currentContract.paymentStructure;
+                        document.getElementById('dyn-target').innerText = currentContract.targetDate;
+                        document.getElementById('dyn-agree-name').innerText = currentContract.clientName;
 
                         document.getElementById('loading').classList.add('hidden');
                         document.getElementById('contract-content').classList.remove('hidden');
@@ -441,7 +460,7 @@
 
         signBtn.addEventListener('click', async () => {
             signBtn.disabled = true;
-            signBtn.innerText = "Signing & Sending Receipts...";
+            signBtn.innerText = "Signing & Preparing Invoice...";
 
             try {
                 const res = await fetch('/api/sign-contract', {
@@ -452,8 +471,9 @@
                 const result = await res.json();
 
                 if (result.success) {
+                    currentContract.status = "signed";
                     document.getElementById('signature-block').classList.add('hidden');
-                    document.getElementById('signed-state').classList.remove('hidden');
+                    renderPaymentState(currentContract);
                 } else {
                     alert('Error: ' + result.message);
                     signBtn.disabled = false;
@@ -496,7 +516,7 @@
 
             const invoiceNum = generateInvoiceNumber(c.clientName, today.toISOString());
             document.getElementById('outInvoiceNum').innerText = invoiceNum;
-            document.title = invoiceNum; // Sets default Save-as-PDF filename to e.g. TH20261118.pdf
+            document.title = invoiceNum; 
 
             const tbody = document.getElementById('invoice-rows');
             tbody.innerHTML = ''; 
@@ -523,12 +543,7 @@
             }
 
             const subtotal = Math.max(0, rawSubtotal);
-
-            // Fallback for legacy database contracts
-            let mode = c.gstMode;
-            if (!mode) {
-                mode = c.applyGst ? "exclusive" : "none";
-            }
+            let mode = c.gstMode || (c.applyGst ? "exclusive" : "none");
 
             let gstAmount = 0;
             let finalTotal = 0;
@@ -549,6 +564,80 @@
             document.getElementById('outGst').innerText = formatCurrency(gstAmount);
             document.getElementById('outTotalTop').innerText = `AUD ${formatCurrency(finalTotal)}`;
             document.getElementById('outTotalBottom').innerText = formatCurrency(finalTotal);
+            
+            // Store total for button rendering
+            c.finalTotalComputed = finalTotal; 
+        }
+
+        // Handles displaying the correct action state (Pay Button vs Paid Stamp)
+        function renderPaymentState(c) {
+            const actionBlock = document.getElementById('payment-action-block');
+            const stamp = document.getElementById('paid-stamp');
+            
+            actionBlock.classList.remove('hidden');
+            
+            if (c.status === 'paid') {
+                stamp.classList.remove('hidden');
+                actionBlock.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 p-8 rounded-2xl text-center shadow-sm">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Invoice Paid in Full</h3>
+                        <p class="text-slate-600">Thank you for your business. A receipt has been emailed to you.</p>
+                    </div>
+                `;
+            } else {
+                // Determine messaging based on threshold
+                const isOver1000 = c.finalTotalComputed >= 1000;
+                const methodsText = isOver1000 
+                    ? "Pay securely online via AU BECS Direct Debit." 
+                    : "Pay securely online via Card, Apple Pay, Google Pay, or AU BECS Direct Debit.";
+
+                actionBlock.innerHTML = `
+                    <div class="bg-blue-50 border border-blue-200 p-8 md:p-10 rounded-2xl text-center shadow-sm relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-100 rounded-full blur-2xl opacity-60"></div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2 relative z-10">Invoice Ready for Payment</h3>
+                        <p class="text-slate-600 mb-6 relative z-10">${methodsText}</p>
+                        <button id="pay-online-btn" onclick="startStripeCheckout()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg text-lg transition-transform transform hover:scale-105 inline-flex items-center relative z-10">
+                            <i class="fa-solid fa-credit-card mr-3"></i> Pay ${formatCurrency(c.finalTotalComputed)} AUD
+                        </button>
+                        <p class="text-xs text-slate-400 mt-4 relative z-10">Or use the manual bank transfer details listed on the invoice below.</p>
+                    </div>
+                `;
+                
+                // If it's a full contract that was JUST signed, auto-scroll to the payment button
+                if (c.type !== "invoice_only") {
+                    actionBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        async function startStripeCheckout() {
+            const btn = document.getElementById('pay-online-btn');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-3"></i> Connecting to Stripe...';
+
+            try {
+                const res = await fetch('/api/create-invoice-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ invoiceId: contractId })
+                });
+
+                const result = await res.json();
+
+                if (result.url) {
+                    window.location.href = result.url;
+                } else {
+                    throw new Error(result.error || 'Failed to initialize payment.');
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
         }
 
         window.onload = () => {
