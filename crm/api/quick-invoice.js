@@ -24,27 +24,28 @@ export default async function handler(req, res) {
         const parsedRate = parseFloat(rate) || 0;
         const parsedDiscount = parseFloat(discount) || 0;
         
-        // 1. Math Strategy (Strict 2-Decimal Precision)
-        let actualRate = parsedRate;
-        if (gstMode === "inclusive") {
-            // Reverse calculate the exclusive base rate from the inputted inclusive total
-            actualRate = parseFloat((parsedRate / 1.1).toFixed(2));
-        }
-
-        const baseAmount = parsedUnits * actualRate;
+        // 1. Math Strategy (Strict 2-Decimal Precision anchoring on Inclusive totals)
+        const baseAmount = parsedUnits * parsedRate;
         const subtotal = Math.max(0, baseAmount - parsedDiscount); 
 
         let gstAmount = 0;
-        if (gstMode === "inclusive" || gstMode === "exclusive") {
-            gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
-        }
-        const totalFee = parseFloat((subtotal + gstAmount).toFixed(2));
+        let totalFee = 0;
 
-        // 2. Construct Line Items array
+        if (gstMode === "inclusive") {
+            totalFee = parseFloat(subtotal.toFixed(2));
+            gstAmount = parseFloat((totalFee / 11).toFixed(2));
+        } else if (gstMode === "exclusive") {
+            gstAmount = parseFloat((subtotal * 0.10).toFixed(2));
+            totalFee = parseFloat((subtotal + gstAmount).toFixed(2));
+        } else {
+            totalFee = parseFloat(subtotal.toFixed(2));
+        }
+
+        // 2. Construct Line Items array (leaving original rate visually intact)
         let lineItems = [{
             name: "Coaching Services",
             desc: description,
-            rate: actualRate,
+            rate: parsedRate,
             qty: parsedUnits
         }];
 
@@ -59,6 +60,10 @@ export default async function handler(req, res) {
 
         // 3. Create the invoice document
         const invoiceId = `inv_${Date.now()}`;
+        
+        // Hoist magic link generation so we can inject it into the CRM log below
+        const magicLink = `https://thps-crm.vercel.app/contract.html?id=${invoiceId}`;
+        
         const contractRef = db.collection("Contracts").doc(invoiceId);
         
         await contractRef.set({
@@ -68,8 +73,8 @@ export default async function handler(req, res) {
             inclusions: description,
             paymentStructure: "100% Upfront",
             targetDate: new Date().toISOString().split('T')[0],
-            gstMode: gstMode, // Save the new explicit mode
-            applyGst: (gstMode !== "none"), // Fallback for legacy safety
+            gstMode: gstMode, 
+            applyGst: (gstMode !== "none"), 
             lineItems: lineItems,
             totalFee: totalFee,
             status: "signed",      
@@ -77,19 +82,19 @@ export default async function handler(req, res) {
             createdAt: new Date().toISOString()
         });
 
-        // 4. Update the client's CRM activity log
+        // 4. Update the client's CRM activity log with Clickable URL and increment Total Charged
         const clientRef = db.collection("Clients").doc(clientEmail.toLowerCase());
-        await clientRef.update({
+        await clientRef.set({
             activity_log: admin.firestore.FieldValue.arrayUnion({
                 type: "admin",
                 action: `Generated Quick Invoice: $${totalFee.toFixed(2)}`,
+                url: magicLink,
                 timestamp: new Date().toISOString()
-            })
-        });
+            }),
+            totalCharged: admin.firestore.FieldValue.increment(totalFee)
+        }, { merge: true }); // Merge ensures this doesn't crash if the Client document is completely new
 
-        const magicLink = `https://thps-crm.vercel.app/contract.html?id=${invoiceId}`;
-
-        // Return the link straight to the CRM dashboard (Gmail automation removed!)
+        // Return the link straight to the CRM dashboard
         res.status(200).json({ success: true, invoiceId: invoiceId, magicLink: magicLink });
 
     } catch (error) {
