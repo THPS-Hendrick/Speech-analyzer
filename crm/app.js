@@ -17,10 +17,10 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Global State
-let clientsMap = {}; // Stores client data in memory for instant modal popups
+let clientsMap = {}; 
 let currentFocusClient = null;
 
-// 2. Auth Guard: Check Login Status & Admin Email
+// 2. Auth Guard
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = "login.html";
@@ -51,7 +51,6 @@ function createClientCard(client) {
 
     const emailKey = client.email.toLowerCase();
 
-    // We add 'client-card' class and 'data-id' to make it clickable
     let cardHtml = `
     <div class="client-card bg-white p-4 rounded-md shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all mb-3 cursor-pointer" data-id="${emailKey}">
         <h3 class="font-bold text-gray-800">${client.name}</h3>
@@ -94,12 +93,12 @@ async function loadClients() {
             if(el) el.innerHTML = "";
         });
         
-        clientsMap = {}; // Reset the dictionary
+        clientsMap = {}; 
 
         querySnapshot.forEach((doc) => {
             const clientData = doc.data();
             const emailKey = clientData.email.toLowerCase();
-            clientsMap[emailKey] = clientData; // Save to memory
+            clientsMap[emailKey] = clientData; 
             
             let colId = "";
             if (clientData.stage === "Enquiry Received") colId = "col-enquiry";
@@ -116,10 +115,8 @@ async function loadClients() {
             }
         });
 
-        // Attach click listeners to all freshly rendered cards
         document.querySelectorAll('.client-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // Don't open modal if they just clicked the details dropdown
                 if (e.target.closest('details')) return; 
                 
                 const emailKey = card.getAttribute('data-id');
@@ -134,12 +131,16 @@ async function loadClients() {
     }
 }
 
-// 5. Client Focus Modal Logic (Activity Log & Routing)
+// 5. Client Focus Modal Logic (Activity Log, Routing & Billing)
 const focusModal = document.getElementById('client-focus-modal');
 const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
 const btnDriveFolder = document.getElementById('btn-drive-folder');
-const btnQuickInvoice = document.getElementById('btn-quick-invoice');
+
+// New Billing Elements
+const btnFullContract = document.getElementById('btn-full-contract');
+const btnQuickInvoiceToggle = document.getElementById('btn-quick-invoice-toggle');
+const quickInvoiceForm = document.getElementById('quick-invoice-form');
 
 function openFocusModal(client) {
     currentFocusClient = client;
@@ -148,7 +149,10 @@ function openFocusModal(client) {
     document.getElementById('focus-email').innerText = client.email;
     focusStageSelect.value = client.stage;
 
-    // Toggle Drive folder button visibility
+    // Reset the mini-form state every time the modal opens
+    quickInvoiceForm.reset();
+    quickInvoiceForm.classList.add('hidden');
+
     if (client.driveFolderUrl) {
         btnDriveFolder.href = client.driveFolderUrl;
         btnDriveFolder.classList.remove('hidden');
@@ -158,7 +162,6 @@ function openFocusModal(client) {
         btnDriveFolder.classList.remove('flex');
     }
 
-    // Render Activity Log (Sorted newest to oldest)
     const logContainer = document.getElementById('focus-activity-log');
     logContainer.innerHTML = '';
     
@@ -175,7 +178,6 @@ function openFocusModal(client) {
             });
             const isAdmin = log.type === 'admin';
             
-            // Visual styling based on who performed the action
             const bgClass = isAdmin ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200';
             const badge = isAdmin ? '<span class="bg-blue-100 text-blue-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded ml-2">Admin</span>' : '';
             
@@ -219,7 +221,6 @@ focusStageSelect.addEventListener('change', async (e) => {
             })
         });
 
-        // 1. Update the local dictionary so the modal stays accurate if we don't refresh
         currentFocusClient.stage = newStage;
         if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
         currentFocusClient.activity_log.push({
@@ -228,11 +229,8 @@ focusStageSelect.addEventListener('change', async (e) => {
             timestamp: new Date().toISOString()
         });
 
-        // 2. Drive folder automation check
         const qualifiesForDrive = (newStage === "Assessment Booked" || newStage === "Session 1 Booked");
         if (qualifiesForDrive && !currentFocusClient.driveFolderUrl) {
-            console.log("Triggering Drive creation in background...");
-            // Notice there is no 'await' here. This lets the UI update instantly!
             fetch('/api/create-drive', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -240,9 +238,8 @@ focusStageSelect.addEventListener('change', async (e) => {
             });
         }
 
-        // 3. Silently refresh the Kanban board in the background
         loadClients();
-        openFocusModal(currentFocusClient); // Re-render the modal to show the new log bubble!
+        openFocusModal(currentFocusClient); 
         
     } catch (error) {
         console.error("Error updating stage:", error);
@@ -250,12 +247,78 @@ focusStageSelect.addEventListener('change', async (e) => {
     }
 });
 
-// Quick Invoice Placeholder
-btnQuickInvoice.addEventListener('click', () => {
-    alert("Quick Invoice backend coming next! We will build /api/quick-invoice shortly.");
+// ==========================================
+// BILLING ACTIONS LOGIC
+// ==========================================
+
+// Path A: Redirect to Full Contract page with auto-fill parameters
+btnFullContract.addEventListener('click', () => {
+    if (!currentFocusClient) return;
+    const name = encodeURIComponent(currentFocusClient.name);
+    const email = encodeURIComponent(currentFocusClient.email);
+    window.location.href = `admin-contract.html?name=${name}&email=${email}`;
 });
 
-// 6. New Client Modal Logic (Deduplication Upgrade)
+// Path B: Reveal Mini-Form
+btnQuickInvoiceToggle.addEventListener('click', () => {
+    quickInvoiceForm.classList.toggle('hidden');
+});
+
+// Path B: Submit Quick Invoice Data
+quickInvoiceForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('qi-submit');
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Generating Invoice...";
+
+    const payload = {
+        clientEmail: currentFocusClient.email,
+        clientName: currentFocusClient.name,
+        description: document.getElementById('qi-desc').value,
+        units: document.getElementById('qi-units').value,
+        rate: document.getElementById('qi-rate').value,
+        discount: document.getElementById('qi-discount').value,
+        applyGst: document.getElementById('qi-gst').checked
+    };
+
+    try {
+        const res = await fetch('/api/quick-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            quickInvoiceForm.reset();
+            quickInvoiceForm.classList.add('hidden');
+            
+            // Log it locally so the modal updates instantly without waiting for a database pull
+            if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
+            currentFocusClient.activity_log.push({
+                type: "admin",
+                action: `Sent Quick Invoice for ${payload.description}`,
+                timestamp: new Date().toISOString()
+            });
+            
+            loadClients(); 
+            openFocusModal(currentFocusClient);
+            alert("Tax Invoice Generated and Sent!");
+        } else {
+            alert("Failed to send invoice: " + (result.error || result.message));
+        }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while generating the invoice.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Send Tax Invoice";
+    }
+});
+
+
+// 6. New Client Modal Logic
 const newClientBtn = document.getElementById('new-client-btn');
 const newClientModal = document.getElementById('new-client-modal');
 const closeModalX = document.getElementById('close-modal-x');
@@ -286,11 +349,10 @@ if (newClientForm) {
             const clientId = rawEmail.toLowerCase();
             const clientRef = doc(db, "Clients", clientId);
 
-            // We use setDoc with { merge: true } to enforce the Email Deduplication rule
             await setDoc(clientRef, {
                 name: document.getElementById('modal-name').value,
                 email: rawEmail,
-                tags: arrayUnion(document.getElementById('modal-source').value), // Appends tags safely
+                tags: arrayUnion(document.getElementById('modal-source').value), 
                 stage: "Enquiry Received",
                 createdAt: new Date().toISOString(),
                 last_contact_date: new Date().toISOString(),
