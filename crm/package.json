@@ -4,6 +4,7 @@
   "description": "Backend for THPS CRM",
   "dependencies": {
     "firebase": "^10.8.0",
+    "firebase-admin": "^12.0.0",
     "googleapis": "^126.0.0"
   }
 }
