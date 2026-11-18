@@ -1,18 +1,13 @@
 const { google } = require('googleapis');
-const { initializeApp, getApps } = require('firebase/app');
-const { getFirestore, doc, setDoc, updateDoc, arrayUnion } = require('firebase/firestore');
+const admin = require('firebase-admin');
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
-    authDomain: "thps-crm.firebaseapp.com",
-    projectId: "thps-crm",
-    storageBucket: "thps-crm.firebasestorage.app",
-    messagingSenderId: "297605373498",
-    appId: "1:297605373498:web:606241a173f3150a16df03"
-};
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+// 1. Safely initialize Firebase Admin "God Mode"
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+    });
+}
+const db = admin.firestore();
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -49,16 +44,16 @@ export default async function handler(req, res) {
             lineItems.push({
                 name: "Discount",
                 desc: "Fixed discount applied",
-                rate: -Math.abs(parsedDiscount), // Forces it to be negative for rendering
+                rate: -Math.abs(parsedDiscount), 
                 qty: 1
             });
         }
 
-        // 1. Create a lightweight document tagged as "invoice_only"
+        // 2. Create the invoice document using Admin syntax
         const invoiceId = `inv_${Date.now()}`;
-        const contractRef = doc(db, "Contracts", invoiceId);
+        const contractRef = db.collection("Contracts").doc(invoiceId);
         
-        await setDoc(contractRef, {
+        await contractRef.set({
             clientName,
             clientEmail,
             clientAddress: "Address on file",
@@ -68,22 +63,22 @@ export default async function handler(req, res) {
             applyGst: applyGst,
             lineItems: lineItems,
             totalFee: totalFee,
-            status: "signed",      // Bypasses the signature workflow
-            type: "invoice_only",  // Triggers the frontend stealth bypass for the legal text
+            status: "signed",      
+            type: "invoice_only",  
             createdAt: new Date().toISOString()
         });
 
-        // 2. Log the action to the client's CRM card
-        const clientRef = doc(db, "Clients", clientEmail.toLowerCase());
-        await updateDoc(clientRef, {
-            activity_log: arrayUnion({
+        // 3. Update the client's activity log using Admin arrayUnion syntax
+        const clientRef = db.collection("Clients").doc(clientEmail.toLowerCase());
+        await clientRef.update({
+            activity_log: admin.firestore.FieldValue.arrayUnion({
                 type: "admin",
                 action: `Generated Quick Invoice: $${totalFee.toFixed(2)}`,
                 timestamp: new Date().toISOString()
             })
         });
 
-        // 3. Email the secure invoice link to the client
+        // 4. Email the secure invoice link to the client
         const magicLink = `https://thps-crm.vercel.app/contract.html?id=${invoiceId}`;
 
         const oauth2Client = new google.auth.OAuth2(
