@@ -95,6 +95,58 @@
         
     </main>
 
+    <!-- NEW CLIENT FOCUS MODAL (Activity Log & Routing) -->
+    <div id="client-focus-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden">
+            
+            <!-- Header -->
+            <div class="bg-slate-800 px-6 py-4 flex justify-between items-center text-white">
+                <div>
+                    <h2 id="focus-name" class="font-bold text-xl">Client Name</h2>
+                    <p id="focus-email" class="text-sm text-slate-300 mt-1">client@email.com</p>
+                </div>
+                <button id="close-focus-modal" class="text-slate-300 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            
+            <!-- Two-Pane Layout -->
+            <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+                
+                <!-- Left: Scrollable Activity Log -->
+                <div class="w-full md:w-3/5 border-r border-gray-200 p-6 overflow-y-auto bg-gray-50 flex flex-col gap-4" id="focus-activity-log">
+                    <!-- Javascript will inject timestamped log bubbles here -->
+                </div>
+                
+                <!-- Right: Actions & Kanban Routing -->
+                <div class="w-full md:w-2/5 p-6 space-y-6 bg-white overflow-y-auto flex flex-col">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Move Pipeline Stage</label>
+                        <select id="focus-stage-select" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-600 bg-gray-50 cursor-pointer text-slate-800 font-medium">
+                            <option value="Enquiry Received">Enquiry Received</option>
+                            <option value="Friday Class RSVP">Online Classes</option>
+                            <option value="Assessment Booked">Assessment Booked</option>
+                            <option value="Session 1 Booked">Session 1 Booked</option>
+                            <option value="Session 2 Booked">Session 2 Booked</option>
+                            <option value="Session 3 Booked">Session 3 Booked</option>
+                            <option value="Session 4 Booked">Session 4 Booked</option>
+                        </select>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-6 flex-grow">
+                        <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Admin Actions</h3>
+                        <button id="btn-quick-invoice" class="w-full mb-3 bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-green-700 transition-colors flex justify-center items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Create Quick Invoice
+                        </button>
+                        <a id="btn-drive-folder" target="_blank" class="hidden w-full text-center border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-md hover:bg-blue-50 transition-colors flex justify-center items-center mt-4">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                            Open Client Drive Folder
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- NEW CLIENT MODAL POPUP -->
     <div id="new-client-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
