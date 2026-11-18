@@ -44,7 +44,7 @@
 
     <!-- INJECT_HEADER -->
 
-    <!-- Auth Guard Loading Overlay -->
+    <!-- Auth & Paywall Guard Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 bg-brand-offwhite z-[60] flex flex-col items-center justify-center transition-opacity duration-500">
         <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-green mb-4"></i>
         <h2 id="loading-text" class="text-xl font-bold text-slate-900 tracking-tight">Authenticating...</h2>
@@ -116,24 +116,46 @@
 
     <!-- Native App Execution Logic -->
     <script>
-        // 1. Auth Guard
-        const checkAuthReady = setInterval(() => {
-            if (window.thpsAuth) {
-                clearInterval(checkAuthReady);
-                
-                window.thpsAuth.onAuthStateChanged((user) => {
-                    if (!user) {
-                        window.location.href = '/members/login.html'; 
-                    } else {
-                        // User is authenticated, remove loading overlay
-                        const loader = document.getElementById('loading-overlay');
+        // 1. Auth & Subscription Paywall Guard
+        const checkAccessReady = setInterval(async () => {
+            if (typeof window.checkMemberAccess === 'function') {
+                clearInterval(checkAccessReady);
+
+                const loadingText = document.getElementById('loading-text');
+                if (loadingText) loadingText.textContent = 'Verifying membership access...';
+
+                try {
+                    const access = await window.checkMemberAccess({
+                        redirectIfUnpaid: true,
+                        upgradeUrl: '/members/account.html?upgrade=1'
+                    });
+
+                    if (!access.allowed) {
+                        if (access.reason === 'unauthenticated') {
+                            window.location.href = '/members/login.html';
+                        }
+                        // If payment_required, checkMemberAccess triggers redirect to account.html?upgrade=1;
+                        // keep the overlay visible until navigation completes so there is no UI flash.
+                        return;
+                    }
+
+                    // User is authenticated and authorized — remove loading overlay
+                    const loader = document.getElementById('loading-overlay');
+                    if (loader) {
                         loader.classList.add('opacity-0');
                         setTimeout(() => loader.remove(), 500);
-                        
-                        // Initialize icons
-                        if (window.lucide) lucide.createIcons();
                     }
-                });
+
+                    // Initialize icons
+                    if (window.lucide) lucide.createIcons();
+                } catch (err) {
+                    console.error('Membership access check failed:', err);
+                    const errorEl = document.getElementById('error-message');
+                    if (errorEl) {
+                        errorEl.textContent = 'Unable to verify membership access. Please refresh the page or sign in again.';
+                        errorEl.classList.remove('hidden');
+                    }
+                }
             }
         }, 100);
 
