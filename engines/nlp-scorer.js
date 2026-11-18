@@ -8,12 +8,16 @@ window.THPS.NLP = window.THPS.NLP || {};
 
 window.THPS.NLP.DICT_URLS = {
     simple: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/simple.json",
-    visual: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json"
+    visual: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/visualdict.json",
+    concreteness: "https://raw.githubusercontent.com/THPS-Hendrick/Speech-analyzer/main/dictionaries/concreteness.json"
 };
+
+window.THPS.NLP.CONCRETENESS_THRESHOLD = 3.8; // Single red highlight threshold
 
 window.THPS.NLP.personalPronouns = new Set(["mrs", "mr", "i", "i'd", "i'll", "i'm", "i've", "he", "his", "he'd", "he'll", "he's", "she", "she'd", "she'll", "she's", "said", "say", "me", "my", "myself", "mine", "him", "himself", "her", "hers", "her's", "herself"]);
 window.THPS.NLP.visualDictPronouns = new Set();
 window.THPS.NLP.visualDictWords = new Set();
+window.THPS.NLP.concretenessMap = new Map();
 window.THPS.NLP.simpleSet = new Set(); 
 window.THPS.NLP.google10kSet = new Set();
 window.THPS.NLP.dictsLoaded = false;
@@ -22,16 +26,29 @@ window.THPS.NLP.loadDictionaries = async function() {
     try {
         const fetchDict = async (url) => {
             const res = await fetch(url + "?v=" + Date.now(), { cache: "no-store" });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return await res.json();
         };
 
-        const [simpleData, visualData] = await Promise.all([
-            fetchDict(window.THPS.NLP.DICT_URLS.simple), 
-            fetchDict(window.THPS.NLP.DICT_URLS.visual)
-        ]).catch(() => [[], {}]); 
+        const [simpleData, visualData, concretenessData] = await Promise.all([
+            fetchDict(window.THPS.NLP.DICT_URLS.simple).catch(() => []), 
+            fetchDict(window.THPS.NLP.DICT_URLS.visual).catch(() => ({})),
+            fetchDict(window.THPS.NLP.DICT_URLS.concreteness).catch(() => ({}))
+        ]);
 
         const simpleWords = Array.isArray(simpleData) ? simpleData : Object.values(simpleData).flat();
         window.THPS.NLP.simpleSet = new Set(simpleWords.map(w => String(w).toLowerCase()));
+
+        if (concretenessData && typeof concretenessData === 'object' && !Array.isArray(concretenessData)) {
+            const cMap = new Map();
+            for (const [word, score] of Object.entries(concretenessData)) {
+                const numScore = Number(score);
+                if (!isNaN(numScore)) {
+                    cMap.set(String(word).toLowerCase(), numScore);
+                }
+            }
+            window.THPS.NLP.concretenessMap = cMap;
+        }
 
         const getFuzzyKey = (obj, keyword) => {
             const key = Object.keys(obj).find(k => k.toLowerCase().includes(keyword));
@@ -57,6 +74,21 @@ window.THPS.NLP.loadDictionaries = async function() {
     } catch (e) { 
         console.error("Dict Load Error", e); 
     }
+};
+
+window.THPS.NLP.lookupConcreteness = function(normal, root, nextNormal = "") {
+    const cMap = window.THPS.NLP.concretenessMap;
+    if (!cMap || cMap.size === 0) return null;
+
+    // Check Muraki two-word expression first if available (e.g., "ice cream", "brick wall")
+    if (nextNormal) {
+        const bigram = `${normal} ${nextNormal}`;
+        if (cMap.has(bigram)) return cMap.get(bigram);
+    }
+
+    if (cMap.has(normal)) return cMap.get(normal);
+    if (root && cMap.has(root)) return cMap.get(root);
+    return null;
 };
 
 window.THPS.NLP.countSyllables = function(word) {
@@ -100,6 +132,13 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
     let unifiedSimpleCount = 0; 
     let google10kCount = 0;
 
+    // 1–5 Concreteness tracking
+    let concretenessScores = {};
+    let concretenessSum = 0;
+    let concretenessCount = 0;
+    const hasConcretenessDict = window.THPS.NLP.concretenessMap && window.THPS.NLP.concretenessMap.size > 0;
+    const threshold = window.THPS.NLP.CONCRETENESS_THRESHOLD || 3.8;
+
     let highlightedHTML = ""; let reportMarkdownText = ""; 
     let inQuotes = false;
     
@@ -117,16 +156,33 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
 
                 for (let tIdx = 0; tIdx < sentence.terms.length; tIdx++) {
                     const term = sentence.terms[tIdx];
+                    const nextTerm = sentence.terms[tIdx + 1];
                     let rawText = term.text || ""; let rawPre = term.pre || ""; let rawPost = term.post || "";
                     let rawRoot = term.root || term.normal || rawText;
 
                     let root = String(rawRoot).toLowerCase().replace(/[^a-z]/g, '');
                     let normal = String(term.normal || rawText).toLowerCase().replace(/[^a-z']/g, ''); 
+                    let nextNormal = nextTerm ? String(nextTerm.normal || nextTerm.text || "").toLowerCase().replace(/[^a-z']/g, '') : "";
                     
                     if (rawPre.includes('"') || rawPre.includes('“') || rawText.includes('“') || rawText.startsWith('"')) inQuotes = true;
                     if (window.THPS.NLP.personalPronouns.has(normal)) personalCountdown = 6;
+
+                    let cScore = null;
+                    if (/[a-zA-Z]/.test(rawText) && normal) {
+                        cScore = window.THPS.NLP.lookupConcreteness(normal, root, nextNormal);
+                        if (cScore !== null) {
+                            concretenessScores[normal] = cScore;
+                            concretenessSum += cScore;
+                            concretenessCount++;
+                        }
+                    }
+
                     if (!window.THPS.NLP.personalPronouns.has(normal)) {
-                        if (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root)) {
+                        const isVisualTrigger = hasConcretenessDict
+                            ? (cScore !== null && cScore >= threshold)
+                            : (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root));
+
+                        if (isVisualTrigger) {
                             visualCountdown = Math.max(visualCountdown, 4);
                         }
                     }
@@ -178,6 +234,10 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
     }
 
     if (useFallback) {
+        concretenessScores = {};
+        concretenessSum = 0;
+        concretenessCount = 0;
+
         let tokens = text.split(/([a-zA-Z']+)/);
         let personalCountdown = 0; let visualCountdown = 0;
         tokens.forEach(token => {
@@ -186,8 +246,22 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
                 let normal = token.toLowerCase().replace(/[^a-z']/g, '');
                 let root = normal.replace(/(?:s|es|ed|ing)$/, ''); 
                 if (window.THPS.NLP.personalPronouns.has(normal)) personalCountdown = 6;
-                if (!window.THPS.NLP.personalPronouns.has(normal) && (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root))) {
-                    visualCountdown = Math.max(visualCountdown, 4);
+
+                let cScore = window.THPS.NLP.lookupConcreteness(normal, root);
+                if (cScore !== null) {
+                    concretenessScores[normal] = cScore;
+                    concretenessSum += cScore;
+                    concretenessCount++;
+                }
+
+                if (!window.THPS.NLP.personalPronouns.has(normal)) {
+                    const isVisualTrigger = hasConcretenessDict
+                        ? (cScore !== null && cScore >= threshold)
+                        : (window.THPS.NLP.visualDictPronouns.has(normal) || window.THPS.NLP.visualDictWords.has(normal) || window.THPS.NLP.visualDictWords.has(root));
+
+                    if (isVisualTrigger) {
+                        visualCountdown = Math.max(visualCountdown, 4);
+                    }
                 }
                 
                 let isSimple = window.THPS.NLP.simpleSet.has(normal);
@@ -242,6 +316,8 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         }
     });
 
+    const avgConcreteness = concretenessCount > 0 ? Number((concretenessSum / concretenessCount).toFixed(2)) : null;
+
     return {
         numSentences: Math.max(1, sentences.length),
         numWords: Math.max(1, words.length),
@@ -252,6 +328,8 @@ window.THPS.NLP.analyzeTranscript = function(text, wordTimestamps = []) {
         visualCount,
         unifiedSimpleCount, 
         google10kCount,
+        concretenessScores,
+        avgConcreteness,
         highlightedHTML,
         reportMarkdownText,
         wordTimestamps 
@@ -505,7 +583,6 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
             if (dbCount > 0) {
                 let avgDb = 10 * Math.log10(linearSum / dbCount);
                 validChunks.push({ start: ev.start, end: ev.end, db: avgDb, type: ev.type });
-                // Assign raw dB to the object reference (captures pause dB for the inspector)
                 if (ev.ref) ev.ref.volumeDb = avgDb; 
             }
         });
@@ -536,9 +613,8 @@ window.THPS.NLP.analyzeSpeech = function(text, timestamps, volumeData, elapsedSe
         ];
         
         validChunks.forEach(vc => {
-            // EXPLICIT FILTER: Do not map math, color, or height to background noise during pauses
             if (vc.type === 'pause') {
-                vc.hPct = 0; // Safe-guard zeroes visual height just in case
+                vc.hPct = 0;
                 return; 
             }
             
