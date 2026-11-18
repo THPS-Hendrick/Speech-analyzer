@@ -1,4 +1,478 @@
-function formatCurrency(amount) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Timeline & Agreement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .fade-enter { opacity: 0; transform: translateY(10px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms ease-out, transform 300ms ease-out; }
+        
+        /* This print block is the magic for ATO Invoice compliance */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white !important; }
+            .print-shadow-none { box-shadow: none !important; }
+            #invoice-wrapper { display: block !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- EXPLAINER HEADER (Hidden on Print & Hidden on Quick Invoice) -->
+    <header class="bg-slate-900 text-white py-8 px-6 shadow-md no-print">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold tracking-tight">Services Agreement Map</h1>
+            <p class="mt-2 text-slate-300 text-lg">Click through the timeline to understand how our partnership works, step-by-step.</p>
+        </div>
+    </header>
+
+    <!-- EXPLAINER MAIN (Hidden on Print & Hidden on Quick Invoice) -->
+    <main class="flex-grow max-w-6xl mx-auto w-full p-6 flex flex-col md:flex-row gap-8 mt-6 no-print">
+        <section class="w-full md:w-1/3 lg:w-2/5 flex-shrink-0">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-semibold mb-6 text-slate-800">Contract Summary (Plain English)</h2>
+                <div class="relative">
+                    <div class="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 z-0"></div>
+                    <ul id="timeline-list" class="relative z-10 flex flex-col gap-6"></ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="w-full md:w-2/3 lg:w-3/5 flex flex-col">
+            <div class="bg-white p-8 md:p-10 rounded-2xl shadow-lg border border-blue-100 flex-grow relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+                <div id="content-display" class="relative z-10 flex flex-col h-full justify-center min-h-[300px]">
+                    <div class="mb-4 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold uppercase tracking-wider w-max" id="display-clauses">
+                        Clauses 1 & 2
+                    </div>
+                    <h3 id="display-title" class="text-3xl font-bold text-slate-900 mb-6">Signing & Invoicing</h3>
+                    <p id="display-desc" class="text-lg text-slate-600 leading-relaxed">
+                        Once you accept and sign the agreement (below), you'll receive an invoice for the services listed below.
+                    </p>
+                </div>
+            </div>
+            <p class="text-center text-sm text-slate-400 mt-6">
+                *This plain English guide summarizes the standard terms. Please refer to the formal Services Agreement below for exact legal phrasing.
+            </p>
+        </section>
+    </main>
+
+    <!-- FORMAL LEGAL CONTRACT SECTION (Hidden on Print & Hidden on Quick Invoice) -->
+    <div id="legal-container" class="max-w-4xl mx-auto w-full p-6 mt-8 mb-16 no-print">
+        <div id="loading" class="text-center py-10 text-gray-500 font-semibold bg-white rounded-xl shadow-sm border border-gray-200">
+            Loading your secure document...
+        </div>
+
+        <div id="contract-content" class="hidden space-y-6 bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
+            
+            <div class="flex justify-center mb-2 no-print">
+                <button class="scroll-to-invoice-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 inline-flex items-center text-lg">
+                    <svg class="w-5 h-5 mr-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    View Invoice
+                </button>
+            </div>
+
+            <h1 class="text-2xl font-bold text-center mb-8 uppercase tracking-wide border-t border-slate-200 pt-8">Public Speaking Services Agreement</h1>
+            
+            <p>This Services Agreement ("Agreement") is entered into on <span id="dyn-date" class="font-semibold text-blue-700"></span> by and between:</p>
+            
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Service Provider:</strong> Tom Hendrick, located in South Australia ("Provider", "I", "me", "my")</li>
+                <li><strong>Client:</strong> <span id="dyn-client-name" class="font-semibold text-blue-700"></span>, located at <span id="dyn-client-address" class="font-semibold text-blue-700"></span> ("Client", "you", "your")</li>
+            </ul>
+
+            <h2 class="text-xl font-bold border-b pb-2 mt-8">TERMS AND CONDITIONS</h2>
+            
+            <h3 class="font-bold mt-4">1. SCOPE OF SERVICES</h3>
+            <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services below. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
+
+            <h3 class="font-bold mt-4">2. FEES AND PAYMENT</h3>
+            <p class="text-sm text-gray-700"><strong>Payment Schedule:</strong> Coaching packages and portal access require 100% payment upfront prior to commencement. Drafting and custom presentation services require a 50% non-refundable deposit to secure the Provider's time, with the remaining 50% due upon delivery of the final draft.<br>
+            <strong>Terms:</strong> All invoices are due within seven (7) days of receipt.<br>
+            <strong>Late Fees:</strong> Overdue invoices will incur a late fee of 5% per month on the outstanding balance. The Provider reserves the right to suspend services or portal access if payments are past due.</p>
+
+            <h3 class="font-bold mt-4">3. CANCELLATIONS, RESCHEDULING, AND REFUNDS</h3>
+            <p class="text-sm text-gray-700"><strong>Coaching Sessions:</strong> The Client must provide a minimum of twenty-four (24) hours' notice to reschedule a coaching session. Failure to provide 24 hours' notice, or failing to attend a scheduled session, will result in the forfeiture of that session.<br>
+            <strong>Refunds:</strong> No refunds will be provided for "change of mind" or partially completed coaching packages. Refunds will only be issued if the Provider is unable to deliver the agreed-upon services.</p>
+
+            <h3 class="font-bold mt-4">4. DELIVERABLES, REVISIONS, AND SCOPE CREEP</h3>
+            <p class="text-sm text-gray-700"><strong>Drafting Revisions:</strong> For presentation drafting services, the Client is entitled to two (2) rounds of revisions within a fourteen (14) day period following the delivery of the initial draft.<br>
+            <strong>Scope Changes:</strong> Revisions must be based on the original brief. If the Client requests a complete change of topic, requires revisions beyond the included two rounds, or requests work outside the agreed Schedule of Services, such work will be billed at the Provider’s standard hourly rate stated below.</p>
+
+            <h3 class="font-bold mt-4">5. INTELLECTUAL PROPERTY</h3>
+            <p class="text-sm text-gray-700"><strong>Provider’s IP:</strong> The Provider retains 100% ownership of all proprietary methodologies, speech measuring tools, rubrics, metrics, course materials, frameworks, and login portal infrastructure. The Client is granted a limited, non-exclusive license to use these tools during the term of this Agreement.<br>
+            <strong>Client’s IP:</strong> Upon receipt of full payment, the Client will retain full ownership of the final customized presentation drafts and their individual assessment reports created under this Agreement.</p>
+
+            <h3 class="font-bold mt-4">6. CONFIDENTIALITY</h3>
+            <p class="text-sm text-gray-700">Both parties agree to a mutual standard of confidentiality. The Provider will not disclose any of the Client's sensitive business information, personal stories, corporate strategies, or trade secrets shared during coaching or drafting. In return, the Client agrees not to share, distribute, or resell their portal login credentials, or the Provider’s proprietary coaching frameworks and course materials, to any third parties.</p>
+
+            <h3 class="font-bold mt-4">7. GUARANTEES AND LIMITATION OF LIABILITY</h3>
+            <p class="text-sm text-gray-700"><strong>Deliverable Guarantee:</strong> The Provider guarantees that the services and deliverables will be measured against and meet the objective metrics ("Green Zone") established by the Provider's speech measuring tool.<br>
+            <strong>Outcome Disclaimer:</strong> The Client acknowledges that the Provider does not and cannot guarantee specific real-world outcomes resulting from the use of these services (e.g., winning a pitch, securing funding, obtaining a promotion).<br>
+            <strong>Liability Cap:</strong> The Provider’s total liability for any claim arising out of this Agreement shall not exceed the total fees paid by the Client to the Provider under this Agreement.</p>
+
+            <h3 class="font-bold mt-4">8. TERM AND TERMINATION</h3>
+            <p class="text-sm text-gray-700">Either party may terminate this Agreement at any time by providing fourteen (14) days' written notice to the other party. Upon early termination by the Client, the Client will be billed on a pro-rata basis for all work completed up to the date of termination. Any unearned deposit funds remaining after accounting for completed work will be refunded to the Client.</p>
+
+            <h3 class="font-bold mt-4">9. GOVERNING LAW</h3>
+            <p class="text-sm text-gray-700">This Agreement shall be governed by and construed in accordance with the laws of South Australia. Any disputes arising from this Agreement shall be resolved in the courts of South Australia.</p>
+
+            <h3 class="font-bold mt-4">10. ENTIRE AGREEMENT</h3>
+            <p class="text-sm text-gray-700">This Agreement constitutes the entire agreement between the parties regarding the subject matter herein and supersedes all prior proposals, negotiations, understandings, and agreements, whether written or oral.</p>
+
+            <h3 class="font-bold mt-4">11. INDEPENDENT CONTRACTOR</h3>
+            <p class="text-sm text-gray-700">The Provider acts as an independent contractor under this Agreement. Nothing contained herein shall be construed to create an employer-employee, partnership, or joint venture relationship between the parties.</p>
+
+            <h3 class="font-bold mt-4">12. FORCE MAJEURE</h3>
+            <p class="text-sm text-gray-700">Neither party shall be liable for any failure or delay in performing their obligations (except for payment obligations) where such failure or delay results from causes beyond their reasonable control, including but not natural disasters, global health emergencies, or severe infrastructure outages.</p>
+
+            <h3 class="font-bold mt-4">13. SEVERABILITY</h3>
+            <p class="text-sm text-gray-700">If any provision of this Agreement is held to be invalid or unenforceable, such provision will be struck out and the remaining provisions will remain in full force and effect.</p>
+
+            <h3 class="font-bold mt-4">14. DISPUTE RESOLUTION</h3>
+            <p class="text-sm text-gray-700">In the event of a dispute arising out of or relating to this Agreement, both parties agree to attempt to resolve the dispute through good-faith mediation before resorting to formal litigation.</p>
+
+            <h3 class="font-bold mt-4">15. AMENDMENTS</h3>
+            <p class="text-sm text-gray-700">This Agreement may only be amended, modified, or supplemented by an agreement in writing signed by both the Provider and the Client.</p>
+
+            <h3 class="font-bold mt-4">16. SURVIVAL</h3>
+            <p class="text-sm text-gray-700">Clauses regarding Intellectual Property, Confidentiality, Limitation of Liability, and any other provisions that by their nature should survive termination, shall survive the expiration or termination of this Agreement.</p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-10">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">SCHEDULE OF SERVICES (The "Inclusions")</h2>
+                <ul class="space-y-3 text-slate-700">
+                    <li><strong>Selected Services:</strong> <span id="dyn-inclusions" class="font-medium"></span></li>
+                    <li><strong>Total Fee:</strong> <span id="dyn-fee" class="font-medium"></span></li>
+                    <li><strong>Payment Structure:</strong> <span id="dyn-payment" class="font-medium"></span></li>
+                    <li><strong>Target Delivery/Completion Date:</strong> <span id="dyn-target" class="font-medium"></span></li>
+                    <li><strong>Additional Hourly Rate:</strong> $150/hour</li>
+                </ul>
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <button class="scroll-to-invoice-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors shadow-sm inline-flex items-center text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        View Invoice
+                    </button>
+                </div>
+            </div>
+
+            <hr class="my-8">
+
+            <div id="signature-block" class="bg-blue-50 p-6 md:p-8 rounded-lg border border-blue-200 scroll-mt-10">
+                <h3 class="font-bold text-xl mb-4 text-slate-900">Digital Signature</h3>
+                <label class="flex items-start space-x-4 cursor-pointer p-4 bg-white rounded border border-blue-100 hover:border-blue-300 transition-colors">
+                    <input type="checkbox" id="agree-checkbox" class="mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                    <span class="text-sm text-gray-800 leading-relaxed">I, <strong id="dyn-agree-name" class="text-blue-700"></strong>, have read and agree to the Terms and Conditions and the Schedule of Services outlined in this Service Agreement.</span>
+                </label>
+                <button id="sign-btn" disabled class="mt-6 w-full bg-gray-400 text-white font-bold py-4 px-4 rounded-md transition-all cursor-not-allowed text-lg shadow-sm">
+                    Accept & Sign Contract
+                </button>
+            </div>
+
+            <div id="signed-state" class="hidden bg-green-50 text-green-800 p-8 rounded-lg border border-green-200 text-center">
+                <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-2xl font-bold mb-2">Contract Signed</h3>
+                <p class="text-md">Thank you. A finalized, time-stamped copy has been emailed to both parties for their records.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVOICE WRAPPER (Always visible; Only block printed) -->
+    <div id="invoice-wrapper" class="max-w-4xl mx-auto mb-16 px-6">
+        <div class="bg-white p-10 rounded shadow-lg print-shadow-none" id="invoicePage">
+            <div class="flex justify-between items-start border-b-2 border-yellow-500 pb-6 mb-6">
+                <img src="https://images.squarespace-cdn.com/content/v1/684927e2a3550529e907b25d/f3e9479a-67e4-4c13-b886-d0064c60ace6/thps-tom-hendrick-public-speaking-skills-diagnostic-coaching-plan.png?format=1500w" alt="Tom Hendrick Public Speaking" class="h-24 object-contain">
+                <div class="text-right">
+                    <h1 class="text-3xl font-bold text-yellow-600">Tax Invoice</h1>
+                    <p class="text-lg font-semibold mt-2" id="outTotalTop">AUD $0</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Service Provider details</h3>
+                    <p class="font-bold">Tom Hendrick</p>
+                    <p>+61 419 499 331</p>
+                    <p>tomhendrick.com</p>
+                    <p>tom@tomhendrick.com</p>
+                    <p class="mt-2">ABN: 56 949 157 639</p>
+                    <p>Suite 110/147 Pirie St</p>
+                    <p>Adelaide SA 5000, Australia</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-500 mb-2 border-b pb-1">Customer Details</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <span class="font-semibold text-gray-600">Date:</span>
+                        <span class="col-span-2" id="outDate"></span>
+                        <span class="font-semibold text-gray-600">Invoice #:</span>
+                        <span class="col-span-2 font-bold" id="outInvoiceNum"></span>
+                        <span class="font-semibold text-gray-600">Due Date:</span>
+                        <span class="col-span-2 text-red-600 font-bold" id="outDueDate"></span>
+                        <span class="font-semibold text-gray-600 mt-2">Name:</span>
+                        <span class="col-span-2 mt-2" id="outName"></span>
+                        <span class="font-semibold text-gray-600">Email:</span>
+                        <span class="col-span-2" id="outEmail"></span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="w-full mb-8 text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 border-b-2 border-yellow-500">
+                        <th class="py-2 px-3 w-1/4">Services</th>
+                        <th class="py-2 px-3 w-2/5">Description</th>
+                        <th class="py-2 px-3 text-center">Units</th>
+                        <th class="py-2 px-3 text-right">Rate</th>
+                        <th class="py-2 px-3 text-right">Amount</th>
+                    </tr>
+                </thead>
+                <!-- Rows injected dynamically via JS -->
+                <tbody id="invoice-rows"></tbody>
+            </table>
+
+            <div class="flex justify-end mb-8">
+                <div class="w-64">
+                    <div class="flex justify-between py-1 border-b" id="gstRow">
+                        <span class="font-bold text-gray-600">GST (10%)</span>
+                        <span id="outGst">$0</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b-4 border-yellow-500 font-bold text-xl">
+                        <span>Total:</span>
+                        <span id="outTotalBottom">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded border">
+                <h3 class="font-bold text-lg mb-4 border-b pb-2">Payment Methods</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="font-bold text-gray-700">PayID:</p>
+                        <p>0419 499 331 <span class="text-gray-500">Or</span> +61 419 499 331</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-700">Bank Transfer:</p>
+                        <p>Tom Hendrick</p>
+                        <p>BSB: <span class="font-semibold">065 114</span></p>
+                        <p>ACC: <span class="font-semibold">1023 4373</span></p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="font-bold text-gray-700">SWIFT/BIC code [international]:</p>
+                        <p>CTBAAU2S</p>
+                        <p class="text-sm text-gray-500 mt-1">Branch Address: T21 North Adelaide Village<br>Shop Centre North Adelaide - SA 5006</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-center no-print">
+            <button onclick="window.print()" class="bg-yellow-600 text-white px-8 py-3 rounded-md font-bold hover:bg-yellow-700 transition-colors shadow-sm inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Print / Save as PDF
+            </button>
+            <p class="ml-4 text-sm text-gray-500 flex items-center">Select "Save as PDF" in your print dialog.</p>
+        </div>
+    </div>
+
+    <script>
+        const stages = [
+            { id: 'stage-1', title: 'Signing & Invoicing', clauses: 'Clauses 1 & 2', description: "Once you accept and sign the contract (below), you'll receive an invoice for the services listed below." },
+            { id: 'stage-2', title: 'Payment Terms', clauses: 'Clause 2', description: "Invoices are due within 7 days. For coaching, it's 100% upfront to secure your spot. For script-writing, it's 50% upfront and 50% on delivery. Late payments incur a 5% monthly fee." },
+            { id: 'stage-3', title: 'Delivering the Work', clauses: 'Clauses 1 & 7', description: "Be sure to schedule your coaching sessions & script view appointments (booking link will be sent in an email after acceptance). Quality is guaranteed by agreed upon 'Green Zone' metrics, so you know exactly what standard you are getting." },
+            { id: 'stage-4', title: 'Rescheduling & Cancellations', clauses: 'Clauses 3 & 8', description: "Need to change a session? Just give me 24 hours' notice and we'll reschedule for free. Less than 24 hours' notice means the session is forfeited. No refunds for change of mind once we start." },
+            { id: 'stage-5', title: 'Completion & Ownership', clauses: 'Clauses 5 & 7', description: "Once fully paid, you own your final presentation and reports! I keep the rights to my proprietary teaching tools and frameworks. As your coach, I can only guarantee speech metrics you're happy with, I can't guarantee how audiences will react!" },
+            { id: 'stage-6', title: 'Sign Contract & Pay Invoice', clauses: 'Final Step', description: "Review the contract and invoice (below). Tick the box to digitally accept, pay the invoice and we'll kick things off!" }
+        ];
+
+        let activeStageIndex = 0;
+        const timelineList = document.getElementById('timeline-list');
+        const displayTitle = document.getElementById('display-title');
+        const displayDesc = document.getElementById('display-desc');
+        const displayClauses = document.getElementById('display-clauses');
+        const contentDisplay = document.getElementById('content-display');
+
+        function initTimeline() {
+            stages.forEach((stage, index) => {
+                const li = document.createElement('li');
+                li.className = 'group cursor-pointer flex items-start gap-4 transition-all duration-200';
+                li.onclick = () => selectStage(index);
+
+                const circleContainer = document.createElement('div');
+                circleContainer.className = 'relative flex-shrink-0 mt-1';
+                
+                const circle = document.createElement('div');
+                circle.id = `circle-${index}`;
+                circle.className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 ' + 
+                                   (index === activeStageIndex ? 'border-blue-600 bg-blue-50' : 'border-slate-300 group-hover:border-blue-400');
+                
+                const innerDot = document.createElement('div');
+                innerDot.id = `dot-${index}`;
+                innerDot.className = 'w-3 h-3 rounded-full transition-colors duration-300 ' + (index === activeStageIndex ? 'bg-blue-600' : 'bg-transparent');
+
+                circle.appendChild(innerDot);
+                circleContainer.appendChild(circle);
+
+                const textContainer = document.createElement('div');
+                const title = document.createElement('h4');
+                title.id = `title-${index}`;
+                title.className = 'font-semibold transition-colors duration-300 ' + (index === activeStageIndex ? 'text-blue-700' : 'text-slate-600 group-hover:text-blue-500');
+                title.innerText = stage.title;
+
+                const subtitle = document.createElement('p');
+                subtitle.className = 'text-xs text-slate-400 mt-0.5';
+                subtitle.innerText = stage.clauses;
+
+                textContainer.appendChild(title);
+                textContainer.appendChild(subtitle);
+                li.appendChild(circleContainer);
+                li.appendChild(textContainer);
+                timelineList.appendChild(li);
+            });
+        }
+
+        function selectStage(index) {
+            if (index === activeStageIndex) return;
+            const prevIndex = activeStageIndex;
+            activeStageIndex = index;
+
+            document.getElementById(`circle-${prevIndex}`).className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 border-slate-300 group-hover:border-blue-400';
+            document.getElementById(`dot-${prevIndex}`).className = 'w-3 h-3 rounded-full transition-colors duration-300 bg-transparent';
+            document.getElementById(`title-${prevIndex}`).className = 'font-semibold transition-colors duration-300 text-slate-600 group-hover:text-blue-500';
+
+            document.getElementById(`circle-${activeStageIndex}`).className = 'w-8 h-8 rounded-full border-2 bg-white flex items-center justify-center transition-colors duration-300 border-blue-600 bg-blue-50';
+            document.getElementById(`dot-${activeStageIndex}`).className = 'w-3 h-3 rounded-full transition-colors duration-300 bg-blue-600';
+            document.getElementById(`title-${activeStageIndex}`).className = 'font-semibold transition-colors duration-300 text-blue-700';
+
+            contentDisplay.classList.remove('fade-enter-active');
+            setTimeout(() => {
+                displayTitle.innerText = stages[index].title;
+                displayDesc.innerText = stages[index].description;
+                displayClauses.innerText = stages[index].clauses;
+                
+                contentDisplay.classList.add('fade-enter');
+                void contentDisplay.offsetWidth; 
+                contentDisplay.classList.add('fade-enter-active');
+                contentDisplay.classList.remove('fade-enter');
+            }, 50);
+
+            if (index === 5) {
+                const sigBlock = document.getElementById('signature-block');
+                if(sigBlock) sigBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const contractId = urlParams.get('id');
+
+        async function loadContract() {
+            if (!contractId) {
+                document.getElementById('loading').innerText = "Error: Invalid Contract Link.";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/get-contract?id=${contractId}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const c = data.contract;
+                    
+                    // Always populate invoice data immediately so they can view the draft
+                    populateInvoiceData(c); 
+                    
+                    // STEALTH BYPASS: If this is a quick invoice, hide the legal stuff
+                    if (c.type === "invoice_only") {
+                        const explainerHeader = document.querySelector('header');
+                        const explainerMain = document.querySelector('main');
+                        const legalContainer = document.getElementById('legal-container');
+                        
+                        if (explainerHeader) explainerHeader.style.display = 'none';
+                        if (explainerMain) explainerMain.style.display = 'none';
+                        if (legalContainer) legalContainer.style.display = 'none';
+                        
+                        document.getElementById('loading').classList.add('hidden');
+                    } else {
+                        // Standard Contract Flow
+                        if (c.status === "signed") {
+                            document.getElementById('signature-block').classList.add('hidden');
+                            document.getElementById('signed-state').classList.remove('hidden');
+                        }
+
+                        const dateObj = new Date(c.createdAt);
+                        document.getElementById('dyn-date').innerText = dateObj.toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+                        document.getElementById('dyn-client-name').innerText = c.clientName;
+                        document.getElementById('dyn-client-address').innerText = c.clientAddress || "Address on file";
+                        document.getElementById('dyn-inclusions').innerText = c.inclusions;
+                        document.getElementById('dyn-fee').innerText = formatCurrency(c.totalFee || 0);
+                        document.getElementById('dyn-payment').innerText = c.paymentStructure;
+                        document.getElementById('dyn-target').innerText = c.targetDate;
+                        document.getElementById('dyn-agree-name').innerText = c.clientName;
+
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('contract-content').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('loading').innerText = "Error: " + data.message;
+                }
+            } catch (err) {
+                document.getElementById('loading').innerText = "Failed to load document.";
+            }
+        }
+
+        const checkbox = document.getElementById('agree-checkbox');
+        const signBtn = document.getElementById('sign-btn');
+        const invoiceWrapper = document.getElementById('invoice-wrapper');
+        const scrollButtons = document.querySelectorAll('.scroll-to-invoice-btn');
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                signBtn.disabled = false;
+                signBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                signBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer', 'shadow-md');
+            } else {
+                signBtn.disabled = true;
+                signBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                signBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer', 'shadow-md');
+            }
+        });
+
+        signBtn.addEventListener('click', async () => {
+            signBtn.disabled = true;
+            signBtn.innerText = "Signing & Sending Receipts...";
+
+            try {
+                const res = await fetch('/api/sign-contract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: contractId })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    document.getElementById('signature-block').classList.add('hidden');
+                    document.getElementById('signed-state').classList.remove('hidden');
+                } else {
+                    alert('Error: ' + result.message);
+                    signBtn.disabled = false;
+                    signBtn.innerText = "Accept & Sign Contract";
+                }
+            } catch (err) {
+                alert('An error occurred. Please try again.');
+                signBtn.disabled = false;
+                signBtn.innerText = "Accept & Sign Contract";
+            }
+        });
+
+        scrollButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                invoiceWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        function formatCurrency(amount) {
             return "$" + parseFloat(amount).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
