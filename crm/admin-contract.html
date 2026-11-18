@@ -58,8 +58,8 @@
             <div class="mb-6 bg-yellow-50 p-4 rounded border border-yellow-200">
                 <label class="block text-sm font-bold text-yellow-900 mb-2">GST Configuration (Australia)</label>
                 <select id="applyGstMode" class="w-full md:w-1/2 p-2 border border-yellow-300 rounded focus:ring-2 focus:ring-yellow-500 bg-white text-yellow-900 font-medium">
+                    <option value="inclusive" selected>GST Included (Inclusive)</option>
                     <option value="exclusive">Apply 10% GST (Exclusive)</option>
-                    <option value="inclusive">GST Included (Inclusive)</option>
                     <option value="none">No GST</option>
                 </select>
             </div>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
-                    <input type="number" id="svcPrice1" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                    <input type="number" id="svcPrice1" value="0" min="0" step="0.01" class="w-full border border-gray-300 p-2 rounded text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
-                    <input type="number" id="svcPrice2" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                    <input type="number" id="svcPrice2" value="0" min="0" step="0.01" class="w-full border border-gray-300 p-2 rounded text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
@@ -116,7 +116,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Rate ($)</label>
-                    <input type="number" id="svcPrice3" value="0" min="0" class="w-full border border-gray-300 p-2 rounded text-sm">
+                    <input type="number" id="svcPrice3" value="0" min="0" step="0.01" class="w-full border border-gray-300 p-2 rounded text-sm">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold mb-1 text-gray-600">Qty</label>
@@ -138,6 +138,7 @@
     </div>
 
     <script>
+        // Auto-fill fields from URL parameters passed by the Kanban board
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('name')) {
             document.getElementById('client-name').value = urlParams.get('name');
@@ -151,6 +152,7 @@
             
             const submitBtn = document.getElementById('submit-btn');
             
+            // Gather the dynamic line items (only grab rows where Qty > 0)
             const lineItems = [];
             for (let i = 1; i <= 3; i++) {
                 const qty = parseInt(document.getElementById(`svcQty${i}`).value) || 0;
@@ -179,8 +181,8 @@
                 inclusions: document.getElementById('inclusions').value,
                 paymentStructure: document.getElementById('payment-structure').value,
                 targetDate: document.getElementById('target-date').value,
-                gstMode: document.getElementById('applyGstMode').value, // Use the new dropdown
-                lineItems: lineItems 
+                gstMode: document.getElementById('applyGstMode').value,
+                lineItems: lineItems
             };
 
             try {
