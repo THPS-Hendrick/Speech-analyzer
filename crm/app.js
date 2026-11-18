@@ -50,6 +50,10 @@ function createClientCard(client) {
     ).join('');
 
     const emailKey = client.email.toLowerCase();
+    const totalChargedFormatted = parseFloat(client.totalCharged || 0).toLocaleString('en-AU', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
     let cardHtml = `
     <div class="client-card bg-white p-4 rounded-md shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all mb-3 cursor-pointer" data-id="${emailKey}">
@@ -57,6 +61,9 @@ function createClientCard(client) {
         <p class="text-sm text-gray-500 mt-1 mb-3">${client.email}</p>
         <div class="flex flex-wrap gap-2">
             ${tagsHtml}
+        </div>
+        <div class="mt-3 pt-2 border-t border-gray-100 text-xs font-semibold text-slate-600">
+            Total Charged: $${totalChargedFormatted}
         </div>
     `;
 
@@ -137,7 +144,7 @@ const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
 const btnDriveFolder = document.getElementById('btn-drive-folder');
 
-// New Billing Elements
+// Billing Elements
 const btnFullContract = document.getElementById('btn-full-contract');
 const btnQuickInvoiceToggle = document.getElementById('btn-quick-invoice-toggle');
 const quickInvoiceForm = document.getElementById('quick-invoice-form');
@@ -180,18 +187,36 @@ function openFocusModal(client) {
             
             const bgClass = isAdmin ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200';
             const badge = isAdmin ? '<span class="bg-blue-100 text-blue-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded ml-2">Admin</span>' : '';
-            
-            logContainer.innerHTML += `
-                <div class="${bgClass} border rounded-lg p-4 shadow-sm text-sm">
-                    <div class="flex justify-between items-start mb-2 border-b border-gray-100 pb-2">
-                        <div class="font-bold text-gray-800 flex items-center">
-                            ${isAdmin ? 'Tom Hendrick' : client.name} ${badge}
-                        </div>
-                        <span class="text-xs text-gray-500 font-medium">${date}</span>
+            const linkBadge = log.url 
+                ? '<span class="text-xs font-bold text-blue-600 group-hover:underline ml-2">Open Document ↗</span>' 
+                : '';
+
+            const cardContent = `
+                <div class="flex justify-between items-start mb-2 border-b border-gray-100 pb-2">
+                    <div class="font-bold text-gray-800 flex items-center">
+                        ${isAdmin ? 'Tom Hendrick' : client.name} ${badge}
                     </div>
+                    <span class="text-xs text-gray-500 font-medium">${date}</span>
+                </div>
+                <div class="flex justify-between items-center">
                     <p class="text-gray-700 font-medium">${log.action}</p>
+                    ${linkBadge}
                 </div>
             `;
+            
+            if (log.url) {
+                logContainer.innerHTML += `
+                    <a href="${log.url}" target="_blank" rel="noopener noreferrer" class="group block ${bgClass} border rounded-lg p-4 shadow-sm text-sm hover:border-blue-400 hover:shadow transition-all cursor-pointer">
+                        ${cardContent}
+                    </a>
+                `;
+            } else {
+                logContainer.innerHTML += `
+                    <div class="${bgClass} border rounded-lg p-4 shadow-sm text-sm">
+                        ${cardContent}
+                    </div>
+                `;
+            }
         });
     }
     
@@ -259,7 +284,7 @@ btnFullContract.addEventListener('click', () => {
     window.location.href = `admin-contract.html?name=${name}&email=${email}`;
 });
 
-// Path B: Reveal Mini-Form
+// Path B: Reveal Mini-Form (Defaults to GST Included)
 btnQuickInvoiceToggle.addEventListener('click', () => {
     quickInvoiceForm.innerHTML = `
         <div>
@@ -273,18 +298,18 @@ btnQuickInvoiceToggle.addEventListener('click', () => {
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Rate ($)</label>
-                <input type="number" id="qi-rate" required min="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+                <input type="number" id="qi-rate" required min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
             </div>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-700 mb-1">Fixed Discount ($)</label>
-            <input type="number" id="qi-discount" min="0" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+            <input type="number" id="qi-discount" min="0" step="0.01" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
         </div>
         <div class="mt-2">
             <label class="block text-xs font-bold text-gray-700 mb-1">GST Configuration</label>
             <select id="qi-gst-mode" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none bg-white">
+                <option value="inclusive" selected>GST Included (Inclusive)</option>
                 <option value="exclusive">Apply 10% GST (Exclusive)</option>
-                <option value="inclusive">GST Included (Inclusive)</option>
                 <option value="none">No GST</option>
             </select>
         </div>
@@ -320,38 +345,46 @@ quickInvoiceForm.addEventListener('submit', async (e) => {
         const result = await res.json();
         
         if (result.success) {
+            // Calculate local total for immediate UI update
+            const baseAmount = (parseInt(payload.units) || 1) * (parseFloat(payload.rate) || 0);
+            const subtotal = Math.max(0, baseAmount - (parseFloat(payload.discount) || 0));
+            const totalFee = payload.gstMode === "exclusive"
+                ? parseFloat((subtotal * 1.1).toFixed(2))
+                : parseFloat(subtotal.toFixed(2));
+
             quickInvoiceForm.reset();
             quickInvoiceForm.classList.add('hidden');
             
             if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
             currentFocusClient.activity_log.push({
                 type: "admin",
-                action: `Generated Quick Invoice: ${payload.description}`,
+                action: `Generated Quick Invoice: $${totalFee.toFixed(2)}`,
+                url: result.magicLink,
                 timestamp: new Date().toISOString()
             });
+            currentFocusClient.totalCharged = (parseFloat(currentFocusClient.totalCharged) || 0) + totalFee;
             
-            loadClients(); 
+            await loadClients(); 
             openFocusModal(currentFocusClient);
-            
-            // Open the standalone invoice PDF layout in a new tab
+
             const newWindow = window.open(result.magicLink, '_blank');
-            
-            // Pop-up blocker fallback
             if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
                 alert(`Invoice generated successfully!\n\nYour browser blocked the automatic pop-up. Please copy this link and open it in a new tab:\n\n${result.magicLink}`);
             }
-
         } else {
-            alert("Failed to send invoice: " + (result.error || result.message));
+            alert("Failed to generate invoice: " + (result.error || result.message));
         }
     } catch (err) {
         console.error(err);
         alert("An error occurred while generating the invoice.");
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Generate PDF Invoice";
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Generate PDF Invoice";
+        }
     }
 });
+
 
 // 6. New Client Modal Logic
 const newClientBtn = document.getElementById('new-client-btn');
@@ -389,6 +422,7 @@ if (newClientForm) {
                 email: rawEmail,
                 tags: arrayUnion(document.getElementById('modal-source').value), 
                 stage: "Enquiry Received",
+                totalCharged: 0,
                 createdAt: new Date().toISOString(),
                 last_contact_date: new Date().toISOString(),
                 activity_log: arrayUnion({
