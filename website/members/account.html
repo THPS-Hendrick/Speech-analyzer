@@ -62,8 +62,25 @@
                 <p class="text-gray-500 mt-2">Manage your subscription, profile details, and integration settings.</p>
             </header>
 
+            <!-- Global Status / Checkout Alert Banner -->
+            <div id="status-banner" class="hidden mb-6 rounded-2xl p-4 border text-sm font-medium"></div>
+
+            <!-- Signed-Out Fallback Card -->
+            <div id="unauthenticated-card" class="hidden bg-white border border-gray-200 rounded-3xl shadow-sm p-8 md:p-12 text-center max-w-xl mx-auto my-8">
+                <div class="w-14 h-14 bg-green-50 text-brand-green rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Sign in to manage your account</h2>
+                <p class="text-gray-600 text-sm mb-6 leading-relaxed">
+                    Log in with your Google account to view your profile, start your 7-day free trial, or manage your Mic-Check Pro subscription.
+                </p>
+                <button type="button" onclick="window.handleGoogleLogin && window.handleGoogleLogin()" class="bg-brand-green text-white font-bold py-3 px-8 rounded-full hover:bg-brand-dark transition-colors shadow-md inline-flex items-center gap-2 text-sm">
+                    <i class="fa-brands fa-google"></i> Sign in with Google
+                </button>
+            </div>
+
             <!-- Dashboard Layout Grid -->
-            <div class="flex flex-col lg:flex-row gap-8 items-start">
+            <div id="dashboard-grid" class="flex flex-col lg:flex-row gap-8 items-start">
                 
                 <!-- NAVIGATION TABS -->
                 <div class="w-full lg:w-64 shrink-0">
@@ -74,7 +91,7 @@
                         </button>
                         
                         <button data-target="panel-billing" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
-                            <i class="fa-solid fa-credit-card fa-fw"></i> Billing & Plan
+                            <i class="fa-solid fa-credit-card fa-fw"></i> Billing &amp; Plan
                         </button>
                         
                         <button data-target="panel-crm" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
@@ -82,7 +99,7 @@
                         </button>
                         
                         <button data-target="panel-legal" class="account-tab-btn snap-start whitespace-nowrap flex items-center gap-3 px-5 py-3.5 text-sm font-semibold rounded-t-xl lg:rounded-xl transition-all border-b-2 lg:border-b-0 lg:border-l-4 text-gray-500 border-transparent hover:bg-gray-50 hover:text-gray-900">
-                            <i class="fa-solid fa-shield-halved fa-fw"></i> Legal & Session
+                            <i class="fa-solid fa-shield-halved fa-fw"></i> Legal &amp; Session
                         </button>
 
                     </div>
@@ -97,90 +114,142 @@
                         
                         <div class="space-y-6 max-w-lg">
                             <div>
-                                <label class="block text-sm font-bold text-slate-900 mb-2">Full Name</label>
-                                <input type="text" value="Executive Client" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors text-slate-900 font-medium">
+                                <label for="profile-name-input" class="block text-sm font-bold text-slate-900 mb-2">Full Name</label>
+                                <input id="profile-name-input" type="text" placeholder="Loading profile..." class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-colors text-slate-900 font-medium">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-slate-900 mb-2">Account Email</label>
+                                <label for="profile-email-input" class="block text-sm font-bold text-slate-900 mb-2">Account Email</label>
                                 <div class="relative">
-                                    <input type="email" value="client@example.com" readonly disabled class="w-full border border-gray-200 bg-gray-100 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed font-medium select-none">
+                                    <input id="profile-email-input" type="email" value="Loading..." readonly disabled class="w-full border border-gray-200 bg-gray-100 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed font-medium select-none">
                                     <i class="fa-solid fa-lock absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-2">Need to change your email? <a href="/contact.html" class="text-brand-green font-bold hover:underline">Contact Support</a> to securely migrate your history.</p>
+                                <p class="text-xs text-gray-500 mt-2">Signed in via Google Authentication. Need to migrate your history? <a href="/contact.html" class="text-brand-green font-bold hover:underline">Contact Support</a>.</p>
                             </div>
 
                             <div class="pt-4 border-t border-gray-100">
-                                <label class="block text-sm font-bold text-slate-900 mb-2">Security</label>
-                                <button class="bg-white border border-gray-300 text-slate-700 font-semibold py-2.5 px-6 rounded-full hover:bg-gray-50 transition-colors shadow-sm text-sm">
-                                    Send Password Reset Link
-                                </button>
+                                <label class="block text-sm font-bold text-slate-900 mb-1">Authentication &amp; Security</label>
+                                <p class="text-xs text-gray-500">Your account is secured through Google Sign-In. Password and two-factor settings are managed via your Google Account.</p>
                             </div>
 
-                            <div class="pt-6">
-                                <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium">
-                                    <i class="fa-regular fa-calendar"></i> Member Since: October 2026
+                            <div class="pt-2">
+                                <span id="member-since-badge" class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium">
+                                    <i class="fa-regular fa-calendar"></i> Member Since: Loading...
                                 </span>
                             </div>
                             
-                            <div class="pt-4">
-                                <button class="bg-brand-green text-white font-bold py-3 px-8 rounded-full hover:bg-brand-dark transition-colors shadow-md">
+                            <div class="pt-4 flex items-center gap-4">
+                                <button id="save-profile-btn" type="button" class="bg-brand-green text-white font-bold py-3 px-8 rounded-full hover:bg-brand-dark transition-colors shadow-md disabled:opacity-50">
                                     Save Changes
                                 </button>
+                                <span id="save-profile-feedback" class="text-sm font-semibold text-brand-green hidden">
+                                    <i class="fa-solid fa-check mr-1"></i> Saved
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <!-- PANEL 2: BILLING & PLAN -->
                     <div id="panel-billing" class="account-tab-panel hidden animate-fade-in">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Billing & Plan</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Billing &amp; Plan</h2>
+
+                        <!-- Past-Due / Locked Alert -->
+                        <div id="past-due-alert" class="hidden mb-6 rounded-2xl bg-red-50 border border-red-200 p-5 text-sm text-red-900 space-y-1">
+                            <p class="font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-circle-exclamation text-red-600"></i> Action Required: Subscription Payment Failed
+                            </p>
+                            <p class="text-red-700 leading-relaxed">
+                                Access to Mic-Check Pro is currently paused. Click <strong>Manage Subscription</strong> below to update your card or bank account and restore access immediately.
+                            </p>
+                        </div>
                         
+                        <!-- Current Plan Banner -->
                         <div class="bg-brand-dark rounded-2xl p-6 md:p-8 relative overflow-hidden mb-8 shadow-inner">
                             <div class="absolute top-0 right-0 w-40 h-40 bg-brand-gold/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                             
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                                 <div>
-                                    <div class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Current Plan</div>
-                                    <h3 class="text-2xl font-bold text-white mb-2">Mic-Check Pro</h3>
-                                    <p class="text-green-100 text-sm"><i class="fa-solid fa-rotate text-xs mr-1"></i> Billed $9.90 AUD monthly</p>
-                                    <p class="text-green-200 text-xs mt-3 font-medium">Next billing date: 14 Nov 2026</p>
+                                    <div id="plan-eyebrow" class="text-brand-gold text-xs font-bold uppercase tracking-widest mb-1">Current Plan</div>
+                                    <h3 id="plan-title" class="text-2xl font-bold text-white mb-2">Loading subscription...</h3>
+                                    <p id="plan-price-line" class="text-green-100 text-sm">Checking membership status...</p>
+                                    <p id="plan-renewal-line" class="text-green-200 text-xs mt-3 font-medium"></p>
                                 </div>
-                                <div class="shrink-0">
-                                    <a href="#" class="bg-brand-gold text-brand-dark font-bold py-3 px-6 rounded-full hover:bg-yellow-400 transition-colors shadow-lg inline-flex items-center gap-2 text-sm">
+                                <div class="shrink-0 flex flex-wrap gap-3">
+                                    <button id="manage-billing-btn" type="button" class="hidden bg-brand-gold text-brand-dark font-bold py-3 px-6 rounded-full hover:bg-yellow-400 transition-colors shadow-lg inline-flex items-center gap-2 text-sm disabled:opacity-50">
                                         Manage Subscription <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-75"></i>
+                                    </button>
+                                    <a href="/members/mic-check.html" class="bg-white/10 text-white font-semibold py-3 px-5 rounded-full hover:bg-white/20 transition-colors inline-flex items-center gap-2 text-sm">
+                                        Open Mic-Check
                                     </a>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-4">Billing History</h3>
-                            <div class="overflow-x-auto rounded-xl border border-gray-200">
-                                <table class="w-full text-left text-sm text-gray-600">
-                                    <thead class="bg-gray-50 border-b border-gray-200">
-                                        <tr class="text-xs uppercase text-gray-500 font-bold tracking-wider">
-                                            <th class="px-6 py-4">Date</th>
-                                            <th class="px-6 py-4">Amount</th>
-                                            <th class="px-6 py-4">Status</th>
-                                            <th class="px-6 py-4 text-right">Receipt</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-100 bg-white">
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 font-medium text-slate-900">14 Oct 2026</td>
-                                            <td class="px-6 py-4">$9.90 AUD</td>
-                                            <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">Paid</span></td>
-                                            <td class="px-6 py-4 text-right"><a href="#" class="text-blue-600 hover:text-blue-800 font-semibold"><i class="fa-solid fa-download"></i> PDF</a></td>
-                                        </tr>
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 font-medium text-slate-900">14 Sep 2026</td>
-                                            <td class="px-6 py-4">$9.90 AUD</td>
-                                            <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">Paid</span></td>
-                                            <td class="px-6 py-4 text-right"><a href="#" class="text-blue-600 hover:text-blue-800 font-semibold"><i class="fa-solid fa-download"></i> PDF</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <!-- Upgrade / Free Trial Cards (Visible when user does not have an active Pro plan) -->
+                        <div id="upgrade-plans-section" class="hidden mb-10">
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <h3 class="text-lg font-bold text-slate-900">Upgrade to Mic-Check Pro</h3>
+                                <span id="trial-badge" class="bg-green-100 text-brand-green px-3 py-0.5 rounded-full text-xs font-bold">
+                                    7-Day Free Trial
+                                </span>
                             </div>
+                            <p id="upgrade-description" class="text-sm text-gray-600 mb-6">
+                                Unlock unlimited speech diagnostics, real-time pacing feedback, filler-word tracking, and cloud progress history. Cancel anytime before your trial ends.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Monthly Plan -->
+                                <div class="border border-gray-200 rounded-2xl p-6 flex flex-col justify-between space-y-6 hover:border-brand-green transition-colors">
+                                    <div>
+                                        <div class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Monthly Plan</div>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-3xl font-extrabold text-slate-900">$9.90</span>
+                                            <span class="text-sm text-gray-500 font-medium">AUD / month</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-2">GST inclusive. Billed monthly after your trial; cancel anytime.</p>
+                                    </div>
+                                    <button type="button" data-plan="monthly" class="checkout-btn w-full bg-slate-900 text-white font-bold py-3 px-5 rounded-full hover:bg-slate-800 transition-colors text-sm shadow-sm disabled:opacity-50">
+                                        Start 7-Day Free Trial — Monthly
+                                    </button>
+                                </div>
+
+                                <!-- Yearly Plan -->
+                                <div class="border-2 border-brand-green bg-green-50/30 rounded-2xl p-6 flex flex-col justify-between space-y-6 relative">
+                                    <span class="absolute -top-3 right-5 bg-brand-gold text-brand-dark text-xs font-extrabold px-3 py-0.5 rounded-full shadow-sm">
+                                        Save 17%
+                                    </span>
+                                    <div>
+                                        <div class="text-xs font-bold uppercase tracking-wider text-brand-green mb-1">Annual Plan</div>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-3xl font-extrabold text-slate-900">$99.00</span>
+                                            <span class="text-sm text-gray-500 font-medium">AUD / year</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-2">GST inclusive. Renews annually on your signup anniversary.</p>
+                                    </div>
+                                    <button type="button" data-plan="yearly" class="checkout-btn w-full bg-brand-green text-white font-bold py-3 px-5 rounded-full hover:bg-brand-dark transition-colors text-sm shadow-md disabled:opacity-50">
+                                        Start 7-Day Free Trial — Yearly
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-gray-500 mt-4">
+                                <i class="fa-solid fa-shield-check text-brand-green mr-1"></i>
+                                Accepts Credit/Debit Cards, Apple Pay, Google Pay, and Australian Bank Direct Debit (AU BECS).
+                            </p>
+                        </div>
+
+                        <!-- Invoices & Receipts -->
+                        <div class="border-t border-gray-100 pt-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Invoices &amp; Tax Receipts</h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                View your complete payment history, update your card or BECS Direct Debit bank account, and download PDF receipts directly via Stripe.
+                            </p>
+                            <button id="view-invoices-btn" type="button" class="hidden bg-white border border-gray-300 text-slate-700 font-semibold py-2.5 px-6 rounded-full hover:bg-gray-50 transition-colors shadow-sm text-sm inline-flex items-center gap-2 disabled:opacity-50">
+                                <i class="fa-solid fa-file-invoice-dollar text-brand-green"></i> Open Billing History &amp; Receipts
+                            </button>
+                            <p id="no-invoices-note" class="text-xs text-gray-400">
+                                No billing history yet. Your receipts will appear in the Stripe Customer Portal once your subscription starts.
+                            </p>
                         </div>
                     </div>
 
@@ -191,7 +260,7 @@
                             Linking your account allows your Mic-Check App progress to sync with your coach's dashboard for professional review during your Performance Plan sessions.
                         </p>
                         
-                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 max-w-lg mb-8">
+                        <div id="crm-linked-box" class="hidden bg-blue-50 border border-blue-100 rounded-2xl p-6 max-w-lg mb-8">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
                                     <i class="fa-solid fa-link"></i>
@@ -202,24 +271,29 @@
                                 </div>
                             </div>
                             
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Active Coach ID</label>
-                            <input type="text" value="cli_9f82a1b74x99z" readonly disabled class="w-full border border-blue-200 bg-white rounded-xl px-4 py-3 text-slate-700 font-mono text-sm shadow-sm cursor-not-allowed select-all">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Active Client ID</label>
+                            <input id="crm-client-id-input" type="text" value="" readonly disabled class="w-full border border-blue-200 bg-white rounded-xl px-4 py-3 text-slate-700 font-mono text-sm shadow-sm cursor-not-allowed select-all">
                         </div>
 
-                        <div class="border-t border-gray-100 pt-6 max-w-lg">
-                            <h4 class="font-bold text-slate-900 mb-2 text-sm">Disconnect Integration</h4>
-                            <p class="text-xs text-gray-500 mb-4 leading-relaxed">
-                                Unlinking your account will immediately stop sending diagnostic data to your coach. Only do this if your 4-week program has concluded.
+                        <div id="crm-unlinked-box" class="bg-gray-50 border border-gray-200 rounded-2xl p-6 max-w-lg mb-8">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900">Status: Self-Guided Member</h4>
+                                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Not Linked to a 1:1 Coaching Plan</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-3 leading-relaxed">
+                                Enrolled in a 1:1 Performance Plan? Your coach can link your account email (<span id="crm-email-display" class="font-semibold"></span>) directly to your CRM profile during your session.
                             </p>
-                            <button class="bg-white border border-red-200 text-red-600 font-bold py-2.5 px-6 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors shadow-sm text-sm inline-flex items-center gap-2">
-                                <i class="fa-solid fa-unlink"></i> Unlink Account
-                            </button>
                         </div>
                     </div>
 
                     <!-- PANEL 4: LEGAL & SESSION -->
                     <div id="panel-legal" class="account-tab-panel hidden animate-fade-in">
-                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Legal & Session</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-6">Legal &amp; Session</h2>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mb-10">
                             <a href="/members/terms.html" class="flex items-center justify-between bg-gray-50 border border-gray-200 p-4 rounded-xl hover:bg-gray-100 transition-colors group">
@@ -240,7 +314,7 @@
 
                         <div class="border-t border-gray-100 pt-8 max-w-lg">
                             <h4 class="font-bold text-slate-900 mb-4">Device Session</h4>
-                            <button class="w-full sm:w-auto bg-red-600 text-white font-bold py-3 px-10 rounded-full hover:bg-red-700 transition-colors shadow-md flex items-center justify-center gap-2">
+                            <button id="logout-btn" type="button" onclick="window.handleLogout && window.handleLogout()" class="w-full sm:w-auto bg-red-600 text-white font-bold py-3 px-10 rounded-full hover:bg-red-700 transition-colors shadow-md flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-right-from-bracket"></i> Log Out
                             </button>
                         </div>
@@ -254,38 +328,321 @@
 
     <!-- INJECT_FOOTER -->
 
-    <!-- TAB SWITCHING SCRIPT -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Tab Switching Logic ---
-            const tabBtns = document.querySelectorAll('.account-tab-btn');
-            const tabPanels = document.querySelectorAll('.account-tab-panel');
+    <!-- Firebase Client & Account Management Logic -->
+    <script type="module" src="/js/firebase-client.js"></script>
+    <script type="module">
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetId = btn.getAttribute('data-target');
+        const tabBtns = document.querySelectorAll('.account-tab-btn');
+        const tabPanels = document.querySelectorAll('.account-tab-panel');
+        const statusBanner = document.getElementById('status-banner');
+        const dashboardGrid = document.getElementById('dashboard-grid');
+        const unauthCard = document.getElementById('unauthenticated-card');
 
-                    // Reset all buttons
-                    tabBtns.forEach(b => {
-                        b.classList.remove('text-brand-green', 'border-brand-green', 'bg-green-50');
-                        b.classList.add('text-gray-500', 'border-transparent');
-                    });
+        function activateTab(targetId) {
+            tabBtns.forEach(b => {
+                b.classList.remove('text-brand-green', 'border-brand-green', 'bg-green-50', 'font-bold');
+                b.classList.add('text-gray-500', 'border-transparent', 'font-semibold');
+            });
+            tabPanels.forEach(p => p.classList.add('hidden'));
 
-                    // Hide all panels
-                    tabPanels.forEach(p => p.classList.add('hidden'));
+            const activeBtn = document.querySelector(`.account-tab-btn[data-target="${targetId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-500', 'border-transparent', 'font-semibold');
+                activeBtn.classList.add('text-brand-green', 'border-brand-green', 'bg-green-50', 'font-bold');
+            }
 
-                    // Activate clicked button
-                    btn.classList.remove('text-gray-500', 'border-transparent');
-                    btn.classList.add('text-brand-green', 'border-brand-green', 'bg-green-50');
+            const targetPanel = document.getElementById(targetId);
+            if (targetPanel) {
+                targetPanel.classList.remove('hidden');
+            }
+        }
 
-                    // Show target panel
-                    const targetPanel = document.getElementById(targetId);
-                    if (targetPanel) {
-                        targetPanel.classList.remove('hidden');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => activateTab(btn.getAttribute('data-target')));
+        });
+
+        function showBanner(message, tone = 'info') {
+            const styles = {
+                success: 'bg-green-50 border-green-200 text-brand-dark',
+                warning: 'bg-amber-50 border-amber-200 text-amber-900',
+                error: 'bg-red-50 border-red-200 text-red-900',
+                info: 'bg-gray-100 border-gray-200 text-slate-800'
+            };
+            statusBanner.className = `mb-6 rounded-2xl p-4 border text-sm font-medium ${styles[tone] || styles.info}`;
+            statusBanner.textContent = message;
+            statusBanner.classList.remove('hidden');
+        }
+
+        function formatAuDate(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // Check query parameters from Stripe redirect or Mic-Check paywall gate
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('checkout') === 'success') {
+            activateTab('panel-billing');
+            showBanner('Subscription confirmed! Your Mic-Check Pro membership is active. (AU BECS Direct Debits take up to 2 business days to clear.)', 'success');
+        } else if (params.get('checkout') === 'canceled') {
+            activateTab('panel-billing');
+            showBanner('Checkout was canceled. No payment was taken.', 'info');
+        } else if (params.get('upgrade') === '1') {
+            activateTab('panel-billing');
+            showBanner('Start your 7-day free trial below to unlock Mic-Check Pro.', 'warning');
+        } else if (params.get('tab') === 'billing') {
+            activateTab('panel-billing');
+        }
+
+        function renderAccountState(profile) {
+            const user = window.thpsAuth?.currentUser;
+
+            if (!user) {
+                dashboardGrid.classList.add('hidden');
+                unauthCard.classList.remove('hidden');
+                return;
+            }
+
+            unauthCard.classList.add('hidden');
+            dashboardGrid.classList.remove('hidden');
+
+            const data = profile || {};
+            const email = data.email || user.email || '';
+
+            // Populate Profile Tab
+            document.getElementById('profile-name-input').value = data.name || user.displayName || '';
+            document.getElementById('profile-email-input').value = email;
+            document.getElementById('crm-email-display').textContent = email;
+
+            if (data.joinedDate) {
+                document.getElementById('member-since-badge').innerHTML =
+                    `<i class="fa-regular fa-calendar"></i> Member Since: ${formatAuDate(data.joinedDate)}`;
+            }
+
+            // Populate CRM Link Tab
+            if (data.crmClientId) {
+                document.getElementById('crm-linked-box').classList.remove('hidden');
+                document.getElementById('crm-unlinked-box').classList.add('hidden');
+                document.getElementById('crm-client-id-input').value = data.crmClientId;
+            } else {
+                document.getElementById('crm-linked-box').classList.add('hidden');
+                document.getElementById('crm-unlinked-box').classList.remove('hidden');
+            }
+
+            // Populate Billing & Plan Tab
+            const planEyebrow = document.getElementById('plan-eyebrow');
+            const planTitle = document.getElementById('plan-title');
+            const planPriceLine = document.getElementById('plan-price-line');
+            const planRenewalLine = document.getElementById('plan-renewal-line');
+            const pastDueAlert = document.getElementById('past-due-alert');
+            const manageBtn = document.getElementById('manage-billing-btn');
+            const viewInvoicesBtn = document.getElementById('view-invoices-btn');
+            const noInvoicesNote = document.getElementById('no-invoices-note');
+            const upgradeSection = document.getElementById('upgrade-plans-section');
+
+            const subStatus = data.subscriptionStatus || 'active_free';
+            const isPro = data.isPro === true;
+            const intervalPrice = data.planInterval === 'year'
+                ? 'Billed $99.00 AUD annually'
+                : data.planInterval === 'month'
+                    ? 'Billed $9.90 AUD monthly'
+                    : '';
+            const periodEndText = formatAuDate(data.currentPeriodEnd);
+
+            // Reset dynamic billing states
+            pastDueAlert.classList.add('hidden');
+            manageBtn.classList.add('hidden');
+            upgradeSection.classList.add('hidden');
+
+            if (data.stripeCustomerId) {
+                viewInvoicesBtn.classList.remove('hidden');
+                noInvoicesNote.classList.add('hidden');
+            } else {
+                viewInvoicesBtn.classList.add('hidden');
+                noInvoicesNote.classList.remove('hidden');
+            }
+
+            if (subStatus === 'trialing' && isPro) {
+                planEyebrow.textContent = '7-Day Free Trial Active';
+                planTitle.textContent = 'Mic-Check Pro (Trial)';
+                planPriceLine.innerHTML = `<i class="fa-solid fa-clock text-xs mr-1"></i> ${intervalPrice} after trial ends`;
+                planRenewalLine.textContent = periodEndText ? `First billing date: ${periodEndText}` : '';
+                manageBtn.classList.remove('hidden');
+            } else if (subStatus === 'active' && isPro) {
+                planEyebrow.textContent = 'Active Subscription';
+                planTitle.textContent = 'Mic-Check Pro';
+                planPriceLine.innerHTML = `<i class="fa-solid fa-rotate text-xs mr-1"></i> ${intervalPrice}`;
+                if (data.cancelAtPeriodEnd && periodEndText) {
+                    planRenewalLine.textContent = `Cancels on ${periodEndText} (access remains active until then)`;
+                } else if (periodEndText) {
+                    planRenewalLine.textContent = `Next billing date: ${periodEndText}`;
+                } else {
+                    planRenewalLine.textContent = '';
+                }
+                manageBtn.classList.remove('hidden');
+            } else if (subStatus === 'past_due') {
+                planEyebrow.textContent = 'Payment Past Due — Access Paused';
+                planTitle.textContent = 'Mic-Check Pro (Action Required)';
+                planPriceLine.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-xs mr-1"></i> ${intervalPrice}`;
+                planRenewalLine.textContent = 'Update your payment method in the Stripe Portal to restore access.';
+                pastDueAlert.classList.remove('hidden');
+                manageBtn.classList.remove('hidden');
+            } else if (subStatus === 'incomplete') {
+                planEyebrow.textContent = 'Bank Debit Processing';
+                planTitle.textContent = 'Mic-Check Pro (Pending Clearance)';
+                planPriceLine.textContent = 'AU BECS Direct Debit clears within 2 business days.';
+                planRenewalLine.textContent = '';
+                manageBtn.classList.remove('hidden');
+            } else {
+                if (!window.THPS_PAYWALL_ENABLED) {
+                    planEyebrow.textContent = 'Early Access Preview';
+                    planTitle.textContent = 'Mic-Check Member (Free Access)';
+                    planPriceLine.textContent = 'All Mic-Check tools are currently unlocked during early access.';
+                    planRenewalLine.textContent = 'Lock in your 7-day free trial below anytime.';
+                } else {
+                    planEyebrow.textContent = subStatus === 'canceled' ? 'Subscription Ended' : 'Free Account';
+                    planTitle.textContent = 'Mic-Check Basic';
+                    planPriceLine.textContent = 'Upgrade to Mic-Check Pro to unlock full speech diagnostics.';
+                    planRenewalLine.textContent = '';
+                }
+
+                if (data.stripeCustomerId) {
+                    manageBtn.classList.remove('hidden');
+                }
+
+                if (data.hasUsedTrial) {
+                    document.getElementById('trial-badge').textContent = 'Pro Membership';
+                    document.getElementById('upgrade-description').textContent =
+                        'Reactivate your Mic-Check Pro subscription anytime. Choose monthly or annual anniversary billing below.';
+                    document.querySelector('[data-plan="monthly"]').textContent = 'Subscribe Now — $9.90 / month';
+                    document.querySelector('[data-plan="yearly"]').textContent = 'Subscribe Now — $99.00 / year';
+                }
+
+                upgradeSection.classList.remove('hidden');
+            }
+        }
+
+        // Save Profile Name to Firestore
+        document.getElementById('save-profile-btn').addEventListener('click', async () => {
+            const user = window.thpsAuth?.currentUser;
+            const db = window.thpsDb;
+            if (!user || !db) return;
+
+            const nameInput = document.getElementById('profile-name-input');
+            const newName = nameInput.value.trim();
+            if (!newName) return;
+
+            const saveBtn = document.getElementById('save-profile-btn');
+            const feedback = document.getElementById('save-profile-feedback');
+            saveBtn.disabled = true;
+
+            try {
+                await setDoc(doc(db, 'Members', user.uid), { name: newName }, { merge: true });
+                if (window.thpsMemberProfile) {
+                    window.thpsMemberProfile.name = newName;
+                }
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+            } catch (err) {
+                console.error('Error updating name:', err);
+                showBanner('Could not save profile changes: ' + err.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        });
+
+        // Start Stripe Checkout Session
+        async function startCheckout(plan, buttonEl) {
+            const user = window.thpsAuth?.currentUser;
+            if (!user) return;
+
+            const allCheckoutBtns = document.querySelectorAll('.checkout-btn');
+            const originalText = buttonEl.textContent;
+            allCheckoutBtns.forEach(btn => btn.disabled = true);
+            buttonEl.textContent = 'Redirecting to Stripe...';
+
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ plan })
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.url) {
+                    throw new Error(result.error || 'Unable to start checkout.');
+                }
+
+                window.location.href = result.url;
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showBanner(error.message, 'error');
+                allCheckoutBtns.forEach(btn => btn.disabled = false);
+                buttonEl.textContent = originalText;
+            }
+        }
+
+        // Open Stripe Customer Portal
+        async function openBillingPortal(triggerBtn) {
+            const user = window.thpsAuth?.currentUser;
+            if (!user) return;
+
+            const originalHTML = triggerBtn.innerHTML;
+            triggerBtn.disabled = true;
+            triggerBtn.textContent = 'Opening Stripe Portal...';
+
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch('/api/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
                     }
                 });
-            });
+
+                const result = await response.json();
+                if (!response.ok || !result.url) {
+                    throw new Error(result.error || 'Unable to open billing portal.');
+                }
+
+                window.location.href = result.url;
+            } catch (error) {
+                console.error('Portal error:', error);
+                showBanner(error.message, 'error');
+                triggerBtn.disabled = false;
+                triggerBtn.innerHTML = originalHTML;
+            }
+        }
+
+        document.querySelectorAll('.checkout-btn').forEach(btn => {
+            btn.addEventListener('click', () => startCheckout(btn.dataset.plan, btn));
         });
+        document.getElementById('manage-billing-btn').addEventListener('click', function () {
+            openBillingPortal(this);
+        });
+        document.getElementById('view-invoices-btn').addEventListener('click', function () {
+            openBillingPortal(this);
+        });
+
+        // Listen for firebase-client.js auth & profile readiness
+        window.addEventListener('thps-member-ready', (event) => {
+            renderAccountState(event.detail);
+        });
+
+        if (window.thpsAuth?.currentUser && window.thpsMemberProfile) {
+            renderAccountState(window.thpsMemberProfile);
+        }
     </script>
 </body>
 </html>
