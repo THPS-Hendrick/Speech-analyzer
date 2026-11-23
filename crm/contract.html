@@ -90,7 +90,6 @@
 
             <h2 class="text-xl font-bold border-b pb-2 mt-8">TERMS AND CONDITIONS</h2>
             
-            <!-- Standard terms truncated for brevity, same as original -->
             <h3 class="font-bold mt-4">1. SCOPE OF SERVICES</h3>
             <p class="text-sm text-gray-700">The Provider agrees to deliver the coaching, drafting, assessment, and/or portal access services outlined in the Schedule of Services below. The standard of quality for all drafting and assessment services is based on the Provider's proprietary objective speech measuring tool, and services will be deemed complete when the deliverables meet the approved measurable metrics (the "Green Zone").</p>
 
@@ -434,7 +433,7 @@
                         document.getElementById('contract-content').classList.remove('hidden');
                     }
                 } else {
-                    document.getElementById('loading').innerText = "Error: " + data.message;
+                    document.getElementById('loading').innerText = "Error: " + (data.message || data.error || "Unable to load document.");
                 }
             } catch (err) {
                 document.getElementById('loading').innerText = "Failed to load document.";
@@ -471,11 +470,11 @@
                 const result = await res.json();
 
                 if (result.success) {
-                    currentContract.status = "signed";
+                    currentContract.status = result.status || "signed";
                     document.getElementById('signature-block').classList.add('hidden');
                     renderPaymentState(currentContract);
                 } else {
-                    alert('Error: ' + result.message);
+                    alert('Error: ' + (result.message || result.error || 'Unable to sign contract. Please try again.'));
                     signBtn.disabled = false;
                     signBtn.innerText = "Accept & Sign Contract";
                 }
@@ -631,7 +630,7 @@
                 if (result.url) {
                     window.location.href = result.url;
                 } else {
-                    throw new Error(result.error || 'Failed to initialize payment.');
+                    throw new Error(result.error || result.message || 'Failed to initialize payment.');
                 }
             } catch (err) {
                 alert('Error: ' + err.message);
