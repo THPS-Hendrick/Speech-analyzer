@@ -184,9 +184,10 @@ const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
 const btnDriveToggle = document.getElementById('btn-drive-toggle');
 
-// Billing Elements
+// Billing & Document Elements
 const btnFullContract = document.getElementById('btn-full-contract');
 const btnQuickInvoiceToggle = document.getElementById('btn-quick-invoice-toggle');
+const btnCertificates = document.getElementById('btn-certificates');
 const quickInvoiceForm = document.getElementById('quick-invoice-form');
 
 function updateDriveToggleButton(client) {
@@ -384,7 +385,7 @@ if (btnDriveToggle) {
 }
 
 // ==========================================
-// BILLING ACTIONS LOGIC
+// BILLING & DOCUMENT ACTIONS LOGIC
 // ==========================================
 
 // Path A: Redirect to Full Contract page with auto-fill parameters
@@ -394,6 +395,16 @@ btnFullContract.addEventListener('click', () => {
     const email = encodeURIComponent(currentFocusClient.email);
     window.location.href = `admin-contract.html?name=${name}&email=${email}`;
 });
+
+// Path C: Redirect to Batch Certificate Builder with client pre-filled
+if (btnCertificates) {
+    btnCertificates.addEventListener('click', () => {
+        if (!currentFocusClient) return;
+        const name = encodeURIComponent(currentFocusClient.name);
+        const email = encodeURIComponent(currentFocusClient.email);
+        window.location.href = `admin-certificates.html?name=${name}&email=${email}`;
+    });
+}
 
 // Path B: Reveal Mini-Form (Defaults to GST Included)
 btnQuickInvoiceToggle.addEventListener('click', () => {
