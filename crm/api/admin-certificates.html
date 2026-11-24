@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Batch Generator | CRM Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Certificate Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+
+    <!-- Client-Side PDF & ZIP Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Exact A4 Landscape Canvas (1123 x 794 px @ 96dpi) */
+        .cert-canvas {
+            position: relative;
+            width: 1123px;
+            height: 794px;
+            background-color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .cert-title {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #111111;
+            letter-spacing: 0.06em;
+            line-height: 1.12;
+        }
+
+        .cert-serif {
+            font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+            color: #1a1a1a;
+            letter-spacing: 0.08em;
+        }
+
+        .cert-recipient {
+            font-family: 'Alex Brush', cursive;
+            color: #111111;
+            line-height: 1.08;
+            white-space: nowrap;
+        }
+
+        .cert-signature {
+            font-family: 'Nothing You Could Do', cursive;
+            color: #111111;
+            letter-spacing: 0.06em;
+            transform: skewX(-14deg) rotate(-2deg);
+            display: inline-block;
+        }
+
+        .cert-founder {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            color: #111111;
+        }
+
+        /* Off-screen 1:1 stage for crisp html2canvas capture */
+        #export-stage {
+            position: fixed;
+            left: -10000px;
+            top: 0;
+            width: 1123px;
+            height: 794px;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Admin Navigation Bar -->
+    <header class="bg-slate-900 text-white px-6 py-3.5 shadow-md flex flex-wrap items-center justify-between gap-4 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-300 hover:text-white text-sm font-medium inline-flex items-center gap-1.5 transition-colors">
+                <span>&larr;</span> Pipeline
+            </a>
+            <div class="h-5 w-px bg-slate-700"></div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight">Certificate Batch Generator</h1>
+                <p id="client-context-label" class="text-xs text-slate-300">Loading client...</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span id="save-status-badge" class="hidden text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-900/60 text-emerald-200 border border-emerald-700"></span>
+            <button id="btn-save-batch" type="button" class="bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-4 py-2 rounded-md shadow-sm transition-colors disabled:opacity-50">
+                Save &amp; Log to CRM
+            </button>
+            <button id="btn-download-zip" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-md shadow-sm transition-colors disabled:opacity-50">
+                Download All (.zip)
+            </button>
+        </div>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div id="page-loading" class="flex-1 flex items-center justify-center text-slate-500 font-medium">
+        Verifying admin session &amp; loading workspace...
+    </div>
+
+    <!-- Main Split-Screen Workspace -->
+    <main id="workspace" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- LEFT PANEL: Batch Builder & Per-Certificate Editor -->
+        <aside class="w-full lg:w-[460px] xl:w-[500px] bg-white border-r border-slate-200 flex flex-col overflow-hidden flex-shrink-0">
+
+            <!-- Collapsible Batch Defaults -->
+            <details class="border-b border-slate-200 bg-slate-50" open>
+                <summary class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-600 cursor-pointer select-none flex items-center justify-between">
+                    <span>Batch Defaults (Shared Copy)</span>
+                    <span class="text-[11px] font-normal normal-case text-slate-400">Click to toggle</span>
+                </summary>
+                <div class="px-5 pb-4 pt-1 space-y-2.5 text-xs">
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Client / Org Name</label>
+                            <input type="text" id="meta-client-name" class="w-full p-2 border border-slate-300 rounded bg-white text-xs">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Default Date</label>
+                            <input type="date" id="def-date" class="w-full p-2 border border-slate-300 rounded bg-white text-xs">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Completion / Program Line</label>
+                        <textarea id="def-program" rows="2" class="w-full p-2 border border-slate-300 rounded bg-white text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Connector Line (Bold)</label>
+                        <input type="text" id="def-connector" class="w-full p-2 border border-slate-300 rounded bg-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Skillsets / Mastery Line</label>
+                        <textarea id="def-skillsets" rows="2" class="w-full p-2 border border-slate-300 rounded bg-white text-xs"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Footnote</label>
+                        <input type="text" id="def-footnote" class="w-full p-2 border border-slate-300 rounded bg-white text-xs">
+                    </div>
+                    <button id="btn-apply-defaults" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 rounded transition-colors">
+                        Apply Defaults to All Certificates
+                    </button>
+                </div>
+            </details>
+
+            <!-- Certificates List Header -->
+            <div class="px-5 py-3 border-b border-slate-200 flex items-center justify-between bg-white">
+                <span class="text-sm font-bold text-slate-800">
+                    Certificates (<span id="cert-count">0</span>)
+                </span>
+                <button id="btn-add-cert" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded shadow-sm transition-colors">
+                    + Add Certificate
+                </button>
+            </div>
+
+            <!-- Scrollable Certificate Rows -->
+            <div id="cert-list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/70"></div>
+        </aside>
+
+        <!-- RIGHT PANEL: Live A4 Landscape Preview -->
+        <section class="flex-1 flex flex-col overflow-hidden bg-slate-200/80">
+            <div class="px-6 py-3 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+                <div>
+                    <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Live Preview (A4 Landscape)</span>
+                    <h2 id="preview-heading" class="text-sm font-bold text-slate-800">Certificate #1</h2>
+                </div>
+                <button id="btn-download-active-pdf" type="button" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-md shadow-sm transition-colors disabled:opacity-50">
+                    Download Current PDF
+                </button>
+            </div>
+
+            <div id="preview-viewport" class="flex-1 flex items-center justify-center p-6 overflow-hidden">
+                <div id="preview-scaler" class="shadow-2xl rounded-sm overflow-hidden bg-white" style="transform-origin: center center;">
+                    <div id="preview-mount"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Hidden 1:1 Export Stage -->
+    <div id="export-stage"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // 1. Firebase Config (matches CRM app.js)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
+            authDomain: "thps-crm.firebaseapp.com",
+            projectId: "thps-crm",
+            storageBucket: "thps-crm.firebasestorage.app",
+            messagingSenderId: "297605373498",
+            appId: "1:297605373498:web:606241a173f3150a16df03"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // ==========================================
+        // STATE & DEFAULTS
+        // ==========================================
+        const LOGO_URL = '/images/thps-logo-tom-hendrick-public-speaking.svg';
+        let inlineLogoMarkup = null;
+        let currentUser = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let batchId = urlParams.get('batchId') || null;
+        let clientName = urlParams.get('name') || '';
+        let clientEmail = urlParams.get('email') || '';
+
+        const todayIso = new Date().toISOString().split('T')[0];
+
+        let batchDefaults = {
+            date: todayIso,
+            programLine: 'COMPLETED THEIR FOURTH 1 HOUR SESSION OF THPS COMMUNICATION TRAINING & ASSESSMENT WITH TOM HENDRICK',
+            connectorLine: 'WHERE THEY DEMONSTRATED',
+            skillsets
