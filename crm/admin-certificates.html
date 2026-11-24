@@ -224,4 +224,698 @@
             date: todayIso,
             programLine: 'COMPLETED THEIR FOURTH 1 HOUR SESSION OF THPS COMMUNICATION TRAINING & ASSESSMENT WITH TOM HENDRICK',
             connectorLine: 'WHERE THEY DEMONSTRATED',
-            skillsets
+            skillsetsLine: 'MASTERY OF THE SELF-REGULATION, CO-REGULATION, WORD ASSOCIATION & VOCAL CONTROL COMMUNICATION SKILLSETS*',
+            footnote: '*THE SKILLSETS HAVE BEEN USED BY THPS CLIENTS TO SUCCESSFULLY PITCH FOR $200M+ IN FUNDING'
+        };
+
+        let certificates = [];
+        let activeCertId = null;
+
+        // DOM Refs
+        const pageLoading = document.getElementById('page-loading');
+        const workspace = document.getElementById('workspace');
+        const clientContextLabel = document.getElementById('client-context-label');
+        const saveStatusBadge = document.getElementById('save-status-badge');
+        const certListEl = document.getElementById('cert-list');
+        const certCountEl = document.getElementById('cert-count');
+        const previewMount = document.getElementById('preview-mount');
+        const previewScaler = document.getElementById('preview-scaler');
+        const previewViewport = document.getElementById('preview-viewport');
+        const previewHeading = document.getElementById('preview-heading');
+        const exportStage = document.getElementById('export-stage');
+
+        const metaClientNameInput = document.getElementById('meta-client-name');
+        const defDateInput = document.getElementById('def-date');
+        const defProgramInput = document.getElementById('def-program');
+        const defConnectorInput = document.getElementById('def-connector');
+        const defSkillsetsInput = document.getElementById('def-skillsets');
+        const defFootnoteInput = document.getElementById('def-footnote');
+
+        const btnSaveBatch = document.getElementById('btn-save-batch');
+        const btnDownloadZip = document.getElementById('btn-download-zip');
+        const btnDownloadActivePdf = document.getElementById('btn-download-active-pdf');
+        const btnAddCert = document.getElementById('btn-add-cert');
+        const btnApplyDefaults = document.getElementById('btn-apply-defaults');
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function uid() {
+            return 'cert_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatCertDate(isoDate) {
+            if (!isoDate) return '';
+            const parts = String(isoDate).split('-');
+            if (parts.length !== 3) return String(isoDate).toUpperCase();
+            const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (isNaN(d.getTime())) return String(isoDate).toUpperCase();
+            return d.toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).toUpperCase();
+        }
+
+        function sanitizeFilePart(str, fallback = 'Recipient') {
+            const clean = String(str || '')
+                .trim()
+                .replace(/[^a-zA-Z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            return clean || fallback;
+        }
+
+        function getRecipientFontSize(name) {
+            const len = (name || '').trim().length;
+            if (len <= 18) return 92;
+            if (len <= 24) return 80;
+            if (len <= 30) return 68;
+            if (len <= 38) return 58;
+            return 48;
+        }
+
+        function syncDefaultsToInputs() {
+            metaClientNameInput.value = clientName;
+            defDateInput.value = batchDefaults.date || todayIso;
+            defProgramInput.value = batchDefaults.programLine || '';
+            defConnectorInput.value = batchDefaults.connectorLine || '';
+            defSkillsetsInput.value = batchDefaults.skillsetsLine || '';
+            defFootnoteInput.value = batchDefaults.footnote || '';
+        }
+
+        function readDefaultsFromInputs() {
+            clientName = metaClientNameInput.value.trim() || clientName;
+            batchDefaults = {
+                date: defDateInput.value || todayIso,
+                programLine: defProgramInput.value.trim(),
+                connectorLine: defConnectorInput.value.trim(),
+                skillsetsLine: defSkillsetsInput.value.trim(),
+                footnote: defFootnoteInput.value.trim()
+            };
+            updateHeaderContext();
+        }
+
+        function updateHeaderContext() {
+            const displayClient = clientName || 'Unnamed Client';
+            const displayEmail = clientEmail ? ` (${clientEmail})` : '';
+            clientContextLabel.innerText = `Client: ${displayClient}${displayEmail}`;
+        }
+
+        // Fetch and inline the SVG logo so html2canvas captures it crisply every time
+        async function loadLogoAsset() {
+            try {
+                const res = await fetch(LOGO_URL);
+                if (!res.ok) throw new Error('Logo HTTP ' + res.status);
+                const svgText = await res.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svgText, 'image/svg+xml');
+                const svgEl = doc.querySelector('svg');
+                if (svgEl) {
+                    svgEl.setAttribute('width', '340');
+                    svgEl.setAttribute('height', '115');
+                    svgEl.style.maxHeight = '115px';
+                    svgEl.style.width = 'auto';
+                    svgEl.style.display = 'block';
+                    svgEl.style.margin = '0 auto';
+                    inlineLogoMarkup = svgEl.outerHTML;
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not inline SVG logo, falling back to <img>:', err.message);
+            }
+            inlineLogoMarkup = `<img src="${LOGO_URL}" alt="Tom Hendrick Public Speaking" style="height: 112px; width: auto; display: block; margin: 0 auto;" crossorigin="anonymous" />`;
+        }
+
+        // ==========================================
+        // CERTIFICATE HTML TEMPLATE (1123 x 794 A4)
+        // ==========================================
+        function buildCertificateMarkup(cert) {
+            const formattedDate = formatCertDate(cert.date);
+            const displayName = cert.recipientName?.trim() || 'Recipient Name';
+            const nameFontSize = getRecipientFontSize(displayName);
+
+            return `
+            <div class="cert-canvas">
+                <!-- Subtle Wavy Cream/Gold Watermark Background -->
+                <svg viewBox="0 0 1123 794" width="1123" height="794" style="position:absolute; inset:0; z-index:0; pointer-events:none;">
+                    <g fill="none" stroke="#f3efe2" stroke-width="18" opacity="0.7">
+                        <path d="M-40,70 Q280,10 560,70 T1165,70" />
+                        <path d="M-40,145 Q280,85 560,145 T1165,145" />
+                        <path d="M-40,220 Q280,160 560,220 T1165,220" />
+                        <path d="M-40,295 Q280,235 560,295 T1165,295" />
+                        <path d="M-40,370 Q280,310 560,370 T1165,370" />
+                        <path d="M-40,445 Q280,385 560,445 T1165,445" />
+                        <path d="M-40,520 Q280,460 560,520 T1165,520" />
+                        <path d="M-40,595 Q280,535 560,595 T1165,595" />
+                        <path d="M-40,670 Q280,610 560,670 T1165,670" />
+                        <path d="M-40,745 Q280,685 560,745 T1165,745" />
+                    </g>
+
+                    <!-- Inset Gold Frame -->
+                    <rect x="22" y="20" width="1079" height="754" fill="none" stroke="#b5942d" stroke-width="3" />
+
+                    <!-- Top-Left Green Corner Triangle + Gold/White Stripes -->
+                    <polygon points="0,0 135,0 0,135" fill="#1e5c16" />
+                    <line x1="115" y1="0" x2="0" y2="115" stroke="#ffffff" stroke-width="4" />
+                    <line x1="106" y1="0" x2="0" y2="106" stroke="#c2a238" stroke-width="2.5" />
+
+                    <!-- Top-Right Green Corner Triangle + Gold/White Stripes -->
+                    <polygon points="1123,0 988,0 1123,135" fill="#1e5c16" />
+                    <line x1="1008" y1="0" x2="1123" y2="115" stroke="#ffffff" stroke-width="4" />
+                    <line x1="1017" y1="0" x2="1123" y2="106" stroke="#c2a238" stroke-width="2.5" />
+
+                    <!-- Bottom-Left Green Corner Triangle + Gold/White Stripes -->
+                    <polygon points="0,794 135,794 0,659" fill="#1e5c16" />
+                    <line x1="115" y1="794" x2="0" y2="679" stroke="#ffffff" stroke-width="4" />
+                    <line x1="106" y1="794" x2="0" y2="688" stroke="#c2a238" stroke-width="2.5" />
+
+                    <!-- Bottom-Right Green Corner Triangle + Gold/White Stripes -->
+                    <polygon points="1123,794 988,794 1123,659" fill="#1e5c16" />
+                    <line x1="1008" y1="794" x2="1123" y2="679" stroke="#ffffff" stroke-width="4" />
+                    <line x1="1017" y1="794" x2="1123" y2="688" stroke="#c2a238" stroke-width="2.5" />
+                </svg>
+
+                <!-- Certificate Content Layer -->
+                <div style="position:relative; z-index:2; height:100%; padding: 42px 84px 44px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; text-align:center;">
+
+                    <!-- Logo -->
+                    <div style="height: 112px; display:flex; align-items:center; justify-content:center;">
+                        ${inlineLogoMarkup || ''}
+                    </div>
+
+                    <!-- Title & Date -->
+                    <div style="margin-top: 2px;">
+                        <div class="cert-title" style="font-size: 56px; font-weight: 500;">
+                            CERTIFICATE OF<br>COMPLETION
+                        </div>
+                        <div class="cert-serif" style="font-size: 20px; font-weight: 500; margin-top: 14px; letter-spacing: 0.14em;">
+                            ${formattedDate ? `ON ${escapeHtml(formattedDate)}` : ''}
+                        </div>
+                        <div style="width: 390px; height: 2.5px; background-color: #b5942d; margin: 12px auto 0;"></div>
+                    </div>
+
+                    <!-- Calligraphic Recipient Name -->
+                    <div style="min-height: 98px; display:flex; align-items:center; justify-content:center; width: 100%;">
+                        <div class="cert-recipient" style="font-size: ${nameFontSize}px;">
+                            ${escapeHtml(displayName)}
+                        </div>
+                    </div>
+
+                    <!-- Achievement Body Copy -->
+                    <div style="max-width: 920px; line-height: 1.52;">
+                        <div class="cert-serif" style="font-size: 16.5px; font-weight: 600; text-transform: uppercase;">
+                            ${escapeHtml(cert.programLine || '')}
+                        </div>
+                        ${cert.connectorLine ? `
+                        <div class="cert-serif" style="font-size: 16.5px; font-weight: 700; text-transform: uppercase; margin-top: 6px;">
+                            ${escapeHtml(cert.connectorLine)}
+                        </div>` : ''}
+                        <div class="cert-serif" style="font-size: 16.5px; font-weight: 500; text-transform: uppercase; margin-top: 6px;">
+                            ${escapeHtml(cert.skillsetsLine || '')}
+                        </div>
+                    </div>
+
+                    <!-- Footnote -->
+                    <div class="cert-serif" style="font-size: 11.5px; font-weight: 500; letter-spacing: 0.1em; color: #262626; max-width: 920px; margin-top: 6px;">
+                        ${escapeHtml(cert.footnote || '')}
+                    </div>
+
+                    <!-- Signature Footer -->
+                    <div style="width: 100%; max-width: 720px; display:flex; align-items:flex-end; justify-content:space-between; margin-top: 4px; padding-bottom: 4px;">
+                        <div style="width: 310px; text-align:center;">
+                            <div class="cert-signature" style="font-size: 38px; line-height: 1; margin-bottom: 6px;">
+                                T HENDRICK
+                            </div>
+                            <div style="width: 100%; height: 2px; background-color: #b5942d;"></div>
+                        </div>
+                        <div style="width: 310px; text-align:center; padding-bottom: 10px;">
+                            <div class="cert-founder" style="font-size: 31px; font-weight: 600;">
+                                Tom Hendrick, Founder
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            `;
+        }
+
+        // ==========================================
+        // RENDERING & RESPONSIVE SCALING
+        // ==========================================
+        function getActiveCert() {
+            return certificates.find(c => c.id === activeCertId) || certificates[0] || null;
+        }
+
+        function scalePreviewToFit() {
+            const rect = previewViewport.getBoundingClientRect();
+            const availW = Math.max(200, rect.width - 32);
+            const availH = Math.max(150, rect.height - 32);
+            const scale = Math.min(availW / 1123, availH / 794, 1);
+
+            previewScaler.style.width = `${1123 * scale}px`;
+            previewScaler.style.height = `${794 * scale}px`;
+            previewMount.style.width = '1123px';
+            previewMount.style.height = '794px';
+            previewMount.style.transform = `scale(${scale})`;
+            previewMount.style.transformOrigin = 'top left';
+        }
+
+        function renderPreview() {
+            const active = getActiveCert();
+            if (!active) {
+                previewMount.innerHTML = '';
+                previewHeading.innerText = 'No certificate selected';
+                return;
+            }
+            const idx = certificates.findIndex(c => c.id === active.id) + 1;
+            previewHeading.innerText = `Certificate #${idx} — ${active.recipientName || 'Unnamed Recipient'}`;
+            previewMount.innerHTML = buildCertificateMarkup(active);
+            scalePreviewToFit();
+        }
+
+        function renderList() {
+            certCountEl.innerText = String(certificates.length);
+            certListEl.innerHTML = '';
+
+            certificates.forEach((cert, index) => {
+                const isSelected = cert.id === activeCertId;
+                const card = document.createElement('div');
+                card.className = isSelected
+                    ? 'bg-white border-2 border-amber-500 rounded-lg shadow-sm overflow-hidden transition-all'
+                    : 'bg-white border border-slate-200 hover:border-slate-300 rounded-lg shadow-sm overflow-hidden transition-all';
+
+                // Card Header (always visible, click to preview)
+                const header = document.createElement('div');
+                header.className = 'px-3.5 py-2.5 flex items-center justify-between gap-2 cursor-pointer ' + (isSelected ? 'bg-amber-50/70 border-b border-amber-200' : 'bg-white');
+                header.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    activeCertId = cert.id;
+                    renderList();
+                    renderPreview();
+                });
+
+                header.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-700'}">#${index + 1}</span>
+                            <span class="font-bold text-sm text-slate-800 truncate">${escapeHtml(cert.recipientName || 'Unnamed Recipient')}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5 truncate">${escapeHtml(formatCertDate(cert.date) || 'No date set')}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button type="button" data-action="pdf" title="Download PDF" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2.5 py-1 rounded transition-colors">
+                            PDF
+                        </button>
+                        <button type="button" data-action="dup" title="Duplicate" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold px-2 py-1 rounded transition-colors">
+                            Copy
+                        </button>
+                        <button type="button" data-action="del" title="Remove" ${certificates.length <= 1 ? 'disabled' : ''} class="bg-red-50 hover:bg-red-100 text-red-600 text-[11px] font-semibold px-2 py-1 rounded transition-colors disabled:opacity-35 disabled:cursor-not-allowed">
+                            &times;
+                        </button>
+                    </div>
+                `;
+
+                header.querySelector('[data-action="pdf"]').addEventListener('click', async (e) => {
+                    const btn = e.currentTarget;
+                    const prev = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = '...';
+                    try {
+                        await downloadSinglePdf(cert);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = prev;
+                    }
+                });
+
+                header.querySelector('[data-action="dup"]').addEventListener('click', () => {
+                    const copy = { ...cert, id: uid() };
+                    certificates.splice(index + 1, 0, copy);
+                    activeCertId = copy.id;
+                    renderList();
+                    renderPreview();
+                });
+
+                header.querySelector('[data-action="del"]').addEventListener('click', () => {
+                    if (certificates.length <= 1) return;
+                    certificates = certificates.filter(c => c.id !== cert.id);
+                    if (activeCertId === cert.id) {
+                        activeCertId = certificates[Math.max(0, index - 1)].id;
+                    }
+                    renderList();
+                    renderPreview();
+                });
+
+                card.appendChild(header);
+
+                // Inline Editor (expanded for selected certificate)
+                if (isSelected) {
+                    const editor = document.createElement('div');
+                    editor.className = 'p-3.5 space-y-2.5 text-xs bg-white';
+                    editor.innerHTML = `
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Recipient Name</label>
+                                <input type="text" data-field="recipientName" value="${escapeHtml(cert.recipientName)}" placeholder="e.g. Vallery Ogello" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Date</label>
+                                <input type="date" data-field="date" value="${escapeHtml(cert.date)}" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Completion / Program Line</label>
+                            <textarea rows="2" data-field="programLine" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">${escapeHtml(cert.programLine)}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Connector Line (Bold)</label>
+                            <input type="text" data-field="connectorLine" value="${escapeHtml(cert.connectorLine)}" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Skillsets / Mastery Line</label>
+                            <textarea rows="2" data-field="skillsetsLine" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">${escapeHtml(cert.skillsetsLine)}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Footnote</label>
+                            <input type="text" data-field="footnote" value="${escapeHtml(cert.footnote)}" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+                    `;
+
+                    editor.querySelectorAll('[data-field]').forEach(input => {
+                        input.addEventListener('input', (e) => {
+                            const field = e.target.getAttribute('data-field');
+                            cert[field] = e.target.value;
+                            // Update header text live without losing input focus
+                            if (field === 'recipientName') {
+                                header.querySelector('.font-bold.text-sm').innerText = cert.recipientName || 'Unnamed Recipient';
+                            }
+                            if (field === 'date') {
+                                header.querySelector('p').innerText = formatCertDate(cert.date) || 'No date set';
+                            }
+                            renderPreview();
+                        });
+                    });
+
+                    card.appendChild(editor);
+                }
+
+                certListEl.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // PDF & ZIP GENERATION
+        // ==========================================
+        async function renderCertificateToPdfBlob(cert) {
+            if (document.fonts && document.fonts.ready) {
+                await document.fonts.ready;
+            }
+
+            exportStage.innerHTML = buildCertificateMarkup(cert);
+            const target = exportStage.firstElementChild;
+
+            // Allow one animation frame for layout/SVG paint
+            await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+            const canvas = await window.html2canvas(target, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff',
+                width: 1123,
+                height: 794,
+                logging: false
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.96);
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4',
+                compress: true
+            });
+
+            pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+            exportStage.innerHTML = '';
+            return pdf.output('blob');
+        }
+
+        function triggerBlobDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
+        async function downloadSinglePdf(cert) {
+            try {
+                const blob = await renderCertificateToPdfBlob(cert);
+                const filename = `${sanitizeFilePart(cert.recipientName, 'THPS')}-THPS-Certificate.pdf`;
+                triggerBlobDownload(blob, filename);
+            } catch (err) {
+                console.error('PDF generation failed:', err);
+                alert('Failed to generate PDF: ' + err.message);
+            }
+        }
+
+        async function downloadAllAsZip() {
+            if (certificates.length === 0) return;
+
+            const originalText = btnDownloadZip.innerText;
+            btnDownloadZip.disabled = true;
+            btnDownloadActivePdf.disabled = true;
+
+            try {
+                const zip = new window.JSZip();
+                const usedNames = {};
+
+                for (let i = 0; i < certificates.length; i++) {
+                    const cert = certificates[i];
+                    btnDownloadZip.innerText = `Generating ${i + 1} of ${certificates.length}...`;
+
+                    const pdfBlob = await renderCertificateToPdfBlob(cert);
+                    const base = sanitizeFilePart(cert.recipientName, `Certificate-${i + 1}`);
+                    usedNames[base] = (usedNames[base] || 0) + 1;
+                    const suffix = usedNames[base] > 1 ? `-${usedNames[base]}` : '';
+                    const filename = `${base}${suffix}-THPS-Certificate.pdf`;
+
+                    zip.file(filename, pdfBlob);
+                }
+
+                btnDownloadZip.innerText = 'Zipping archive...';
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const dateStamp = (batchDefaults.date || todayIso).replace(/-/g, '');
+                const orgPart = sanitizeFilePart(clientName, 'THPS');
+                triggerBlobDownload(zipBlob, `${orgPart}-Certificates-${dateStamp}.zip`);
+            } catch (err) {
+                console.error('ZIP generation failed:', err);
+                alert('Failed to generate ZIP archive: ' + err.message);
+            } finally {
+                btnDownloadZip.disabled = false;
+                btnDownloadActivePdf.disabled = false;
+                btnDownloadZip.innerText = originalText;
+            }
+        }
+
+        // ==========================================
+        // FIRESTORE / CRM API SYNC
+        // ==========================================
+        async function saveBatchToCrm() {
+            if (!clientEmail) {
+                alert('Missing client email. Please open this page from a client card in your CRM.');
+                return;
+            }
+            if (certificates.length === 0) {
+                alert('Add at least one certificate before saving.');
+                return;
+            }
+
+            readDefaultsFromInputs();
+            const originalText = btnSaveBatch.innerText;
+            btnSaveBatch.disabled = true;
+            btnSaveBatch.innerText = 'Saving...';
+
+            try {
+                const idToken = await currentUser.getIdToken();
+                const res = await fetch('/api/certificates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({
+                        batchId,
+                        clientEmail,
+                        clientName: clientName || clientEmail,
+                        defaults: batchDefaults,
+                        certificates
+                    })
+                });
+
+                const result = await res.json();
+                if (!res.ok || !result.success) {
+                    throw new Error(result.error || result.message || 'Failed to save certificate batch.');
+                }
+
+                batchId = result.batchId;
+
+                // Keep URL updated with batchId so refreshing reloads the saved batch
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('batchId', batchId);
+                window.history.replaceState({}, '', newUrl.toString());
+
+                saveStatusBadge.innerText = result.isUpdate
+                    ? `Updated (${result.count} logged)`
+                    : `Saved & Logged (${result.count})`;
+                saveStatusBadge.classList.remove('hidden');
+            } catch (err) {
+                console.error('Save batch error:', err);
+                alert('Error saving batch: ' + err.message);
+            } finally {
+                btnSaveBatch.disabled = false;
+                btnSaveBatch.innerText = originalText;
+            }
+        }
+
+        async function loadExistingBatch(id) {
+            const idToken = await currentUser.getIdToken();
+            const res = await fetch(`/api/certificates?batchId=${encodeURIComponent(id)}`, {
+                headers: { 'Authorization': `Bearer ${idToken}` }
+            });
+            const result = await res.json();
+
+            if (!res.ok || !result.success || !result.batch) {
+                throw new Error(result.error || result.message || 'Could not load certificate batch.');
+            }
+
+            const b = result.batch;
+            clientName = b.clientName || clientName;
+            clientEmail = b.clientEmail || clientEmail;
+            if (b.defaults) {
+                batchDefaults = { ...batchDefaults, ...b.defaults };
+            }
+            certificates = Array.isArray(b.certificates) && b.certificates.length > 0
+                ? b.certificates.map(c => ({ ...c, id: c.id || uid() }))
+                : [createBlankCertificate(clientName)];
+
+            activeCertId = certificates[0].id;
+            saveStatusBadge.innerText = `Loaded Batch (${certificates.length})`;
+            saveStatusBadge.classList.remove('hidden');
+        }
+
+        function createBlankCertificate(recipientName = '') {
+            return {
+                id: uid(),
+                recipientName,
+                date: batchDefaults.date || todayIso,
+                programLine: batchDefaults.programLine,
+                connectorLine: batchDefaults.connectorLine,
+                skillsetsLine: batchDefaults.skillsetsLine,
+                footnote: batchDefaults.footnote
+            };
+        }
+
+        // ==========================================
+        // EVENT LISTENERS
+        // ==========================================
+        btnAddCert.addEventListener('click', () => {
+            readDefaultsFromInputs();
+            const nextCert = createBlankCertificate('');
+            certificates.push(nextCert);
+            activeCertId = nextCert.id;
+            renderList();
+            renderPreview();
+        });
+
+        btnApplyDefaults.addEventListener('click', () => {
+            readDefaultsFromInputs();
+            certificates = certificates.map(cert => ({
+                ...cert,
+                date: batchDefaults.date,
+                programLine: batchDefaults.programLine,
+                connectorLine: batchDefaults.connectorLine,
+                skillsetsLine: batchDefaults.skillsetsLine,
+                footnote: batchDefaults.footnote
+            }));
+            renderList();
+            renderPreview();
+        });
+
+        btnSaveBatch.addEventListener('click', saveBatchToCrm);
+        btnDownloadZip.addEventListener('click', downloadAllAsZip);
+
+        btnDownloadActivePdf.addEventListener('click', async () => {
+            const active = getActiveCert();
+            if (!active) return;
+            const prev = btnDownloadActivePdf.innerText;
+            btnDownloadActivePdf.disabled = true;
+            btnDownloadActivePdf.innerText = 'Generating PDF...';
+            try {
+                await downloadSinglePdf(active);
+            } finally {
+                btnDownloadActivePdf.disabled = false;
+                btnDownloadActivePdf.innerText = prev;
+            }
+        });
+
+        new ResizeObserver(scalePreviewToFit).observe(previewViewport);
+
+        // ==========================================
+        // BOOTSTRAP WITH ADMIN AUTH GUARD
+        // ==========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (user.email !== 'tom@tomhendrick.com') {
+                alert('Unauthorized Access: Admin privileges required.');
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                await loadLogoAsset();
+
+                if (batchId) {
+                    await loadExistingBatch(batchId);
+                } else {
+                    certificates = [createBlankCertificate(clientName)];
+                    activeCertId = certificates[0].id;
+                }
+
+                syncDefaultsToInputs();
+                updateHeaderContext();
+                renderList();
+                renderPreview();
+
+                pageLoading.classList.add('hidden');
+                workspace.classList.remove('hidden');
+                scalePreviewToFit();
+            } catch (err) {
+                console.error('Initialization error:', err);
+                pageLoading.innerText = 'Error: ' + err.message;
+            }
+        });
+    </script>
+</body>
+</html>
