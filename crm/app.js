@@ -17,17 +17,16 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Global State
-let clientsMap = {}; 
+let clientsMap = {};
 let currentFocusClient = null;
 let currentAdminUser = null;
 let isSyncing = false;
 
 const SYNC_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
-const SYNC_STORAGE_KEY = 'thps_last_workspace_sync';
-const syncStatusBtn = document.getElementById('sync-status-btn');
+const SYNC_STORAGE_KEY = "thps_last_workspace_sync";
 
 // 2. Auth Guard
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = "login.html";
     } else if (user.email !== "tom@tomhendrick.com") {
@@ -37,10 +36,7 @@ onAuthStateChanged(auth, (user) => {
         });
     } else {
         currentAdminUser = user;
-        loadClients().then(() => {
-            syncWorkspace(false);
-        });
-        
+
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
@@ -49,6 +45,19 @@ onAuthStateChanged(auth, (user) => {
                 });
             });
         }
+
+        const syncStatusBtn = document.getElementById('sync-status-btn');
+        if (syncStatusBtn) {
+            syncStatusBtn.addEventListener('click', () => {
+                if (currentAdminUser) {
+                    syncWorkspace(currentAdminUser, true);
+                }
+            });
+        }
+
+        // Render cached Firestore cards immediately, then run background Workspace sync
+        await loadClients();
+        await syncWorkspace(user, false);
     }
 });
 
@@ -56,31 +65,30 @@ onAuthStateChanged(auth, (user) => {
 // GOOGLE WORKSPACE BACKGROUND SYNC
 // ==========================================
 function formatSyncLabel(timestampMs) {
-    if (!timestampMs) return 'Sync';
+    if (!timestampMs) return "Click to sync";
     const diffMins = Math.floor((Date.now() - timestampMs) / 60000);
-    if (diffMins < 1) return 'Synced just now';
-    if (diffMins === 1) return 'Synced 1m ago';
+    if (diffMins < 1) return "Synced just now";
+    if (diffMins === 1) return "Synced 1m ago";
     if (diffMins < 60) return `Synced ${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
     return `Synced ${diffHours}h ago`;
 }
 
-async function syncWorkspace(force = false) {
-    if (!currentAdminUser || isSyncing) return;
+async function syncWorkspace(user, force = false) {
+    const syncStatusBtn = document.getElementById('sync-status-btn');
+    if (isSyncing) return;
 
     const lastSyncMs = Number(localStorage.getItem(SYNC_STORAGE_KEY) || 0);
-    if (!force && lastSyncMs && (Date.now() - lastSyncMs) < SYNC_COOLDOWN_MS) {
+    if (!force && lastSyncMs > 0 && (Date.now() - lastSyncMs) < SYNC_COOLDOWN_MS) {
         if (syncStatusBtn) syncStatusBtn.innerText = formatSyncLabel(lastSyncMs);
         return;
     }
 
     isSyncing = true;
-    if (syncStatusBtn) {
-        syncStatusBtn.innerText = 'Syncing...';
-    }
+    if (syncStatusBtn) syncStatusBtn.innerText = "Syncing...";
 
     try {
-        const idToken = await currentAdminUser.getIdToken();
+        const idToken = await user.getIdToken();
         const res = await fetch('/api/sync-workspace', {
             method: 'POST',
             headers: {
@@ -96,31 +104,27 @@ async function syncWorkspace(force = false) {
 
         const nowMs = Date.now();
         localStorage.setItem(SYNC_STORAGE_KEY, String(nowMs));
-        if (syncStatusBtn) {
-            syncStatusBtn.innerText = formatSyncLabel(nowMs);
-        }
+        if (syncStatusBtn) syncStatusBtn.innerText = formatSyncLabel(nowMs);
 
+        // Reload cards from Firestore with updated counts & alerts
         await loadClients();
 
-        // Refresh open modal counters live if a client card is currently open
+        // If a client modal is currently open, refresh its live status badges
         if (currentFocusClient) {
-            const key = currentFocusClient.email.toLowerCase();
-            if (clientsMap[key]) {
-                openFocusModal(clientsMap[key]);
+            const refreshed = clientsMap[currentFocusClient.email.toLowerCase()];
+            if (refreshed) {
+                currentFocusClient = refreshed;
+                updateFocusStatusBadges(refreshed);
             }
         }
     } catch (err) {
-        console.warn('Workspace sync warning:', err.message);
+        console.warn("Workspace sync warning:", err.message);
         if (syncStatusBtn) {
-            syncStatusBtn.innerText = 'Sync retry';
+            syncStatusBtn.innerText = lastSyncMs ? formatSyncLabel(lastSyncMs) : "Sync paused";
         }
     } finally {
         isSyncing = false;
     }
-}
-
-if (syncStatusBtn) {
-    syncStatusBtn.addEventListener('click', () => syncWorkspace(true));
 }
 
 // ==========================================
@@ -162,6 +166,23 @@ function resolveClientStage(client) {
     return "Active";
 }
 
+function getClientCounts(client) {
+    const syncedSessionsCount = (client.syncedSessions && typeof client.syncedSessions === 'object')
+        ? Object.keys(client.syncedSessions).length
+        : 0;
+    const syncedClassesCount = (client.syncedClasses && typeof client.syncedClasses === 'object')
+        ? Object.keys(client.syncedClasses).length
+        : 0;
+
+    const legacySessionsCount = Array.isArray(client.bookedSessions) ? client.bookedSessions.length : 0;
+    const legacyClassesCount = Array.isArray(client.bookedDates) ? client.bookedDates.length : 0;
+
+    return {
+        sessionsCount: Math.max(syncedSessionsCount, legacySessionsCount),
+        classesCount: Math.max(syncedClassesCount, legacyClassesCount)
+    };
+}
+
 // 3. HTML Card Builder
 function createClientCard(client) {
     let tagsHtml = (client.tags || []).map(tag => 
@@ -169,35 +190,23 @@ function createClientCard(client) {
     ).join('');
 
     const emailKey = client.email.toLowerCase();
-
-    const syncedSessionsCount = (client.syncedSessions && typeof client.syncedSessions === 'object')
-        ? Object.keys(client.syncedSessions).length
-        : 0;
-    const syncedClassesCount = (client.syncedClasses && typeof client.syncedClasses === 'object')
-        ? Object.keys(client.syncedClasses).length
-        : 0;
-    const legacySessionsCount = Array.isArray(client.bookedSessions) ? client.bookedSessions.length : 0;
-    const legacyClassesCount = Array.isArray(client.bookedDates) ? client.bookedDates.length : 0;
-
-    const sessionsCount = Math.max(syncedSessionsCount, legacySessionsCount);
-    const classesCount = Math.max(syncedClassesCount, legacyClassesCount);
-
-    const unreadCount = Number(client.gmailUnread || 0);
-    const newDriveCount = Number(client.driveNewFiles || 0);
-    const hasAlerts = unreadCount > 0 || newDriveCount > 0;
-
-    const alertTitleParts = [];
-    if (unreadCount > 0) alertTitleParts.push(`${unreadCount} unread email${unreadCount === 1 ? '' : 's'}`);
-    if (newDriveCount > 0) alertTitleParts.push(`${newDriveCount} new Drive file${newDriveCount === 1 ? '' : 's'}`);
-
-    const alertBadge = hasAlerts
-        ? `<span title="${alertTitleParts.join(' • ')}" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs font-extrabold flex-shrink-0 border border-red-200">!</span>`
-        : '';
-
+    const { sessionsCount, classesCount } = getClientCounts(client);
     const totalChargedFormatted = parseFloat(client.totalCharged || 0).toLocaleString('en-AU', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
+
+    const unreadCount = Number(client.gmailUnread || 0);
+    const newDriveCount = Number(client.driveNewFiles || 0);
+    const hasAlert = unreadCount > 0 || newDriveCount > 0;
+
+    const alertReasons = [];
+    if (unreadCount > 0) alertReasons.push(`${unreadCount} unread email${unreadCount === 1 ? '' : 's'}`);
+    if (newDriveCount > 0) alertReasons.push(`${newDriveCount} new Drive file${newDriveCount === 1 ? '' : 's'}`);
+
+    const alertBadge = hasAlert
+        ? `<span title="${alertReasons.join(' • ')}" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-600 border border-red-200 text-xs font-extrabold flex-shrink-0">!</span>`
+        : '';
 
     let cardHtml = `
     <div class="client-card bg-white p-4 rounded-md shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all mb-3 cursor-pointer" data-id="${emailKey}">
@@ -293,13 +302,11 @@ async function loadClients() {
     }
 }
 
-// 5. Client Focus Modal Logic (Activity Log, Routing, Workspace Status, Drive & Billing)
+// 5. Client Focus Modal Logic (Activity Log, Routing, Drive Toggle & Billing)
 const focusModal = document.getElementById('client-focus-modal');
 const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
 const btnDriveToggle = document.getElementById('btn-drive-toggle');
-
-// Workspace Status Elements
 const btnClientEmails = document.getElementById('btn-client-emails');
 const focusEmailCounts = document.getElementById('focus-email-counts');
 const focusGoogleReview = document.getElementById('focus-google-review');
@@ -313,9 +320,9 @@ const quickInvoiceForm = document.getElementById('quick-invoice-form');
 function updateDriveToggleButton(client) {
     if (!btnDriveToggle) return;
     if (client.driveFolderUrl) {
-        const newCount = Number(client.driveNewFiles || 0);
-        const badgeHtml = newCount > 0
-            ? `<span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">[${newCount} new]</span>`
+        const newFiles = Number(client.driveNewFiles || 0);
+        const badgeHtml = newFiles > 0
+            ? `<span class="bg-amber-400 text-slate-900 text-xs font-extrabold px-2 py-0.5 rounded-full">[${newFiles} new]</span>`
             : '';
         btnDriveToggle.innerHTML = `<span>Go to Drive</span> ${badgeHtml}`;
         btnDriveToggle.className = "w-full mb-3 bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-sm hover:bg-blue-700 transition-colors flex justify-center items-center gap-2";
@@ -325,6 +332,28 @@ function updateDriveToggleButton(client) {
     }
 }
 
+function updateFocusStatusBadges(client) {
+    // 1. Emails [X/Y] + direct Gmail search link
+    const unread = Number(client.gmailUnread || 0);
+    const total = Number(client.gmailTotal || 0);
+    if (focusEmailCounts) {
+        focusEmailCounts.innerText = `[${unread}/${total}]`;
+        focusEmailCounts.className = unread > 0 ? "text-red-600 font-extrabold" : "text-slate-600";
+    }
+    if (btnClientEmails && client.email) {
+        const query = encodeURIComponent(`from:${client.email} OR to:${client.email}`);
+        btnClientEmails.href = `https://mail.google.com/mail/u/0/#search/${query}`;
+    }
+
+    // 2. Manual Google Review checkbox
+    if (focusGoogleReview) {
+        focusGoogleReview.checked = Boolean(client.googleReview);
+    }
+
+    // 3. Drive button + [X new] badge
+    updateDriveToggleButton(client);
+}
+
 function openFocusModal(client) {
     currentFocusClient = client;
     
@@ -332,26 +361,12 @@ function openFocusModal(client) {
     document.getElementById('focus-email').innerText = client.email;
     focusStageSelect.value = resolveClientStage(client);
 
-    // Sync Workspace Status Row (Emails [X/Y] + Manual Google Review Toggle)
-    const unreadCount = Number(client.gmailUnread || 0);
-    const totalCount = Number(client.gmailTotal || 0);
-    if (focusEmailCounts) {
-        focusEmailCounts.innerText = `[${unreadCount}/${totalCount}]`;
-        focusEmailCounts.className = unreadCount > 0 ? 'text-red-600 font-extrabold' : 'text-slate-600';
-    }
-    if (btnClientEmails) {
-        btnClientEmails.href = `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(client.email)}`;
-    }
-    if (focusGoogleReview) {
-        focusGoogleReview.checked = Boolean(client.googleReview);
-    }
-
     // Reset the mini-form state every time the modal opens
     quickInvoiceForm.reset();
     quickInvoiceForm.classList.add('hidden');
 
-    // Sync Generate Drive / Go to Drive [X new] button state
-    updateDriveToggleButton(client);
+    // Sync Emails, Google Review, and Drive status indicators
+    updateFocusStatusBadges(client);
 
     const logContainer = document.getElementById('focus-activity-log');
     logContainer.innerHTML = '';
@@ -424,13 +439,9 @@ if (focusGoogleReview) {
             await setDoc(clientRef, {
                 googleReview: checked
             }, { merge: true });
-
             currentFocusClient.googleReview = checked;
-            if (clientsMap[clientId]) {
-                clientsMap[clientId].googleReview = checked;
-            }
         } catch (err) {
-            console.error("Error updating Google Review status:", err);
+            console.error("Failed to save Google Review status:", err);
             e.target.checked = !checked;
             alert("Failed to update Google Review status.");
         }
@@ -496,7 +507,7 @@ if (btnDriveToggle) {
     btnDriveToggle.addEventListener('click', async () => {
         if (!currentFocusClient) return;
 
-        // If folder already exists, open it in a new tab & clear [X new] badge
+        // If folder already exists, open it and mark Drive files as reviewed
         if (currentFocusClient.driveFolderUrl) {
             window.open(currentFocusClient.driveFolderUrl, '_blank', 'noopener,noreferrer');
 
@@ -529,4 +540,226 @@ if (btnDriveToggle) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email: currentFocusClient.email,
-                    name: current
+                    name: currentFocusClient.name
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.success && result.folderUrl) {
+                const nowIso = new Date().toISOString();
+                currentFocusClient.driveFolderUrl = result.folderUrl;
+                currentFocusClient.lastDriveVisitedAt = nowIso;
+                currentFocusClient.driveNewFiles = 0;
+                currentFocusClient.manualStageOverride = null;
+                currentFocusClient.last_contact_date = nowIso;
+
+                if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
+                currentFocusClient.activity_log.push({
+                    type: "admin",
+                    action: "Generated Google Drive folder",
+                    url: result.folderUrl,
+                    timestamp: nowIso
+                });
+
+                await loadClients();
+                openFocusModal(currentFocusClient);
+            } else {
+                alert("Failed to generate Drive folder: " + (result.error || result.message));
+                updateDriveToggleButton(currentFocusClient);
+            }
+        } catch (err) {
+            console.error("Drive toggle error:", err);
+            alert("An error occurred while generating the Google Drive folder.");
+            updateDriveToggleButton(currentFocusClient);
+        } finally {
+            btnDriveToggle.disabled = false;
+        }
+    });
+}
+
+// ==========================================
+// BILLING & DOCUMENT ACTIONS LOGIC
+// ==========================================
+
+// Path A: Redirect to Full Contract page with auto-fill parameters
+btnFullContract.addEventListener('click', () => {
+    if (!currentFocusClient) return;
+    const name = encodeURIComponent(currentFocusClient.name);
+    const email = encodeURIComponent(currentFocusClient.email);
+    window.location.href = `admin-contract.html?name=${name}&email=${email}`;
+});
+
+// Path C: Redirect to Batch Certificate Builder with client pre-filled
+if (btnCertificates) {
+    btnCertificates.addEventListener('click', () => {
+        if (!currentFocusClient) return;
+        const name = encodeURIComponent(currentFocusClient.name);
+        const email = encodeURIComponent(currentFocusClient.email);
+        window.location.href = `admin-certificates.html?name=${name}&email=${email}`;
+    });
+}
+
+// Path B: Reveal Mini-Form (Defaults to GST Included)
+btnQuickInvoiceToggle.addEventListener('click', () => {
+    quickInvoiceForm.innerHTML = `
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Service Description</label>
+            <input type="text" id="qi-desc" required placeholder="e.g., 1x Ad-hoc Coaching" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Units (Hrs/Qty)</label>
+                <input type="number" id="qi-units" required min="1" value="1" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Rate ($)</label>
+                <input type="number" id="qi-rate" required min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Fixed Discount ($)</label>
+            <input type="number" id="qi-discount" min="0" step="0.01" value="0" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none">
+        </div>
+        <div class="mt-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1">GST Configuration</label>
+            <select id="qi-gst-mode" class="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-600 outline-none bg-white">
+                <option value="inclusive" selected>GST Included (Inclusive)</option>
+                <option value="exclusive">Apply 10% GST (Exclusive)</option>
+                <option value="none">No GST</option>
+            </select>
+        </div>
+        <button type="submit" id="qi-submit" class="w-full bg-green-700 text-white font-bold py-3 rounded shadow hover:bg-green-800 transition-colors mt-4 text-sm">Generate PDF Invoice</button>
+    `;
+    quickInvoiceForm.classList.toggle('hidden');
+});
+
+// Path B: Submit Quick Invoice Data
+quickInvoiceForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('qi-submit');
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Generating Invoice...";
+
+    const payload = {
+        clientEmail: currentFocusClient.email,
+        clientName: currentFocusClient.name,
+        description: document.getElementById('qi-desc').value,
+        units: document.getElementById('qi-units').value,
+        rate: document.getElementById('qi-rate').value,
+        discount: document.getElementById('qi-discount').value,
+        gstMode: document.getElementById('qi-gst-mode').value
+    };
+
+    try {
+        const res = await fetch('/api/quick-invoice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            const baseAmount = (parseInt(payload.units) || 1) * (parseFloat(payload.rate) || 0);
+            const subtotal = Math.max(0, baseAmount - (parseFloat(payload.discount) || 0));
+            const totalFee = payload.gstMode === "exclusive"
+                ? parseFloat((subtotal * 1.1).toFixed(2))
+                : parseFloat(subtotal.toFixed(2));
+
+            quickInvoiceForm.reset();
+            quickInvoiceForm.classList.add('hidden');
+            
+            if (!currentFocusClient.activity_log) currentFocusClient.activity_log = [];
+            currentFocusClient.activity_log.push({
+                type: "admin",
+                action: `Generated Quick Invoice: $${totalFee.toFixed(2)}`,
+                url: result.magicLink,
+                timestamp: new Date().toISOString()
+            });
+            currentFocusClient.totalCharged = (parseFloat(currentFocusClient.totalCharged) || 0) + totalFee;
+            currentFocusClient.manualStageOverride = null;
+            
+            await loadClients(); 
+            openFocusModal(currentFocusClient);
+
+            const newWindow = window.open(result.magicLink, '_blank');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                alert(`Invoice generated successfully!\n\nYour browser blocked the automatic pop-up. Please copy this link and open it in a new tab:\n\n${result.magicLink}`);
+            }
+        } else {
+            alert("Failed to generate invoice: " + (result.error || result.message));
+        }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while generating the invoice.");
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Generate PDF Invoice";
+        }
+    }
+});
+
+
+// 6. New Client Modal Logic
+const newClientBtn = document.getElementById('new-client-btn');
+const newClientModal = document.getElementById('new-client-modal');
+const closeModalX = document.getElementById('close-modal-x');
+const cancelModalBtn = document.getElementById('cancel-modal-btn');
+const newClientForm = document.getElementById('new-client-form');
+const saveClientBtn = document.getElementById('save-client-btn');
+
+if (newClientBtn) {
+    newClientBtn.addEventListener('click', () => newClientModal.classList.remove('hidden'));
+}
+
+const closeNewClientModal = () => {
+    newClientModal.classList.add('hidden');
+    newClientForm.reset();
+};
+
+if (closeModalX) closeModalX.addEventListener('click', closeNewClientModal);
+if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeNewClientModal);
+
+if (newClientForm) {
+    newClientForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        saveClientBtn.disabled = true;
+        saveClientBtn.innerText = "Saving...";
+
+        try {
+            const rawEmail = document.getElementById('modal-email').value;
+            const clientId = rawEmail.toLowerCase();
+            const clientRef = doc(db, "Clients", clientId);
+            const nowIso = new Date().toISOString();
+
+            await setDoc(clientRef, {
+                name: document.getElementById('modal-name').value,
+                email: rawEmail,
+                tags: arrayUnion(document.getElementById('modal-source').value), 
+                stage: "Enquiry Received",
+                manualStageOverride: null,
+                totalCharged: 0,
+                bookedSessions: [],
+                bookedDates: [],
+                createdAt: nowIso,
+                last_contact_date: nowIso,
+                activity_log: arrayUnion({
+                    type: "admin",
+                    action: "Manually added to CRM Pipeline",
+                    timestamp: nowIso
+                })
+            }, { merge: true });
+
+            closeNewClientModal();
+            window.location.reload(); 
+        } catch (error) {
+            console.error("Error adding client: ", error);
+            alert("Failed to add client. Check console.");
+        } finally {
+            saveClientBtn.disabled = false;
+            saveClientBtn.innerText = "Save";
+        }
+    });
+}
