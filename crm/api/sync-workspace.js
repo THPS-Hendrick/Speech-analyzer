@@ -206,31 +206,36 @@ export default async function handler(req, res) {
                 Object.assign(existingSessions, freshCal.sessions);
                 Object.assign(existingClasses, freshCal.classes);
 
-                // B. Gmail Unread / Total Counts
+                // B. Exact Gmail Unread / Total Counts (avoids resultSizeEstimate=201 bug)
                 let gmailUnread = typeof data.gmailUnread === 'number' ? data.gmailUnread : 0;
                 let gmailTotal = typeof data.gmailTotal === 'number' ? data.gmailTotal : 0;
                 let latestGmailIso = null;
 
                 try {
-                    const baseQuery = `(from:${emailKey} OR to:${emailKey})`;
+                    const totalQuery = `from:${emailKey} OR to:${emailKey}`;
+                    const unreadQuery = `from:${emailKey} is:unread`;
+
                     const [totalRes, unreadRes] = await Promise.all([
                         gmail.users.messages.list({
                             userId: 'me',
-                            q: baseQuery,
-                            maxResults: 1
+                            q: totalQuery,
+                            maxResults: 500
                         }),
                         gmail.users.messages.list({
                             userId: 'me',
-                            q: `${baseQuery} is:unread`,
-                            maxResults: 1
+                            q: unreadQuery,
+                            maxResults: 500
                         })
                     ]);
 
-                    gmailTotal = totalRes.data.resultSizeEstimate ?? 0;
-                    gmailUnread = unreadRes.data.resultSizeEstimate ?? 0;
+                    const totalMessages = totalRes.data.messages || [];
+                    const unreadMessages = unreadRes.data.messages || [];
+
+                    gmailTotal = totalMessages.length;
+                    gmailUnread = unreadMessages.length;
 
                     // Fetch timestamp of newest message to keep dormancy accurate
-                    const newestMsg = totalRes.data.messages?.[0];
+                    const newestMsg = totalMessages[0];
                     if (newestMsg?.id) {
                         const msgMeta = await gmail.users.messages.get({
                             userId: 'me',
