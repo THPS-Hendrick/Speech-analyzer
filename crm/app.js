@@ -306,6 +306,7 @@ async function loadClients() {
 const focusModal = document.getElementById('client-focus-modal');
 const closeFocusModalBtn = document.getElementById('close-focus-modal');
 const focusStageSelect = document.getElementById('focus-stage-select');
+const btnOnboard = document.getElementById('btn-onboard');
 const btnDriveToggle = document.getElementById('btn-drive-toggle');
 const btnClientEmails = document.getElementById('btn-client-emails');
 const focusEmailCounts = document.getElementById('focus-email-counts');
@@ -426,6 +427,16 @@ closeFocusModalBtn.addEventListener('click', () => {
     focusModal.classList.add('hidden');
     currentFocusClient = null;
 });
+
+// Launch Onboarding & Speech Assessment Wizard
+if (btnOnboard) {
+    btnOnboard.addEventListener('click', () => {
+        if (!currentFocusClient) return;
+        const name = encodeURIComponent(currentFocusClient.name);
+        const email = encodeURIComponent(currentFocusClient.email);
+        window.location.href = `admin-onboard.html?name=${name}&email=${email}`;
+    });
+}
 
 // Manual Google Review Toggle
 if (focusGoogleReview) {
