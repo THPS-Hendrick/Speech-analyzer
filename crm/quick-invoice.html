@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Invoice &amp; Checkout | THPS CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen font-sans p-4 md:p-8">
+
+    <div id="loading-guard" class="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center text-slate-500 font-medium">
+        Verifying admin session...
+    </div>
+
+    <div id="invoice-workspace" class="hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-slate-900 px-6 py-5 text-white flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <span id="pkg-badge" class="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 mb-1">
+                    Coaching Package Invoice
+                </span>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight">Quick Invoice &amp; Onboarding Checkout</h1>
+            </div>
+            <div class="text-right">
+                <div id="header-discount-note" class="hidden text-xs text-slate-400 line-through">$2,475.00 AUD</div>
+                <div id="header-total-display" class="text-2xl font-extrabold text-emerald-400">$990.00 AUD</div>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8 space-y-6">
+            <!-- Status Banner -->
+            <div id="status-banner" class="hidden rounded-xl p-4 border text-sm font-medium"></div>
+
+            <!-- 1. Client Details -->
+            <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2 mb-4">1. Client Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Client Name</label>
+                        <input type="text" id="qi-client-name" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Client Email</label>
+                        <input type="email" id="qi-client-email" required class="w-full p-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Editable Line Item & Pricing -->
+            <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2 mb-4">2. Package &amp; Pricing (Editable)</h2>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Service Description</label>
+                        <input type="text" id="qi-description" required class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Units (Qty)</label>
+                            <input type="number" id="qi-units" min="1" value="1" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Unit Rate ($ AUD)</label>
+                            <input type="number" id="qi-rate" min="0" step="0.01" value="990" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Fixed Discount ($)</label>
+                            <input type="number" id="qi-discount" min="0" step="0.01" value="0" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">GST Mode</label>
+                            <select id="qi-gst" class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none">
+                                <option value="inclusive" selected>GST Included (Inclusive)</option>
+                                <option value="exclusive">Apply 10% GST (Exclusive)</option>
+                                <option value="none">No GST</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Totals Summary -->
+                    <div class="border-t border-slate-200 pt-3 flex flex-wrap items-center justify-between gap-4 text-sm">
+                        <div class="text-slate-500">
+                            <span id="calc-gst-label">Includes GST (10%):</span>
+                            <strong id="calc-gst-amount" class="text-slate-700">$90.00</strong>
+                        </div>
+                        <div class="text-lg font-extrabold text-slate-900">
+                            Final Invoice Total: <span id="calc-final-total" class="text-emerald-700">$990.00 AUD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Included Client Onboarding Links & Member Hub Instructions -->
+            <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2 mb-4">3. Client Booking Link &amp; Member Hub Instructions</h2>
+                <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 space-y-3 text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-white border border-indigo-100 rounded-lg p-3">
+                            <span class="block text-[11px] font-bold uppercase tracking-wider text-indigo-600 mb-1">Session Booking Link</span>
+                            <a href="https://www.tomhendrick.com/services/thps-speech-assessment" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-slate-800 hover:text-indigo-600 break-all underline">
+                                https://www.tomhendrick.com/services/thps-speech-assessment
+                            </a>
+                        </div>
+                        <div class="bg-white border border-indigo-100 rounded-lg p-3">
+                            <span class="block text-[11px] font-bold uppercase tracking-wider text-indigo-600 mb-1">Member Hub Login (1-Year Access)</span>
+                            <a href="https://www.tomhendrick.com/members/login" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-slate-800 hover:text-indigo-600 break-all underline">
+                                https://www.tomhendrick.com/members/login
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        <strong>Member Hub Instructions (included automatically in email):</strong> Log in at <em>tomhendrick.com/members/login</em> using the client email above, enable microphone permissions, and practise with Mic-Check Daily &amp; Voice Choice between coaching sessions.
+                    </p>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Optional Personal Note for Email</label>
+                        <textarea id="qi-custom-note" rows="2" placeholder="Add any custom message to include above the invoice & onboarding links..." class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-600 outline-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons: Pay on Spot (Stripe) vs Send Email -->
+            <div class="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="btn-stripe-now" type="button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-5 rounded-xl shadow-md transition-colors flex flex-col items-center justify-center">
+                    <span class="text-base">Pay on the Spot via Stripe</span>
+                    <span id="stripe-method-hint" class="text-[11px] font-normal text-indigo-200 mt-0.5">Card, Apple Pay, Google Pay, or BECS Direct Debit</span>
+                </button>
+
+                <button id="btn-send-invoice" type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-5 rounded-xl shadow-md transition-colors flex flex-col items-center justify-center">
+                    <span class="text-base">Send Invoice &amp; Hub Links to Email</span>
+                    <span class="text-[11px] font-normal text-emerald-100 mt-0.5">Emails invoice link, booking link &amp; member login guide</span>
+                </button>
+            </div>
+
+            <!-- Direct Invoice Magic Link Preview (revealed once generated) -->
+            <div id="generated-link-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="text-xs">
+                    <span class="font-bold text-slate-700 block">Generated Invoice Link:</span>
+                    <a id="generated-link-anchor" href="#" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-mono underline break-all"></a>
+                </div>
+                <button id="btn-copy-link" type="button" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-lg">
+                    Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
+            authDomain: "thps-crm.firebaseapp.com",
+            projectId: "thps-crm",
+            storageBucket: "thps-crm.firebasestorage.app",
+            messagingSenderId: "297605373498",
+            appId: "1:297605373498:web:606241a173f3150a16df03"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        let currentUser = null;
+        let createdInvoice = null; // Cache { invoiceId, magicLink, fingerprint } so clicking both buttons reuses same invoice
+
+        const params = new URLSearchParams(window.location.search);
+        const pkg = params.get('pkg') || '4hr';
+
+        const nameInput = document.getElementById('qi-client-name');
+        const emailInput = document.getElementById('qi-client-email');
+        const descInput = document.getElementById('qi-description');
+        const unitsInput = document.getElementById('qi-units');
+        const rateInput = document.getElementById('qi-rate');
+        const discountInput = document.getElementById('qi-discount');
+        const gstSelect = document.getElementById('qi-gst');
+        const customNoteInput = document.getElementById('qi-custom-note');
+
+        const pkgBadge = document.getElementById('pkg-badge');
+        const headerDiscountNote = document.getElementById('header-discount-note');
+        const headerTotalDisplay = document.getElementById('header-total-display');
+        const calcGstLabel = document.getElementById('calc-gst-label');
+        const calcGstAmount = document.getElementById('calc-gst-amount');
+        const calcFinalTotal = document.getElementById('calc-final-total');
+        const stripeMethodHint = document.getElementById('stripe-method-hint');
+        const statusBanner = document.getElementById('status-banner');
+        const btnStripeNow = document.getElementById('btn-stripe-now');
+        const btnSendInvoice = document.getElementById('btn-send-invoice');
+
+        // Pre-fill from URL parameters
+        nameInput.value = params.get('name') || '';
+        emailInput.value = params.get('email') || '';
+
+        if (pkg === '10hr') {
+            pkgBadge.innerText = 'Best Value Package';
+            descInput.value = '10x 1 Hour Coaching Package + 1 Year Member Hub Access + Certificate (Discounted from $2,475)';
+            unitsInput.value = '1';
+            rateInput.value = '2475';
+            discountInput.value = '485';
+        } else {
+            pkgBadge.innerText = 'Most Popular Package';
+            descInput.value = '4x 1 Hour Coaching Package + 1 Year Member Hub Access';
+            unitsInput.value = '1';
+            rateInput.value = '990';
+            discountInput.value = '0';
+        }
+
+        function computeTotals() {
+            const units = Math.max(1, parseInt(unitsInput.value) || 1);
+            const rate = Math.max(0, parseFloat(rateInput.value) || 0);
+            const discount = Math.max(0, parseFloat(discountInput.value) || 0);
+            const gstMode = gstSelect.value;
+
+            const base = units * rate;
+            const subtotal = Math.max(0, base - discount);
+            let gst = 0;
+            let total = subtotal;
+
+            if (gstMode === 'inclusive') {
+                total = parseFloat(subtotal.toFixed(2));
+                gst = parseFloat((total / 11).toFixed(2));
+                calcGstLabel.innerText = 'Includes GST (10%):';
+            } else if (gstMode === 'exclusive') {
+                gst = parseFloat((subtotal * 0.10).toFixed(2));
+                total = parseFloat((subtotal + gst).toFixed(2));
+                calcGstLabel.innerText = 'Plus GST (10%):';
+            } else {
+                calcGstLabel.innerText = 'GST:';
+            }
+
+            calcGstAmount.innerText = `$${gst.toFixed(2)}`;
+            calcFinalTotal.innerText = `$${total.toFixed(2)} AUD`;
+            headerTotalDisplay.innerText = `$${total.toFixed(2)} AUD`;
+
+            if (discount > 0 && base > total) {
+                headerDiscountNote.innerText = `$${base.toFixed(2)} AUD`;
+                headerDiscountNote.classList.remove('hidden');
+            } else {
+                headerDiscountNote.classList.add('hidden');
+            }
+
+            stripeMethodHint.innerText = total >= 1000
+                ? 'AU BECS Direct Debit (orders $1,000+ AUD)'
+                : 'Card, Apple Pay, Google Pay, or AU BECS Direct Debit';
+
+            return { units, rate, discount, gstMode, total };
+        }
+
+        [unitsInput, rateInput, discountInput, gstSelect].forEach(el => {
+            el.addEventListener('input', computeTotals);
+            el.addEventListener('change', computeTotals);
+        });
+        computeTotals();
+
+        function showBanner(type, message) {
+            statusBanner.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'text-emerald-800', 'bg-red-50', 'border-red-200', 'text-red-800', 'bg-blue-50', 'border-blue-200', 'text-blue-800');
+            if (type === 'success') {
+                statusBanner.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+            } else if (type === 'error') {
+                statusBanner.classList.add('bg-red-50', 'border-red-200', 'text-red-800');
+            } else {
+                statusBanner.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-800');
+            }
+            statusBanner.innerText = message;
+        }
+
+        async function ensureInvoiceCreated() {
+            const clientName = nameInput.value.trim();
+            const clientEmail = emailInput.value.trim();
+            const description = descInput.value.trim();
+
+            if (!clientName || !clientEmail || !description) {
+                throw new Error('Please fill in Client Name, Client Email, and Service Description.');
+            }
+
+            const totals = computeTotals();
+            const payload = {
+                clientName,
+                clientEmail,
+                description,
+                units: totals.units,
+                rate: totals.rate,
+                discount: totals.discount,
+                gstMode: totals.gstMode
+            };
+            const fingerprint = JSON.stringify(payload);
+
+            if (createdInvoice && createdInvoice.fingerprint === fingerprint) {
+                return createdInvoice;
+            }
+
+            const res = await fetch('/api/quick-invoice', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                throw new Error(result.error || result.message || 'Failed to generate invoice.');
+            }
+
+            createdInvoice = {
+                invoiceId: result.invoiceId,
+                magicLink: result.magicLink,
+                totalFee: totals.total,
+                packageTitle: description,
+                fingerprint
+            };
+
+            const linkBox = document.getElementById('generated-link-box');
+            const linkAnchor = document.getElementById('generated-link-anchor');
+            linkAnchor.href = result.magicLink;
+            linkAnchor.innerText = result.magicLink;
+            linkBox.classList.remove('hidden');
+
+            return createdInvoice;
+        }
+
+        document.getElementById('btn-copy-link').addEventListener('click', () => {
+            if (!createdInvoice?.magicLink) return;
+            navigator.clipboard.writeText(createdInvoice.magicLink);
+            showBanner('info', 'Invoice link copied to clipboard.');
+        });
+
+        // Pay on the spot via Stripe Checkout
+        btnStripeNow.addEventListener('click', async () => {
+            btnStripeNow.disabled = true;
+            btnSendInvoice.disabled = true;
+            showBanner('info', 'Generating invoice and connecting to Stripe Checkout...');
+
+            try {
+                const inv = await ensureInvoiceCreated();
+                const res = await fetch('/api/create-invoice-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ invoiceId: inv.invoiceId })
+                });
+                const checkout = await res.json();
+                if (!res.ok || !checkout.url) {
+                    throw new Error(checkout.error || checkout.message || 'Could not start Stripe Checkout.');
+                }
+                window.location.href = checkout.url;
+            } catch (err) {
+                showBanner('error', err.message);
+                btnStripeNow.disabled = false;
+                btnSendInvoice.disabled = false;
+            }
+        });
+
+        // Send Invoice + Booking Link + Member Hub Instructions via Gmail
+        btnSendInvoice.addEventListener('click', async () => {
+            btnStripeNow.disabled = true;
+            btnSendInvoice.disabled = true;
+            showBanner('info', 'Generating invoice and emailing client with booking & Member Hub links...');
+
+            try {
+                const inv = await ensureInvoiceCreated();
+                const idToken = await currentUser.getIdToken();
+
+                const res = await fetch('/api/onboarding-actions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({
+                        action: 'send_package_invoice',
+                        clientEmail: emailInput.value.trim(),
+                        clientName: nameInput.value.trim(),
+                        packageTitle: inv.packageTitle,
+                        totalFee: inv.totalFee,
+                        magicLink: inv.magicLink,
+                        customNotes: customNoteInput.value.trim()
+                    })
+                });
+
+                const result = await res.json();
+                if (!res.ok || !result.success) {
+                    throw new Error(result.error || result.message || 'Failed to email invoice.');
+                }
+
+                showBanner('success', `Invoice (${inv.magicLink}) and onboarding instructions emailed to ${emailInput.value.trim()}!`);
+            } catch (err) {
+                showBanner('error', err.message);
+            } finally {
+                btnStripeNow.disabled = false;
+                btnSendInvoice.disabled = false;
+            }
+        });
+
+        // Admin Auth Guard
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (user.email !== 'tom@tomhendrick.com') {
+                alert('Unauthorized Access: Admin privileges required.');
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = user;
+            document.getElementById('loading-guard').classList.add('hidden');
+            document.getElementById('invoice-workspace').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
