@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Onboarding &amp; Speech Assessment | THPS CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Speech Analyzer Dependencies (NLP + Engines + Voice Timeline Widget) -->
+    <script src="https://cdn.jsdelivr.net/npm/compromise@14.14.3/builds/compromise.min.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-engine-headless.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/report-scoring-matrix.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/thps-mini-core.js"></script>
+    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/widgets/vocal-timeline.js"></script>
+
+    <style>
+        /* Horizontal Phantasia Dial Styling */
+        .phantasia-dial::-webkit-scrollbar { height: 8px; }
+        .phantasia-dial::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 9999px; }
+        .phantasia-dial::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 9999px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #ffffff !important; height: auto !important; overflow: visible !important; }
+            #main-shell { height: auto !important; overflow: visible !important; }
+            #step-scroll-area { overflow: visible !important; padding: 0 !important; }
+            .print-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden font-sans">
+
+    <!-- Top Admin Header -->
+    <header class="bg-slate-900 text-white px-5 py-3.5 shadow-md flex flex-wrap items-center justify-between gap-3 flex-shrink-0 no-print">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="text-slate-300 hover:text-white text-sm font-semibold inline-flex items-center gap-1 transition-colors">
+                <span>&larr;</span> Pipeline
+            </a>
+            <div class="h-5 w-px bg-slate-700"></div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-base md:text-lg font-bold tracking-tight">Client Onboarding Wizard</h1>
+                    <span id="step-counter-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/40">
+                        Step 1 of 15
+                    </span>
+                </div>
+                <p id="client-header-subtitle" class="text-xs text-slate-300">Loading client...</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+            <span id="global-toast" class="hidden text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-900/80 text-emerald-200 border border-emerald-600"></span>
+            <button id="btn-header-save" type="button" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors">
+                Save Payload (.json)
+            </button>
+        </div>
+    </header>
+
+    <!-- Auth Loading Screen -->
+    <div id="auth-loading" class="flex-1 flex items-center justify-center text-slate-500 font-medium">
+        Verifying admin session &amp; loading client profile...
+    </div>
+
+    <!-- Main 2-Pane Wizard Shell -->
+    <div id="main-shell" class="hidden flex-1 flex overflow-hidden">
+
+        <!-- Left Step Sidebar -->
+        <aside class="w-16 md:w-64 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col overflow-y-auto flex-shrink-0 no-print">
+            <nav id="wizard-sidebar-nav" class="p-2.5 space-y-1"></nav>
+        </aside>
+
+        <!-- Right Step Content + Sticky Footer -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            <div id="step-scroll-area" class="flex-1 overflow-y-auto p-4 md:p-8">
+                <div id="step-mount" class="max-w-5xl mx-auto"></div>
+            </div>
+
+            <!-- Sticky Bottom Bar (Prev / Save / Next) -->
+            <footer class="bg-white border-t border-slate-200 px-6 py-3.5 flex items-center justify-between gap-3 flex-shrink-0 no-print">
+                <button id="btn-prev-step" type="button" class="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                    &larr; Previous
+                </button>
+
+                <div class="flex items-center gap-3">
+                    <button id="btn-footer-save" type="button" class="px-5 py-2.5 rounded-lg border-2 border-indigo-600 text-indigo-700 hover:bg-indigo-50 font-bold text-sm transition-colors">
+                        Save
+                    </button>
+                    <button id="btn-next-step" type="button" class="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-sm transition-colors">
+                        Next &rarr;
+                    </button>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Hidden input used by speech engines if queried -->
+    <textarea id="cba-inputText" class="hidden"></textarea>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOUyOnxrYzL_lFe86pA5M61CI1N7ER5gU",
+            authDomain: "thps-crm.firebaseapp.com",
+            projectId: "thps-crm",
+            storageBucket: "thps-crm.firebasestorage.app",
+            messagingSenderId: "297605373498",
+            appId: "1:297605373498:web:606241a173f3150a16df03"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ==========================================
+        // CONSTANTS & CURRICULUM DEFINITIONS
+        // ==========================================
+        const HOUSE_IMAGE_URL = "https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/courses/say-what-you-see/images/image_1.png";
+        const MEMBER_PORTAL_URL = "https://www.tomhendrick.com/members/login";
+        const BOOKING_URL = "https://www.tomhendrick.com/services/thps-speech-assessment";
+
+        const CHALLENGE_PILLS = [
+            "large crowds",
+            "interviews",
+            "socials",
+            "no blanking",
+            "engaging",
+            "no script",
+            "low discomfort",
+            "team talks",
+            "hard talks"
+        ];
+
+        const NERVE_QUESTIONS = [
+            { id: "q1", label: "1. How much discomfort when preparing for an important conversation / presentation?" },
+            { id: "q2", label: "2. How much discomfort when you begin an important conversation / presentation?" },
+            { id: "q3", label: "3. How much discomfort giving bad news?" },
+            { id: "q4", label: "4. How much discomfort receiving bad news?" }
+        ];
+
+        const PACINO_LINES = [
+            { intensity: 1, text: "You know, when you get old in life things get taken from you. I mean that's...part of life." },
+            { intensity: 1, text: "You find out life's this game of inches" },
+            { intensity: 2, text: "So is football. Because in either game, life or football, the margin for error is so small." },
+            { intensity: 2, text: "One-half a step too late, or too early, and you don't quite make it." },
+            { intensity: 3, text: "But the inches we need are everywhere." },
+            { intensity: 3, text: "They're in every break of the game, every minute, every second." },
+            { intensity: 4, text: "On this team, we fight for that inch." },
+            { intensity: 4, text: "On this team, we tear ourselves and everyone else around us to pieces for that inch." },
+            { intensity: 5, text: "We claw with our fingernails for that inch, because we know when we add up all those inches that's gonna make the difference between winning and losing!" },
+            { intensity: 5, text: "Between livin' and dyin'!" }
+        ];
+
+        const RULE_PROMPT_ROUNDS = [
+            {
+                step: 7,
+                round: 1,
+                title: "Rule Prompt Test — Round 1 of 6",
+                instructions: [
+                    "SAY ONLY underlined word(s)",
+                    "INFLECT VOICE"
+                ],
+                questions: [
+                    "1. Would you invest in a <u>bakery</u>?",
+                    "2. Would you <u>invest</u> in a theme park?",
+                    "3. Would you rather <u>coffee or tea</u>?",
+                    "4. Would you rather have <u>a home</u> by the beach or in the mountains?",
+                    "5. What's your <u>dream job</u> if money didn't matter?"
+                ]
+            },
+            {
+                step: 8,
+                round: 2,
+                title: "Rule Prompt Test — Round 2 of 6",
+                instructions: [
+                    "REPEAT 1 or 2 words",
+                    "INFLECT VOICE"
+                ],
+                questions: [
+                    "1. What does the ideal Sunday look like?",
+                    "2. Would you invest in a board game?",
+                    "3. Would you invest in a fashion store?",
+                    "4. What's better: summer or winter?",
+                    "5. Would you rather lose a phone or wallet?"
+                ]
+            },
+            {
+                step: 9,
+                round: 3,
+                title: "Rule Prompt Test — Round 3 of 6",
+                instructions: [
+                    "AMEND QUESTION from your perspective",
+                    "INFLECT VOICE for ONE WORD only"
+                ],
+                questions: [
+                    "1. What does the ideal birthday look like?",
+                    "2. What's the best way to spend a rainy day?",
+                    "3. Would you invest in a jazz club?",
+                    "4. Would you invest in a rooftop bar?",
+                    "5. What's better: skydiving or scuba diving?"
+                ]
+            },
+            {
+                step: 10,
+                round: 4,
+                title: "Rule Prompt Test — Round 4 of 6",
+                instructions: [
+                    "AMEND QUESTION into a STATEMENT",
+                    "INFLECT VOICE for ONE WORD only"
+                ],
+                questions: [
+                    "1. Would you rather live on a boat or bus?",
+                    "2. What's your go-to comfort food?",
+                    "3. What's your dream festival or event?",
+                    "4. Would you invest in a yoga studio?",
+                    "5. Would you invest in an indie movie?"
+                ]
+            },
+            {
+                step: 11,
+                round: 5,
+                title: "Rule Prompt Test — Round 5 of 6",
+                instructions: [
+                    "QUESTION or STATEMENT",
+                    "ADD a SMALL thing and a BIG thing",
+                    "INFLECT VOICE for ONE WORD only"
+                ],
+                questions: [
+                    "1. What's your ideal daily routine?",
+                    "2. What makes a perfect morning?",
+                    "3. Would you invest in a chocolate factory?",
+                    "4. Could you live without the internet?",
+                    "5. What's better: unlimited travel or time?"
+                ]
+            },
+            {
+                step: 12,
+                round: 6,
+                title: "Rule Prompt Test — Round 6 of 6",
+                instructions: [
+                    "QUESTION or STATEMENT",
+                    "ADD a pair of OPPOSITES",
+                    "NOT SMALL thing or BIG thing",
+                    "INFLECT VOICE for ONE WORD only"
+                ],
+                questions: [
+                    "1. Would you invest in a local newspaper?",
+                    "2. What's better: famous or anonymous?",
+                    "3. Would you invest in a casino?",
+                    "4. Would you invest in a cooking school?",
+                    "5. What's better: early or fashionably late?"
+                ]
+            }
+        ];
+
+        const WIZARD_STEPS = [
+            { step: 1, short: "Challenges", label: "1. Challenges & Opportunities" },
+            { step: 2, short: "Nerves", label: "2. Nerve Assessment" },
+            { step: 3, short: "Vocal Inhibition", label: "3. Vocal Inhibition Test" },
+            { step: 4, short: "Phantasia", label: "4. Phantasia Test" },
+            { step: 5, short: "Image Prompt 1", label: "5. Image Prompt #1 (House)" },
+            { step: 6, short: "Image Prompt 2", label: "6. Image Prompt #2 (Blank)" },
+            { step: 7, short: "Rules 1/6", label: "7. Rule Prompts (1 of 6)" },
+            { step: 8, short: "Rules 2/6", label: "8. Rule Prompts (2 of 6)" },
+            { step: 9, short: "Rules 3/6", label: "9. Rule Prompts (3 of 6)" },
+            { step: 10, short: "Rules 4/6", label: "10. Rule Prompts (4 of 6)" },
+            { step: 11, short: "Rules 5/6", label: "11. Rule Prompts (5 of 6)" },
+            { step: 12, short: "Rules 6/6", label: "12. Rule Prompts (6 of 6)" },
+            { step: 13, short: "Results & Drive", label: "13. Assessment Results" },
+            { step: 14, short: "Sales Options", label: "14. Sales Packages" },
+            { step: 15, short: "Batch Booking", label: "15. Batch Session Booking" }
+        ];
+
+        // ==========================================
+        // STATE MODEL (Unified & Hydration-Ready)
+        // ==========================================
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentUser = null;
+        let currentStep = 1;
+        let activeRecordingContext = null; // { type: 'vocal_demo' | 'vocal_client' | 'image1' | 'image2' }
+        let uiTimerInterval = null;
+        let activeTimelineTab = "client"; // 'demo' | 'client'
+
+        const state = {
+            schemaVersion: "thps-onboarding-v1",
+            updatedAt: new Date().toISOString(),
+            client: {
+                name: urlParams.get("name") || "",
+                email: (urlParams.get("email") || "").toLowerCase(),
+                driveFolderUrl: "",
+                driveFolderId: ""
+            },
+            challenges: {
+                selectedPills: [],
+                notes: ""
+            },
+            nerves: {
+                q1: { score: 5, notes: "" },
+                q2: { score: 5, notes: "" },
+                q3: { score: 5, notes: "" },
+                q4: { score: 5, notes: "" }
+            },
+            vocalInhibition: {
+                achievedLevels: { 1: false, 2: false, 3: false, 4: false, 5: false },
+                notes: "",
+                demoPayload: null,
+                clientPayload: null
+            },
+            phantasia: {
+                score: 55,
+                type: "Phantasia",
+                notes: ""
+            },
+            imagePrompt1: {
+                time: 0,
+                wpm: 0,
+                visual: 0,
+                recorded: false,
+                transcript: "",
+                notes: ""
+            },
+            imagePrompt2: {
+                time: 0,
+                wpm: 0,
+                visual: 0,
+                recorded: false,
+                transcript: "",
+                notes: ""
+            },
+            rulePrompts: RULE_PROMPT_ROUNDS.reduce((acc, r) => {
+                acc[`round${r.round}`] = {
+                    round: r.round,
+                    title: r.title,
+                    notes: "",
+                    items: r.questions.map((q, idx) => ({
+                        index: idx + 1,
+                        question: q,
+                        correct: false,
+                        noDelay: false,
+                        voice: false
+                    }))
+                };
+                return acc;
+            }, {}),
+            batchSessions: [
+                { title: "", date: "", time: "10:00", durationMinutes: 60 }
+            ]
+        };
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function escapeHtml(str) {
+            return String(str ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById("global-toast");
+            toast.innerText = msg;
+            toast.className = isError
+                ? "text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-900/90 text-rose-100 border border-rose-600"
+                : "text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-900/90 text-emerald-100 border border-emerald-600";
+            toast.classList.remove("hidden");
+            clearTimeout(toast._hideTimer);
+            toast._hideTimer = setTimeout(() => toast.classList.add("hidden"), 4000);
+        }
+
+        function getNerveColorMeta(score) {
+            const n = Number(score);
+            if (n <= 2) return { bg: "bg-purple-600", text: "text-white", border: "border-purple-600", badge: "bg-purple-100 text-purple-800" };
+            if (n <= 4) return { bg: "bg-blue-600", text: "text-white", border: "border-blue-600", badge: "bg-blue-100 text-blue-800" };
+            if (n <= 6) return { bg: "bg-yellow-400", text: "text-slate-900", border: "border-yellow-500", badge: "bg-yellow-100 text-yellow-900" };
+            if (n <= 8) return { bg: "bg-orange-500", text: "text-white", border: "border-orange-500", badge: "bg-orange-100 text-orange-800" };
+            return { bg: "bg-red-600", text: "text-white", border: "border-red-600", badge: "bg-red-100 text-red-800" };
+        }
+
+        function getPhantasiaBand(val) {
+            const n = Math.max(0, Math.min(100, Number(val) || 0));
+            if (n <= 9) return { label: "Aphantasia", range: "0–9", color: "text-purple-700 bg-purple-100 border-purple-200", desc: "Unable to voluntarily visualize mental images." };
+            if (n <= 49) return { label: "Hypophantasia", range: "10–49", color: "text-blue-700 bg-blue-100 border-blue-200", desc: "Dim, fleeting, or effortful mental imagery." };
+            if (n <= 79) return { label: "Phantasia", range: "50–79", color: "text-emerald-700 bg-emerald-100 border-emerald-200", desc: "Clear, compliant mental imagery on demand." };
+            return { label: "Hyperphantasia", range: "80–100", color: "text-amber-800 bg-amber-100 border-amber-200", desc: "Vivid, effortless, and involuntary mental imagery." };
+        }
+
+        function buildExportPayload() {
+            state.updatedAt = new Date().toISOString();
+            const totalNerves = ["q1", "q2", "q3", "q4"].reduce((sum, k) => sum + (Number(state.nerves[k]?.score) || 0), 0);
+
+            let rulesCorrect = 0, rulesNoDelay = 0, rulesVoice = 0;
+            Object.values(state.rulePrompts).forEach(r => {
+                (r.items || []).forEach(it => {
+                    if (it.correct) rulesCorrect++;
+                    if (it.noDelay) rulesNoDelay++;
+                    if (it.voice) rulesVoice++;
+                });
+            });
+
+            return {
+                ...state,
+                computedSummary: {
+                    totalNervesScore: totalNerves,
+                    phantasiaBand: getPhantasiaBand(state.phantasia.score).label,
+                    vocalAchievedCount: Object.values(state.vocalInhibition.achievedLevels).filter(Boolean).length,
+                    rulesTotals: {
+                        correct: rulesCorrect,
+                        noDelay: rulesNoDelay,
+                        voice: rulesVoice,
+                        overall: rulesCorrect + rulesNoDelay + rulesVoice,
+                        maxPossible: 90
+                    }
+                }
+            };
+        }
+
+        function downloadJsonPayload(stepTag = "") {
+            const payload = buildExportPayload();
+            const safeClient = (state.client.name || "Client").trim().replace(/[^a-zA-Z0-9_-]/g, "-");
+            const datePart = new Date().toISOString().slice(0, 10);
+            const suffix = stepTag ? `-${stepTag}` : "";
+            const fileName = `${safeClient}-Speech-Assessment${suffix}-${datePart}.json`;
+
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+            showToast(`Saved ${fileName}`);
+        }
+
+        function mergeUploadedPayloads(jsonObjects) {
+            jsonObjects.forEach((raw) => {
+                if (!raw || typeof raw !== "object") return;
+
+                if (raw.client) {
+                    if (raw.client.name && !state.client.name) state.client.name = raw.client.name;
+                    if (raw.client.email && !state.client.email) state.client.email = raw.client.email;
+                    if (raw.client.driveFolderUrl) state.client.driveFolderUrl = raw.client.driveFolderUrl;
+                    if (raw.client.driveFolderId) state.client.driveFolderId = raw.client.driveFolderId;
+                }
+                if (raw.challenges) {
+                    if (Array.isArray(raw.challenges.selectedPills)) state.challenges.selectedPills = [...raw.challenges.selectedPills];
+                    if (typeof raw.challenges.notes === "string") state.challenges.notes = raw.challenges.notes;
+                }
+                if (raw.nerves) {
+                    ["q1", "q2", "q3", "q4"].forEach(k => {
+                        if (raw.nerves[k]) {
+                            state.nerves[k] = {
+                                score: Number(raw.nerves[k].score) || 5,
+                                notes: String(raw.nerves[k].notes || "")
+                            };
+                        }
+                    });
+                }
+                if (raw.vocalInhibition) {
+                    if (raw.vocalInhibition.achievedLevels) {
+                        state.vocalInhibition.achievedLevels = { ...state.vocalInhibition.achievedLevels, ...raw.vocalInhibition.achievedLevels };
+                    }
+                    if (typeof raw.vocalInhibition.notes === "string") state.vocalInhibition.notes = raw.vocalInhibition.notes;
+                    if (raw.vocalInhibition.demoPayload) state.vocalInhibition.demoPayload = raw.vocalInhibition.demoPayload;
+                    if (raw.vocalInhibition.clientPayload) state.vocalInhibition.clientPayload = raw.vocalInhibition.clientPayload;
+                }
+                if (raw.phantasia) {
+                    if (raw.phantasia.score !== undefined) state.phantasia.score = Number(raw.phantasia.score);
+                    state.phantasia.type = getPhantasiaBand(state.phantasia.score).label;
+                    if (typeof raw.phantasia.notes === "string") state.phantasia.notes = raw.phantasia.notes;
+                }
+                if (raw.imagePrompt1) {
+                    state.imagePrompt1 = { ...state.imagePrompt1, ...raw.imagePrompt1 };
+                }
+                if (raw.imagePrompt2) {
+                    state.imagePrompt2 = { ...state.imagePrompt2, ...raw.imagePrompt2 };
+                }
+                if (raw.rulePrompts && typeof raw.rulePrompts === "object") {
+                    Object.keys(raw.rulePrompts).forEach(rk => {
+                        if (state.rulePrompts[rk] && raw.rulePrompts[rk]) {
+                            state.rulePrompts[rk] = {
+                                ...state.rulePrompts[rk],
+                                ...raw.rulePrompts[rk]
+                            };
+                        }
+                    });
+                }
+            });
+        }
+
+        // ==========================================
+        // SPEECH ENGINE TELEMETRY ROUTING
+        // ==========================================
+        window.addEventListener("thps-dashboard-update", (e) => {
+            const payload = e.detail;
+            if (!payload || !payload.text || !payload.text.trim()) return;
+            if (!activeRecordingContext) return;
+
+            const ctx = activeRecordingContext;
+            activeRecordingContext = null;
+
+            if (ctx.type === "vocal_demo") {
+                state.vocalInhibition.demoPayload = payload;
+                activeTimelineTab = "demo";
+                if (currentStep === 3) renderCurrentStep();
+                showToast("Tom's demo timeline captured.");
+            } else if (ctx.type === "vocal_client") {
+                state.vocalInhibition.clientPayload = payload;
+                activeTimelineTab = "client";
+                if (currentStep === 3) renderCurrentStep();
+                showToast("Client attempt timeline captured.");
+            } else if (ctx.type === "image1") {
+                state.imagePrompt1.time = Math.round(payload.time || 0);
+                state.imagePrompt1.wpm = Math.round(payload.wpm || 0);
+                state.imagePrompt1.visual = Math.round(payload.visual || 0);
+                state.imagePrompt1.recorded = true;
+                state.imagePrompt1.transcript = payload.text || "";
+                if (currentStep === 5) renderCurrentStep();
+                showToast("Image Prompt #1 metrics captured.");
+            } else if (ctx.type === "image2") {
+                state.imagePrompt2.time = Math.round(payload.time || 0);
+                state.imagePrompt2.wpm = Math.round(payload.wpm || 0);
+                state.imagePrompt2.visual = Math.round(payload.visual || 0);
+                state.imagePrompt2.recorded = true;
+                state.imagePrompt2.transcript = payload.text || "";
+                if (currentStep === 6) renderCurrentStep();
+                showToast("Image Prompt #2 metrics captured.");
+            }
+        });
+
+        window.addEventListener("thps-recording-error", (e) => {
+            activeRecordingContext = null;
+            showToast(e.detail?.message || "Microphone error.", true);
+        });
+
+        function triggerContextRecording(ctxObj) {
+            if (window.thps_isProcessing) return;
+
+            // If currently recording, stop it
+            if (window.isActive) {
+                if (typeof window.toggleRecording === "function") window.toggleRecording();
+                return;
+            }
+
+            // Start new recording tagged to ctxObj
+            activeRecordingContext = ctxObj;
+            if (typeof window.toggleRecording === "function") {
+                window.toggleRecording();
+            } else {
+                alert("Speech engine is still loading. Please try again in a second.");
+            }
+        }
+
+        // Live 50ms timer update for Vocal & Image steps
+        uiTimerInterval = setInterval(() => {
+            const isRec = Boolean(window.isActive && window.THPS?.Audio?.recordStartTime);
+            const elapsed = isRec ? (Date.now() - window.THPS.Audio.recordStartTime) / 1000 : 0;
+
+            // Step 3 Vocal Timers
+            if (currentStep === 3) {
+                const demoBtn = document.getElementById("btn-rec-vocal-demo");
+                const clientBtn = document.getElementById("btn-rec-vocal-client");
+                const timerEl = document.getElementById("vocal-live-timer");
+
+                if (timerEl) {
+                    const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+                    const s = String(Math.floor(elapsed % 60)).padStart(2, "0");
+                    timerEl.innerText = `${m}:${s}`;
+                    timerEl.className = isRec
+                        ? "text-2xl font-mono font-black text-rose-600"
+                        : "text-2xl font-mono font-black text-slate-800";
+                }
+
+                if (demoBtn) {
+                    const activeDemo = isRec && activeRecordingContext?.type === "vocal_demo";
+                    demoBtn.innerText = activeDemo ? "Stop Tom Demo" : "Record Tom Demo";
+                    demoBtn.className = activeDemo
+                        ? "px-4 py-2.5 rounded-lg bg-rose-600 text-white font-bold text-xs shadow animate-pulse"
+                        : "px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow";
+                }
+
+                if (clientBtn) {
+                    const activeClient = isRec && activeRecordingContext?.type === "vocal_client";
+                    clientBtn.innerText = activeClient ? "Stop Client Attempt" : "Record Client Attempt";
+                    clientBtn.className = activeClient
+                        ? "px-4 py-2.5 rounded-lg bg-rose-600 text-white font-bold text-xs shadow animate-pulse"
+                        : "px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow";
+                }
+            }
+
+            // Steps 5 & 6 Image Prompt 80s Progress Bars (20s = 25%, 60s = 75%)
+            if (currentStep === 5 || currentStep === 6) {
+                const slotKey = currentStep === 5 ? "image1" : "image2";
+                const bar = document.getElementById("img-progress-bar");
+                const star20 = document.getElementById("img-star-20");
+                const star60 = document.getElementById("img-star-60");
+                const recBtn = document.getElementById("btn-img-record");
+                const timePill = document.getElementById("pill-img-time");
+
+                const activeHere = isRec && activeRecordingContext?.type === slotKey;
+                if (bar) {
+                    const pct = activeHere ? Math.min((elapsed / 80) * 100, 100) : 0;
+                    bar.style.width = `${pct}%`;
+                }
+                if (star20) {
+                    star20.className = activeHere && elapsed >= 20
+                        ? "text-amber-400 font-black text-xs"
+                        : "text-slate-400 font-bold text-xs";
+                }
+                if (star60) {
+                    star60.className = activeHere && elapsed >= 60
+                        ? "text-amber-400 font-black text-xs"
+                        : "text-slate-400 font-bold text-xs";
+                }
+                if (recBtn) {
+                    if (window.thps_isProcessing) {
+                        recBtn.innerText = "Analyzing...";
+                    } else {
+                        recBtn.innerText = activeHere ? "Stop" : "Start";
+                    }
+                }
+                if (timePill && activeHere) {
+                    timePill.innerText = `${Math.floor(elapsed)}s TIME`;
+                }
+            }
+        }, 50);
+
+        // ==========================================
+        // NAVIGATION & SIDEBAR RENDERING
+        // ==========================================
+        function renderSidebar() {
+            const nav = document.getElementById("wizard-sidebar-nav");
+            nav.innerHTML = WIZARD_STEPS.map(s => {
+                const active = s.step === currentStep;
+                return `
+                    <button type="button" data-goto-step="${s.step}" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2.5 ${active ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}">
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold flex-shrink-0 ${active ? 'bg-white text-indigo-700' : 'bg-slate-800 text-slate-300'}">${s.step}</span>
+                        <span class="hidden md:inline truncate">${escapeHtml(s.short)}</span>
+                    </button>
+                `;
+            }).join("");
+
+            nav.querySelectorAll("[data-goto-step]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    goToStep(Number(btn.getAttribute("data-goto-step")));
+                });
+            });
+
+            document.getElementById("step-counter-badge").innerText = `Step ${currentStep} of 15`;
+            document.getElementById("btn-prev-step").disabled = currentStep === 1;
+            const nextBtn = document.getElementById("btn-next-step");
+            nextBtn.style.display = currentStep === 15 ? "none" : "inline-flex";
+        }
+
+        function goToStep(stepNum) {
+            if (stepNum < 1 || stepNum > 15) return;
+            if (window.isActive && typeof window.toggleRecording === "function") {
+                activeRecordingContext = null;
+                window.toggleRecording();
+            }
+            currentStep = stepNum;
+            renderSidebar();
+            renderCurrentStep();
+            document.getElementById("step-scroll-area").scrollTop = 0;
+        }
+
+        // ==========================================
+        // STEP 1–15 RENDERERS
+        // ==========================================
+        function renderCurrentStep() {
+            const mount = document.getElementById("step-mount");
+
+            // ------------------------------------------
+            // STEP 1: CHALLENGES & OPPORTUNITIES
+            // ------------------------------------------
+            if (currentStep === 1) {
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 1 of 15</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">Challenges &amp; Opportunities</h2>
+                            <p class="text-sm text-slate-500 mt-1">Select the client's focus areas and capture key context from your discovery conversation.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Quick-Select Focus Pills</label>
+                            <div class="flex flex-wrap gap-2.5" id="challenge-pills-wrap">
+                                ${CHALLENGE_PILLS.map(pill => {
+                                    const selected = state.challenges.selectedPills.includes(pill);
+                                    return `
+                                        <button type="button" data-pill="${escapeHtml(pill)}" class="px-4 py-2 rounded-full text-sm font-bold border-2 transition-all ${selected ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-indigo-400'}">
+                                            ${escapeHtml(pill)}
+                                        </button>
+                                    `;
+                                }).join("")}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Notes</label>
+                            <textarea id="step1-notes" rows="5" placeholder="Write notes on their goals, upcoming presentations, or speaking blockers..." class="w-full p-3.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(state.challenges.notes)}</textarea>
+                        </div>
+                    </div>
+                `;
+
+                mount.querySelectorAll("[data-pill]").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const pill = btn.getAttribute("data-pill");
+                        const idx = state.challenges.selectedPills.indexOf(pill);
+                        if (idx >= 0) state.challenges.selectedPills.splice(idx, 1);
+                        else state.challenges.selectedPills.push(pill);
+                        renderCurrentStep();
+                    });
+                });
+
+                document.getElementById("step1-notes").addEventListener("input", (e) => {
+                    state.challenges.notes = e.target.value;
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 2: NERVE ASSESSMENT (1–10 COLOR CODED)
+            // ------------------------------------------
+            if (currentStep === 2) {
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 2 of 15</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">Nerve Assessment</h2>
+                            <p class="text-sm text-slate-500 mt-1">Rate discomfort from 1 to 10 for each scenario (1–2 Purple, 3–4 Blue, 5–6 Yellow, 7–8 Orange, 9–10 Red).</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            ${NERVE_QUESTIONS.map(q => {
+                                const currentVal = Number(state.nerves[q.id]?.score || 5);
+                                const meta = getNerveColorMeta(currentVal);
+                                return `
+                                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <label class="font-bold text-slate-800 text-sm md:text-base">${escapeHtml(q.label)}</label>
+                                            <span class="text-xs font-extrabold px-3 py-1 rounded-full ${meta.badge}">Score: ${currentVal} / 10</span>
+                                        </div>
+
+                                        <div class="grid grid-cols-5 sm:grid-cols-10 gap-1.5">
+                                            ${[1,2,3,4,5,6,7,8,9,10].map(num => {
+                                                const c = getNerveColorMeta(num);
+                                                const isSelected = num === currentVal;
+                                                return `
+                                                    <button type="button" data-nerve-q="${q.id}" data-nerve-val="${num}" class="py-2.5 rounded-lg font-extrabold text-sm border-2 transition-all ${isSelected ? `${c.bg} ${c.text} ${c.border} scale-105 shadow-md ring-2 ring-offset-1 ring-slate-400` : `bg-white text-slate-700 border-slate-200 hover:${c.border}`}">
+                                                        ${num}
+                                                    </button>
+                                                `;
+                                            }).join("")}
+                                        </div>
+
+                                        <div>
+                                            <textarea data-nerve-notes="${q.id}" rows="2" placeholder="Notes for this prompt..." class="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(state.nerves[q.id]?.notes || "")}</textarea>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join("")}
+                        </div>
+                    </div>
+                `;
+
+                mount.querySelectorAll("[data-nerve-q]").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const qId = btn.getAttribute("data-nerve-q");
+                        const val = Number(btn.getAttribute("data-nerve-val"));
+                        state.nerves[qId].score = val;
+                        renderCurrentStep();
+                    });
+                });
+
+                mount.querySelectorAll("[data-nerve-notes]").forEach(ta => {
+                    ta.addEventListener("input", (e) => {
+                        const qId = e.target.getAttribute("data-nerve-notes");
+                        state.nerves[qId].notes = e.target.value;
+                    });
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 3: VOCAL INHIBITION TEST (PACINO + DUAL TIMELINES)
+            // ------------------------------------------
+            if (currentStep === 3) {
+                const intensityStyle = (lvl) => {
+                    if (lvl === 1) return "bg-purple-600 text-white";
+                    if (lvl === 2) return "bg-blue-500 text-white";
+                    if (lvl === 3) return "bg-emerald-500 text-white";
+                    if (lvl === 4) return "bg-orange-500 text-white";
+                    return "bg-rose-600 text-white";
+                };
+
+                mount.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-5">
+                            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                                <div>
+                                    <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 3 of 15</span>
+                                    <h2 class="text-2xl font-bold text-slate-900 mt-1">Vocal Inhibition Test — Al Pacino (Any Given Sunday)</h2>
+                                    <p class="text-sm text-slate-500">Demonstrate the 1–5 sound changes first, then record the client's attempt and compare both timelines.</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span id="vocal-live-timer" class="text-2xl font-mono font-black text-slate-800">00:00</span>
+                                    <button id="btn-rec-vocal-demo" type="button" class="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow">
+                                        Record Tom Demo
+                                    </button>
+                                    <button id="btn-rec-vocal-client" type="button" class="px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow">
+                                        Record Client Attempt
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Al Pacino 1-5 Script -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 max-h-72 overflow-y-auto space-y-2.5">
+                                ${PACINO_LINES.map(line => `
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                                        <span class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0 ${intensityStyle(line.intensity)}">
+                                            ${line.intensity}
+                                        </span>
+                                        <p class="text-sm md:text-base font-semibold text-slate-800">${escapeHtml(line.text)}</p>
+                                    </div>
+                                `).join("")}
+                            </div>
+
+                            <!-- Dual Vocal Timelines (Tom Demo vs Client Attempt) -->
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600">Vocal Timelines Comparison</h3>
+                                    <div class="inline-flex rounded-lg bg-slate-200 p-1 text-xs font-bold">
+                                        <button type="button" data-tl-tab="demo" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'demo' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}">
+                                            Tom's Demo ${state.vocalInhibition.demoPayload ? '✓' : ''}
+                                        </button>
+                                        <button type="button" data-tl-tab="client" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'client' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600'}">
+                                            Client's Attempt ${state.vocalInhibition.clientPayload ? '✓' : ''}
+                                        </button>
+                                        <button type="button" data-tl-tab="both" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'both' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600'}">
+                                            Compare Both
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 ${activeTimelineTab === 'both' ? 'lg:grid-cols-2' : ''} gap-4">
+                                    <div class="${activeTimelineTab === 'client' ? 'hidden' : ''}">
+                                        <div class="text-xs font-bold text-slate-600 mb-1.5">Tom's Benchmark Demonstration</div>
+                                        <thps-voice-timeline id="tl-demo-widget"></thps-voice-timeline>
+                                    </div>
+                                    <div class="${activeTimelineTab === 'demo' ? 'hidden' : ''}">
+                                        <div class="text-xs font-bold text-indigo-700 mb-1.5">Client's Attempt</div>
+                                        <thps-voice-timeline id="tl-client-widget"></thps-voice-timeline>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes + 1-5 Delivery Check Buttons -->
+                            <div class="border-t border-slate-200 pt-5 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Performance Notes</label>
+                                    <textarea id="step3-notes" rows="3" placeholder="Notes on volume range, pause control, and vocal inhibition..." class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(state.vocalInhibition.notes)}</textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Delivery Levels Achieved (Tick / Untick 1–5)</label>
+                                    <div class="grid grid-cols-5 gap-3">
+                                        ${[1,2,3,4,5].map(num => {
+                                            const ticked = Boolean(state.vocalInhibition.achievedLevels[num]);
+                                            return `
+                                                <button type="button" data-vocal-lvl="${num}" class="py-3 rounded-xl border-2 font-extrabold text-sm flex items-center justify-center gap-2 transition-all ${ticked ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm' : 'bg-white border-slate-300 text-slate-700 hover:border-indigo-400'}">
+                                                    <span>${ticked ? '☑' : '☐'}</span>
+                                                    <span>Level ${num}</span>
+                                                </button>
+                                            `;
+                                        }).join("")}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Hydrate the two isolated Vocal Timeline widgets after custom elements upgrade
+                requestAnimationFrame(() => {
+                    const demoEl = document.getElementById("tl-demo-widget");
+                    const clientEl = document.getElementById("tl-client-widget");
+                    if (demoEl && typeof demoEl.update === "function" && state.vocalInhibition.demoPayload) {
+                        demoEl.update(state.vocalInhibition.demoPayload);
+                    }
+                    if (clientEl && typeof clientEl.update === "function" && state.vocalInhibition.clientPayload) {
+                        clientEl.update(state.vocalInhibition.clientPayload);
+                    }
+                });
+
+                document.getElementById("btn-rec-vocal-demo").addEventListener("click", () => {
+                    triggerContextRecording({ type: "vocal_demo" });
+                });
+                document.getElementById("btn-rec-vocal-client").addEventListener("click", () => {
+                    triggerContextRecording({ type: "vocal_client" });
+                });
+
+                mount.querySelectorAll("[data-tl-tab]").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        activeTimelineTab = btn.getAttribute("data-tl-tab");
+                        renderCurrentStep();
+                    });
+                });
+
+                document.getElementById("step3-notes").addEventListener("input", (e) => {
+                    state.vocalInhibition.notes = e.target.value;
+                });
+
+                mount.querySelectorAll("[data-vocal-lvl]").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const lvl = Number(btn.getAttribute("data-vocal-lvl"));
+                        state.vocalInhibition.achievedLevels[lvl] = !state.vocalInhibition.achievedLevels[lvl];
+                        renderCurrentStep();
+                    });
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 4: PHANTASIA TEST (0–100 HORIZONTAL DIAL)
+            // ------------------------------------------
+            if (currentStep === 4) {
+                const score = Number(state.phantasia.score) || 0;
+                const band = getPhantasiaBand(score);
+
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 4 of 15</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">Phantasia Test (0–100 Scale)</h2>
+                            <p class="text-sm text-slate-500 mt-1">Scroll or drag the dial horizontally from 0 to 100 to classify their mental imagery vividness.</p>
+                        </div>
+
+                        <!-- Live Classification Card -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-2">
+                            <div class="text-5xl font-black text-slate-900" id="phantasia-score-readout">${score}</div>
+                            <div>
+                                <span id="phantasia-band-badge" class="inline-block text-sm font-extrabold px-4 py-1 rounded-full border ${band.color}">
+                                    ${band.label} (${band.range})
+                                </span>
+                            </div>
+                            <p id="phantasia-band-desc" class="text-xs text-slate-500 pt-1">${band.desc}</p>
+                        </div>
+
+                        <!-- Horizontal Scroll / Drag Dial -->
+                        <div class="space-y-3">
+                            <input id="phantasia-range" type="range" min="0" max="100" value="${score}" class="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+
+                            <!-- Horizontally Scrollable Quick-Pick Ruler (0 to 100) -->
+                            <div id="phantasia-ruler" class="phantasia-dial flex items-center gap-1.5 overflow-x-auto py-3 px-2 bg-slate-100 rounded-xl border border-slate-200">
+                                ${Array.from({ length: 101 }, (_, n) => {
+                                    let bandTint = "border-slate-300 text-slate-700";
+                                    if (n <= 9) bandTint = "border-purple-300 text-purple-800";
+                                    else if (n <= 49) bandTint = "border-blue-300 text-blue-800";
+                                    else if (n <= 79) bandTint = "border-emerald-300 text-emerald-800";
+                                    else bandTint = "border-amber-300 text-amber-800";
+
+                                    const active = n === score;
+                                    return `
+                                        <button type="button" data-ph-val="${n}" class="flex-shrink-0 w-10 h-11 rounded-lg border font-bold text-xs transition-all ${active ? 'bg-indigo-600 text-white border-indigo-600 scale-110 shadow' : `bg-white ${bandTint} hover:border-indigo-500`}">
+                                            ${n}
+                                        </button>
+                                    `;
+                                }).join("")}
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-bold">
+                                <div class="p-2 rounded-lg bg-purple-50 text-purple-800 border border-purple-200">0–9: Aphantasia</div>
+                                <div class="p-2 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">10–49: Hypophantasia</div>
+                                <div class="p-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">50–79: Phantasia</div>
+                                <div class="p-2 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">80–100: Hyperphantasia</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Notes</label>
+                            <textarea id="step4-notes" rows="4" placeholder="Notes on their red apple / diamond visualization response..." class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(state.phantasia.notes)}</textarea>
+                        </div>
+                    </div>
+                `;
+
+                const setPhantasiaVal = (val) => {
+                    const clamped = Math.max(0, Math.min(100, Number(val) || 0));
+                    state.phantasia.score = clamped;
+                    state.phantasia.type = getPhantasiaBand(clamped).label;
+                    renderCurrentStep();
+                };
+
+                document.getElementById("phantasia-range").addEventListener("input", (e) => {
+                    const val = Number(e.target.value);
+                    state.phantasia.score = val;
+                    state.phantasia.type = getPhantasiaBand(val).label;
+                    const b = getPhantasiaBand(val);
+                    document.getElementById("phantasia-score-readout").innerText = val;
+                    const badge = document.getElementById("phantasia-band-badge");
+                    badge.className = `inline-block text-sm font-extrabold px-4 py-1 rounded-full border ${b.color}`;
+                    badge.innerText = `${b.label} (${b.range})`;
+                    document.getElementById("phantasia-band-desc").innerText = b.desc;
+                });
+
+                document.getElementById("phantasia-range").addEventListener("change", (e) => {
+                    setPhantasiaVal(e.target.value);
+                });
+
+                mount.querySelectorAll("[data-ph-val]").forEach(btn => {
+                    btn.addEventListener("click", () => setPhantasiaVal(btn.getAttribute("data-ph-val")));
+                });
+
+                // Center active tick in horizontal ruler
+                requestAnimationFrame(() => {
+                    const activeBtn = mount.querySelector(`[data-ph-val="${score}"]`);
+                    if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                });
+
+                document.getElementById("step4-notes").addEventListener("input", (e) => {
+                    state.phantasia.notes = e.target.value;
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEPS 5 & 6: IMAGE PROMPT #1 & #2
+            // ------------------------------------------
+            if (currentStep === 5 || currentStep === 6) {
+                const isFirst = currentStep === 5;
+                const slot = isFirst ? state.imagePrompt1 : state.imagePrompt2;
+                const slotType = isFirst ? "image1" : "image2";
+
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step ${currentStep} of 15</span>
+                                <h2 class="text-2xl font-bold text-slate-900 mt-1">
+                                    ${isFirst ? "Image Prompt Test #1 — Dilapidated House" : "Image Prompt Test #2 — Blank Imagination Prompt"}
+                                </h2>
+                                <p class="text-sm text-slate-500 mt-1">
+                                    ${isFirst
+                                        ? "Goal: Visually describe the dilapidated house for 60s (under 100 WPM, over 50% visual words)."
+                                        : "Goal: Visually describe an imagined scene from the blank black screen for 60s (over 170 WPM, over 50% visual words)."}
+                                </p>
+                            </div>
+
+                            <!-- Live Metric Pills -->
+                            <div class="flex items-center gap-2.5">
+                                <span id="pill-img-time" class="px-3.5 py-2 rounded-full bg-amber-100 text-amber-800 font-extrabold text-xs tracking-wider">${slot.time}s TIME</span>
+                                <span class="px-3.5 py-2 rounded-full bg-indigo-100 text-indigo-800 font-extrabold text-xs tracking-wider">${slot.wpm} WPM</span>
+                                <span class="px-3.5 py-2 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs tracking-wider">${slot.visual}% VIS</span>
+                            </div>
+                        </div>
+
+                        <!-- Prompt Visual (House Image vs Black Rectangle) -->
+                        ${isFirst ? `
+                            <div class="w-full h-72 md:h-96 bg-slate-200 rounded-2xl overflow-hidden border border-slate-300 shadow-inner">
+                                <img src="${HOUSE_IMAGE_URL}" alt="Dilapidated House Prompt" class="w-full h-full object-cover">
+                            </div>
+                        ` : `
+                            <div class="w-full h-72 md:h-96 bg-black rounded-2xl border border-slate-800 shadow-inner flex items-center justify-center">
+                                <span class="text-slate-600 text-xs font-bold uppercase tracking-widest">Blank Visual Prompt</span>
+                            </div>
+                        `}
+
+                        <!-- 80s Progress Bar with 20s & 60s Timer Indicators -->
+                        <div class="max-w-xl mx-auto">
+                            <div class="relative h-16 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center shadow-inner">
+                                <div id="img-progress-bar" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-75"></div>
+
+                                <!-- 20s Indicator (25% of 80s) -->
+                                <div class="absolute top-0 bottom-0 flex flex-col items-center justify-between py-1.5 z-10 pointer-events-none" style="left: 25%; transform: translateX(-50%);">
+                                    <span id="img-star-20" class="text-slate-400 font-bold text-xs">★ 20s</span>
+                                    <div class="w-0.5 flex-1 bg-amber-400/60 my-0.5"></div>
+                                </div>
+
+                                <!-- 60s Indicator (75% of 80s) -->
+                                <div class="absolute top-0 bottom-0 flex flex-col items-center justify-between py-1.5 z-10 pointer-events-none" style="left: 75%; transform: translateX(-50%);">
+                                    <span id="img-star-60" class="text-slate-400 font-bold text-xs">★ 60s</span>
+                                    <div class="w-0.5 flex-1 bg-emerald-400/70 my-0.5"></div>
+                                </div>
+
+                                <button id="btn-img-record" type="button" class="relative z-20 mx-auto px-6 py-2.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-white font-extrabold text-xs uppercase tracking-widest backdrop-blur-sm transition-all">
+                                    Start
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Notes</label>
+                            <textarea id="step-img-notes" rows="3" placeholder="Observations on descriptive detail, pacing, and pauses..." class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(slot.notes)}</textarea>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById("btn-img-record").addEventListener("click", () => {
+                    triggerContextRecording({ type: slotType });
+                });
+
+                document.getElementById("step-img-notes").addEventListener("input", (e) => {
+                    slot.notes = e.target.value;
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEPS 7–12: RULE PROMPT TESTS (6 ROUNDS x 5 QUESTIONS)
+            // ------------------------------------------
+            if (currentStep >= 7 && currentStep <= 12) {
+                const roundCfg = RULE_PROMPT_ROUNDS.find(r => r.step === currentStep);
+                const roundState = state.rulePrompts[`round${roundCfg.round}`];
+
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step ${currentStep} of 15</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">${escapeHtml(roundCfg.title)}</h2>
+                        </div>
+
+                        <!-- Specific Rule Instructions Banner -->
+                        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4">
+                            <span class="block text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2">Rules for Round ${roundCfg.round}</span>
+                            <ul class="space-y-1.5">
+                                ${roundCfg.instructions.map(rule => `
+                                    <li class="text-sm md:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                                        <span>${escapeHtml(rule)}</span>
+                                    </li>
+                                `).join("")}
+                            </ul>
+                        </div>
+
+                        <!-- 5 Questions with 3 Tick Boxes Each -->
+                        <div class="space-y-3.5">
+                            ${roundState.items.map((item, idx) => `
+                                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <p class="font-bold text-slate-800 text-sm md:text-base">${item.question}</p>
+                                    <div class="flex flex-wrap items-center gap-4 flex-shrink-0">
+                                        <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-white px-3 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-400">
+                                            <input type="checkbox" data-r-idx="${idx}" data-r-field="correct" ${item.correct ? "checked" : ""} class="w-4 h-4 text-indigo-600 rounded">
+                                            <span class="text-xs font-bold text-slate-700">Correct</span>
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-white px-3 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-400">
+                                            <input type="checkbox" data-r-idx="${idx}" data-r-field="noDelay" ${item.noDelay ? "checked" : ""} class="w-4 h-4 text-indigo-600 rounded">
+                                            <span class="text-xs font-bold text-slate-700">No Delay</span>
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-white px-3 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-400">
+                                            <input type="checkbox" data-r-idx="${idx}" data-r-field="voice" ${item.voice ? "checked" : ""} class="w-4 h-4 text-indigo-600 rounded">
+                                            <span class="text-xs font-bold text-slate-700">Voice</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Round ${roundCfg.round} Notes</label>
+                            <textarea id="step-rule-notes" rows="2" placeholder="Optional notes for this round..." class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none">${escapeHtml(roundState.notes || "")}</textarea>
+                        </div>
+                    </div>
+                `;
+
+                mount.querySelectorAll("[data-r-idx]").forEach(cb => {
+                    cb.addEventListener("change", (e) => {
+                        const idx = Number(e.target.getAttribute("data-r-idx"));
+                        const field = e.target.getAttribute("data-r-field");
+                        roundState.items[idx][field] = e.target.checked;
+                    });
+                });
+
+                document.getElementById("step-rule-notes").addEventListener("input", (e) => {
+                    roundState.notes = e.target.value;
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 13: RESULTS SCREEN (UPLOAD HYDRATION + PDF + DRIVE SYNC)
+            // ------------------------------------------
+            if (currentStep === 13) {
+                const payload = buildExportPayload();
+                const band = getPhantasiaBand(state.phantasia.score);
+                const achievedList = [1,2,3,4,5].filter(n => state.vocalInhibition.achievedLevels[n]);
+                const hasDrive = Boolean(state.client.driveFolderUrl);
+
+                mount.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Top Action Bar (Upload JSON, Print PDF, Drive Sync) -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4 no-print">
+                            <div>
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 13 of 15</span>
+                                <h2 class="text-2xl font-bold text-slate-900 mt-0.5">Speech Assessment Results</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Upload saved .json payload file(s) to hydrate panels, print PDF, or sync directly to Google Drive.</p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold px-3.5 py-2.5 rounded-lg transition-colors">
+                                    Upload Payload (.json)
+                                    <input id="input-hydrate-json" type="file" accept=".json,application/json" multiple class="hidden">
+                                </label>
+
+                                <button id="btn-print-results" type="button" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-lg transition-colors">
+                                    Print / Save PDF
+                                </button>
+
+                                ${hasDrive ? `
+                                    <button id="btn-sync-drive-json" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-lg shadow-sm transition-colors">
+                                        Sync Assessment to Drive
+                                    </button>
+                                    <a href="${escapeHtml(state.client.driveFolderUrl)}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-lg shadow-sm transition-colors inline-flex items-center gap-1">
+                                        Go to Drive <span>&#8599;</span>
+                                    </a>
+                                ` : `
+                                    <button id="btn-sync-drive-json" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition-colors">
+                                        Generate Drive &amp; Upload Results
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Hydrated Results Dashboard -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6 print-card">
+                            <div class="border-b border-slate-200 pb-4 flex flex-wrap justify-between items-end gap-2">
+                                <div>
+                                    <h3 class="text-xl font-extrabold text-slate-900">${escapeHtml(state.client.name || "Client Assessment")}</h3>
+                                    <p class="text-xs text-slate-500">${escapeHtml(state.client.email)} &bull; ${new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    THPS Diagnostic Profile
+                                </span>
+                            </div>
+
+                            <!-- 1. Challenges & Opportunities -->
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">1. Challenges &amp; Opportunities</h4>
+                                <div class="flex flex-wrap gap-1.5 mb-2">
+                                    ${state.challenges.selectedPills.length > 0
+                                        ? state.challenges.selectedPills.map(p => `<span class="px-2.5 py-1 rounded-full bg-indigo-600 text-white text-xs font-bold">${escapeHtml(p)}</span>`).join("")
+                                        : `<span class="text-xs text-slate-400 italic">No pills selected</span>`}
+                                </div>
+                                <p class="text-sm text-slate-700 whitespace-pre-wrap">${escapeHtml(state.challenges.notes || "No notes recorded.")}</p>
+                            </div>
+
+                            <!-- 2. Nerve Assessment -->
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. Nerve Assessment</h4>
+                                    <span class="text-xs font-extrabold text-slate-800">Total: ${payload.computedSummary.totalNervesScore} / 40</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    ${NERVE_QUESTIONS.map(q => {
+                                        const sc = Number(state.nerves[q.id]?.score || 5);
+                                        const m = getNerveColorMeta(sc);
+                                        return `
+                                            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                                <div class="flex justify-between items-start gap-2 mb-1">
+                                                    <span class="text-xs font-bold text-slate-700">${escapeHtml(q.label)}</span>
+                                                    <span class="text-xs font-extrabold px-2 py-0.5 rounded ${m.badge} flex-shrink-0">${sc}/10</span>
+                                                </div>
+                                                <p class="text-xs text-slate-500">${escapeHtml(state.nerves[q.id]?.notes || "—")}</p>
+                                            </div>
+                                        `;
+                                    }).join("")}
+                                </div>
+                            </div>
+
+                            <!-- 3. Vocal Inhibition + 4. Phantasia -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">3. Vocal Inhibition</h4>
+                                    <div class="flex flex-wrap gap-1.5 mb-2">
+                                        ${[1,2,3,4,5].map(n => {
+                                            const ok = achievedList.includes(n);
+                                            return `<span class="px-2.5 py-1 rounded-md text-xs font-extrabold ${ok ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'}">Level ${n}: ${ok ? 'Yes' : 'No'}</span>`;
+                                        }).join("")}
+                                    </div>
+                                    <p class="text-xs text-slate-700 whitespace-pre-wrap">${escapeHtml(state.vocalInhibition.notes || "No notes recorded.")}</p>
+                                </div>
+
+                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">4. Phantasia Profile</h4>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="text-2xl font-black text-slate-900">${state.phantasia.score}/100</span>
+                                        <span class="text-xs font-extrabold px-3 py-1 rounded-full border ${band.color}">${band.label}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-700 whitespace-pre-wrap">${escapeHtml(state.phantasia.notes || "No notes recorded.")}</p>
+                                </div>
+                            </div>
+
+                            <!-- 5. Image Prompts Summary -->
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">5. Image Prompt Tests</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                        <div class="font-bold text-xs text-slate-800 mb-1">Prompt #1 (Dilapidated House)</div>
+                                        <div class="text-xs font-extrabold text-indigo-700 mb-1">${state.imagePrompt1.time}s &bull; ${state.imagePrompt1.wpm} WPM &bull; ${state.imagePrompt1.visual}% Visual</div>
+                                        <p class="text-xs text-slate-500">${escapeHtml(state.imagePrompt1.notes || "—")}</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                        <div class="font-bold text-xs text-slate-800 mb-1">Prompt #2 (Blank Screen)</div>
+                                        <div class="text-xs font-extrabold text-indigo-700 mb-1">${state.imagePrompt2.time}s &bull; ${state.imagePrompt2.wpm} WPM &bull; ${state.imagePrompt2.visual}% Visual</div>
+                                        <p class="text-xs text-slate-500">${escapeHtml(state.imagePrompt2.notes || "—")}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 6. Rule Prompts Matrix (Rounds 1–6) -->
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">6. Rule Prompts (6 Rounds)</h4>
+                                    <span class="text-xs font-extrabold text-slate-800">Total Score: ${payload.computedSummary.rulesTotals.overall} / 90</span>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-xs border-collapse bg-white rounded-lg overflow-hidden border border-slate-200">
+                                        <thead>
+                                            <tr class="bg-slate-100 border-b border-slate-200 text-slate-600">
+                                                <th class="py-2 px-3">Round</th>
+                                                <th class="py-2 px-3 text-center">Correct (/5)</th>
+                                                <th class="py-2 px-3 text-center">No Delay (/5)</th>
+                                                <th class="py-2 px-3 text-center">Voice (/5)</th>
+                                                <th class="py-2 px-3 text-right">Round Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${[1,2,3,4,5,6].map(rNum => {
+                                                const r = state.rulePrompts[`round${rNum}`];
+                                                const c = r.items.filter(i => i.correct).length;
+                                                const nd = r.items.filter(i => i.noDelay).length;
+                                                const v = r.items.filter(i => i.voice).length;
+                                                return `
+                                                    <tr class="border-b border-slate-100 last:border-0">
+                                                        <td class="py-2 px-3 font-bold text-slate-800">Round ${rNum}</td>
+                                                        <td class="py-2 px-3 text-center font-semibold">${c}</td>
+                                                        <td class="py-2 px-3 text-center font-semibold">${nd}</td>
+                                                        <td class="py-2 px-3 text-center font-semibold">${v}</td>
+                                                        <td class="py-2 px-3 text-right font-extrabold text-indigo-700">${c + nd + v} / 15</td>
+                                                    </tr>
+                                                `;
+                                            }).join("")}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Upload & hydrate JSON files
+                document.getElementById("input-hydrate-json").addEventListener("change", async (e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length === 0) return;
+
+                    try {
+                        const parsed = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                try { resolve(JSON.parse(reader.result)); }
+                                catch (err) { reject(new Error(`Invalid JSON in ${file.name}`)); }
+                            };
+                            reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+                            reader.readAsText(file);
+                        })));
+
+                        mergeUploadedPayloads(parsed);
+                        renderCurrentStep();
+                        showToast(`Hydrated results from ${files.length} file${files.length === 1 ? '' : 's'}.`);
+                    } catch (err) {
+                        alert(err.message);
+                    }
+                });
+
+                document.getElementById("btn-print-results").addEventListener("click", () => window.print());
+
+                // Generate Drive (if needed) & upload JSON directly
+                document.getElementById("btn-sync-drive-json").addEventListener("click", async (e) => {
+                    if (!state.client.email) {
+                        alert("Client email is required to sync to Google Drive.");
+                        return;
+                    }
+                    const btn = e.currentTarget;
+                    const origText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = "Uploading to Drive...";
+
+                    try {
+                        const idToken = await currentUser.getIdToken();
+                        const exportData = buildExportPayload();
+                        const res = await fetch("/api/onboarding-actions", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                action: "upload_drive_json",
+                                clientEmail: state.client.email,
+                                clientName: state.client.name || state.client.email,
+                                payload: exportData
+                            })
+                        });
+
+                        const result = await res.json();
+                        if (!res.ok || !result.success) {
+                            throw new Error(result.error || result.message || "Drive upload failed.");
+                        }
+
+                        state.client.driveFolderUrl = result.folderUrl;
+                        state.client.driveFolderId = result.folderId;
+                        renderCurrentStep();
+                        showToast(`Uploaded ${result.fileName} to Google Drive!`);
+                    } catch (err) {
+                        alert("Drive Sync Error: " + err.message);
+                        btn.disabled = false;
+                        btn.innerText = origText;
+                    }
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 14: SALES OPTIONS (FREE TRIAL, $990, $1990)
+            // ------------------------------------------
+            if (currentStep === 14) {
+                const encodedName = encodeURIComponent(state.client.name || "");
+                const encodedEmail = encodeURIComponent(state.client.email || "");
+
+                mount.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 14 of 15</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">Select Client Onboarding Package</h2>
+                            <p class="text-sm text-slate-500 mt-1">Choose the option the client selects to send their DIY trial login or open an editable Quick Invoice &amp; Stripe checkout.</p>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
+                                <!-- Option 1: FREE 1 Month Trial -->
+                                <div class="border-2 border-slate-200 rounded-2xl p-6 flex flex-col justify-between bg-slate-50">
+                                    <div>
+                                        <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 mb-3">
+                                            DIY Option
+                                        </span>
+                                        <h3 class="text-2xl font-black text-slate-900">FREE</h3>
+                                        <p class="text-sm font-bold text-slate-700 mt-1">1 Month Trial (DIY Option)</p>
+                                        <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                                            <li>&bull; 30 days access to THPS Member Portal</li>
+                                            <li>&bull; Live Speech Analyzer &amp; Daily Prompts</li>
+                                            <li>&bull; Automatically emails portal login link &amp; setup steps</li>
+                                        </ul>
+                                    </div>
+                                    <button id="btn-sales-opt1" type="button" class="mt-6 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-sm">
+                                        Send Free Trial Email
+                                    </button>
+                                </div>
+
+                                <!-- Option 2: $990 Most Popular -->
+                                <div class="border-2 border-indigo-600 rounded-2xl p-6 flex flex-col justify-between bg-indigo-50/40 shadow-md relative">
+                                    <div>
+                                        <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-600 text-white mb-3">
+                                            Most Popular
+                                        </span>
+                                        <h3 class="text-3xl font-black text-slate-900">$990</h3>
+                                        <p class="text-sm font-bold text-slate-800 mt-1">4x 1 Hour Package + 1 Year Access</p>
+                                        <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                                            <li>&bull; 4x 1-hour 1-on-1 coaching sessions</li>
+                                            <li>&bull; Full 1-year Member Hub access</li>
+                                            <li>&bull; Opens editable Quick Invoice + Stripe + Booking &amp; Hub links</li>
+                                        </ul>
+                                    </div>
+                                    <a href="quick-invoice.html?pkg=4hr&name=${encodedName}&email=${encodedEmail}" target="_blank" rel="noopener noreferrer" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm text-center transition-colors shadow-sm block">
+                                        Open $990 Quick Invoice &#8599;
+                                    </a>
+                                </div>
+
+                                <!-- Option 3: $2475 -> $1990 Best Value -->
+                                <div class="border-2 border-emerald-600 rounded-2xl p-6 flex flex-col justify-between bg-emerald-50/40 shadow-md">
+                                    <div>
+                                        <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-600 text-white mb-3">
+                                            Best Value
+                                        </span>
+                                        <div class="flex items-baseline gap-2.5">
+                                            <span class="text-lg font-bold text-slate-400 line-through">$2,475</span>
+                                            <span class="text-3xl font-black text-slate-900">$1,990</span>
+                                        </div>
+                                        <p class="text-sm font-bold text-slate-800 mt-1">10x 1 Hour Package + 1 Year Access + Certificate</p>
+                                        <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                                            <li>&bull; 10x 1-hour 1-on-1 coaching sessions</li>
+                                            <li>&bull; Full 1-year Member Hub access</li>
+                                            <li>&bull; Official THPS Completion Certificate</li>
+                                        </ul>
+                                    </div>
+                                    <a href="quick-invoice.html?pkg=10hr&name=${encodedName}&email=${encodedEmail}" target="_blank" rel="noopener noreferrer" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm text-center transition-colors shadow-sm block">
+                                        Open $1,990 Quick Invoice &#8599;
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                                <div>
+                                    <strong>Booking Link:</strong> <a href="${BOOKING_URL}" target="_blank" class="text-indigo-600 underline">${BOOKING_URL}</a>
+                                </div>
+                                <div>
+                                    <strong>Member Portal:</strong> <a href="${MEMBER_PORTAL_URL}" target="_blank" class="text-indigo-600 underline">${MEMBER_PORTAL_URL}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById("btn-sales-opt1").addEventListener("click", async (e) => {
+                    if (!state.client.email) {
+                        alert("Missing client email.");
+                        return;
+                    }
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    btn.innerText = "Sending Trial Email...";
+
+                    try {
+                        const idToken = await currentUser.getIdToken();
+                        const res = await fetch("/api/onboarding-actions", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                action: "send_trial_email",
+                                clientEmail: state.client.email,
+                                clientName: state.client.name || state.client.email
+                            })
+                        });
+
+                        const result = await res.json();
+                        if (!res.ok || !result.success) {
+                            throw new Error(result.error || result.message || "Failed to send email.");
+                        }
+
+                        btn.innerText = "Trial Email Sent ✓";
+                        btn.classList.replace("bg-slate-800", "bg-emerald-600");
+                        showToast("Free 1-Month Trial email sent & logged to CRM!");
+                    } catch (err) {
+                        alert("Email Error: " + err.message);
+                        btn.disabled = false;
+                        btn.innerText = "Send Free Trial Email";
+                    }
+                });
+                return;
+            }
+
+            // ------------------------------------------
+            // STEP 15: BATCH SESSION BOOKING (GOOGLE CALENDAR + MEET)
+            // ------------------------------------------
+            if (currentStep === 15) {
+                const defaultTitle = `1-on-1 Public Speaking Coaching - ${state.client.name || "Client"}`;
+
+                mount.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 15 of 15</span>
+                                <h2 class="text-2xl font-bold text-slate-900 mt-1">Batch Session Booking</h2>
+                                <p class="text-sm text-slate-500 mt-1">Schedule multiple 1-hour coaching sessions (Adelaide time) and send Google Calendar + Google Meet invitations in one click.</p>
+                            </div>
+                            <button id="btn-add-session-row" type="button" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-extrabold px-4 py-2.5 rounded-lg transition-colors">
+                                + Add Session
+                            </button>
+                        </div>
+
+                        <div id="batch-sessions-list" class="space-y-3">
+                            ${state.batchSessions.map((sess, idx) => `
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3.5 items-end">
+                                    <div class="md:col-span-5">
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Session #${idx + 1} Title</label>
+                                        <input type="text" data-sess-idx="${idx}" data-sess-field="title" value="${escapeHtml(sess.title || defaultTitle)}" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-sm">
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Date</label>
+                                        <input type="date" data-sess-idx="${idx}" data-sess-field="date" value="${escapeHtml(sess.date)}" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-sm">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Time (Adelaide)</label>
+                                        <input type="time" data-sess-idx="${idx}" data-sess-field="time" value="${escapeHtml(sess.time || "10:00")}" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-sm">
+                                    </div>
+                                    <div class="md:col-span-2 flex items-center gap-2">
+                                        <div class="flex-1">
+                                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Mins</label>
+                                            <input type="number" data-sess-idx="${idx}" data-sess-field="durationMinutes" value="${sess.durationMinutes || 60}" min="15" step="15" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-sm">
+                                        </div>
+                                        ${state.batchSessions.length > 1 ? `
+                                            <button type="button" data-remove-sess="${idx}" title="Remove row" class="mt-5 px-2.5 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs">
+                                                &times;
+                                            </button>
+                                        ` : ""}
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+
+                        <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
+                            <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-slate-800">
+                                &larr; Return to CRM Pipeline
+                            </a>
+                            <button id="btn-send-batch-invites" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3.5 rounded-xl shadow-md text-sm transition-colors">
+                                Send All Calendar &amp; Meet Invites (${state.batchSessions.length})
+                            </button>
+                        </div>
+
+                        <div id="batch-booking-results" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-900 space-y-2"></div>
+                    </div>
+                `;
+
+                document.getElementById("btn-add-session-row").addEventListener("click", () => {
+                    const last = state.batchSessions[state.batchSessions.length - 1];
+                    let nextDate = "";
+                    if (last?.date) {
+                        const d = new Date(last.date + "T00:00:00");
+                        d.setDate(d.getDate() + 7);
+                        nextDate = d.toISOString().slice(0, 10);
+                    }
+                    state.batchSessions.push({
+                        title: defaultTitle,
+                        date: nextDate,
+                        time: last?.time || "10:00",
+                        durationMinutes: last?.durationMinutes || 60
+                    });
+                    renderCurrentStep();
+                });
+
+                mount.querySelectorAll("[data-sess-idx]").forEach(inp => {
+                    inp.addEventListener("input", (e) => {
+                        const idx = Number(e.target.getAttribute("data-sess-idx"));
+                        const field = e.target.getAttribute("data-sess-field");
+                        state.batchSessions[idx][field] = e.target.value;
+                    });
+                });
+
+                mount.querySelectorAll("[data-remove-sess]").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const idx = Number(btn.getAttribute("data-remove-sess"));
+                        state.batchSessions.splice(idx, 1);
+                        renderCurrentStep();
+                    });
+                });
+
+                document.getElementById("btn-send-batch-invites").addEventListener("click", async (e) => {
+                    if (!state.client.email) {
+                        alert("Client email is required.");
+                        return;
+                    }
+
+                    const prepared = [];
+                    for (let i = 0; i < state.batchSessions.length; i++) {
+                        const s = state.batchSessions[i];
+                        if (!s.date || !s.time) {
+                            alert(`Please select both a date and time for Session #${i + 1}.`);
+                            return;
+                        }
+                        const localIso = new Date(`${s.date}T${s.time}:00`).toISOString();
+                        prepared.push({
+                            title: s.title || defaultTitle,
+                            startIso: localIso,
+                            durationMinutes: Number(s.durationMinutes) || 60
+                        });
+                    }
+
+                    const btn = e.currentTarget;
+                    const origText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = "Creating Calendar & Meet Invites...";
+
+                    try {
+                        const idToken = await currentUser.getIdToken();
+                        const res = await fetch("/api/onboarding-actions", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                action: "batch_book_sessions",
+                                clientEmail: state.client.email,
+                                clientName: state.client.name || state.client.email,
+                                sessions: prepared
+                            })
+                        });
+
+                        const result = await res.json();
+                        if (!res.ok || !result.success) {
+                            throw new Error(result.error || result.message || "Batch booking failed.");
+                        }
+
+                        const box = document.getElementById("batch-booking-results");
+                        box.innerHTML = `
+                            <div class="font-extrabold">Booked ${result.bookedCount} session${result.bookedCount === 1 ? '' : 's'} and emailed Calendar + Google Meet invites!</div>
+                            <ul class="list-disc pl-5 text-xs space-y-1">
+                                ${(result.events || []).map(ev => `
+                                    <li>
+                                        <strong>${escapeHtml(ev.summary)}</strong> — ${new Date(ev.start).toLocaleString('en-AU')}
+                                        ${ev.meetLink ? `(<a href="${escapeHtml(ev.meetLink)}" target="_blank" class="underline font-bold">Google Meet</a>)` : ""}
+                                    </li>
+                                `).join("")}
+                            </ul>
+                        `;
+                        box.classList.remove("hidden");
+                        showToast(`Booked ${result.bookedCount} session(s) to Google Calendar!`);
+                    } catch (err) {
+                        alert("Batch Booking Error: " + err.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = origText;
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // FOOTER & HEADER CONTROLS
+        // ==========================================
+        document.getElementById("btn-prev-step").addEventListener("click", () => goToStep(currentStep - 1));
+        document.getElementById("btn-next-step").addEventListener("click", () => goToStep(currentStep + 1));
+        document.getElementById("btn-footer-save").addEventListener("click", () => downloadJsonPayload(`Step-${currentStep}`));
+        document.getElementById("btn-header-save").addEventListener("click", () => downloadJsonPayload());
+
+        // ==========================================
+        // AUTH GUARD & FIRESTORE CLIENT HYDRATION
+        // ==========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+            if (user.email !== "tom@tomhendrick.com") {
+                alert("Unauthorized Access: Admin privileges required.");
+                await signOut(auth);
+                window.location.href = "login.html";
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                if (state.client.email) {
+                    const snap = await getDoc(doc(db, "Clients", state.client.email));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        state.client.name = data.name || state.client.name;
+                        state.client.driveFolderUrl = data.driveFolderUrl || "";
+                        state.client.driveFolderId = data.driveFolderId || "";
+                    }
+                }
+
+                const labelName = state.client.name || "New Client";
+                const labelEmail = state.client.email ? ` (${state.client.email})` : "";
+                document.getElementById("client-header-subtitle").innerText = `Client: ${labelName}${labelEmail}`;
+
+                document.getElementById("auth-loading").classList.add("hidden");
+                document.getElementById("main-shell").classList.remove("hidden");
+
+                renderSidebar();
+                renderCurrentStep();
+            } catch (err) {
+                console.error("Onboarding init error:", err);
+                document.getElementById("auth-loading").innerText = "Error loading client: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>
