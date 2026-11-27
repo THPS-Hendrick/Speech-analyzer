@@ -6,16 +6,441 @@
     <title>Client Onboarding &amp; Speech Assessment | THPS CRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Speech Analyzer Dependencies (NLP + Engines + Voice Timeline Widget) -->
+    <!-- Speech Analyzer Dependencies (NLP + Audio & Scoring Engines) -->
     <script src="https://cdn.jsdelivr.net/npm/compromise@14.14.3/builds/compromise.min.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/audio-engine-headless.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/nlp-scorer.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/report-scoring-matrix.js"></script>
     <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/engines/thps-mini-core.js"></script>
-    <script src="https://raw.githack.com/THPS-Hendrick/Speech-analyzer/main/widgets/vocal-timeline.js"></script>
+
+    <!-- Inline ThpsVoiceTimeline Custom Element (Guarantees Registration & Crisp Canvas Redraw) -->
+    <script>
+        if (!customElements.get('thps-voice-timeline')) {
+            class ThpsVoiceTimeline extends HTMLElement {
+                constructor() {
+                    super();
+                }
+
+                connectedCallback() {
+                    this.innerHTML = `
+                        <style>
+                            .custom-scrollbar::-webkit-scrollbar { height: 14px; }
+                            .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+                            .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 4px solid #f8fafc; }
+                            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; border: 3px solid #f8fafc; }
+                        </style>
+                        <div class="glass-panel p-5 sm:p-6 rounded-2xl border border-slate-200 border-t-4 border-t-indigo-500 shadow-sm flex flex-col bg-white relative w-full">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-0.5">
+                                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Voice Timeline</h3>
+                                        <span id="overall-variety-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-100 text-slate-500 border-slate-200">Wait</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400">Measures pause, volume &amp; pace variety</p>
+                                </div>
+                                <span id="timeline-owner-pill" class="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600"></span>
+                            </div>
+
+                            <div class="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-slate-200 bg-slate-50 pb-1 custom-scrollbar relative" id="thps-scroll-wrapper">
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none thps-vg-placeholder z-50">
+                                    <span class="text-slate-300 text-[10px] font-bold uppercase tracking-widest bg-slate-800/85 px-4 py-2 rounded-lg backdrop-blur-sm border border-slate-700/50">Waiting for Audio Recording...</span>
+                                </div>
+
+                                <div class="thps-sync-track relative flex flex-col" style="min-width: 100%;">
+                                    <div class="thps-time-axis relative w-full h-7 border-b border-slate-700/50 bg-slate-800/90 shrink-0"></div>
+
+                                    <div class="w-full h-36 md:h-44 relative shrink-0 bg-slate-900 cursor-crosshair" id="thps-canvas-container">
+                                        <canvas class="thps-vg-canvas absolute inset-0 w-full h-full"></canvas>
+                                    </div>
+
+                                    <div class="thps-staff-words relative w-full h-[120px] bg-slate-50 shrink-0 overflow-hidden">
+                                        <div class="absolute inset-0 flex flex-col justify-evenly py-[10px] pointer-events-none opacity-40 z-0">
+                                            <div class="w-full h-px bg-slate-300"></div>
+                                            <div class="w-full h-px bg-slate-300"></div>
+                                            <div class="w-full h-px bg-slate-300"></div>
+                                            <div class="w-full h-px bg-slate-300"></div>
+                                            <div class="w-full h-px bg-slate-300"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GRAPHS -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                                <div class="flex flex-col">
+                                    <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Pause Var.</h4>
+                                        <span id="badge-pause-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                                    </div>
+                                    <div class="thps-bar-container-pause flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
+                                </div>
+                                <div class="flex flex-col h-full">
+                                    <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Vol Var.</h4>
+                                        <span id="badge-voice-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                                    </div>
+                                    <div class="thps-bar-container-voice flex-1 flex items-end"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="flex justify-between items-end border-b border-slate-200 pb-1 mb-2">
+                                        <h4 class="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Pace Var.</h4>
+                                        <span id="badge-run-var" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100">--%</span>
+                                    </div>
+                                    <div class="thps-bar-container-run flex flex-col gap-1.5 text-[9px] font-medium text-slate-500"></div>
+                                </div>
+                            </div>
+
+                            <!-- TELEMETRY INSPECTOR -->
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col w-full h-[96px]">
+                                <div class="w-full h-full bg-slate-800 rounded-xl p-4 flex flex-col justify-center relative overflow-hidden shadow-inner">
+                                    <div id="timeline-telemetry-content" class="w-full h-full flex flex-col justify-center">
+                                        <span class="text-xs font-mono text-slate-400">Click a word, pause bar, or colored run to view acoustic data.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                formatTimeCode(seconds) {
+                    const m = Math.floor(seconds / 60);
+                    const s = Math.floor(seconds % 60);
+                    const ms = Math.floor((seconds % 1) * 100);
+                    return `00:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+                }
+
+                calculateVariety(countsObj, ignoreKeys = []) {
+                    let total = 0;
+                    let max = 0;
+                    for (const [k, v] of Object.entries(countsObj)) {
+                        if (ignoreKeys.includes(k)) continue;
+                        let val = v || 0;
+                        total += val;
+                        if (val > max) max = val;
+                    }
+                    if (total < 3) return { label: 'N/A', pctStr: '', color: 'bg-slate-200 text-slate-500 border-slate-300', score: 0 };
+                    let spreadPct = ((total - max) / total) * 100;
+                    let pctStr = Math.round(spreadPct) + '%';
+                    if (spreadPct < 50) return { label: 'Low', pctStr, color: 'bg-red-100 text-red-700 border-red-200', score: -1 };
+                    if (spreadPct > 60) return { label: 'High', pctStr, color: 'bg-orange-100 text-orange-700 border-orange-200', score: 1 };
+                    return { label: 'Med', pctStr, color: 'bg-green-100 text-green-700 border-green-200', score: 0 };
+                }
+
+                showWordTelemetry(word, start, t, confidence) {
+                    if (!t) return;
+                    const container = this.querySelector('#timeline-telemetry-content');
+                    let delta = t.actualDurationMs - t.expectedDurationMs;
+                    let sign = delta >= 0 ? '+' : '';
+                    let vol = t.volumeDb !== undefined ? t.volumeDb.toFixed(1) : '--';
+                    let clarityStr = (confidence !== undefined && confidence !== null) ? confidence.toFixed(2) : 'N/A';
+
+                    container.innerHTML = `
+                        <div class="flex items-center text-white text-[13px] font-bold tracking-wide mb-1.5">
+                            ${word} [${t.sylCount}] (${t.paceLabel || 'normal'})
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 gap-y-1 text-slate-400 text-[11px] font-mono">
+                            <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(start)}</span>
+                            <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
+                            <span><strong class="text-slate-300">Duration:</strong> ${t.actualDurationMs}ms [${sign}${delta}]</span>
+                            <span><strong class="text-slate-300">Clarity:</strong> ${clarityStr}</span>
+                        </div>
+                    `;
+                }
+
+                showPauseTelemetry(pause) {
+                    const container = this.querySelector('#timeline-telemetry-content');
+                    let category = "unknown", range = "";
+                    if (pause.duration < 0.350) { category = "micro pause"; range = "< 0.35s"; }
+                    else if (pause.duration < 0.700) { category = "short pause"; range = "0.35s to 0.70s"; }
+                    else if (pause.duration < 1.200) { category = "medium pause"; range = "0.70s to 1.20s"; }
+                    else if (pause.duration < 1.700) { category = "long pause"; range = "1.20s to 1.70s"; }
+                    else if (pause.duration < 2.200) { category = "very long pause"; range = "1.70s to 2.20s"; }
+                    else { category = "extreme pause"; range = "> 2.20s"; }
+
+                    let vol = pause.volumeDb !== undefined ? pause.volumeDb.toFixed(1) : '--';
+                    container.innerHTML = `
+                        <div class="flex items-center text-[13px] font-bold tracking-wide mb-1.5" style="color: ${pause.color}">
+                            ${category} (${range})
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+                            <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(pause.start)}</span>
+                            <span><strong class="text-slate-300">Vol Avg:</strong> ${vol} dB</span>
+                            <span><strong class="text-slate-300">Duration:</strong> ${Math.round(pause.duration * 1000)}ms</span>
+                        </div>
+                    `;
+                }
+
+                showRunTelemetry(rp) {
+                    if (!rp) return;
+                    const container = this.querySelector('#timeline-telemetry-content');
+                    container.innerHTML = `
+                        <div class="flex items-center text-[13px] font-bold tracking-wide mb-1.5" style="color: ${rp.color}">
+                            Run ${rp.id} [${rp.duration.toFixed(2)} secs] (${rp.label})
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 text-slate-400 text-[11px] font-mono">
+                            <span><strong class="text-slate-300">Start:</strong> ${this.formatTimeCode(rp.start)}</span>
+                            <span><strong class="text-slate-300">Wpm:</strong> ${rp.wpm}</span>
+                            <span><strong class="text-slate-300">Sps:</strong> ${rp.sps}</span>
+                        </div>
+                    `;
+                }
+
+                resetEmpty(ownerLabel = '') {
+                    const pill = this.querySelector('#timeline-owner-pill');
+                    if (pill) pill.innerText = ownerLabel;
+
+                    const placeholder = this.querySelector('.thps-vg-placeholder');
+                    if (placeholder) placeholder.style.display = 'flex';
+
+                    const overallEl = this.querySelector('#overall-variety-badge');
+                    if (overallEl) {
+                        overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-100 text-slate-500 border-slate-200';
+                        overallEl.innerText = 'Wait';
+                    }
+
+                    ['#badge-pause-var', '#badge-voice-var', '#badge-run-var'].forEach(id => {
+                        const el = this.querySelector(id);
+                        if (el) {
+                            el.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-50 text-slate-400 border-slate-100';
+                            el.innerText = '--%';
+                        }
+                    });
+
+                    const axis = this.querySelector('.thps-time-axis');
+                    if (axis) axis.innerHTML = '';
+
+                    const canvas = this.querySelector('.thps-vg-canvas');
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    }
+
+                    const staff = this.querySelector('.thps-staff-words');
+                    if (staff) staff.querySelectorAll('.staff-item').forEach(el => el.remove());
+
+                    ['.thps-bar-container-pause', '.thps-bar-container-voice', '.thps-bar-container-run'].forEach(sel => {
+                        const c = this.querySelector(sel);
+                        if (c) c.innerHTML = '';
+                    });
+                }
+
+                update(data, ownerLabel = '') {
+                    const pill = this.querySelector('#timeline-owner-pill');
+                    if (pill && ownerLabel) pill.innerText = ownerLabel;
+
+                    if (!data || !data.wordTimestamps || data.wordTimestamps.length === 0) {
+                        this.resetEmpty(ownerLabel);
+                        return;
+                    }
+
+                    this.querySelector('.thps-vg-placeholder').style.display = 'none';
+
+                    const duration = Math.max(data.time || 1, Math.ceil(data.wordTimestamps[data.wordTimestamps.length - 1].end));
+                    const PIXELS_PER_SEC = 50;
+                    const scrollWrapper = this.querySelector('#thps-scroll-wrapper');
+                    const track = this.querySelector('.thps-sync-track');
+
+                    const wrapperWidth = scrollWrapper.clientWidth || 800;
+                    const trackWidth = Math.max(duration * PIXELS_PER_SEC, wrapperWidth);
+                    track.style.width = `${trackWidth}px`;
+
+                    const canvas = this.querySelector('.thps-vg-canvas');
+                    const canvasContainer = this.querySelector('#thps-canvas-container');
+                    const axis = this.querySelector('.thps-time-axis');
+                    const staff = this.querySelector('.thps-staff-words');
+
+                    const pauseEvents = data.pauseEvents || [];
+                    const runPaces = data.runPaces || [];
+
+                    const rawPauseBuckets = data.pauseBuckets || {};
+                    const pauseCounts = {
+                        short: rawPauseBuckets.short || rawPauseBuckets.orange || 0,
+                        medium: rawPauseBuckets.medium || rawPauseBuckets.green || 0,
+                        long: rawPauseBuckets.long || rawPauseBuckets.blue || 0,
+                        vLong: rawPauseBuckets.vLong || rawPauseBuckets.red || 0,
+                        extreme: rawPauseBuckets.extreme || 0
+                    };
+
+                    const voiceCounts = data.volumeBuckets || { vLow: 0, low: 0, norm: 0, high: 0, vHigh: 0 };
+                    const runCounts = data.runBuckets || { vFast: 0, fast: 0, norm: 0, slow: 0, vSlow: 0 };
+                    const validChunks = data.volumeChunks || [];
+
+                    const pauseVar = this.calculateVariety(pauseCounts);
+                    const voiceVar = this.calculateVariety(voiceCounts);
+                    const paceVar = this.calculateVariety(runCounts);
+
+                    const setBadge = (id, result) => {
+                        const el = this.querySelector(id);
+                        if (el) {
+                            el.className = `text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border ${result.color}`;
+                            el.innerText = result.pctStr ? `${result.label} ${result.pctStr}` : result.label;
+                        }
+                    };
+
+                    setBadge('#badge-pause-var', pauseVar);
+                    setBadge('#badge-voice-var', voiceVar);
+                    setBadge('#badge-run-var', paceVar);
+
+                    let totalScore = pauseVar.score + voiceVar.score + paceVar.score;
+                    let overallEl = this.querySelector('#overall-variety-badge');
+
+                    if (pauseVar.score === 0 && voiceVar.score === 0 && paceVar.score === 0 && pauseVar.label === 'N/A') {
+                        overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-slate-200 text-slate-500 border-slate-300';
+                        overallEl.innerText = 'N/A';
+                    } else if (totalScore <= -2) {
+                        overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-red-100 text-red-700 border-red-200';
+                        overallEl.innerText = 'Low Variety';
+                    } else if (totalScore >= 2) {
+                        overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-orange-100 text-orange-700 border-orange-200';
+                        overallEl.innerText = 'High Variety';
+                    } else {
+                        overallEl.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border bg-green-100 text-green-700 border-green-200';
+                        overallEl.innerText = 'Med Variety';
+                    }
+
+                    // 1. TIME AXIS
+                    axis.innerHTML = '';
+                    for (let i = 0; i <= duration; i++) {
+                        let xPos = i * PIXELS_PER_SEC;
+                        if (i % 5 === 0) {
+                            let label = document.createElement('span');
+                            label.className = 'absolute top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold -translate-x-1/2 select-none';
+                            label.style.left = `${xPos}px`;
+                            label.innerText = `${i}s`;
+                            axis.appendChild(label);
+                        } else {
+                            let tick = document.createElement('div');
+                            tick.className = 'absolute bottom-0 border-l border-slate-500/50 h-2';
+                            tick.style.left = `${xPos}px`;
+                            axis.appendChild(tick);
+                        }
+                    }
+
+                    // 2. VOLUME WAVEFORM CANVAS
+                    const canvasHeight = canvasContainer.clientHeight || 160;
+                    canvas.width = trackWidth * 2;
+                    canvas.height = canvasHeight * 2;
+                    const ctx = canvas.getContext('2d');
+                    ctx.scale(2, 2);
+                    ctx.clearRect(0, 0, trackWidth, canvasHeight);
+
+                    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                    ctx.lineWidth = 1;
+                    for (let i = 0; i < duration; i += 3) {
+                        let x = i * PIXELS_PER_SEC;
+                        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasHeight); ctx.stroke();
+                    }
+
+                    validChunks.forEach(vc => {
+                        if (vc.type === 'pause' || !vc.color) return;
+                        let x = vc.start * PIXELS_PER_SEC;
+                        let w = Math.max(2, (vc.end - vc.start) * PIXELS_PER_SEC);
+                        let h = vc.hPct * canvasHeight;
+                        let y = canvasHeight - h;
+
+                        ctx.fillStyle = vc.color;
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = vc.color;
+                        ctx.fillRect(x, y, w - 1, h);
+                        ctx.shadowBlur = 0;
+                    });
+
+                    // 3. SPEECH STAFF (WORDS, PACE RUNS, PAUSE BLOCKS)
+                    staff.querySelectorAll('.staff-item').forEach(el => el.remove());
+
+                    runPaces.forEach(rp => {
+                        const bar = document.createElement('div');
+                        bar.className = 'staff-item absolute opacity-20 hover:opacity-40 cursor-pointer rounded-sm z-0 transition-all';
+                        bar.style.backgroundColor = rp.color;
+                        bar.style.left = `${rp.start * PIXELS_PER_SEC}px`;
+                        bar.style.width = `${rp.width * PIXELS_PER_SEC}px`;
+                        bar.style.top = `${rp.row * 20}%`;
+                        bar.style.height = '20%';
+                        bar.onclick = () => this.showRunTelemetry(rp);
+                        staff.appendChild(bar);
+                    });
+
+                    data.wordTimestamps.forEach((w, index) => {
+                        const span = document.createElement('span');
+                        span.innerText = w.word;
+                        const xPos = w.start * PIXELS_PER_SEC;
+                        const row = index % 5;
+                        const paceColor = w.telemetry && w.telemetry.paceColor ? w.telemetry.paceColor : '#334155';
+
+                        span.className = 'staff-item absolute text-[9px] px-1 py-0.5 bg-white font-bold rounded border border-slate-200 shadow-sm whitespace-nowrap z-10 hover:bg-slate-50 hover:z-20 hover:scale-110 transition-all cursor-pointer';
+                        span.style.color = paceColor;
+                        span.style.left = `${xPos}px`;
+                        span.style.top = `calc(${row * 20}% + 4px)`;
+                        span.onclick = () => this.showWordTelemetry(w.word, w.start, w.telemetry, w.confidence);
+                        staff.appendChild(span);
+                    });
+
+                    pauseEvents.forEach((p) => {
+                        const block = document.createElement('div');
+                        block.className = 'staff-item absolute rounded shadow-sm z-0 hover:brightness-110 transition-all cursor-pointer border border-black/10';
+                        block.style.backgroundColor = p.color;
+                        block.style.left = `${p.start * PIXELS_PER_SEC}px`;
+                        block.style.width = `${p.duration * PIXELS_PER_SEC}px`;
+                        block.style.top = 'calc(40% + 4px)';
+                        block.style.height = '16px';
+                        block.onclick = () => this.showPauseTelemetry(p);
+                        staff.appendChild(block);
+                    });
+
+                    // 4. VARIETY BAR CHARTS
+                    const drawHorizontalBars = (containerClass, countsObj, labels, colors) => {
+                        const container = this.querySelector(containerClass);
+                        container.innerHTML = '';
+                        const maxVal = Math.max(...Object.values(countsObj), 1);
+                        Object.keys(countsObj).forEach((key, idx) => {
+                            const count = countsObj[key];
+                            const widthPct = Math.max(5, (count / maxVal) * 100);
+                            container.innerHTML += `
+                                <div class="flex items-center gap-2">
+                                    <span class="w-12 text-right">${labels[idx]}:</span>
+                                    <div class="flex-1 h-3 bg-slate-100 rounded-sm overflow-hidden">
+                                        <div class="h-full rounded-sm ${colors[idx]}" style="width: ${widthPct}%"></div>
+                                    </div>
+                                    <span class="w-4 font-bold text-slate-700">${count}</span>
+                                </div>
+                            `;
+                        });
+                    };
+
+                    const drawVerticalBars = (containerClass, countsObj, labels, colors) => {
+                        const container = this.querySelector(containerClass);
+                        container.innerHTML = '<div class="flex items-end justify-between w-full h-full pt-1 pb-1"></div>';
+                        const wrapper = container.firstElementChild;
+                        const maxVal = Math.max(...Object.values(countsObj), 1);
+                        Object.keys(countsObj).forEach((key, idx) => {
+                            const count = countsObj[key];
+                            const heightPct = Math.max(5, (count / maxVal) * 100);
+                            wrapper.innerHTML += `
+                                <div class="flex flex-col items-center justify-end gap-1 flex-1 h-full">
+                                    <span class="text-[9px] font-bold text-slate-700">${count}</span>
+                                    <div class="w-3 sm:w-4 h-16 bg-slate-100 rounded-sm flex flex-col justify-end overflow-hidden">
+                                        <div class="w-full rounded-sm ${colors[idx]}" style="height: ${heightPct}%"></div>
+                                    </div>
+                                    <span class="text-[8px] text-slate-500">${labels[idx] || ''}</span>
+                                </div>
+                            `;
+                        });
+                    };
+
+                    drawHorizontalBars('.thps-bar-container-pause', pauseCounts, ['0.35s', '0.70s', '1.2s', '1.7s', '2.2s+'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+
+                    const mirroredVolCounts = { vHigh: voiceCounts.vHigh, high: voiceCounts.high, norm: voiceCounts.norm, low: voiceCounts.low, vLow: voiceCounts.vLow };
+                    const mirroredVolLabels = data.volumeLabels ? [...data.volumeLabels].reverse() : ['> -20dB', '-20dB', '-30dB', '-40dB', '< -40dB'];
+                    drawVerticalBars('.thps-bar-container-voice', mirroredVolCounts, mirroredVolLabels, ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+
+                    drawHorizontalBars('.thps-bar-container-run', runCounts, ['>4.9sps', '4.6sps', '4.0sps', '3.5sps', '<3.1sps'], ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-purple-500']);
+                }
+            }
+            customElements.define('thps-voice-timeline', ThpsVoiceTimeline);
+        }
+    </script>
 
     <style>
-        /* Horizontal Phantasia Dial Styling */
         .phantasia-dial::-webkit-scrollbar { height: 8px; }
         .phantasia-dial::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 9999px; }
         .phantasia-dial::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 9999px; }
@@ -496,6 +921,17 @@
             });
         }
 
+        function refreshActiveVoiceTimeline() {
+            const timelineEl = document.getElementById("vocal-timeline-widget");
+            if (!timelineEl || typeof timelineEl.update !== "function") return;
+
+            if (activeTimelineTab === "demo") {
+                timelineEl.update(state.vocalInhibition.demoPayload, "Tom's Benchmark Demo");
+            } else {
+                timelineEl.update(state.vocalInhibition.clientPayload, "Client's Attempt");
+            }
+        }
+
         // ==========================================
         // SPEECH ENGINE TELEMETRY ROUTING
         // ==========================================
@@ -544,13 +980,11 @@
         function triggerContextRecording(ctxObj) {
             if (window.thps_isProcessing) return;
 
-            // If currently recording, stop it
             if (window.isActive) {
                 if (typeof window.toggleRecording === "function") window.toggleRecording();
                 return;
             }
 
-            // Start new recording tagged to ctxObj
             activeRecordingContext = ctxObj;
             if (typeof window.toggleRecording === "function") {
                 window.toggleRecording();
@@ -564,7 +998,6 @@
             const isRec = Boolean(window.isActive && window.THPS?.Audio?.recordStartTime);
             const elapsed = isRec ? (Date.now() - window.THPS.Audio.recordStartTime) / 1000 : 0;
 
-            // Step 3 Vocal Timers
             if (currentStep === 3) {
                 const demoBtn = document.getElementById("btn-rec-vocal-demo");
                 const clientBtn = document.getElementById("btn-rec-vocal-client");
@@ -581,7 +1014,11 @@
 
                 if (demoBtn) {
                     const activeDemo = isRec && activeRecordingContext?.type === "vocal_demo";
-                    demoBtn.innerText = activeDemo ? "Stop Tom Demo" : "Record Tom Demo";
+                    if (window.thps_isProcessing && !isRec) {
+                        demoBtn.innerText = "Processing...";
+                    } else {
+                        demoBtn.innerText = activeDemo ? "Stop Tom Demo" : "Record Tom Demo";
+                    }
                     demoBtn.className = activeDemo
                         ? "px-4 py-2.5 rounded-lg bg-rose-600 text-white font-bold text-xs shadow animate-pulse"
                         : "px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow";
@@ -589,14 +1026,17 @@
 
                 if (clientBtn) {
                     const activeClient = isRec && activeRecordingContext?.type === "vocal_client";
-                    clientBtn.innerText = activeClient ? "Stop Client Attempt" : "Record Client Attempt";
+                    if (window.thps_isProcessing && !isRec) {
+                        clientBtn.innerText = "Processing...";
+                    } else {
+                        clientBtn.innerText = activeClient ? "Stop Client Attempt" : "Record Client Attempt";
+                    }
                     clientBtn.className = activeClient
                         ? "px-4 py-2.5 rounded-lg bg-rose-600 text-white font-bold text-xs shadow animate-pulse"
                         : "px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow";
                 }
             }
 
-            // Steps 5 & 6 Image Prompt 80s Progress Bars (20s = 25%, 60s = 75%)
             if (currentStep === 5 || currentStep === 6) {
                 const slotKey = currentStep === 5 ? "image1" : "image2";
                 const bar = document.getElementById("img-progress-bar");
@@ -791,7 +1231,7 @@
             }
 
             // ------------------------------------------
-            // STEP 3: VOCAL INHIBITION TEST (PACINO + DUAL TIMELINES)
+            // STEP 3: VOCAL INHIBITION TEST (PACINO + TOGGLEABLE VOICE TIMELINE)
             // ------------------------------------------
             if (currentStep === 3) {
                 const intensityStyle = (lvl) => {
@@ -809,7 +1249,7 @@
                                 <div>
                                     <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 3 of 15</span>
                                     <h2 class="text-2xl font-bold text-slate-900 mt-1">Vocal Inhibition Test — Al Pacino (Any Given Sunday)</h2>
-                                    <p class="text-sm text-slate-500">Demonstrate the 1–5 sound changes first, then record the client's attempt and compare both timelines.</p>
+                                    <p class="text-sm text-slate-500">Demonstrate the 1–5 sound changes first, then record the client's attempt and toggle between timelines.</p>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <span id="vocal-live-timer" class="text-2xl font-mono font-black text-slate-800">00:00</span>
@@ -834,33 +1274,21 @@
                                 `).join("")}
                             </div>
 
-                            <!-- Dual Vocal Timelines (Tom Demo vs Client Attempt) -->
+                            <!-- Single Full-Width Voice Timeline with Toggle Redraw (Tom Demo vs Client Attempt) -->
                             <div class="space-y-3">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
-                                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600">Vocal Timelines Comparison</h3>
+                                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600">Vocal Timeline Comparison</h3>
                                     <div class="inline-flex rounded-lg bg-slate-200 p-1 text-xs font-bold">
-                                        <button type="button" data-tl-tab="demo" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'demo' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}">
+                                        <button type="button" data-tl-tab="demo" class="px-4 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'demo' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
                                             Tom's Demo ${state.vocalInhibition.demoPayload ? '✓' : ''}
                                         </button>
-                                        <button type="button" data-tl-tab="client" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'client' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600'}">
+                                        <button type="button" data-tl-tab="client" class="px-4 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'client' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
                                             Client's Attempt ${state.vocalInhibition.clientPayload ? '✓' : ''}
-                                        </button>
-                                        <button type="button" data-tl-tab="both" class="px-3 py-1.5 rounded-md transition-colors ${activeTimelineTab === 'both' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600'}">
-                                            Compare Both
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 ${activeTimelineTab === 'both' ? 'lg:grid-cols-2' : ''} gap-4">
-                                    <div class="${activeTimelineTab === 'client' ? 'hidden' : ''}">
-                                        <div class="text-xs font-bold text-slate-600 mb-1.5">Tom's Benchmark Demonstration</div>
-                                        <thps-voice-timeline id="tl-demo-widget"></thps-voice-timeline>
-                                    </div>
-                                    <div class="${activeTimelineTab === 'demo' ? 'hidden' : ''}">
-                                        <div class="text-xs font-bold text-indigo-700 mb-1.5">Client's Attempt</div>
-                                        <thps-voice-timeline id="tl-client-widget"></thps-voice-timeline>
-                                    </div>
-                                </div>
+                                <thps-voice-timeline id="vocal-timeline-widget"></thps-voice-timeline>
                             </div>
 
                             <!-- Notes + 1-5 Delivery Check Buttons -->
@@ -889,16 +1317,9 @@
                     </div>
                 `;
 
-                // Hydrate the two isolated Vocal Timeline widgets after custom elements upgrade
+                // Render/redraw the Voice Timeline immediately for the active tab
                 requestAnimationFrame(() => {
-                    const demoEl = document.getElementById("tl-demo-widget");
-                    const clientEl = document.getElementById("tl-client-widget");
-                    if (demoEl && typeof demoEl.update === "function" && state.vocalInhibition.demoPayload) {
-                        demoEl.update(state.vocalInhibition.demoPayload);
-                    }
-                    if (clientEl && typeof clientEl.update === "function" && state.vocalInhibition.clientPayload) {
-                        clientEl.update(state.vocalInhibition.clientPayload);
-                    }
+                    refreshActiveVoiceTimeline();
                 });
 
                 document.getElementById("btn-rec-vocal-demo").addEventListener("click", () => {
@@ -911,7 +1332,17 @@
                 mount.querySelectorAll("[data-tl-tab]").forEach(btn => {
                     btn.addEventListener("click", () => {
                         activeTimelineTab = btn.getAttribute("data-tl-tab");
-                        renderCurrentStep();
+                        mount.querySelectorAll("[data-tl-tab]").forEach(b => {
+                            const tab = b.getAttribute("data-tl-tab");
+                            if (tab === activeTimelineTab) {
+                                b.className = tab === "demo"
+                                    ? "px-4 py-1.5 rounded-md transition-colors bg-slate-900 text-white shadow-sm"
+                                    : "px-4 py-1.5 rounded-md transition-colors bg-indigo-600 text-white shadow-sm";
+                            } else {
+                                b.className = "px-4 py-1.5 rounded-md transition-colors text-slate-600 hover:text-slate-900";
+                            }
+                        });
+                        refreshActiveVoiceTimeline();
                     });
                 });
 
@@ -944,7 +1375,6 @@
                             <p class="text-sm text-slate-500 mt-1">Scroll or drag the dial horizontally from 0 to 100 to classify their mental imagery vividness.</p>
                         </div>
 
-                        <!-- Live Classification Card -->
                         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-2">
                             <div class="text-5xl font-black text-slate-900" id="phantasia-score-readout">${score}</div>
                             <div>
@@ -955,11 +1385,9 @@
                             <p id="phantasia-band-desc" class="text-xs text-slate-500 pt-1">${band.desc}</p>
                         </div>
 
-                        <!-- Horizontal Scroll / Drag Dial -->
                         <div class="space-y-3">
                             <input id="phantasia-range" type="range" min="0" max="100" value="${score}" class="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
 
-                            <!-- Horizontally Scrollable Quick-Pick Ruler (0 to 100) -->
                             <div id="phantasia-ruler" class="phantasia-dial flex items-center gap-1.5 overflow-x-auto py-3 px-2 bg-slate-100 rounded-xl border border-slate-200">
                                 ${Array.from({ length: 101 }, (_, n) => {
                                     let bandTint = "border-slate-300 text-slate-700";
@@ -1019,7 +1447,6 @@
                     btn.addEventListener("click", () => setPhantasiaVal(btn.getAttribute("data-ph-val")));
                 });
 
-                // Center active tick in horizontal ruler
                 requestAnimationFrame(() => {
                     const activeBtn = mount.querySelector(`[data-ph-val="${score}"]`);
                     if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
@@ -1054,7 +1481,6 @@
                                 </p>
                             </div>
 
-                            <!-- Live Metric Pills -->
                             <div class="flex items-center gap-2.5">
                                 <span id="pill-img-time" class="px-3.5 py-2 rounded-full bg-amber-100 text-amber-800 font-extrabold text-xs tracking-wider">${slot.time}s TIME</span>
                                 <span class="px-3.5 py-2 rounded-full bg-indigo-100 text-indigo-800 font-extrabold text-xs tracking-wider">${slot.wpm} WPM</span>
@@ -1062,7 +1488,6 @@
                             </div>
                         </div>
 
-                        <!-- Prompt Visual (House Image vs Black Rectangle) -->
                         ${isFirst ? `
                             <div class="w-full h-72 md:h-96 bg-slate-200 rounded-2xl overflow-hidden border border-slate-300 shadow-inner">
                                 <img src="${HOUSE_IMAGE_URL}" alt="Dilapidated House Prompt" class="w-full h-full object-cover">
@@ -1073,18 +1498,15 @@
                             </div>
                         `}
 
-                        <!-- 80s Progress Bar with 20s & 60s Timer Indicators -->
                         <div class="max-w-xl mx-auto">
                             <div class="relative h-16 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center shadow-inner">
                                 <div id="img-progress-bar" class="absolute top-0 bottom-0 left-0 bg-rose-600 w-0 transition-all duration-75"></div>
 
-                                <!-- 20s Indicator (25% of 80s) -->
                                 <div class="absolute top-0 bottom-0 flex flex-col items-center justify-between py-1.5 z-10 pointer-events-none" style="left: 25%; transform: translateX(-50%);">
                                     <span id="img-star-20" class="text-slate-400 font-bold text-xs">★ 20s</span>
                                     <div class="w-0.5 flex-1 bg-amber-400/60 my-0.5"></div>
                                 </div>
 
-                                <!-- 60s Indicator (75% of 80s) -->
                                 <div class="absolute top-0 bottom-0 flex flex-col items-center justify-between py-1.5 z-10 pointer-events-none" style="left: 75%; transform: translateX(-50%);">
                                     <span id="img-star-60" class="text-slate-400 font-bold text-xs">★ 60s</span>
                                     <div class="w-0.5 flex-1 bg-emerald-400/70 my-0.5"></div>
@@ -1127,7 +1549,6 @@
                             <h2 class="text-2xl font-bold text-slate-900 mt-1">${escapeHtml(roundCfg.title)}</h2>
                         </div>
 
-                        <!-- Specific Rule Instructions Banner -->
                         <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4">
                             <span class="block text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2">Rules for Round ${roundCfg.round}</span>
                             <ul class="space-y-1.5">
@@ -1140,7 +1561,6 @@
                             </ul>
                         </div>
 
-                        <!-- 5 Questions with 3 Tick Boxes Each -->
                         <div class="space-y-3.5">
                             ${roundState.items.map((item, idx) => `
                                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1195,7 +1615,6 @@
 
                 mount.innerHTML = `
                     <div class="space-y-6">
-                        <!-- Top Action Bar (Upload JSON, Print PDF, Drive Sync) -->
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-wrap items-center justify-between gap-4 no-print">
                             <div>
                                 <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Step 13 of 15</span>
@@ -1228,7 +1647,6 @@
                             </div>
                         </div>
 
-                        <!-- Hydrated Results Dashboard -->
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6 print-card">
                             <div class="border-b border-slate-200 pb-4 flex flex-wrap justify-between items-end gap-2">
                                 <div>
@@ -1240,7 +1658,6 @@
                                 </span>
                             </div>
 
-                            <!-- 1. Challenges & Opportunities -->
                             <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
                                 <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">1. Challenges &amp; Opportunities</h4>
                                 <div class="flex flex-wrap gap-1.5 mb-2">
@@ -1251,7 +1668,6 @@
                                 <p class="text-sm text-slate-700 whitespace-pre-wrap">${escapeHtml(state.challenges.notes || "No notes recorded.")}</p>
                             </div>
 
-                            <!-- 2. Nerve Assessment -->
                             <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
                                 <div class="flex justify-between items-center mb-3">
                                     <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. Nerve Assessment</h4>
@@ -1274,7 +1690,6 @@
                                 </div>
                             </div>
 
-                            <!-- 3. Vocal Inhibition + 4. Phantasia -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
                                     <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">3. Vocal Inhibition</h4>
@@ -1297,7 +1712,6 @@
                                 </div>
                             </div>
 
-                            <!-- 5. Image Prompts Summary -->
                             <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
                                 <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">5. Image Prompt Tests</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1314,7 +1728,6 @@
                                 </div>
                             </div>
 
-                            <!-- 6. Rule Prompts Matrix (Rounds 1–6) -->
                             <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print-card">
                                 <div class="flex justify-between items-center mb-3">
                                     <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">6. Rule Prompts (6 Rounds)</h4>
@@ -1355,7 +1768,6 @@
                     </div>
                 `;
 
-                // Upload & hydrate JSON files
                 document.getElementById("input-hydrate-json").addEventListener("change", async (e) => {
                     const files = Array.from(e.target.files || []);
                     if (files.length === 0) return;
@@ -1381,7 +1793,6 @@
 
                 document.getElementById("btn-print-results").addEventListener("click", () => window.print());
 
-                // Generate Drive (if needed) & upload JSON directly
                 document.getElementById("btn-sync-drive-json").addEventListener("click", async (e) => {
                     if (!state.client.email) {
                         alert("Client email is required to sync to Google Drive.");
@@ -1442,7 +1853,6 @@
                             <p class="text-sm text-slate-500 mt-1">Choose the option the client selects to send their DIY trial login or open an editable Quick Invoice &amp; Stripe checkout.</p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
-                                <!-- Option 1: FREE 1 Month Trial -->
                                 <div class="border-2 border-slate-200 rounded-2xl p-6 flex flex-col justify-between bg-slate-50">
                                     <div>
                                         <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 mb-3">
@@ -1461,7 +1871,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Option 2: $990 Most Popular -->
                                 <div class="border-2 border-indigo-600 rounded-2xl p-6 flex flex-col justify-between bg-indigo-50/40 shadow-md relative">
                                     <div>
                                         <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-600 text-white mb-3">
@@ -1480,7 +1889,6 @@
                                     </a>
                                 </div>
 
-                                <!-- Option 3: $2475 -> $1990 Best Value -->
                                 <div class="border-2 border-emerald-600 rounded-2xl p-6 flex flex-col justify-between bg-emerald-50/40 shadow-md">
                                     <div>
                                         <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-600 text-white mb-3">
